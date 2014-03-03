@@ -1,0 +1,473 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{124F8C50-D4C4-4727-8237-24CD2D06577C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sconit_CS</RootNamespace>
+    <AssemblyName>Sconit_CS</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <ApplicationIcon>favicon1.ico</ApplicationIcon>
+    <ManifestCertificateThumbprint>44E194118AD426484A835CFE2B3A35FDE2BC464E</ManifestCertificateThumbprint>
+    <ManifestKeyFile>Sconit_CS_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>true</SignManifests>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <PublishUrl>D:\TEMP\Sconit_CS\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <InstallUrl>http://192.168.210.147/Sconit/Sconit_CS/</InstallUrl>
+    <TargetCulture>zh-CHS</TargetCulture>
+    <ProductName>SCMS CS</ProductName>
+    <PublisherName>YFK</PublisherName>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>Publish.htm</WebPage>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <ApplicationRevision>89</ApplicationRevision>
+    <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ExternalDLL\Dll Lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BusinessConstants.cs" />
+    <Compile Include="UCBatchDevanning.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCBatchDevanning.Designer.cs">
+      <DependentUpon>UCBatchDevanning.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomDataGridView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="UCBatchDevanning.resx">
+      <DependentUpon>UCBatchDevanning.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCBase.resx">
+      <DependentUpon>UCBase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCInspection.resx">
+      <DependentUpon>UCInspection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCMaterialIn.resx">
+      <DependentUpon>UCMaterialIn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCFlushBack.resx">
+      <DependentUpon>UCFlushBack.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCInspect.resx">
+      <DependentUpon>UCInspect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCInvTransfer.resx">
+      <DependentUpon>UCInvTransfer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCPrintMonitor.resx">
+      <DependentUpon>UCPrintMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCReturn.resx">
+      <DependentUpon>UCReturn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCShip.resx">
+      <DependentUpon>UCShip.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCLogin.resx">
+      <DependentUpon>UCLogin.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCModuleSelection.resx">
+      <DependentUpon>UCModuleSelection.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCOnline.resx">
+      <DependentUpon>UCOnline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCOffline.resx">
+      <DependentUpon>UCOffline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCPickList.resx">
+      <DependentUpon>UCPickList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCPickUp.resx">
+      <DependentUpon>UCPickUp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCPutAway.resx">
+      <DependentUpon>UCPutAway.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCReceipt.resx">
+      <DependentUpon>UCReceipt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCRepack.resx">
+      <DependentUpon>UCRepack.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCDevanning.resx">
+      <DependentUpon>UCDevanning.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCStockTaking.resx">
+      <DependentUpon>UCStockTaking.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\SconitWS\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="UCBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCBase.Designer.cs">
+      <DependentUpon>UCBase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCHuStatus.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCHuStatus.Designer.cs">
+      <DependentUpon>UCHuStatus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCInspection.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCInspection.Designer.cs">
+      <DependentUpon>UCInspection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCMaterialIn.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCMaterialIn.Designer.cs">
+      <DependentUpon>UCMaterialIn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCFlushBack.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCFlushBack.Designer.cs">
+      <DependentUpon>UCFlushBack.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCInspect.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCInspect.Designer.cs">
+      <DependentUpon>UCInspect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCInvTransfer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCInvTransfer.Designer.cs">
+      <DependentUpon>UCInvTransfer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCOfflineHu.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCOfflineHu.Designer.cs">
+      <DependentUpon>UCOfflineHu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCPrintMonitor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCPrintMonitor.Designer.cs">
+      <DependentUpon>UCPrintMonitor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCReturn.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCReturn.Designer.cs">
+      <DependentUpon>UCReturn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCReuse.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCReuse.Designer.cs">
+      <DependentUpon>UCReuse.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCShip.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCShip.Designer.cs">
+      <DependentUpon>UCShip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCLogin.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCLogin.Designer.cs">
+      <DependentUpon>UCLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCModuleSelection.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCModuleSelection.Designer.cs">
+      <DependentUpon>UCModuleSelection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCOnline.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCOnline.Designer.cs">
+      <DependentUpon>UCOnline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCOffline.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCOffline.Designer.cs">
+      <DependentUpon>UCOffline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCPickList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCPickList.Designer.cs">
+      <DependentUpon>UCPickList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCPickUp.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCPickUp.Designer.cs">
+      <DependentUpon>UCPickUp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCPutAway.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCPutAway.Designer.cs">
+      <DependentUpon>UCPutAway.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCReceipt.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCReceipt.Designer.cs">
+      <DependentUpon>UCReceipt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCRepack.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCRepack.Designer.cs">
+      <DependentUpon>UCRepack.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCDevanning.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCDevanning.Designer.cs">
+      <DependentUpon>UCDevanning.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UCStockTaking.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCStockTaking.Designer.cs">
+      <DependentUpon>UCStockTaking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Sconit_CS_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+    <Content Include="favicon1.ico" />
+    <None Include="Service References\SconitWS\ClientMgrWS1.disco" />
+    <None Include="Service References\SconitWS\ClientMgrWS1.wsdl" />
+    <None Include="Service References\SconitWS\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\SconitWS\configuration.svcinfo" />
+    <None Include="Service References\SconitWS\configuration91.svcinfo" />
+    <None Include="Service References\SconitWS\ClientMgrWS.disco" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\SconitWS\ClientMgrWS.wsdl" />
+    <None Include="Service References\SconitWS\Sconit_CS.SconitWS.Employee.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\SconitWS\Sconit_CS.SconitWS.Permission.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\SconitWS\Sconit_CS.SconitWS.Resolver.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\SconitWS\Sconit_CS.SconitWS.User.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\SconitWS\Sconit_CS.SconitWS.UserPreference.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\SconitWS\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="Microsoft.Office.Interop.Excel">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="Microsoft.Vbe.Interop">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="office">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="stdole">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

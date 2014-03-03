@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://com.Sconit.Webservice" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://com.Sconit.Webservice" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://com.Sconit.Webservice">
+      <s:element name="LoadEmployee">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="employeeCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LoadEmployeeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LoadEmployeeResult" type="tns:Employee" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Employee">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EmployeeBase" />
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="EmployeeBase" abstract="true">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EntityBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="Code" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Gender" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Department" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="WorkGroup" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Post" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Memo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsActive" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="LastModifyDate" type="s:dateTime" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="EntityBase" abstract="true" />
+      <s:element name="AnalyzeBarcode">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="barcode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="moduleType" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AnalyzeBarcodeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AnalyzeBarcodeResult" type="tns:Resolver" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Resolver">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EntityBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="ModuleType" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="UserCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BarcodeHead" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Code" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Description" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="PickBy" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Input" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BinCode" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsDetailContainHu" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsScanHu" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="NeedPrintAsn" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="NeedPrintReceipt" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="AllowExceed" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsQualified" nillable="true" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="IOType" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Transformers" type="tns:ArrayOfTransformer" />
+              <s:element minOccurs="0" maxOccurs="1" name="WorkingHours" type="tns:ArrayOfArrayOfString" />
+              <s:element minOccurs="0" maxOccurs="1" name="Command" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Result" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfTransformer">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Transformer" nillable="true" type="tns:Transformer" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Transformer">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EntityBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="OrderLocTransId" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="OrderNo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Sequence" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="ItemCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ItemDescription" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ReferenceItemCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="UomCode" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="UnitCount" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocationFrom" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocationTo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="StorageBinCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="LotNo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="OrderedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ShippedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ReceivedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="LocationLotDetId" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="Qty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="CurrentQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="CurrentRejectQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ScrapQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="RejectedQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="Cartons" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="TransformerDetails" type="tns:ArrayOfTransformerDetail" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfTransformerDetail">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="TransformerDetail" nillable="true" type="tns:TransformerDetail" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="TransformerDetail">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EntityBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="HuId" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ItemCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ItemDescription" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="UomCode" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="UnitCount" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="LotNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="StorageBinCode" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="LocationLotDetId" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="Qty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="CurrentQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="CurrentRejectQty" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsQualified" nillable="true" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="IOType" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="LocationCode" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="StorageAreaCode" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ArrayOfString" nillable="true" type="tns:ArrayOfString" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetTransformer">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="resolver" type="tns:Resolver" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTransformerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetTransformerResult" type="tns:Resolver" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="MatchHuScan">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="resolver" type="tns:Resolver" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="MatchHuScanResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="MatchHuScanResult" type="tns:Resolver" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Operation">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="resolver" type="tns:Resolver" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="OperationResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="OperationResult" type="tns:Resolver" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LoadUser">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LoadUserResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LoadUserResult" type="tns:User" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="User">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:UserBase" />
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="UserBase" abstract="true">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EntityBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="Code" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="FirstName" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="LastName" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Email" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Address" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Gender" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Phone" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MobliePhone" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsActive" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="LastModifyDate" type="s:dateTime" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:element name="GetUserPermissions">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="categoryCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserPermissionsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserPermissionsResult" type="tns:ArrayOfPermission" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfPermission">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Permission" nillable="true" type="tns:Permission" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Permission">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:PermissionBase" />
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="PermissionBase" abstract="true">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EntityBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="Code" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Description" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:element name="LoadUserPerference">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="preCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LoadUserPerferenceResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LoadUserPerferenceResult" type="tns:UserPreference" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="UserPreference">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:UserPreferenceBase" />
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="UserPreferenceBase" abstract="true">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:EntityBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="Code" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Value" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="LoadEmployeeSoapIn">
+    <wsdl:part name="parameters" element="tns:LoadEmployee" />
+  </wsdl:message>
+  <wsdl:message name="LoadEmployeeSoapOut">
+    <wsdl:part name="parameters" element="tns:LoadEmployeeResponse" />
+  </wsdl:message>
+  <wsdl:message name="AnalyzeBarcodeSoapIn">
+    <wsdl:part name="parameters" element="tns:AnalyzeBarcode" />
+  </wsdl:message>
+  <wsdl:message name="AnalyzeBarcodeSoapOut">
+    <wsdl:part name="parameters" element="tns:AnalyzeBarcodeResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTransformerSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTransformer" />
+  </wsdl:message>
+  <wsdl:message name="GetTransformerSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTransformerResponse" />
+  </wsdl:message>
+  <wsdl:message name="MatchHuScanSoapIn">
+    <wsdl:part name="parameters" element="tns:MatchHuScan" />
+  </wsdl:message>
+  <wsdl:message name="MatchHuScanSoapOut">
+    <wsdl:part name="parameters" element="tns:MatchHuScanResponse" />
+  </wsdl:message>
+  <wsdl:message name="OperationSoapIn">
+    <wsdl:part name="parameters" element="tns:Operation" />
+  </wsdl:message>
+  <wsdl:message name="OperationSoapOut">
+    <wsdl:part name="parameters" element="tns:OperationResponse" />
+  </wsdl:message>
+  <wsdl:message name="LoadUserSoapIn">
+    <wsdl:part name="parameters" element="tns:LoadUser" />
+  </wsdl:message>
+  <wsdl:message name="LoadUserSoapOut">
+    <wsdl:part name="parameters" element="tns:LoadUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPermissionsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserPermissions" />
+  </wsdl:message>
+  <wsdl:message name="GetUserPermissionsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserPermissionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="LoadUserPerferenceSoapIn">
+    <wsdl:part name="parameters" element="tns:LoadUserPerference" />
+  </wsdl:message>
+  <wsdl:message name="LoadUserPerferenceSoapOut">
+    <wsdl:part name="parameters" element="tns:LoadUserPerferenceResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ClientMgrWSSoap">
+    <wsdl:operation name="LoadEmployee">
+      <wsdl:input message="tns:LoadEmployeeSoapIn" />
+      <wsdl:output message="tns:LoadEmployeeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AnalyzeBarcode">
+      <wsdl:input message="tns:AnalyzeBarcodeSoapIn" />
+      <wsdl:output message="tns:AnalyzeBarcodeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTransformer">
+      <wsdl:input message="tns:GetTransformerSoapIn" />
+      <wsdl:output message="tns:GetTransformerSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="MatchHuScan">
+      <wsdl:input message="tns:MatchHuScanSoapIn" />
+      <wsdl:output message="tns:MatchHuScanSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Operation">
+      <wsdl:input message="tns:OperationSoapIn" />
+      <wsdl:output message="tns:OperationSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LoadUser">
+      <wsdl:input message="tns:LoadUserSoapIn" />
+      <wsdl:output message="tns:LoadUserSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissions">
+      <wsdl:input message="tns:GetUserPermissionsSoapIn" />
+      <wsdl:output message="tns:GetUserPermissionsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LoadUserPerference">
+      <wsdl:input message="tns:LoadUserPerferenceSoapIn" />
+      <wsdl:output message="tns:LoadUserPerferenceSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ClientMgrWSSoap" type="tns:ClientMgrWSSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="LoadEmployee">
+      <soap:operation soapAction="http://com.Sconit.Webservice/LoadEmployee" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AnalyzeBarcode">
+      <soap:operation soapAction="http://com.Sconit.Webservice/AnalyzeBarcode" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTransformer">
+      <soap:operation soapAction="http://com.Sconit.Webservice/GetTransformer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MatchHuScan">
+      <soap:operation soapAction="http://com.Sconit.Webservice/MatchHuScan" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Operation">
+      <soap:operation soapAction="http://com.Sconit.Webservice/Operation" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoadUser">
+      <soap:operation soapAction="http://com.Sconit.Webservice/LoadUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissions">
+      <soap:operation soapAction="http://com.Sconit.Webservice/GetUserPermissions" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoadUserPerference">
+      <soap:operation soapAction="http://com.Sconit.Webservice/LoadUserPerference" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ClientMgrWSSoap12" type="tns:ClientMgrWSSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="LoadEmployee">
+      <soap12:operation soapAction="http://com.Sconit.Webservice/LoadEmployee" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AnalyzeBarcode">
+      <soap12:operation soapAction="http://com.Sconit.Webservice/AnalyzeBarcode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTransformer">
+      <soap12:operation soapAction="http://com.Sconit.Webservice/GetTransformer" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MatchHuScan">
+      <soap12:operation soapAction="http://com.Sconit.Webservice/MatchHuScan" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Operation">
+      <soap12:operation soapAction="http://com.Sconit.Webservice/Operation" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoadUser">
+      <soap12:operation soapAction="http://com.Sconit.Webservice/LoadUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserPermissions">
+      <soap12:operation soapAction="http://com.Sconit.Webservice/GetUserPermissions" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoadUserPerference">
+      <soap12:operation soapAction="http://com.Sconit.Webservice/LoadUserPerference" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ClientMgrWS">
+    <wsdl:port name="ClientMgrWSSoap" binding="tns:ClientMgrWSSoap">
+      <soap:address location="http://sconit.yfkey.com/Webservice/ClientMgrWS.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ClientMgrWSSoap12" binding="tns:ClientMgrWSSoap12">
+      <soap12:address location="http://sconit.yfkey.com/Webservice/ClientMgrWS.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
