@@ -54,13 +54,15 @@ public partial class Order_GoodsReceipt_AsnReceipt_List : ListModuleBase
         get { return ViewState["IsGroup"] != null ? (bool)ViewState["IsGroup"] : false; }
         set { ViewState["IsGroup"] = value; }
     }
-
+    public string supplier;
+    
     public override void UpdateView()
     {
         if (!IsExport)
         {
             if (IsGroup)
             {
+               
                 this.GV_List.Execute();
                 this.GV_List.Visible = true;
                 this.gp.Visible = true;
@@ -97,6 +99,30 @@ public partial class Order_GoodsReceipt_AsnReceipt_List : ListModuleBase
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        supplier = ((Controls_TextBox)(this.Parent.FindControl("ucSearch").FindControl("tbPartyFrom"))).Text;
+
+        if (supplier == "YFK-FG")
+        {
+            this.GV_List_Detail.Columns[2].Visible = false;
+            this.GV_List_Detail.Columns[9].Visible = false;
+            this.GV_List_Detail.Columns[10].Visible = true;
+            this.GV_List_Detail.Columns[11].Visible = true;
+
+            this.GV_List_Detail.Columns[13].Visible = false;
+            this.GV_List_Detail.Columns[14].Visible = true;
+            this.GV_List_Detail.Columns[15].Visible = true;
+        }
+        else
+        {
+            this.GV_List_Detail.Columns[2].Visible = true;
+            this.GV_List_Detail.Columns[9].Visible = true;
+            this.GV_List_Detail.Columns[10].Visible = false;
+            this.GV_List_Detail.Columns[11].Visible = false;
+
+            this.GV_List_Detail.Columns[13].Visible = true;
+            this.GV_List_Detail.Columns[14].Visible = false;
+            this.GV_List_Detail.Columns[15].Visible = false;
+        }
 
         if (!IsPostBack)
         {
@@ -111,6 +137,7 @@ public partial class Order_GoodsReceipt_AsnReceipt_List : ListModuleBase
                 this.GV_List.Columns[3].Visible = false;  //供应商
                 this.GV_List.Columns[4].Visible = false;  //发货地址
             }
+             
         }
     }
 

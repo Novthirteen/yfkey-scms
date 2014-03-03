@@ -34,6 +34,7 @@ public partial class MasterData_Customer_New : NewModuleBase
         ((TextBox)(this.FV_Customer.FindControl("tbCode"))).Text = string.Empty;
         ((TextBox)(this.FV_Customer.FindControl("tbName"))).Text = string.Empty;
         ((CheckBox)(this.FV_Customer.FindControl("cbIsActive"))).Checked = true;
+        ((CheckBox)(this.FV_Customer.FindControl("cbIsIntern"))).Checked = false;
     }
 
     protected void checkCustomerExists(object source, ServerValidateEventArgs args)
@@ -62,10 +63,12 @@ public partial class MasterData_Customer_New : NewModuleBase
             TextBox tbCode = (TextBox)(this.FV_Customer.FindControl("tbCode"));
             TextBox tbName = (TextBox)(this.FV_Customer.FindControl("tbName"));
             CheckBox cbIsActive = (CheckBox)(this.FV_Customer.FindControl("cbIsActive"));
+            CheckBox cbIsIntern = (CheckBox)(this.FV_Customer.FindControl("cbIsIntern"));
             Customer customer = new Customer();
             customer.Code = tbCode.Text.Trim();
             customer.Name = tbName.Text.Trim();
             customer.IsActive = cbIsActive.Checked;
+            customer.IsIntern = cbIsIntern.Checked;
             try
             {
                 TheCustomerMgr.CreateCustomer(customer, this.CurrentUser);

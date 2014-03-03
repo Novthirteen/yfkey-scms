@@ -27,6 +27,7 @@
                     <ItemTemplate>
                         <asp:TextBox ID="tbStartTime" runat="server" Text='<%# Eval("StartTime","{0:yyyy-MM-dd HH:mm}")%>'
                             onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowWeek:true})" />
+                            <asp:HiddenField Value='<%# Eval("ReferenceOrderNo")%>' runat="server" ID="tbRefOrderNo" />
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="${MasterData.Order.OrderHead.WindowTime}">

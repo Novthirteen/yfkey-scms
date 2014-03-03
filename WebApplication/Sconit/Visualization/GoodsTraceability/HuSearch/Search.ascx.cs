@@ -14,13 +14,15 @@ using com.Sconit.Web;
 using System.Collections.Generic;
 using NHibernate.Expression;
 using com.Sconit.Entity.MasterData;
+using com.Sconit.Entity.View;
 
 public partial class Visualization_GoodsTraceability_HuSearch_Search : SearchModuleBase
 {
     public event EventHandler SearchEvent;
-
+    public event EventHandler ExportEvent;
     protected void Page_Load(object sender, EventArgs e)
     {
+        this.tbLotNo.ServiceParameter = "string:" + this.CurrentUser.Code;
         if (!IsPostBack)
         {
             this.tbStartDate.Text = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
@@ -30,10 +32,13 @@ public partial class Visualization_GoodsTraceability_HuSearch_Search : SearchMod
 
     protected void btnSearch_Click(object sender, EventArgs e)
     {
-        this.DoSearch();
+        this.DoSearch(false);
     }
-
     protected override void DoSearch()
+    {
+        
+    }
+    protected   void DoSearch(bool isExport)
     {
         if (SearchEvent != null)
         {
@@ -45,14 +50,14 @@ public partial class Visualization_GoodsTraceability_HuSearch_Search : SearchMod
             string endDate = this.tbEndDate.Text.Trim() != string.Empty ? this.tbEndDate.Text.Trim() : string.Empty;
 
             #region DetachedCriteria
-            DetachedCriteria selectCriteria = DetachedCriteria.For(typeof(Hu));
-            DetachedCriteria selectCountCriteria = DetachedCriteria.For(typeof(Hu))
+            DetachedCriteria selectCriteria = DetachedCriteria.For(typeof(GoodsTraceabilityViewBase));
+            DetachedCriteria selectCountCriteria = DetachedCriteria.For(typeof(GoodsTraceabilityViewBase))
                 .SetProjection(Projections.Count("HuId"));
-
+            
             if (item != string.Empty)
             {
-                selectCriteria.Add(Expression.Like("Item.Code", item, MatchMode.Start));
-                selectCountCriteria.Add(Expression.Like("Item.Code", item, MatchMode.Start));
+                selectCriteria.Add(Expression.Like("Item", item, MatchMode.Start));
+                selectCountCriteria.Add(Expression.Like("Item", item, MatchMode.Start));
             }
             if (huId != string.Empty)
             {
@@ -61,8 +66,8 @@ public partial class Visualization_GoodsTraceability_HuSearch_Search : SearchMod
             }
             if (lotNo != string.Empty)
             {
-                selectCriteria.Add(Expression.Eq("LotNo", lotNo));
-                selectCountCriteria.Add(Expression.Eq("LotNo", lotNo));
+                selectCriteria.Add(Expression.Eq("Location", lotNo));
+                selectCountCriteria.Add(Expression.Eq("Location", lotNo));
             }
             if (orderNo != string.Empty)
             {
@@ -71,20 +76,37 @@ public partial class Visualization_GoodsTraceability_HuSearch_Search : SearchMod
             }
             if (startDate != string.Empty)
             {
-                selectCriteria.Add(Expression.Ge("ManufactureDate", DateTime.Parse(startDate)));
-                selectCountCriteria.Add(Expression.Ge("ManufactureDate", DateTime.Parse(startDate)));
+                selectCriteria.Add(Expression.Ge("CreateDate", DateTime.Parse(startDate)));
+                selectCountCriteria.Add(Expression.Ge("CreateDate", DateTime.Parse(startDate)));
             }
             if (endDate != string.Empty)
             {
-                selectCriteria.Add(Expression.Lt("ManufactureDate", DateTime.Parse(endDate).AddDays(1)));
-                selectCountCriteria.Add(Expression.Lt("ManufactureDate", DateTime.Parse(endDate).AddDays(1)));
+                selectCriteria.Add(Expression.Lt("CreateDate", DateTime.Parse(endDate).AddDays(1)));
+                selectCountCriteria.Add(Expression.Lt("CreateDate", DateTime.Parse(endDate).AddDays(1)));
             }
 
             #endregion
 
-            SearchEvent((new object[] { selectCriteria, selectCountCriteria }), null);
+            if (isExport)
+            {
+                ExportEvent((new object[] { selectCriteria, selectCountCriteria }), null);
+            }
+            else
+            {
+                SearchEvent((new object[] { selectCriteria, selectCountCriteria }), null);
+            }
         }
     }
+
+    protected void btnExport_Click(object sender, EventArgs e)
+    {
+        this.DoSearch(true);
+    }
+    
+      
+           
+        
+     
 
     protected override void InitPageParameter(IDictionary<string, string> actionParameter)
     {

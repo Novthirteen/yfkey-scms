@@ -204,7 +204,7 @@
                         <td class="td02">
                             <uc3:textbox ID="tbPriceListTo" runat="server" Visible="true" Width="250" DescField="Code"
                                 ServiceParameter="string:#tbBillTo" ValueField="Code" ServicePath="SalesPriceListMgr.service"
-                                ServiceMethod="GetAllSalesPriceList" CssClass="inputRequired" />
+                                ServiceMethod="GetAllSalesPriceList" CssClass="inputRequired" MustMatch="true" />
                             <asp:RequiredFieldValidator ID="rfvPriceListTo" runat="server" ErrorMessage="${MasterData.Flow.PriceListTo.Required}"
                                 Display="Dynamic" ControlToValidate="tbPriceListTo" ValidationGroup="vgSave" />
                         </td>

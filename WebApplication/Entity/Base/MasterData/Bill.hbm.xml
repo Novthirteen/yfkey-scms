@@ -4,6 +4,7 @@
 		<id name="BillNo" column="BillNo" type="String" unsaved-value="null" >
 			<generator class="assigned" />
 		</id>
+    <property name="Memo" column="Memo" type="String" length="50"  />
 		<property name="ExternalBillNo" column="ExtBillNo" type="String" length="50" />
 		<property name="ReferenceBillNo" column="RefBillNo" type="String" length="50" />
 		<property name="Status" column="Status" type="String" length="50" />

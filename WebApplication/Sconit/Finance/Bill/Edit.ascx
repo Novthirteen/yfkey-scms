@@ -1,9 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Edit.ascx.cs" Inherits="Finance_Bill_Edit" %>
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="sc1" %>
 <%@ Register Src="NewSearch.ascx" TagName="NewSearch" TagPrefix="uc" %>
-
 <script language="javascript" type="text/javascript" src="Js/calcamount.js"></script>
-
 <script type="text/javascript" language="javascript">
     function GVCheckClick() {
         if ($(".GVHeader input:checkbox").attr("checked") == true) {
@@ -32,7 +30,6 @@
         CalCulateTotalAmount("BaseOnDiscountRate", '#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>', '#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>', null, 0, 0);
     }
 </script>
-
 <fieldset>
     <legend>${MasterData.Bill.POBill}</legend>
     <asp:FormView ID="FV_Bill" runat="server" DataSourceID="ODS_Bill" DefaultMode="Edit"
@@ -99,6 +96,14 @@
                         <asp:TextBox ID="tbExternalBillNo" runat="server" Text='<%# Bind("ExternalBillNo") %>' />
                     </td>
                 </tr>
+                <tr>
+                <td  class="td01">
+                <asp:Literal ID="Literal1" runat="server" Text="备注" />
+                </td>
+                <td class="td02">
+                   <asp:TextBox ID="tbMemo" runat="server" Text='<%# Bind("Memo") %>' />
+                </td>
+                </tr>
             </table>
         </EditItemTemplate>
     </asp:FormView>
@@ -121,8 +126,10 @@
         <sc1:Button ID="btnVoid" runat="server" Text="${Common.Button.Void}" Width="59px"
             OnClientClick="return confirm('${Common.Button.Void.Confirm}')" OnClick="btnVoid_Click"
             FunctionId="VoidBill" />
+            <asp:Button ID="btnTongji" runat="server" Text="汇总" Width="59px" OnClick="btnTongji_Click" />
         <asp:Button ID="btnBack" runat="server" Text="${Common.Button.Back}" Width="59px"
             OnClick="btnBack_Click" />
+        
     </div>
 </fieldset>
 <asp:ObjectDataSource ID="ODS_Bill" runat="server" TypeName="com.Sconit.Web.BillMgrProxy"
@@ -135,6 +142,39 @@
 <fieldset>
     <legend>${MasterData.Bill.BillDetail}</legend>
     <div class="GridView">
+     <table class="mtable">
+            <tr>
+                <td class="td01">
+                    <asp:Button ID="btnAddDetail" runat="server" Text="${Common.Button.New}" OnClick="btnAddDetail_Click" />
+                    <asp:Button ID="btnDeleteDetail" runat="server" Text="${Common.Button.Remove}" OnClick="btnDeleteDetail_Click" />
+                </td>
+                <td class="td02">
+                </td>
+                <td class="ttd01">
+                </td>
+                <td class="ttd02">
+                </td>
+                <td class="ttd01">
+                    <asp:Literal ID="lblTotalQty" runat="server" Text="${MasterData.Bill.TotalQty}:" />
+                </td>
+                <td class="ttd02">
+                    <asp:TextBox ID="tbTotalQty" runat="server" onfocus="this.blur();" Width="150px" />
+                </td>
+                <td class="ttd01">
+                    <asp:Literal ID="lblTotalDetailAmount" runat="server" Text="${MasterData.Bill.TotalDetailAmount}:" />
+                </td>
+                <td class="ttd02">
+                    <asp:TextBox ID="tbTotalDetailAmount" runat="server" onfocus="this.blur();" Width="150px" />
+                    <span style="display: none">
+                        <asp:TextBox ID="tbTotalDiscountRate" runat="server" Text="0" />
+                        <asp:TextBox ID="tbTotalDiscount" runat="server" Text="0" />
+                        <asp:TextBox ID="tbTotalAmount" runat="server" Visible="false" onfocus="this.blur();"
+                            Width="150px" />
+                    </span>
+                </td>
+            </tr>
+          
+        </table>
         <asp:GridView ID="Gv_List" runat="server" AllowPaging="False" DataKeyNames="Id" AllowSorting="False"
             AutoGenerateColumns="False" OnRowDataBound="GV_List_RowDataBound">
             <Columns>
@@ -169,14 +209,13 @@
                         <%# DataBinder.Eval(Container.DataItem, "ActingBill.Item.Description")%>
                     </ItemTemplate>
                 </asp:TemplateField>
-                    <%-- added by williamlu@esteering 2012/4/12 --%>
+                <%-- added by williamlu@esteering 2012/4/12 --%>
                 <asp:TemplateField HeaderText=" ASN " SortExpression="IpNo">
                     <ItemTemplate>
                         <%# DataBinder.Eval(Container.DataItem, "IpNo")%>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <%-- added end --%> 
-
+                <%-- added end --%>
                 <asp:TemplateField HeaderText=" ${Common.Business.RefCode}">
                     <ItemTemplate>
                         <%# DataBinder.Eval(Container.DataItem, "ActingBill.ReferenceItemCode")%>
@@ -192,7 +231,7 @@
                         <%# DataBinder.Eval(Container.DataItem, "ActingBill.EffectiveDate", "{0:yyyy-MM-dd}")%>
                     </ItemTemplate>
                 </asp:TemplateField>
-             <asp:TemplateField HeaderText="${MasterData.Bill.UnitPrice}" SortExpression="UnitPrice">
+                <asp:TemplateField HeaderText="${MasterData.Bill.UnitPrice}" SortExpression="UnitPrice">
                     <ItemTemplate>
                         <asp:HiddenField ID="hfUnitPrice" runat="server" Value='<%# Bind("UnitPrice") %>' />
                         <%# DataBinder.Eval(Container.DataItem, "UnitPrice", "{0:0.########}")%>
@@ -242,65 +281,91 @@
                 </asp:TemplateField>
             </Columns>
         </asp:GridView>
+       
+    </div>
+</fieldset>
+<div id="floatdiv" style=" visibility:hidden">
+    <uc:NewSearch ID="ucNewSearch" runat="server" Visible="false" /><fieldset runat="server" id="field" visible="false">
+        <legend>汇总信息</legend>
         <table class="mtable">
             <tr>
                 <td class="td01">
-                    <asp:Button ID="btnAddDetail" runat="server" Text="${Common.Button.New}" OnClick="btnAddDetail_Click" />
-                    <asp:Button ID="btnDeleteDetail" runat="server" Text="${Common.Button.Remove}" OnClick="btnDeleteDetail_Click" />
+                    <asp:Literal ID="lblBillNo" runat="server" Text="${MasterData.Item.Code}:" />
                 </td>
                 <td class="td02">
-                </td>
-                <td class="ttd01">
-                </td>
-                <td class="ttd02">
-                </td>
-                <td class="ttd01">
-                    <asp:Literal ID="lblTotalQty" runat="server" Text="${MasterData.Bill.TotalQty}:" />
-                </td>
-                <td class="ttd02">
-                    <asp:TextBox ID="tbTotalQty" runat="server" onfocus="this.blur();" Width="150px" />
-                </td>
-                <td class="ttd01">
-                    <asp:Literal ID="lblTotalDetailAmount" runat="server" Text="${MasterData.Bill.TotalDetailAmount}:" />
-                </td>
-                <td class="ttd02">
-                    <asp:TextBox ID="tbTotalDetailAmount" runat="server" onfocus="this.blur();" Width="150px" />
-                    <span style="display: none">
-                        <asp:TextBox ID="tbTotalDiscountRate" runat="server" Text="0" />
-                        <asp:TextBox ID="tbTotalDiscount" runat="server" Text="0" />
-                        <asp:TextBox ID="tbTotalAmount" runat="server" Visible="false" onfocus="this.blur();"
-                            Width="150px" />
-                    </span>
-                </td>
-            </tr>
-            <%--<tr>
-                <td class="td02">
-                </td>
-                <td class="td02">
+                   <%-- <sc1:ReadonlyTextBox ID="tbBillNo" runat="server" CodeField="BillNo" />--%>
+                    <asp:DropDownList runat="server" ID="itemInList" Width="180">
+                    
+                    </asp:DropDownList>
                 </td>
                 <td class="td01">
-                    <asp:Literal ID="lblTotalDiscount" runat="server" Text="${MasterData.Bill.TotalDiscount}:" />
+                    
                 </td>
                 <td class="td02">
-                    <asp:TextBox ID="tbTotalDiscountRate" runat="server" onChange="orderDiscountRateChanged(this);" Width="65px" />%
-                    <asp:TextBox ID="tbTotalDiscount" runat="server" onChange="orderDiscountChanged(this);" Width="65px" />
+                     
                 </td>
             </tr>
-            <tr>
-                <td class="td02">
-                </td>
-                <td class="td02">
-                </td>
-                <td class="td01">
-                    <asp:Literal ID="lblTotalAmount" runat="server" Text="${MasterData.Bill.TotalAmount}:" />
-                </td>
-                <td class="td02">
-                    <asp:TextBox ID="tbTotalAmount" runat="server" Visible="true" onfocus="this.blur();" Width="150px" />
-                </td>
-            </tr>--%>
+          
+           
+         
         </table>
-    </div>
-</fieldset>
-<div id="floatdiv">
-    <uc:NewSearch ID="ucNewSearch" runat="server" Visible="false" />
+        <div class="tablefooter">
+            <asp:Button ID="btnQuery" runat="server" Text="查询明细" Width="59px"   OnClick="btnQuery_Click" />
+             <asp:Button ID="btnClearMX" runat="server" Text="返回汇总" Width="59px"  OnClick="btnTongji_Click" />
+            <asp:Button ID="Button2" runat="server" Text="退出" Width="59px" OnClick="btnClear_Click" />
+            <asp:Button ID="Button9" runat="server" Text="返回" Width="59px" OnClick="btnClear_Click" />
+        </div>
+    </fieldset><fieldset style="margin-top:10px" runat="server" id="mx" visible="false">
+    <legend> <asp:Literal ID="tbshowTotal" runat="server" Text="零件总数" /> </legend>
+       
+    <asp:GridView ID="HZ" Visible="false" runat="server" AutoGenerateColumns="False">
+        <Columns>
+            <asp:TemplateField HeaderText=" ${MasterData.Item.Code}" >
+                <ItemTemplate>
+                    <%# DataBinder.Eval(Container.DataItem, "Code")%>
+                </ItemTemplate>
+            </asp:TemplateField>
+             <asp:TemplateField HeaderText="参考零件号">
+                <ItemTemplate>
+                    <%# DataBinder.Eval(Container.DataItem, "ReferenceItemCode")%>
+                </ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText=" ${MasterData.Item.Description}">
+                <ItemTemplate>
+                    <%# DataBinder.Eval(Container.DataItem, "Description")%>
+                </ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="总数">
+                <ItemTemplate>
+                    <%# DataBinder.Eval(Container.DataItem, "Amount", "{0:0}")%>
+                </ItemTemplate>
+            </asp:TemplateField>
+        </Columns>
+    </asp:GridView>
+
+    <asp:GridView ID="itemMX" runat="server" AutoGenerateColumns="false" Visible="false">
+    <Columns>
+      <asp:TemplateField HeaderText=" ${MasterData.Item.Code}" >
+                <ItemTemplate>
+                    <%# DataBinder.Eval(Container.DataItem, "Actingbill.Item.Code")%>
+                </ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText=" ${MasterData.Item.Description}">
+                <ItemTemplate>
+                    <%# DataBinder.Eval(Container.DataItem, "Actingbill.Item.Description")%>
+                </ItemTemplate>
+            </asp:TemplateField>
+              <asp:TemplateField HeaderText=" ASN "  >
+                    <ItemTemplate>
+                        <%# DataBinder.Eval(Container.DataItem, "IpNo")%>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="数量"  >
+                <ItemTemplate>
+                 <%# DataBinder.Eval(Container.DataItem, "BilledQty", "{0:0.########}")%>
+                </ItemTemplate>
+                </asp:TemplateField>
+    </Columns>
+    </asp:GridView>
+    </fieldset>
 </div>

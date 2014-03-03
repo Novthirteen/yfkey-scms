@@ -194,6 +194,7 @@ public partial class Inventory_InspectOrder_New : ModuleBase
         IList<BomDetail> bomDetailList = TheBomDetailMgr.GetFlatBomDetail(tbItemCode.Text.Trim(), DateTime.Now);
         foreach (BomDetail bomDetail in bomDetailList)
         {
+            if (bomDetail.CalculatedQty == 0) continue;
             if (bomDetail.BackFlushMethod != BusinessConstants.CODE_MASTER_BACKFLUSH_METHOD_VALUE_BATCH_FEED)
             {
                 if (InspectItemDic.ContainsKey(bomDetail.Item.Code + "-" + bomDetail.Bom.Code + "-" + tbDefectClassification.Text.Trim()))

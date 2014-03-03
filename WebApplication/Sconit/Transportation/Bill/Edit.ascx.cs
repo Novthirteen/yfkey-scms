@@ -12,7 +12,7 @@ using com.Sconit.Entity;
 using com.Sconit.Entity.Exception;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
- 
+
 using System.IO;
 public partial class Transportation_Bill_Edit : EditModuleBase
 {
@@ -64,8 +64,8 @@ public partial class Transportation_Bill_Edit : EditModuleBase
             list.Add(transportationBill.TransportationBillDetails);
         }
         string barCodeUrl = WriteToFile(list);
-       // barCodeUrl = TheReportMgr.WriteToFile("TransportationBill.xls", list);/*20110420 Tag 先做标记，后期补充  TransportationBill.xls没有开发*/
-        
+        // barCodeUrl = TheReportMgr.WriteToFile("TransportationBill.xls", list);/*20110420 Tag 先做标记，后期补充  TransportationBill.xls没有开发*/
+
         Page.ClientScript.RegisterStartupScript(GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + barCodeUrl + "'); </script>");
         this.ShowSuccessMessage("Transportation.TransportationBill.Print.Successful");
     }
@@ -77,83 +77,15 @@ public partial class Transportation_Bill_Edit : EditModuleBase
     /// <returns></returns>
     public string WriteToFile(IList<object> list)
     {
-        string path=Server.MapPath(".")+@"\Reports\Templates\YFKExcelTemplates\TransportationBill.xls";
-        if (File.Exists(path))
-        {
-            TransportationBill tb = (TransportationBill)list[0];
-            string filename = @"/Reports/Templates/TempFiles/temp_" + DateTime.Now.ToString("yyyyMMddhhmmss") + tb.BillNo + ".xls";
-            string _wpath = Server.MapPath(".") + filename;
-            File.Copy(path, _wpath);
-            FileStream file = new FileStream(_wpath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
-            HSSFWorkbook hssfworkbook = new HSSFWorkbook(file);
-            Sheet sheet = hssfworkbook.GetSheet("sheet1");
-            NPOI.SS.UserModel.CellStyle normalStyle=setCellstyle(hssfworkbook,new string[]{"Border","Center"});
-            NPOI.SS.UserModel.CellStyle dateStyle = setCellstyle(hssfworkbook, new string[] { "Border", "Center" ,"DateTime"});
-            Cell cell=sheet.GetRow(8).GetCell(2);
-            cell.SetCellValue(tb.BillAddress.Party.Name);
-            cell = sheet.GetRow(8).GetCell(8);
-            cell.SetCellValue(tb.BillNo);
-            int i = 10;
-            decimal cnt = 0;
-            foreach (TransportationBillDetail tbd in tb.TransportationBillDetails)
-            {
-                Row row = sheet.CreateRow(i);
-               
-                TransportationOrder tord = TheTransportationOrderMgr.LoadTransportationOrder(tbd.ActBill.OrderNo); 
-                row.CreateCell(0).SetCellValue(tord.CreateDate);//运输日期
-                row.CreateCell(1).SetCellValue(tord.TransportationRoute!=null?tord.TransportationRoute.Description:"");//运输路线
-                row.CreateCell(2).SetCellValue(tbd.ActBill.PricingMethod!=null?tbd.ActBill.PricingMethod:"");//运输形式
-                row.CreateCell(3).SetCellValue(tord.OrderNo);//运单号码
-                row.CreateCell(4).SetCellValue(tbd.ActBill.EffectiveDate);//生效日期
-                row.CreateCell(5).SetCellValue(tbd.ActBill.UnitPrice.ToString("F2"));//单价
-                row.CreateCell(6).SetCellValue(tbd.ActBill.Currency.Name);//币种
-                row.CreateCell(7).SetCellValue(tbd.ActBill.BillQty.ToString("F0"));//开票数
-                row.CreateCell(8).SetCellValue(tbd.ActBill.BillAmount.ToString("F2"));//金额
-                cnt = Convert.ToInt32(tbd.ActBill.BillAmount) + cnt;
-                for (int y = 0; y < 9; y++)
-                {
-                    row.GetCell(y).CellStyle = normalStyle;
-                }
-                row.GetCell(0).CellStyle = dateStyle;
-                row.GetCell(4).CellStyle = dateStyle;
-                i++;
 
-            }
-            if (i <= 20)
-            {
-                for (int j = i; j < 21; j++)
-                {
-                    Row row = sheet.CreateRow(j);
-                    for(int y=0;y<9;y++)
-                    {
-                        row.CreateCell(y).CellStyle = normalStyle;
-                    }
-                }
-                i = 20;
-            }
-            Row _row = sheet.CreateRow(i + 1);
-            sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(i+1,i+1,6,7));
-            _row.CreateCell(6).SetCellValue("合计发票金额：");
-            _row.GetCell(6).CellStyle.Alignment = HorizontalAlignment.RIGHT;
-            _row.CreateCell(8).SetCellValue(cnt.ToString("F2"));
-            MemoryStream ms = new MemoryStream();
-            hssfworkbook.Write(ms);
-            
-           // Response.AddHeader("Content-Disposition", string.Format("attachment;filename=TempWorkBook.xls"));
-            // Response.BinaryWrite(ms.ToArray());Reports/Templates/TempFiles
-           
-            FileStream f = new FileStream(_wpath, FileMode.Open, FileAccess.Write);
-            byte[] data = ms.ToArray();
-            f.Write(data,0,data.Length);
-            f.Close();
-            f.Dispose();
-            hssfworkbook = null;
-            ms.Close();
-            ms.Dispose();
-            return "http://"+Request.Url.Authority+ filename;
-        }
+        TransportationBill tb = (TransportationBill)list[0];
+        return getExcel(tb, tb.TransportationBillDetails, false).ToString();
 
-        return "";
+
+        // Response.AddHeader("Content-Disposition", string.Format("attachment;filename=TempWorkBook.xls"));
+        // Response.BinaryWrite(ms.ToArray());Reports/Templates/TempFiles
+
+
     }
     /// <summary>
     /// 设置excel中单元格的样式
@@ -188,6 +120,96 @@ public partial class Transportation_Bill_Edit : EditModuleBase
         return style3;
     }
 
+    public object getExcel(TransportationBill tb, IList<TransportationBillDetail> detailList, bool isExportExcel)
+    {
+        string path = Server.MapPath(".") + @"\Reports\Templates\YFKExcelTemplates\TransportationBill.xls";
+        if (File.Exists(path))
+        {
+
+            string filename = @"/Reports/Templates/TempFiles/temp_" + DateTime.Now.ToString("yyyyMMddhhmmss") + tb.BillNo + ".xls";
+            string _wpath = Server.MapPath(".") + filename;
+            File.Copy(path, _wpath);
+            FileStream file = new FileStream(_wpath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+            HSSFWorkbook hssfworkbook = new HSSFWorkbook(file);
+            Sheet sheet = hssfworkbook.GetSheet("sheet1");
+            NPOI.SS.UserModel.CellStyle normalStyle = setCellstyle(hssfworkbook, new string[] { "Border", "Center" });
+            NPOI.SS.UserModel.CellStyle dateStyle = setCellstyle(hssfworkbook, new string[] { "Border", "Center", "DateTime" });
+            Cell cell = sheet.GetRow(8).GetCell(2);
+            cell.SetCellValue(tb.BillAddress.Party.Name);
+            cell = sheet.GetRow(8).GetCell(8);
+            cell.SetCellValue(tb.BillNo);
+            int i = 10;
+            decimal cnt = 0;
+            foreach (TransportationBillDetail tbd in detailList)
+            {
+                Row row = sheet.CreateRow(i);
+
+                TransportationOrder tord = TheTransportationOrderMgr.LoadTransportationOrder(tbd.ActBill.OrderNo);
+                row.CreateCell(0).SetCellValue(tord.CreateDate);//运输日期
+                row.CreateCell(1).SetCellValue(tord.TransportationRoute != null ? tord.TransportationRoute.Description : "");//运输路线
+                row.CreateCell(2).SetCellValue(tbd.ActBill.PricingMethod != null ? tbd.ActBill.PricingMethod : "");//运输形式
+                row.CreateCell(3).SetCellValue(tord.OrderNo);//运单号码
+                row.CreateCell(4).SetCellValue(tbd.ActBill.EffectiveDate);//生效日期
+                row.CreateCell(5).SetCellValue(tbd.ActBill.UnitPrice.ToString("F2"));//单价
+                row.CreateCell(6).SetCellValue(tbd.ActBill.Currency.Name);//币种
+                row.CreateCell(7).SetCellValue(tbd.ActBill.BillQty.ToString("F0"));//开票数
+                row.CreateCell(8).SetCellValue(tbd.ActBill.BillAmount.ToString("F2"));//金额
+                cnt = Convert.ToInt32(tbd.ActBill.BillAmount) + cnt;
+                for (int y = 0; y < 9; y++)
+                {
+                    row.GetCell(y).CellStyle = normalStyle;
+                }
+                row.GetCell(0).CellStyle = dateStyle;
+                row.GetCell(4).CellStyle = dateStyle;
+                i++;
+
+            }
+            if (i <= 20)
+            {
+                for (int j = i; j < 21; j++)
+                {
+                    Row row = sheet.CreateRow(j);
+                    for (int y = 0; y < 9; y++)
+                    {
+                        row.CreateCell(y).CellStyle = normalStyle;
+                    }
+                }
+                i = 20;
+            }
+            Row _row = sheet.CreateRow(i + 1);
+            sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(i + 1, i + 1, 6, 7));
+            _row.CreateCell(6).SetCellValue("合计发票金额：");
+            _row.GetCell(6).CellStyle.Alignment = HorizontalAlignment.RIGHT;
+            _row.CreateCell(8).SetCellValue(cnt.ToString("F2"));
+
+            MemoryStream ms = new MemoryStream();
+            hssfworkbook.Write(ms);
+            if (!isExportExcel)
+            {
+                FileStream f = new FileStream(_wpath, FileMode.Open, FileAccess.Write);
+                byte[] data = ms.ToArray();
+                f.Write(data, 0, data.Length);
+                f.Close();
+                f.Dispose();
+                hssfworkbook = null;
+                ms.Close();
+                ms.Dispose();
+                return "http://" + Request.Url.Authority + filename;
+            }
+            else
+            {
+                Response.AddHeader("Content-Disposition", string.Format("attachment;filename=TBillResult.xls"));
+                Response.BinaryWrite(ms.ToArray());
+                hssfworkbook = null;
+                ms.Close();
+                ms.Dispose();
+                return null;
+            }
+        }
+        else
+            return null;
+    }
+
     public void InitPageParameter(string billNo)
     {
         this.BillNo = billNo;
@@ -213,16 +235,16 @@ public partial class Transportation_Bill_Edit : EditModuleBase
         {
             TransportationBillDetail transportationBillDetail = (TransportationBillDetail)e.Row.DataItem;
             TransportationOrder to = TheTransportationOrderMgr.LoadTransportationOrder(transportationBillDetail.ActBill.OrderNo);
-            if(to!=null)
+            if (to != null)
             {
-            Label lb_createDate = (System.Web.UI.WebControls.Label)e.Row.FindControl("lb_createDate");//运输日期
-                lb_createDate.Text = to.CreateDate.ToString("yyyy-MM-dd")!=null?to.CreateDate.ToString("yyyy-MM-dd"):"";
-            Label lb_route = (System.Web.UI.WebControls.Label)e.Row.FindControl("lb_route");//运输路线
-                lb_route.Text = to.TransportationRoute!=null?to.TransportationRoute.Description:"";
-            Label lb_pricingMethod = (System.Web.UI.WebControls.Label)e.Row.FindControl("lb_pricingMethod");//运输方式
-                lb_pricingMethod.Text = to.PricingMethod!=null?to.PricingMethod:"";
-            Label lb_OrderNo = (System.Web.UI.WebControls.Label)e.Row.FindControl("lb_OrderNo");//运单号码
-                lb_OrderNo.Text = to.OrderNo!=null?to.OrderNo:"";
+                Label lb_createDate = (System.Web.UI.WebControls.Label)e.Row.FindControl("lb_createDate");//运输日期
+                lb_createDate.Text = to.CreateDate.ToString("yyyy-MM-dd") != null ? to.CreateDate.ToString("yyyy-MM-dd") : "";
+                Label lb_route = (System.Web.UI.WebControls.Label)e.Row.FindControl("lb_route");//运输路线
+                lb_route.Text = to.TransportationRoute != null ? to.TransportationRoute.Description : "";
+                Label lb_pricingMethod = (System.Web.UI.WebControls.Label)e.Row.FindControl("lb_pricingMethod");//运输方式
+                lb_pricingMethod.Text = to.PricingMethod != null ? to.PricingMethod : "";
+                Label lb_OrderNo = (System.Web.UI.WebControls.Label)e.Row.FindControl("lb_OrderNo");//运单号码
+                lb_OrderNo.Text = to.OrderNo != null ? to.OrderNo : "";
             }
             TextBox tbAmount = (TextBox)e.Row.FindControl("tbAmount");
             tbAmount.Attributes["oldValue"] = tbAmount.Text;
@@ -514,7 +536,7 @@ public partial class Transportation_Bill_Edit : EditModuleBase
         this.tbTotalDiscountRate.Text = transportationBill.TotalBillDiscountRate.ToString("F2");
         #endregion
 
-        #region 初始化弹出窗口  
+        #region 初始化弹出窗口
         this.PartyCode = transportationBill.BillAddress.Party.Code;
         this.ucNewSearch.InitPageParameter(true, transportationBill);
         #endregion
@@ -556,5 +578,19 @@ public partial class Transportation_Bill_Edit : EditModuleBase
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// 运单导出
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    protected void btnExport_Click(object sender, EventArgs e)
+    {
+
+        TransportationBill tb = TheTransportationBillMgr.LoadTransportationBill(this.BillNo,true);
+        IList<TransportationBillDetail> detail = tb.TransportationBillDetails;
+        getExcel(tb, detail, true);
+     
     }
 }

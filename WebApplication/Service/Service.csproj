@@ -1,0 +1,771 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1D995C1B-A6A9-4C85-BDB4-D3D2381937BF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>com.Sconit.Service</RootNamespace>
+    <AssemblyName>com.Sconit.Service</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\☆☆重要逻辑修改专用解决方案☆☆\DllLib\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Services.Transaction, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\☆☆重要逻辑修改专用解决方案☆☆\DllLib\Castle.Services.Transaction.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\☆☆重要逻辑修改专用解决方案☆☆\DllLib\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.5, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\☆☆重要逻辑修改专用解决方案☆☆\DllLib\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\☆☆重要逻辑修改专用解决方案☆☆\DllLib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <HintPath>D:\ViStudio\Visual Studio Tools for Office\PIA\Office14\Microsoft.Office.Interop.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=1.2.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\☆☆重要逻辑修改专用解决方案☆☆\DllLib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=1.2.3.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\☆☆重要逻辑修改专用解决方案☆☆\DllLib\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\Batch\IBatchJobDetailBaseMgr.cs" />
+    <Compile Include="Base\Batch\IBatchJobParameterBaseMgr.cs" />
+    <Compile Include="Base\Batch\IBatchRunLogBaseMgr.cs" />
+    <Compile Include="Base\Batch\IBatchTriggerBaseMgr.cs" />
+    <Compile Include="Base\Batch\IBatchTriggerParameterBaseMgr.cs" />
+    <Compile Include="Base\Batch\Impl\BatchJobDetailBaseMgr.cs" />
+    <Compile Include="Base\Batch\Impl\BatchJobParameterBaseMgr.cs" />
+    <Compile Include="Base\Batch\Impl\BatchRunLogBaseMgr.cs" />
+    <Compile Include="Base\Batch\Impl\BatchTriggerBaseMgr.cs" />
+    <Compile Include="Base\Batch\Impl\BatchTriggerParameterBaseMgr.cs" />
+    <Compile Include="Base\Criteria\ICriteriaMgr.cs" />
+    <Compile Include="Base\Criteria\Impl\CriteriaMgr.cs" />
+    <Compile Include="Base\Distribution\ICustomerRollingPlanBaseMgr.cs" />
+    <Compile Include="Base\Distribution\ICustomerRollingPlanDetailBaseMgr.cs" />
+    <Compile Include="Base\Distribution\IInProcessLocationBaseMgr.cs" />
+    <Compile Include="Base\Distribution\IInProcessLocationDetailBaseMgr.cs" />
+    <Compile Include="Base\Distribution\IInProcessLocationTrackBaseMgr.cs" />
+    <Compile Include="Base\Distribution\Impl\CustomerRollingPlanBaseMgr.cs" />
+    <Compile Include="Base\Distribution\Impl\CustomerRollingPlanDetailBaseMgr.cs" />
+    <Compile Include="Base\Distribution\Impl\InProcessLocationBaseMgr.cs" />
+    <Compile Include="Base\Distribution\Impl\InProcessLocationDetailBaseMgr.cs" />
+    <Compile Include="Base\Distribution\Impl\InProcessLocationTrackBaseMgr.cs" />
+    <Compile Include="Base\Distribution\Impl\SalesPriceListBaseMgr.cs" />
+    <Compile Include="Base\Distribution\ISalesPriceListBaseMgr.cs" />
+    <Compile Include="Base\Hql\IHqlMgr.cs" />
+    <Compile Include="Base\Hql\Impl\HqlMgr.cs" />
+    <Compile Include="Base\ISession.cs" />
+    <Compile Include="Base\MasterData\IActingBillBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IAddressBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IBillAddressBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IBillBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IBillDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IBillTransactionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IBomBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IBomDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IClientBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IClientLogBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IClientMonitorBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IClientOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IClientOrderHeadBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IClientWorkingHoursBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ICodeMasterBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ICurrencyBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ICustomerBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ICycleCountBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ICycleCountDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ICycleCountResultBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IEmployeeBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IEntityPreferenceBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFavoritesBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFileUploadBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFinanceCalendarBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFlowBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFlowBindingBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFlowDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFlowDetailTrackBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFlowPlanBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IFlowTrackBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IHuBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IHuOddBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IInspectOrderBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IInspectOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IInspectResultBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IItemBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IItemKitBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IItemReferenceBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IKPItemBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IKPOrderBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ILocationBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ILocationDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ILocationLotDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ILocationTransactionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IMiscOrderBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IMiscOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ActingBillBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\AddressBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\BillAddressBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\BillBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\BillDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\BillTransactionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\BomBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\BomDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ClientBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ClientLogBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ClientMonitorBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ClientOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ClientOrderHeadBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ClientWorkingHoursBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\CodeMasterBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\CurrencyBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\CustomerBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\CycleCountBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\CycleCountDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\CycleCountResultBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\EmployeeBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\EntityPreferenceBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FavoritesBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FileUploadBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FinanceCalendarBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FlowBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FlowBindingBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FlowDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FlowDetailTrackBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FlowPlanBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\FlowTrackBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\HuBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\HuOddBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\InspectOrderBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\InspectOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\InspectResultBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ItemBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ItemKitBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ItemReferenceBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\KPItemBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\KPOrderBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\LocationBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\LocationDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\LocationLotDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\LocationTransactionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\MiscOrderBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\MiscOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\NamedQueryBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\NumberControlBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\OrderBindingBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\OrderDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\OrderHeadBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\OrderLocationTransactionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\OrderOperationBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\OrderPlannedBackflushBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PartyBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PermissionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PermissionCategoryBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PickListBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PickListDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PickListResultBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PlannedBillBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PriceListBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\PriceListDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ProductLineInProcessLocationDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ReceiptBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ReceiptDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ReceiptInProcessLocationBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\RegionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\RepackBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\RepackDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\RoleBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\RolePermissionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\RollingForecastBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\RoutingBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\RoutingDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ShiftBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ShiftDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ShiftPlanScheduleBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\ShipAddressBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\SpecialTimeBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\StorageAreaBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\StorageBinBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\SubjectListBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\SupplierBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\UomBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\UomConversionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\UserBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\UserPermissionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\UserPreferenceBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\UserRoleBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\WorkCenterBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\WorkdayBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\WorkdayShiftBaseMgr.cs" />
+    <Compile Include="Base\MasterData\Impl\WorkingHoursBaseMgr.cs" />
+    <Compile Include="Base\MasterData\INamedQueryBaseMgr.cs" />
+    <Compile Include="Base\MasterData\INumberControlBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IOrderBindingBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IOrderHeadBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IOrderLocationTransactionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IOrderOperationBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IOrderPlannedBackflushBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPartyBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPermissionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPermissionCategoryBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPickListBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPickListDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPickListResultBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPlannedBillBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPriceListBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IPriceListDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IProductLineInProcessLocationDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IReceiptBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IReceiptDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IReceiptInProcessLocationBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IRegionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IRepackBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IRepackDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IRoleBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IRolePermissionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IRollingForecastBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IRoutingBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IRoutingDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IShiftBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IShiftDetailBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IShiftPlanScheduleBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IShipAddressBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ISpecialTimeBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IStorageAreaBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IStorageBinBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ISubjectListBaseMgr.cs" />
+    <Compile Include="Base\MasterData\ISupplierBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IUomBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IUomConversionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IUserBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IUserPermissionBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IUserPreferenceBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IUserRoleBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IWorkCenterBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IWorkdayBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IWorkdayShiftBaseMgr.cs" />
+    <Compile Include="Base\MasterData\IWorkingHoursBaseMgr.cs" />
+    <Compile Include="Base\Mes\IByMaterialBaseMgr.cs" />
+    <Compile Include="Base\Mes\IMesBomBaseMgr.cs" />
+    <Compile Include="Base\Mes\IMesBomDetailBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\ByMaterialBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\MesBomBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\MesBomDetailBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\ProductLineUserBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\ShelfBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\ShelfItemBaseMgr.cs" />
+    <Compile Include="Base\Mes\IProductLineUserBaseMgr.cs" />
+    <Compile Include="Base\Mes\IShelfBaseMgr.cs" />
+    <Compile Include="Base\Mes\IShelfItemBaseMgr.cs" />
+    <Compile Include="Base\Procurement\IAutoOrderTrackBaseMgr.cs" />
+    <Compile Include="Base\Procurement\IItemFlowPlanBaseMgr.cs" />
+    <Compile Include="Base\Procurement\IItemFlowPlanDetailBaseMgr.cs" />
+    <Compile Include="Base\Procurement\IItemFlowPlanTrackBaseMgr.cs" />
+    <Compile Include="Base\Procurement\Impl\AutoOrderTrackBaseMgr.cs" />
+    <Compile Include="Base\Procurement\Impl\ItemFlowPlanBaseMgr.cs" />
+    <Compile Include="Base\Procurement\Impl\ItemFlowPlanDetailBaseMgr.cs" />
+    <Compile Include="Base\Procurement\Impl\ItemFlowPlanTrackBaseMgr.cs" />
+    <Compile Include="Base\Procurement\Impl\OrderTracerBaseMgr.cs" />
+    <Compile Include="Base\Procurement\Impl\PurchasePriceListBaseMgr.cs" />
+    <Compile Include="Base\Procurement\IOrderTracerBaseMgr.cs" />
+    <Compile Include="Base\Procurement\IPurchasePriceListBaseMgr.cs" />
+    <Compile Include="Base\SessionBase.cs" />
+    <Compile Include="Base\Transportation\ICarrierBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\CarrierBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportationActBillBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportPriceListBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportPriceListDetailBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportationActBillBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportPriceListBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportPriceListDetailBaseMgr.cs" />
+    <Compile Include="Base\View\IActingBillViewBaseMgr.cs" />
+    <Compile Include="Base\View\IBillAgingViewBaseMgr.cs" />
+    <Compile Include="Base\View\IFlowViewBaseMgr.cs" />
+    <Compile Include="Base\View\IInProcessLocationDetailTrackViewBaseMgr.cs" />
+    <Compile Include="Base\View\IInProcessLocationDetailViewBaseMgr.cs" />
+    <Compile Include="Base\View\IInventoryAgingViewBaseMgr.cs" />
+    <Compile Include="Base\View\ILeanEngineViewBaseMgr.cs" />
+    <Compile Include="Base\View\ILocationBinBaseMgr.cs" />
+    <Compile Include="Base\View\ILocationBinDetailBaseMgr.cs" />
+    <Compile Include="Base\View\ILocationBinItemDetailBaseMgr.cs" />
+    <Compile Include="Base\View\ILocationLotDetailViewBaseMgr.cs" />
+    <Compile Include="Base\View\ILocationTransactionViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\ActingBillViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\BillAgingViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\FlowViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\InProcessLocationDetailTrackViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\InProcessLocationDetailViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\InventoryAgingViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\LeanEngineViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\LocationBinBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\LocationBinDetailBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\LocationBinItemDetailBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\LocationLotDetailViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\LocationTransactionViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\OrderDetailViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\OrderLocTransViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\PlannedBillViewBaseMgr.cs" />
+    <Compile Include="Base\View\Impl\SupllierLocationViewBaseMgr.cs" />
+    <Compile Include="Base\View\IOrderDetailViewBaseMgr.cs" />
+    <Compile Include="Base\View\IOrderLocTransViewBaseMgr.cs" />
+    <Compile Include="Base\View\IPlannedBillViewBaseMgr.cs" />
+    <Compile Include="Base\View\ISupllierLocationViewBaseMgr.cs" />
+    <Compile Include="Batch\IBatchJobDetailMgr.cs" />
+    <Compile Include="Batch\IBatchJobParameterMgr.cs" />
+    <Compile Include="Batch\IBatchRunLogMgr.cs" />
+    <Compile Include="Batch\IBatchTriggerMgr.cs" />
+    <Compile Include="Batch\IBatchTriggerParameterMgr.cs" />
+    <Compile Include="Batch\IJob.cs" />
+    <Compile Include="Batch\IJobRunMgr.cs" />
+    <Compile Include="Batch\Impl\BatchJobDetailMgr.cs" />
+    <Compile Include="Batch\Impl\BatchJobParameterMgr.cs" />
+    <Compile Include="Batch\Impl\BatchRunLogMgr.cs" />
+    <Compile Include="Batch\Impl\BatchTriggerMgr.cs" />
+    <Compile Include="Batch\Impl\BatchTriggerParameterMgr.cs" />
+    <Compile Include="Batch\Impl\JobRunMgr.cs" />
+    <Compile Include="Batch\JobDataMap.cs" />
+    <Compile Include="Batch\JobRunContext.cs" />
+    <Compile Include="Batch\Job\BillCreateJob.cs" />
+    <Compile Include="Batch\Job\CycleCountProcessJob.cs" />
+    <Compile Include="Batch\Job\LeanEngineJob.cs" />
+    <Compile Include="Batch\Job\OrderCloseJob.cs" />
+    <Compile Include="Batch\Job\OrderCompleteJob.cs" />
+    <Compile Include="Batch\Job\PickListCreateJob.cs" />
+    <Compile Include="Batch\Job\WOBackflushJob.cs" />
+    <Compile Include="Batch\Job\WOReceiptInboundJob.cs" />
+    <Compile Include="Business\AbstractBusinessMgr.cs" />
+    <Compile Include="Business\IBusinessMgr.cs" />
+    <Compile Include="Business\IExecuteMgr.cs" />
+    <Compile Include="Business\Impl\BatchDevanningMgr.cs" />
+    <Compile Include="Business\Impl\DevanningMgr.cs" />
+    <Compile Include="Business\Impl\ExecuteMgr.cs" />
+    <Compile Include="Business\Impl\FlushBackMgr.cs" />
+    <Compile Include="Business\Impl\InspectConfirmMgr.cs" />
+    <Compile Include="Business\Impl\InspectionMgr.cs" />
+    <Compile Include="Business\Impl\InspectMgr.cs" />
+    <Compile Include="Business\Impl\MaterialInMgr.cs" />
+    <Compile Include="Business\Impl\OfflineMgr.cs" />
+    <Compile Include="Business\Impl\OnlineMgr.cs" />
+    <Compile Include="Business\Impl\PickListOnlineMgr.cs" />
+    <Compile Include="Business\Impl\PickMgr.cs" />
+    <Compile Include="Business\Impl\PickupMgr.cs" />
+    <Compile Include="Business\Impl\PrintingMgr.cs" />
+    <Compile Include="Business\Impl\PutAwayMgr.cs" />
+    <Compile Include="Business\Impl\ReceiveMgr.cs" />
+    <Compile Include="Business\Impl\RepackageMgr.cs" />
+    <Compile Include="Business\Impl\ResolverMgr.cs" />
+    <Compile Include="Business\Impl\ReturnMgr.cs" />
+    <Compile Include="Business\Impl\ReuseMgr.cs" />
+    <Compile Include="Business\Impl\SetBaseMgr.cs" />
+    <Compile Include="Business\Impl\SetDetailMgr.cs" />
+    <Compile Include="Business\Impl\ShipMgr.cs" />
+    <Compile Include="Business\Impl\StockTakingMgr.cs" />
+    <Compile Include="Business\Impl\TransferMgr.cs" />
+    <Compile Include="Business\IResolverMgr.cs" />
+    <Compile Include="Business\ISetBaseMgr.cs" />
+    <Compile Include="Business\ISetDetailMgr.cs" />
+    <Compile Include="Distribution\ICustomerRollingPlanDetailMgr.cs" />
+    <Compile Include="Distribution\ICustomerRollingPlanMgr.cs" />
+    <Compile Include="Distribution\IInProcessLocationDetailMgr.cs" />
+    <Compile Include="Distribution\IInProcessLocationMgr.cs" />
+    <Compile Include="Distribution\IInProcessLocationTrackMgr.cs" />
+    <Compile Include="Distribution\Impl\CustomerRollingPlanDetailMgr.cs" />
+    <Compile Include="Distribution\Impl\CustomerRollingPlanMgr.cs" />
+    <Compile Include="Distribution\Impl\InProcessLocationDetailMgr.cs" />
+    <Compile Include="Distribution\Impl\InProcessLocationMgr.cs" />
+    <Compile Include="Distribution\Impl\InProcessLocationTrackMgr.cs" />
+    <Compile Include="Distribution\Impl\SalesPriceListMgr.cs" />
+    <Compile Include="Distribution\ISalesPriceListMgr.cs" />
+    <Compile Include="MasterData\IActingBillMgr.cs" />
+    <Compile Include="MasterData\IAddressMgr.cs" />
+    <Compile Include="MasterData\IBillAddressMgr.cs" />
+    <Compile Include="MasterData\IBillDetailMgr.cs" />
+    <Compile Include="MasterData\IBillMgr.cs" />
+    <Compile Include="MasterData\IBillTransactionMgr.cs" />
+    <Compile Include="MasterData\IBomDetailMgr.cs" />
+    <Compile Include="MasterData\IBomMgr.cs" />
+    <Compile Include="MasterData\IClientLogMgr.cs" />
+    <Compile Include="MasterData\IClientMgr.cs" />
+    <Compile Include="MasterData\IClientMonitorMgr.cs" />
+    <Compile Include="MasterData\IClientOrderDetailMgr.cs" />
+    <Compile Include="MasterData\IClientOrderHeadMgr.cs" />
+    <Compile Include="MasterData\IClientWorkingHoursMgr.cs" />
+    <Compile Include="MasterData\ICodeMasterMgr.cs" />
+    <Compile Include="MasterData\ICurrencyMgr.cs" />
+    <Compile Include="MasterData\ICustomerMgr.cs" />
+    <Compile Include="MasterData\ICycleCountDetailMgr.cs" />
+    <Compile Include="MasterData\ICycleCountMgr.cs" />
+    <Compile Include="MasterData\ICycleCountResultMgr.cs" />
+    <Compile Include="MasterData\IEmployeeMgr.cs" />
+    <Compile Include="MasterData\IEntityPreferenceMgr.cs" />
+    <Compile Include="MasterData\IFavoritesMgr.cs" />
+    <Compile Include="MasterData\IFileUploadMgr.cs" />
+    <Compile Include="MasterData\IFinanceCalendarMgr.cs" />
+    <Compile Include="MasterData\IFlowBindingMgr.cs" />
+    <Compile Include="MasterData\IFlowDetailMgr.cs" />
+    <Compile Include="MasterData\IFlowDetailTrackMgr.cs" />
+    <Compile Include="MasterData\IFlowMgr.cs" />
+    <Compile Include="MasterData\IFlowPlanMgr.cs" />
+    <Compile Include="MasterData\IFlowTrackMgr.cs" />
+    <Compile Include="MasterData\IHuMgr.cs" />
+    <Compile Include="MasterData\IHuOddMgr.cs" />
+    <Compile Include="MasterData\IImportMgr.cs" />
+    <Compile Include="MasterData\IInspectOrderDetailMgr.cs" />
+    <Compile Include="MasterData\IInspectOrderMgr.cs" />
+    <Compile Include="MasterData\IInspectResultMgr.cs" />
+    <Compile Include="MasterData\IItemKitMgr.cs" />
+    <Compile Include="MasterData\IItemMgr.cs" />
+    <Compile Include="MasterData\IItemReferenceMgr.cs" />
+    <Compile Include="MasterData\IKPItemMgr.cs" />
+    <Compile Include="MasterData\IKPOrderMgr.cs" />
+    <Compile Include="MasterData\ILanguageMgr.cs" />
+    <Compile Include="MasterData\ILocationDetailMgr.cs" />
+    <Compile Include="MasterData\ILocationLotDetailMgr.cs" />
+    <Compile Include="MasterData\ILocationMgr.cs" />
+    <Compile Include="MasterData\ILocationTransactionMgr.cs" />
+    <Compile Include="MasterData\IMiscOrderDetailMgr.cs" />
+    <Compile Include="MasterData\IMiscOrderMgr.cs" />
+    <Compile Include="MasterData\Impl\ActingBillMgr.cs" />
+    <Compile Include="MasterData\Impl\AddressMgr.cs" />
+    <Compile Include="MasterData\Impl\BillAddressMgr.cs" />
+    <Compile Include="MasterData\Impl\BillDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\BillMgr.cs" />
+    <Compile Include="MasterData\Impl\BillTransactionMgr.cs" />
+    <Compile Include="MasterData\Impl\BomDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\BomMgr.cs" />
+    <Compile Include="MasterData\Impl\ClientLogMgr.cs" />
+    <Compile Include="MasterData\Impl\ClientMgr.cs" />
+    <Compile Include="MasterData\Impl\ClientMonitorMgr.cs" />
+    <Compile Include="MasterData\Impl\ClientOrderDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\ClientOrderHeadMgr.cs" />
+    <Compile Include="MasterData\Impl\ClientWorkingHoursMgr.cs" />
+    <Compile Include="MasterData\Impl\CodeMasterMgr.cs" />
+    <Compile Include="MasterData\Impl\CurrencyMgr.cs" />
+    <Compile Include="MasterData\Impl\CustomerMgr.cs" />
+    <Compile Include="MasterData\Impl\CycleCountDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\CycleCountMgr.cs" />
+    <Compile Include="MasterData\Impl\CycleCountResultMgr.cs" />
+    <Compile Include="MasterData\Impl\EmployeeMgr.cs" />
+    <Compile Include="MasterData\Impl\EntityPreferenceMgr.cs" />
+    <Compile Include="MasterData\Impl\FavoritesMgr.cs" />
+    <Compile Include="MasterData\Impl\FileUploadMgr.cs" />
+    <Compile Include="MasterData\Impl\FinanceCalendarMgr.cs" />
+    <Compile Include="MasterData\Impl\FlowBindingMgr.cs" />
+    <Compile Include="MasterData\Impl\FlowDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\FlowDetailTrackMgr.cs" />
+    <Compile Include="MasterData\Impl\FlowMgr.cs" />
+    <Compile Include="MasterData\Impl\FlowPlanMgr.cs" />
+    <Compile Include="MasterData\Impl\FlowTrackMgr.cs" />
+    <Compile Include="MasterData\Impl\HuMgr.cs" />
+    <Compile Include="MasterData\Impl\HuOddMgr.cs" />
+    <Compile Include="MasterData\Impl\ImportMgr.cs" />
+    <Compile Include="MasterData\Impl\InspectOrderDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\InspectOrderMgr.cs" />
+    <Compile Include="MasterData\Impl\InspectResultMgr.cs" />
+    <Compile Include="MasterData\Impl\ItemKitMgr.cs" />
+    <Compile Include="MasterData\Impl\ItemMgr.cs" />
+    <Compile Include="MasterData\Impl\ItemReferenceMgr.cs" />
+    <Compile Include="MasterData\Impl\KPItemMgr.cs" />
+    <Compile Include="MasterData\Impl\KPOrderMgr.cs" />
+    <Compile Include="MasterData\Impl\LanguageMgr.cs" />
+    <Compile Include="MasterData\Impl\LocationDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\LocationLotDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\LocationMgr.cs" />
+    <Compile Include="MasterData\Impl\LocationTransactionMgr.cs" />
+    <Compile Include="MasterData\Impl\MiscOrderDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\MiscOrderMgr.cs" />
+    <Compile Include="MasterData\Impl\NamedQueryMgr.cs" />
+    <Compile Include="MasterData\Impl\NumberControlMgr.cs" />
+    <Compile Include="MasterData\Impl\OrderBindingMgr.cs" />
+    <Compile Include="MasterData\Impl\OrderDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\OrderHeadMgr.cs" />
+    <Compile Include="MasterData\Impl\OrderLocationTransactionMgr.cs" />
+    <Compile Include="MasterData\Impl\OrderMgr.cs" />
+    <Compile Include="MasterData\Impl\OrderOperationMgr.cs" />
+    <Compile Include="MasterData\Impl\OrderPlannedBackflushMgr.cs" />
+    <Compile Include="MasterData\Impl\PartyMgr.cs" />
+    <Compile Include="MasterData\Impl\PermissionCategoryMgr.cs" />
+    <Compile Include="MasterData\Impl\PermissionMgr.cs" />
+    <Compile Include="MasterData\Impl\PickListDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\PickListMgr.cs" />
+    <Compile Include="MasterData\Impl\PickListResultMgr.cs" />
+    <Compile Include="MasterData\Impl\PlannedBillMgr.cs" />
+    <Compile Include="MasterData\Impl\PriceListDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\PriceListMgr.cs" />
+    <Compile Include="MasterData\Impl\ProductLineInProcessLocationDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\ReceiptDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\ReceiptInProcessLocationMgr.cs" />
+    <Compile Include="MasterData\Impl\ReceiptMgr.cs" />
+    <Compile Include="MasterData\Impl\RegionMgr.cs" />
+    <Compile Include="MasterData\Impl\RepackDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\RepackMgr.cs" />
+    <Compile Include="MasterData\Impl\RoleMgr.cs" />
+    <Compile Include="MasterData\Impl\RolePermissionMgr.cs" />
+    <Compile Include="MasterData\Impl\RollingForecastMgr.cs" />
+    <Compile Include="MasterData\Impl\RoutingDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\RoutingMgr.cs" />
+    <Compile Include="MasterData\Impl\ScanBarcodeMgr.cs" />
+    <Compile Include="MasterData\Impl\ShiftDetailMgr.cs" />
+    <Compile Include="MasterData\Impl\ShiftMgr.cs" />
+    <Compile Include="MasterData\Impl\ShiftPlanScheduleMgr.cs" />
+    <Compile Include="MasterData\Impl\ShipAddressMgr.cs" />
+    <Compile Include="MasterData\Impl\SpecialTimeMgr.cs" />
+    <Compile Include="MasterData\Impl\StorageAreaMgr.cs" />
+    <Compile Include="MasterData\Impl\StorageBinMgr.cs" />
+    <Compile Include="MasterData\Impl\SubjectListMgr.cs" />
+    <Compile Include="MasterData\Impl\SupplierMgr.cs" />
+    <Compile Include="MasterData\Impl\UomConversionMgr.cs" />
+    <Compile Include="MasterData\Impl\UomMgr.cs" />
+    <Compile Include="MasterData\Impl\UserMgr.cs" />
+    <Compile Include="MasterData\Impl\UserPermissionMgr.cs" />
+    <Compile Include="MasterData\Impl\UserPreferenceMgr.cs" />
+    <Compile Include="MasterData\Impl\UserRoleMgr.cs" />
+    <Compile Include="MasterData\Impl\WorkCalendarMgr.cs" />
+    <Compile Include="MasterData\Impl\WorkCenterMgr.cs" />
+    <Compile Include="MasterData\Impl\WorkdayMgr.cs" />
+    <Compile Include="MasterData\Impl\WorkdayShiftMgr.cs" />
+    <Compile Include="MasterData\Impl\WorkingHoursMgr.cs" />
+    <Compile Include="MasterData\INamedQueryMgr.cs" />
+    <Compile Include="MasterData\INumberControlMgr.cs" />
+    <Compile Include="MasterData\IOrderBindingMgr.cs" />
+    <Compile Include="MasterData\IOrderDetailMgr.cs" />
+    <Compile Include="MasterData\IOrderHeadMgr.cs" />
+    <Compile Include="MasterData\IOrderLocationTransactionMgr.cs" />
+    <Compile Include="MasterData\IOrderMgr.cs" />
+    <Compile Include="MasterData\IOrderOperationMgr.cs" />
+    <Compile Include="MasterData\IOrderPlannedBackflushMgr.cs" />
+    <Compile Include="MasterData\IPartyMgr.cs" />
+    <Compile Include="MasterData\IPermissionCategoryMgr.cs" />
+    <Compile Include="MasterData\IPermissionMgr.cs" />
+    <Compile Include="MasterData\IPickListDetailMgr.cs" />
+    <Compile Include="MasterData\IPickListMgr.cs" />
+    <Compile Include="MasterData\IPickListResultMgr.cs" />
+    <Compile Include="MasterData\IPlannedBillMgr.cs" />
+    <Compile Include="MasterData\IPriceListDetailMgr.cs" />
+    <Compile Include="MasterData\IPriceListMgr.cs" />
+    <Compile Include="MasterData\IProductLineInProcessLocationDetailMgr.cs" />
+    <Compile Include="MasterData\IReceiptDetailMgr.cs" />
+    <Compile Include="MasterData\IReceiptInProcessLocationMgr.cs" />
+    <Compile Include="MasterData\IReceiptMgr.cs" />
+    <Compile Include="MasterData\IRegionMgr.cs" />
+    <Compile Include="MasterData\IRepackDetailMgr.cs" />
+    <Compile Include="MasterData\IRepackMgr.cs" />
+    <Compile Include="MasterData\IRoleMgr.cs" />
+    <Compile Include="MasterData\IRolePermissionMgr.cs" />
+    <Compile Include="MasterData\IRollingForecastMgr.cs" />
+    <Compile Include="MasterData\IRoutingDetailMgr.cs" />
+    <Compile Include="MasterData\IRoutingMgr.cs" />
+    <Compile Include="MasterData\IScanBarcodeMgr.cs" />
+    <Compile Include="MasterData\IShiftDetailMgr.cs" />
+    <Compile Include="MasterData\IShiftMgr.cs" />
+    <Compile Include="MasterData\IShiftPlanScheduleMgr.cs" />
+    <Compile Include="MasterData\IShipAddressMgr.cs" />
+    <Compile Include="MasterData\ISpecialTimeMgr.cs" />
+    <Compile Include="MasterData\IStorageAreaMgr.cs" />
+    <Compile Include="MasterData\IStorageBinMgr.cs" />
+    <Compile Include="MasterData\ISubjectListMgr.cs" />
+    <Compile Include="MasterData\ISupplierMgr.cs" />
+    <Compile Include="MasterData\IUomConversionMgr.cs" />
+    <Compile Include="MasterData\IUomMgr.cs" />
+    <Compile Include="MasterData\IUserMgr.cs" />
+    <Compile Include="MasterData\IUserPermissionMgr.cs" />
+    <Compile Include="MasterData\IUserPreferenceMgr.cs" />
+    <Compile Include="MasterData\IUserRoleMgr.cs" />
+    <Compile Include="MasterData\IWorkCalendarMgr.cs" />
+    <Compile Include="MasterData\IWorkCenterMgr.cs" />
+    <Compile Include="MasterData\IWorkdayMgr.cs" />
+    <Compile Include="MasterData\IWorkdayShiftMgr.cs" />
+    <Compile Include="MasterData\IWorkingHoursMgr.cs" />
+    <Compile Include="Procurement\IAutoOrderTrackMgr.cs" />
+    <Compile Include="Procurement\IItemFlowPlanDetailMgr.cs" />
+    <Compile Include="Procurement\IItemFlowPlanMgr.cs" />
+    <Compile Include="Procurement\IItemFlowPlanTrackMgr.cs" />
+    <Compile Include="Procurement\ILeanEngineMgr.cs" />
+    <Compile Include="Procurement\Impl\AutoOrderTrackMgr.cs" />
+    <Compile Include="Procurement\Impl\ItemFlowPlanDetailMgr.cs" />
+    <Compile Include="Procurement\Impl\ItemFlowPlanMgr.cs" />
+    <Compile Include="Procurement\Impl\ItemFlowPlanTrackMgr.cs" />
+    <Compile Include="Procurement\Impl\LeanEngineMgr.cs" />
+    <Compile Include="Procurement\Impl\OrderTracerMgr.cs" />
+    <Compile Include="Procurement\Impl\PurchasePriceListMgr.cs" />
+    <Compile Include="Procurement\Impl\SupplyChainMgr.cs" />
+    <Compile Include="Procurement\IOrderTracerMgr.cs" />
+    <Compile Include="Procurement\IPurchasePriceListMgr.cs" />
+    <Compile Include="Procurement\ISupplyChainMgr.cs" />
+    <Compile Include="Production\IMaterialFlushBackMgr.cs" />
+    <Compile Include="Production\Impl\MaterialFlushBackMgr.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\Impl\ReportMgr.cs" />
+    <Compile Include="Report\IReportBaseMgr.cs" />
+    <Compile Include="Report\IReportMgr.cs" />
+    <Compile Include="Report\ReportBaseMgr.cs" />
+    <Compile Include="Report\RepTemplate1.cs" />
+    <Compile Include="Report\Yfgm\Impl\RepBarCodeMgr.cs" />
+    <Compile Include="Report\Yfgm\Impl\RepPickListMgr.cs" />
+    <Compile Include="Report\Yfgm\Impl\RepProductionMgr.cs" />
+    <Compile Include="Report\Yfgm\Impl\RepRequisitionOrderMgr.cs" />
+    <Compile Include="Transportation\ICarrierMgr.cs" />
+    <Compile Include="Transportation\Impl\CarrierMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportationActBillMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportPriceListDetailMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportPriceListMgr.cs" />
+    <Compile Include="Transportation\ITransportationActBillMgr.cs" />
+    <Compile Include="Transportation\ITransportPriceListDetailMgr.cs" />
+    <Compile Include="Transportation\ITransportPriceListMgr.cs" />
+    <Compile Include="View\IActingBillViewMgr.cs" />
+    <Compile Include="View\IBillAgingViewMgr.cs" />
+    <Compile Include="View\IFlowViewMgr.cs" />
+    <Compile Include="View\IInProcessLocationDetailTrackViewMgr.cs" />
+    <Compile Include="View\IInProcessLocationDetailViewMgr.cs" />
+    <Compile Include="View\IInventoryAgingViewMgr.cs" />
+    <Compile Include="View\ILeanEngineViewMgr.cs" />
+    <Compile Include="View\ILocationBinDetailMgr.cs" />
+    <Compile Include="View\ILocationBinItemDetailMgr.cs" />
+    <Compile Include="View\ILocationBinMgr.cs" />
+    <Compile Include="View\ILocationLotDetailViewMgr.cs" />
+    <Compile Include="View\ILocationTransactionViewMgr.cs" />
+    <Compile Include="View\Impl\ActingBillViewMgr.cs" />
+    <Compile Include="View\Impl\BillAgingViewMgr.cs" />
+    <Compile Include="View\Impl\FlowViewMgr.cs" />
+    <Compile Include="View\Impl\InProcessLocationDetailTrackViewMgr.cs" />
+    <Compile Include="View\Impl\InProcessLocationDetailViewMgr.cs" />
+    <Compile Include="View\Impl\InventoryAgingViewMgr.cs" />
+    <Compile Include="View\Impl\LeanEngineViewMgr.cs" />
+    <Compile Include="View\Impl\LocationBinDetailMgr.cs" />
+    <Compile Include="View\Impl\LocationBinItemDetailMgr.cs" />
+    <Compile Include="View\Impl\LocationBinMgr.cs" />
+    <Compile Include="View\Impl\LocationLotDetailViewMgr.cs" />
+    <Compile Include="View\Impl\LocationTransactionViewMgr.cs" />
+    <Compile Include="View\Impl\OrderDetailViewMgr.cs" />
+    <Compile Include="View\Impl\OrderLocTransViewMgr.cs" />
+    <Compile Include="View\Impl\PlannedBillViewMgr.cs" />
+    <Compile Include="View\Impl\SupllierLocationViewMgr.cs" />
+    <Compile Include="View\IOrderDetailViewMgr.cs" />
+    <Compile Include="View\IOrderLocTransViewMgr.cs" />
+    <Compile Include="View\IPlannedBillViewMgr.cs" />
+    <Compile Include="View\ISupllierLocationViewMgr.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Entity\Entity.csproj">
+      <Project>{CADA5382-5233-4D03-9F4F-655382538AB1}</Project>
+      <Name>Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LeanEngine\LeanEngine.csproj">
+      <Project>{68052145-B627-45AC-8844-516DA63584F6}</Project>
+      <Name>LeanEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Persistence\Persistence.csproj">
+      <Project>{C8D4D3DC-F7B1-4AC8-B123-5B319E99C2D3}</Project>
+      <Name>Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{49EED42C-851F-4F50-B7D0-59C6C5A6F21E}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)$(SolutionName)\bin</PostBuildEvent>
+  </PropertyGroup>
+</Project>

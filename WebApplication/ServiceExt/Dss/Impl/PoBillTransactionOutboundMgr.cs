@@ -126,7 +126,8 @@ namespace com.Sconit.Service.Dss.Impl
                     if ((string)((object[])obj)[8] == BusinessConstants.SYSTEM_LOCATION_REJECT)
                     {
                         dssExportHistory.PartyTo = (string)((object[])obj)[7];
-                        this.GetLoctransInfo(dssExportHistory,true);
+                       // this.GetLoctransInfo(dssExportHistory);
+                        this.GetLoctransInfo(dssExportHistory,true);//10-15上线
 
                         dssExportHistory.KeyCode = orderHeadMgr.LoadOrderHead(dssExportHistory.OrderNo).ExternalOrderNo;
                     }

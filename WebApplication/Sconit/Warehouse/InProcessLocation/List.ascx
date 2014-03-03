@@ -1,5 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="List.ascx.cs" Inherits="Order_GoodsReceipt_AsnReceipt_List" %>
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="cc1" %>
+<%@ Register Src="~/Controls/TextBox.ascx" TagName="textbox" TagPrefix="uc3" %>
 <fieldset>
     <div class="GridView">
         <cc1:GridView ID="GV_List" runat="server" AutoGenerateColumns="False" DataKeyNames="IpNo"
@@ -26,6 +27,12 @@
                         <%# DataBinder.Eval(Container.DataItem, "ShipFrom.Address")%>
                     </ItemTemplate>
                 </asp:TemplateField>--%>
+                <asp:TemplateField HeaderText="${InProcessLocation.PartyToCode}"  >
+                    <ItemTemplate>
+                        <asp:Label ID="PartyToCode" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "PartyTo.Code")%>'
+                             />
+                    </ItemTemplate>
+                </asp:TemplateField>
                 <asp:TemplateField HeaderText="${InProcessLocation.PartyTo}" SortExpression="PartyTo">
                     <ItemTemplate>
                         <asp:Label ID="PartyToName" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "PartyTo.Name")%>'
@@ -39,13 +46,14 @@
                 </asp:TemplateField>--%>
                 <asp:BoundField DataField="DockDescription" HeaderText="${InProcessLocation.DockDescription}"
                     SortExpression="DockDescription" />
+                      <asp:BoundField DataField="CreateDate" HeaderText="${InProcessLocation.CreateDate}"
+                    SortExpression="CreateDate" />
                 <asp:TemplateField HeaderText="${InProcessLocation.Status}">
                     <ItemTemplate>
                         <cc1:CodeMstrLabel ID="lblStatus" runat="server" Code="Status" Value='<%# Bind("Status") %>' />
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:BoundField DataField="CreateDate" HeaderText="${InProcessLocation.CreateDate}"
-                    SortExpression="CreateDate" />
+              
                 <asp:TemplateField HeaderText="${Common.Business.CreateUser}" SortExpression="CreateUser.FirstName">
                     <ItemTemplate>
                         <%# DataBinder.Eval(Container.DataItem, "CreateUser.Name")%>
@@ -118,18 +126,44 @@
                          ToolTip='<%# DataBinder.Eval(Container.DataItem, "OrderDetail.DefaultLocationFrom.Name")%>'/>
                     </ItemTemplate>
                 </asp:TemplateField>
+                 
                 <asp:TemplateField HeaderText="${MasterData.Order.OrderHead.LocTo}" SortExpression="OrderLocationTransaction.OrderDetail.LocationTo.Code">
                     <ItemTemplate>
-                        <asp:Label ID="lblLocationTo" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "OrderDetail.DefaultLocationTo.Code")%>'
+                        <asp:Label ID="lblLocationTo" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "OrderDetail.LocationTo.Code")%>'
                         ToolTip='<%# DataBinder.Eval(Container.DataItem, "OrderDetail.DefaultLocationTo.Name")%>' />
                     </ItemTemplate>
                 </asp:TemplateField>
+                <asp:TemplateField HeaderText="PartyTo" Visible="false" SortExpression="OrderLocationTransaction.OrderDetail.OrderHead.PartyTo.Code">
+                    <ItemTemplate>
+                        <asp:Label ID="lblPartyTo" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "OrderDetail.OrderHead.PartyTo.Code")%>'
+                        />
+                    </ItemTemplate>
+                </asp:TemplateField>
+                 <asp:TemplateField HeaderText="PartyTo描述" Visible="false" SortExpression="OrderLocationTransaction.OrderHead.PartyTo.Name">
+                    <ItemTemplate>
+                        <asp:Label ID="lblPartyToCode" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "OrderDetail.OrderHead.PartyTo.Name")%>'
+                        />
+                    </ItemTemplate>
+                </asp:TemplateField>
                 <asp:BoundField DataField="Qty" HeaderText="${Common.Business.Qty}" SortExpression="Qty"  DataFormatString="{0:0.########}"/>
+                 
                  <asp:TemplateField HeaderText="${Common.Business.CreateDate}" SortExpression="InProcessLocation.CreateDate">
                     <ItemTemplate>
-                        <asp:Label ID="lblCreateDate" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "InProcessLocation.CreateDate")%>' />
+                        <asp:Label ID="lblCreateDate" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "InProcessLocation.CreateDate")%>'   />
                     </ItemTemplate>
-                </asp:TemplateField>          
+                </asp:TemplateField>
+                
+                     <asp:TemplateField HeaderText="创建日期" Visible="false" SortExpression="InProcessLocation.CreateDate">
+                    <ItemTemplate>
+                        <asp:Label ID="lblCreateDate" runat="server" Text='<%# String.Format("{0:yyyy-MM-dd} ", DataBinder.Eval(Container.DataItem, "InProcessLocation.CreateDate"))%>'   />
+                    </ItemTemplate>
+                </asp:TemplateField>
+                   <asp:TemplateField HeaderText="创建时间" Visible="false" SortExpression="InProcessLocation.CreateDate">
+                    <ItemTemplate>
+                        <asp:Label ID="lblCreateDate" runat="server" Text='<%# String.Format("{0:HH:mm:ss} ", DataBinder.Eval(Container.DataItem, "InProcessLocation.CreateDate"))%>'   />
+                    </ItemTemplate>
+                </asp:TemplateField>
+                          
             </Columns>
         </cc1:GridView>
         <cc1:GridPager ID="gp_Detail" runat="server" GridViewID="GV_List_Detail" PageSize="10">

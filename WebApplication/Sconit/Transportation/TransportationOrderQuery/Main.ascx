@@ -82,6 +82,8 @@
         <asp:BoundField DataField="orderno" HeaderText="运单号" />
         <asp:BoundField DataField="status" HeaderText="状态" />
         <asp:BoundField DataField="flow" HeaderText="发货路线" />
+         <asp:BoundField DataField="createuser" HeaderText="创建人" />
+          
     </Columns>
 </asp:GridView>
 </fieldset>

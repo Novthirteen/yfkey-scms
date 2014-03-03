@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.View.GoodsTraceabilityViewBase, com.Sconit.Entity" table="GoodsTraceabilityView" lazy="false">
+    <id name="HuId" column="HuId" type="String" unsaved-value="0" >
+      <generator class="assigned" />
+    </id>
+    <!--<property name="HuId" column="HuId" type="String" length="50" />-->
+    <property name="OrderNo" column="OrderNo" type="String" length="50"  />
+    <property name="Item" column="Item" type="String" length="50" />
+    <property name="Desc" column="Desc1" type="String" length="150" />
+    <property name="Qty" column="Qty" type="Decimal"   />
+    <property name="CreateUser" column="CreateUser" type="String" length="50" />
+    <property name="Location" column="Name" type="String" length="50" />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+  </class>
+</hibernate-mapping>

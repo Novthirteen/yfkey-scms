@@ -127,6 +127,8 @@
         <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Distribution__mp--ModuleType-Distribution_ModuleSubType-Adj_StatusGroupId-1_IsQuick-true__act--NewAction" title="$Resources:Language,ShipAdjustment"  description="ShipAdjustment"  />
         <siteMapNode url="~/Main.aspx?mid=Finance.PlanBill.SO__mp--ModuleType-SO" title="$Resources:Language,SOPlanBill" description="SOPlanBill"/>
         <siteMapNode url="~/Main.aspx?mid=Finance.Bill__mp--ModuleType-SO" title="$Resources:Language,SOBill" description="SOBill" />
+        <siteMapNode url="~/Main.aspx?mid=Warehouse.CheckASN" title="$Resources:Language,CheckASN" description="CheckASN" />
+
       </siteMapNode>
       <siteMapNode url="" title="$Resources:Language,Information" description="Information">
         <siteMapNode url="~/Main.aspx?mid=Reports.IntransitDetail__mp--ModuleType-Distribution" title="$Resources:Language,ShipmentMonitoring" description="ShipmentMonitoring"/>
@@ -150,6 +152,8 @@
         <siteMapNode url="~/Main.aspx?mid=Inventory.PrintHu__mp--ModuleType-Region" title="$Resources:Language, GoodsUniting" description="GoodsUniting"  />
         <siteMapNode url="~/Main.aspx?mid=Warehouse.PutAway" title="$Resources:Language,PutAway" description="PutAway" />
         <siteMapNode url="~/Main.aspx?mid=Warehouse.Pickup" title="$Resources:Language,Pickup" description="Pickup" />
+        <!--盘点下架-->
+        <siteMapNode url="~/Main.aspx?mid=Warehouse.BatchShelf" title="$Resources:Language,BatchShelf" description="BatchShelf" />
         <siteMapNode url="~/Main.aspx?mid=Inventory.MiscOrder.__mp--ModuleType-Gr" title="$Resources:Language,InvIn"  description="InvIn"  />
         <siteMapNode url="~/Main.aspx?mid=Inventory.MiscOrder.__mp--ModuleType-Gi" title="$Resources:Language,InvOut" description="InvOut"  />
         <siteMapNode url="~/Main.aspx?mid=Inventory.Repack__mp--Type-Repack" title="$Resources:Language, Repack" description="Repack"  />
@@ -165,6 +169,7 @@
       <siteMapNode url="" title="$Resources:Language,Information" description="Information">
         <!--siteMapNode url="~/Main.aspx?mid=Inventory.RepackNotes" title="$Resources:Language,RepackNotes"  description="RepackNotes"  /-->
         <siteMapNode url="~/Main.aspx?mid=Reports.LocInvQuery" title="$Resources:Language, LocInvQuery" description="LocInvQuery"></siteMapNode>
+         <siteMapNode url="~/Main.aspx?mid=Inventory.UnWHQuery" title="$Resources:Language, UnWHQuery" description="UnWHQuery"></siteMapNode> 
         <siteMapNode url="~/Main.aspx?mid=Reports.InvDetail__mp--ModuleType-InvDet" title="$Resources:Language,InventoryDetail"  description="InventoryDetail"  />
         <siteMapNode url="~/Main.aspx?mid=Reports.LocTrans" title="$Resources:Language,InventoryTrans" description="InventoryTrans"  />
         <siteMapNode url="~/Main.aspx?mid=Reports.InvDetail__mp--ModuleType-HisInv" title="$Resources:Language,HistoricalInventory" description="HistoricalInventory"  />
@@ -174,6 +179,7 @@
         <siteMapNode url="~/Main.aspx?mid=Reports.Inventory" title="$Resources:Language,ViewInventory" description="ViewInventory" />
         <siteMapNode url="~/Main.aspx?mid=Reports.CycCntDiff" title="$Resources:Language,CycleCountDiff" description="CycleCountDiff" />
         <siteMapNode url="~/Main.aspx?mid=Reports.WorkshopFinshGoods" title="$Resources:Language,WorkshopFinshGoods" description="WorkshopFinshGoods" />
+        <siteMapNode url="~/Main.aspx?mid=Reports.InvR" title="$Resources:Language,InvR" description="InvR" />
       </siteMapNode>
       <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
         <siteMapNode url="~/Main.aspx?mid=Flow.Transfer" title="$Resources:Language, TransferFlow" description="TransferFlow"  />
@@ -192,6 +198,7 @@
         <siteMapNode url="~/Main.aspx?mid=Transportation.TransportationOrderQuery" title="$Resources:Language,TranOrderQuery" description="TranOrderQuery"/>
       </siteMapNode>
       <siteMapNode url="" title="$Resources:Language,Information" description="Information">
+        <siteMapNode url="~/Main.aspx?mid=Transportation.CostCenterFilter" title="$Resources:Language,CostCenterFilter"  description="CostCenterFilter"  />
       </siteMapNode>
       <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
         <siteMapNode url="~/Main.aspx?mid=Transportation.Carrier" title="$Resources:Language,Carrier"  description="Carrier"  />

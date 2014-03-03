@@ -97,19 +97,19 @@ namespace com.Sconit.Entity.MasterData
 			}
 		}
 
-        #region  20120828 wuri
-        //private Boolean _isIntern;
-        //public virtual Boolean IsIntern
-        //{
-        //    get
-        //    {
-        //        return _isIntern;
-        //    }
-        //    set
-        //    {
-        //        _isIntern = value;
-        //    }
-        //}
+        #region  20120828 wuri //内部客户
+        private Boolean _isIntern;
+        public virtual Boolean IsIntern
+        {
+            get
+            {
+                return _isIntern;
+            }
+            set
+            {
+                _isIntern = value;
+            }
+        }
         #endregion
 
 

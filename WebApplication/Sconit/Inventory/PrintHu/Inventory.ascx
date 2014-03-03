@@ -58,6 +58,7 @@
                 <asp:TextBox ID="tbCreateDate" runat="server" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" />                 
             </td>
             <td class="td01">
+           
             </td>
             <td class="td02">
                 <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" OnClick="btnSearch_Click"
@@ -66,6 +67,7 @@
                     Width="59px" CssClass="button2" />
             </td>
         </tr>
+      
     </table>
 </fieldset>
 <uc2:List ID="ucList" runat="server" Visible="false" />

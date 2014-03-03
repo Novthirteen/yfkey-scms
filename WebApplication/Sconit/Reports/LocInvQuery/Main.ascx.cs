@@ -30,15 +30,15 @@ public partial class LocInvQuery : MainModuleBase
     {
     }
 
-    protected DataSet sqltods(string sqltext)
+    protected DataSet sqltods(string sqltext,bool ex)
     {
         XmlTextReader reader = new XmlTextReader(Server.MapPath("Config/properties.config"));
         XmlDocument doc = new XmlDocument();
         doc.Load(reader);//  
         reader.Close();//
         ConnString = doc.SelectSingleNode("/configuration/properties/connectionString").InnerText.Trim();
-        dsOrderQuery = SqlHelper.ExecuteDataset(ConnString, CommandType.Text, sqlText);
-
+        dsOrderQuery = SqlHelper.ExecuteDataset(ConnString, CommandType.Text, sqltext);
+        if(ex)
         Session["ds"] = dsOrderQuery;
         return dsOrderQuery;
     }
@@ -65,8 +65,10 @@ public partial class LocInvQuery : MainModuleBase
             //}
             sqlText = "select * from locinvqueryview";
 
-            BindData(sqltods(sqlText));
+            BindData(sqltods(sqlText,true));
+          
         }
+        BindSel();
     }
 
     protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
@@ -74,7 +76,19 @@ public partial class LocInvQuery : MainModuleBase
         GridView1.PageIndex = e.NewPageIndex;
         btn1_Click(sender, e);
     }
-
+    protected void BindSel()
+    {
+        if (location.Items.Count == 0)
+        {
+            string sql = "select distinct refloc from locinvqueryview ";
+            DataTable dt = sqltods(sql, false).Tables[0];
+            location.Items.Add(new ListItem("ALL", ""));
+            foreach (DataRow dr in dt.Rows)
+            {
+                location.Items.Add(new ListItem(dr["refloc"].ToString(), dr["refloc"].ToString()));
+            }
+        }
+    }
     protected void btn1_Click(object sender, EventArgs e)
     {
         string TRoute = txtTRoute.Text;
@@ -88,9 +102,9 @@ public partial class LocInvQuery : MainModuleBase
         {
             sqlText += " and item like '%" + TRoute + "%'";
         }
-        if (location.Value != "")
+        if (location.SelectedValue != "")
         {
-            sqlText += " and location='" + location.Value + "'";
+            sqlText += " and refloc='" + location.SelectedValue + "'";
         }
         //if (IpNo != "")
         //{
@@ -123,13 +137,13 @@ public partial class LocInvQuery : MainModuleBase
         //    sqlText += " and CreateDate > '" + Convert.ToDateTime(txtCreateDate.Text).AddDays(-2).Date + "'";
         //}
         //sqlText += " order by CreateDate desc";
-        BindData(sqltods(sqlText));
+        BindData(sqltods(sqlText,true));
     }
 
     protected void btnClear_Click(object sender, EventArgs e)
     {
         txtTRoute.Text = "";
-        location.Value = "";
+        location.SelectedValue = "";
         //txtIpNo.Text = "";
         //txtOrderNo.Text = "";
         //ddlStatus.SelectedIndex = 0;
@@ -144,7 +158,7 @@ public partial class LocInvQuery : MainModuleBase
         sheet1.GetRow(0).CreateCell(1).SetCellValue("物料代码");
         sheet1.GetRow(0).CreateCell(2).SetCellValue("物料名称");
         sheet1.GetRow(0).CreateCell(3).SetCellValue("库位");
-        sheet1.GetRow(0).CreateCell(4).SetCellValue("库位描述");
+        sheet1.GetRow(0).CreateCell(4).SetCellValue("来源库位");
         sheet1.GetRow(0).CreateCell(5).SetCellValue("单位");
         sheet1.GetRow(0).CreateCell(6).SetCellValue("数量");
 
@@ -154,12 +168,12 @@ public partial class LocInvQuery : MainModuleBase
         for (int i = 1; i <= ds.Tables[0].Rows.Count; i++)
         {
             sheet1.CreateRow(i).CreateCell(0).SetCellValue(Convert.ToString(i));
-            sheet1.GetRow(i).CreateCell(1).SetCellValue(ds.Tables[0].Rows[i - 1][0].ToString());
-            sheet1.GetRow(i).CreateCell(2).SetCellValue(ds.Tables[0].Rows[i - 1][1].ToString());
-            sheet1.GetRow(i).CreateCell(3).SetCellValue(ds.Tables[0].Rows[i - 1][2].ToString());
-            sheet1.GetRow(i).CreateCell(4).SetCellValue(ds.Tables[0].Rows[i - 1][3].ToString());
-            sheet1.GetRow(i).CreateCell(5).SetCellValue(ds.Tables[0].Rows[i - 1][4].ToString());
-            sheet1.GetRow(i).CreateCell(6).SetCellValue(ds.Tables[0].Rows[i - 1][5].ToString());
+            sheet1.GetRow(i).CreateCell(1).SetCellValue(ds.Tables[0].Rows[i - 1]["Item"].ToString());
+            sheet1.GetRow(i).CreateCell(2).SetCellValue(ds.Tables[0].Rows[i - 1]["desc1"].ToString());
+            sheet1.GetRow(i).CreateCell(3).SetCellValue(ds.Tables[0].Rows[i - 1]["location"].ToString());
+            sheet1.GetRow(i).CreateCell(4).SetCellValue(ds.Tables[0].Rows[i - 1]["refloc"].ToString());
+            sheet1.GetRow(i).CreateCell(5).SetCellValue(ds.Tables[0].Rows[i - 1]["uom"].ToString());
+            sheet1.GetRow(i).CreateCell(6).SetCellValue(ds.Tables[0].Rows[i - 1]["qty"].ToString());
         }
         sheet1.AutoSizeColumn(0);
         sheet1.AutoSizeColumn(1);

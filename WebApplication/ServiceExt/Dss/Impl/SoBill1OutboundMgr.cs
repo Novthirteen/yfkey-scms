@@ -42,7 +42,8 @@ namespace com.Sconit.Service.Dss.Impl
                 dssExportHistory.PartyTo,//客户
                 DssHelper.FormatDate(effDate,dssExportHistory.DssOutboundControl.ExternalSystem.Code),//生效日期
                 dssExportHistory.PartyFrom,//QAD:Site
-                dssExportHistory.Item//零件号
+                //"",//零件号
+                dssExportHistory.Item
             };
 
             string[] line2 = new string[]

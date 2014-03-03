@@ -58,7 +58,7 @@
                         </td>
                         <td class="td02">
                             <asp:TextBox ID="tbUC" runat="server" Text='<%# Bind("UnitCount","{0:0.########}") %>'
-                                CssClass="inputRequired" />
+                                 CssClass="inputRequired"/>
                             <asp:RequiredFieldValidator ID="rfvUC" runat="server" ErrorMessage="${MasterData.Flow.FlowDetail.UnitCount.Required}"
                                 Display="Dynamic" ControlToValidate="tbUC" ValidationGroup="vgSaveGroup" />
                             <asp:RangeValidator ID="rvUC" ControlToValidate="tbUC" runat="server" Display="Dynamic"
@@ -69,7 +69,15 @@
                             <asp:Literal ID="lblHuLotSize" runat="server" Text="${MasterData.Flow.FlowDetail.HuLotSize}:" />
                         </td>
                         <td class="td02">
-                            <asp:TextBox ID="tbHuLotSize" runat="server" Text='<%# Bind("HuLotSize") %>' />
+                            <asp:TextBox ID="tbHuLotSize" runat="server" Text='<%# Bind("HuLotSize") %>' 
+                                CssClass="inputRequired"/>
+                            <%--wurui----2012/10/09--start--%>
+                            <asp:RequiredFieldValidator ID="rfvHuLotSize" runat="server" ControlToValidate="tbHuLotSize"
+                                Display="Dynamic" ErrorMessage="${MasterData.Flow.FlowDetail.HuLotSize.Required}" ValidationGroup="vgSaveGroup" />
+                            <asp:RangeValidator ID="rvHuLotSize" ControlToValidate="tbHuLotSize" runat="server" Display="Dynamic"
+                                ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="999999999" MinimumValue="0.00000001"
+                                Type="Double" ValidationGroup="vgSaveGroup" />
+                            <%--wurui--end--%>
                         </td>
                     </tr>
                     <tr>

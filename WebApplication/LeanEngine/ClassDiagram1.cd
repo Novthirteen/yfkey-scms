@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="LeanEngine.Engine" BaseTypeListCollapsed="true">
+    <Position X="28.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQSgEABAAABACALAAAAAAAAQgAAAAAACAAAAQACAAAQ=</HashCode>
+      <FileName>Engine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="LeanEngine.Entity.Bom">
+    <Position X="8.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAQAEAAAAAAAAAAgAAAAACAA=</HashCode>
+      <FileName>Entity\Bom.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.BusinessException">
+    <Position X="26.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entity\BusinessException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.DemandChain">
+    <Position X="19.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAADCCAgAoAQgwAAgIAAEAAgIAIAAACAAAgAACAA=</HashCode>
+      <FileName>Entity\DemandChain.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.EngineContainer">
+    <Position X="1.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAJAAABAAIAAQAACAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Entity\EngineContainer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.EntityBase" Collapsed="true">
+    <Position X="12.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entity\EntityBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.Flow">
+    <Position X="10.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAJAAAAIAAAAAgEAgAAIIAgAAIIAAAAQAAAAAAEA=</HashCode>
+      <FileName>Entity\Flow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.FlowStrategy">
+    <Position X="15" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAEAAAAAAAgAAgAQAAABIBAIAQAAAAABARIAA=</HashCode>
+      <FileName>Entity\FlowStrategy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.InvBalance">
+    <Position X="21.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAEgAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entity\InvBalance.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.ItemFlow">
+    <Position X="3.75" Y="1.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AIAAIAAAAQAAgAQEwABAgBAkAAIAAIAAASQAABAAAAA=</HashCode>
+      <FileName>Entity\ItemFlow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.Orders">
+    <Position X="6" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQIAAAQAAAAAgAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entity\Orders.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.OrderTracer">
+    <Position X="12.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgCAAEgAAABAAAACBAAAAAAAQ=</HashCode>
+      <FileName>Entity\OrderTracer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.Plans">
+    <Position X="17.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAgAiAAAgAAACAAEgAgABIAgACAAAAAAAEM=</HashCode>
+      <FileName>Entity\Plans.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Entity.SupplyChain">
+    <Position X="24" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAABAAAAAoAQAwAAAAQAEAAgIAIAAACAAAAAAIAA=</HashCode>
+      <FileName>Entity\SupplyChain.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.OAE.JIT">
+    <Position X="3.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OAE\JIT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.OAE.KB">
+    <Position X="5.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>OAE\KB.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.OAE.OAEBase">
+    <Position X="0.5" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ACiAIABBFQAIgCFAAUAgAIAEAAAAAAgCAIAAAAAAAAQ=</HashCode>
+      <FileName>OAE\OAEBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LeanEngine.OAE.ODP">
+    <Position X="5.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>OAE\ODP.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.SCM.SupplyChainMgr" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAIAAAAAAAAAAAAAAAAACAAAAAAAAAAACAA=</HashCode>
+      <FileName>SCM\SupplyChainMgr.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="LeanEngine.Utility.Enumerators" Collapsed="true">
+    <Position X="30" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="LeanEngine.Utility.Enumerators.FlowType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Utility\Enumerators.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="LeanEngine.Utility.Enumerators.IRType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Utility\Enumerators.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="LeanEngine.Utility.Enumerators.PlanType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Utility\Enumerators.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="LeanEngine.Utility.Enumerators.Strategy" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Utility\Enumerators.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="LeanEngine.Utility.Enumerators.TimeUnit" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Utility\Enumerators.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="LeanEngine.Utility.Enumerators.RoundUp" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Utility\Enumerators.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="LeanEngine.Utility.Enumerators.InvType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Utility\Enumerators.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="LeanEngine.Utility.Enumerators.TracerType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Utility\Enumerators.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utility\Enumerators.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LeanEngine.Utility.Utilities" Collapsed="true">
+    <Position X="30" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utility\Utilities.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="LeanEngine.IEngine" Collapsed="true">
+    <Position X="26.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAQAAAAAQ=</HashCode>
+      <FileName>IEngine.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LeanEngine.OAE.IOAE" Collapsed="true">
+    <Position X="30" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OAE\IOAE.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LeanEngine.SCM.ISupplyChainMgr" Collapsed="true">
+    <Position X="30" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SCM\ISupplyChainMgr.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

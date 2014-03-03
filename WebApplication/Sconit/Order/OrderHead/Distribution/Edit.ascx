@@ -3,9 +3,7 @@
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="sc1" %>
 <%@ Register Src="~/Order/OrderDetail/List.ascx" TagName="Detail" TagPrefix="uc2" %>
-
 <script language="javascript" type="text/javascript" src="Js/DatePicker/WdatePicker.js"></script>
-
 <fieldset>
     <legend>${MasterData.Order.OrderHead}</legend>
     <asp:FormView ID="FV_Order" runat="server" DataSourceID="ODS_Order" DefaultMode="Edit"
@@ -129,13 +127,13 @@
                     <td class="td01">
                         <asp:Literal ID="lblMemo" runat="server" Text="${MasterData.Order.OrderHead.Memo}:" />
                     </td>
-                    <td class="td02" >
+                    <td class="td02">
                         <asp:TextBox ID="tbMemo" runat="server" Text='<%# Bind("Memo") %>'></asp:TextBox>
                     </td>
                     <td class="td01">
                         <asp:Literal ID="ltlFlow" runat="server" Text="${Common.Business.Flow}:" />
                     </td>
-                    <td class="td02" >
+                    <td class="td02">
                         <asp:TextBox ID="tbFlow" runat="server" ReadOnly="true" Text='<%# Bind("Flow") %>'></asp:TextBox>
                     </td>
                 </tr>
@@ -170,7 +168,7 @@
                             <sc1:CodeMstrLabel ID="lReceiptTemplate" Code="ReceiptTemplate" runat="server" Value='<%# Bind("ReceiptTemplate") %>' />
                         </td>
                     </tr>
-                     <tr>
+                    <tr>
                         <td class="td01">
                             <asp:Literal ID="lblHuTemplate" runat="server" Text="${MasterData.Order.OrderHead.HuTemplate}:" />
                         </td>
@@ -178,10 +176,8 @@
                             <sc1:CodeMstrLabel ID="lHuTemplate" Code="HuTemplate" runat="server" Value='<%# Bind("HuTemplate") %>' />
                         </td>
                         <td class="td01">
-                            
                         </td>
                         <td class="td02">
-                            
                         </td>
                     </tr>
                 </table>

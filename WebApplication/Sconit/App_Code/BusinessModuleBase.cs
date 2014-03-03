@@ -41,7 +41,7 @@ namespace com.Sconit.Web
         {
             CacheResolver.Input = input;
             CacheResolver = TheResolverMgr.Resolve(this.CacheResolver);
-
+          
             if (bind) Bind();
         }
 

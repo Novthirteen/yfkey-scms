@@ -487,6 +487,8 @@ public partial class Order_OrderHead_Edit : EditModuleBase
         }
     }
 
+   
+
     protected void btnExport_Click(object sender, EventArgs e)
     {
         OrderHead orderHead = TheOrderHeadMgr.LoadOrderHead(this.OrderNo);

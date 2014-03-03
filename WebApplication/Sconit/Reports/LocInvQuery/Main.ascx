@@ -16,15 +16,13 @@
                     <asp:TextBox ID="txtTRoute" runat="server"></asp:TextBox>
             </td>
             <td class="ttd01">
-                <asp:Label ID="lblIpNo" runat="server" Text="库位："></asp:Label>
+                <asp:Label ID="lblIpNo" runat="server" Text="来源库位："></asp:Label>
             </td>
             <td class="ttd02">
-               <select runat="server" id="location">
-               <option value="">ALL</option>
-               <option value="Reject">Reject 不合格品库位</option>
-               <option value="Inspect">Inspect 待验库位</option>
-               </select>
+             <asp:DropDownList ID="location" runat="server">
+            </asp:DropDownList>
             </td>
+            
         </tr>
         <%--<tr>
             <td class="ttd01">
@@ -73,8 +71,10 @@
     </table>
 </fieldset>
 <fieldset>
-<asp:GridView ID="GridView1" AutoGenerateColumns="false" runat="server" CellMaxLength="10" EmptyDataText="无记录！"
-    AllowPaging="True" Width="100%" OnPageIndexChanging="GridView1_PageIndexChanging">
+<asp:GridView ID="GridView1" AutoGenerateColumns="false" runat="server" 
+        CellMaxLength="25" EmptyDataText="无记录！"
+    AllowPaging="True" Width="100%" 
+        OnPageIndexChanging="GridView1_PageIndexChanging" PageSize="20">
     <Columns>
         <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderText="序号" HeaderStyle-HorizontalAlign="Center" ItemStyle-Width="30">
         <ItemTemplate >
@@ -84,7 +84,7 @@
         <asp:BoundField DataField="item" HeaderText="物料代码" />
         <asp:BoundField DataField="desc1" HeaderText="物料描述" />
         <asp:BoundField DataField="location" HeaderText="库位" />
-        <asp:BoundField DataField="name" HeaderText="库位描述" />
+        <asp:BoundField DataField="refloc" HeaderText="来源库位" />
         <asp:BoundField DataField="uom" HeaderText="单位" />
         <asp:BoundField DataField="qty" HeaderText="数量" />
     </Columns>

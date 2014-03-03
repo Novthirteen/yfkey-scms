@@ -17,5 +17,7 @@ namespace com.Mes.Dss.Service
         IList<MesScmsCompletedBox> GetUpdateMesScmsCompletedBox();
 
         void Complete(MesScmsCompletedBox mesScmsCompletedBox);
+
+        int GetMesScmsCompletedBox(string orderno);
     }
 }

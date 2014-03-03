@@ -224,5 +224,14 @@ public partial class Warehouse_InProcessLocation_ViewMain : MainModuleBase
         //ScriptManager.RegisterClientScriptBlock(this, GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + asnUrl + "'); </script>", false);
         Page.ClientScript.RegisterStartupScript(GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + asnUrl + "'); </script>");
     }
+    protected void PrintDasAuto(object sender, EventArgs e)
+    {
+        InProcessLocation inProcessLocation = TheInProcessLocationMgr.LoadInProcessLocation(IpNo, true);
+        IList<object> list = new List<object>();
+        list.Add(inProcessLocation);
+        list.Add(inProcessLocation.InProcessLocationDetails);
+        string printUrl = TheReportMgr.WriteToFile("DasAutoAsn.xls", list);
+        Page.ClientScript.RegisterStartupScript(GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + printUrl + "'); </script>");
 
+    }
 }

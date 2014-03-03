@@ -24,7 +24,8 @@ namespace com.Sconit.Service.Dss.Impl
         private ICommonOutboundMgr commonOutboundMgr;
         private ILocationTransactionMgr locationTransactionMgr;
         private ILocationMgr locationMgr;
-
+        private IDssOutboundControlMgr dssOutboundControlMgr;
+        protected IMiscOrderMgr miscOrderMgr { get; set; }
         public RcttrOutboundMgr(INumberControlMgr numberControlMgr,
             IDssExportHistoryMgr dssExportHistoryMgr,
             ICriteriaMgr criteriaMgr,
@@ -40,33 +41,35 @@ namespace com.Sconit.Service.Dss.Impl
             this.commonOutboundMgr = commonOutboundMgr;
             this.locationTransactionMgr = locationTransactionMgr;
             this.locationMgr = locationMgr;
+            this.dssOutboundControlMgr = dssOutboundControlMgr;
         }
 
         [Transaction(TransactionMode.Unspecified)]
         protected override IList<DssExportHistory> ExtractOutboundData(DssOutboundControl dssOutboundControl)
         {
-            IList<DssExportHistory> trList = this.GetRctTrLocationTransaction(dssOutboundControl.Mark);
-            this.ProcessRctTr(trList, dssOutboundControl);
-
             IList<LocationTransaction> inpTr = this.GetInpLocationTransaction(dssOutboundControl.Mark);
+            IList<DssExportHistory> trList = this.GetRctTrLocationTransaction(dssOutboundControl.Mark, "RCT-TR");
+            this.ProcessRctTr(trList, dssOutboundControl);
             IList<DssExportHistory> inpList = this.ProcessRctInp(inpTr);
-           
+            IList<DssExportHistory> issunplist = GetIssUnpLocationTransaction(dssOutboundControl.Mark, dssOutboundControl);
             IList<DssExportHistory> result = trList.Concat(inpList).ToList();
-            log.Debug("Get records: RCT-TR:" + trList.Count + ",RCT-INP:" + inpList.Count + ",concat result:" + result.Count);
-
+            result = result.Concat(issunplist).ToList();
+            log.Debug("Get records: RCT-TR:" + trList.Count + ",RCT-INP:" + inpList.Count + ",ISS-UNP:" + issunplist.Count + ",concat result:" + result.Count);
             result = this.GroupData(result, dssOutboundControl);
             log.Debug("Group data,now records: " + result.Count);
-
             return result;
         }
 
         protected override object GetOutboundData(DssExportHistory dssExportHistory)
         {
-            if (dssExportHistory.ReferenceLocation == null || dssExportHistory.ReferenceLocation.Trim() == string.Empty)
-            {
-                dssExportHistory.Comments = "来源库位为空";
-                throw new BusinessErrorException("来源库位为空");
-            }
+            //if (dssExportHistory.Comments != "ISS-UNP2RCT-TR")
+            //{
+                if (dssExportHistory.ReferenceLocation == null || dssExportHistory.ReferenceLocation.Trim() == string.Empty)
+                {
+                    dssExportHistory.Comments = "来源库位为空";
+                    throw new BusinessErrorException("来源库位为空");
+                }
+            //}
             if (dssExportHistory.Location == null || dssExportHistory.Location.Trim() == string.Empty)
             {
                 throw new BusinessErrorException("目的库位为空");
@@ -142,7 +145,7 @@ namespace com.Sconit.Service.Dss.Impl
                             //if (issTrans.Location == "Reject")
                             //    dssExportHistory.PartyFrom = locationMgr.LoadLocation(issTrans.RefLocation).Region.Code;
                             //else
-                                dssExportHistory.PartyFrom = issTrans.PartyFrom;
+                            dssExportHistory.PartyFrom = issTrans.PartyFrom;
                         }
                     }
                 }
@@ -167,14 +170,14 @@ namespace com.Sconit.Service.Dss.Impl
                     dssExportHistory.OriginalId = rctinp.Id;
                     dssExportHistory.OrderNo = rctinp.OrderNo;
                     dssExportHistory.PartyFrom = rctinp.PartyFrom;
-                   // dssExportHistory.PartyTo = rctinp.PartyTo;
-                    if(rctinp.TransactionType=="RCT-INP")
-                    dssExportHistory.PartyTo = rctinp.RefLocation!=string.Empty?
-                        locationMgr.LoadLocation(rctinp.RefLocation).Region.Code:rctinp.PartyTo;//20120829 djin
-                    else
-                        dssExportHistory.PartyTo = rctinp.PartyTo;
+                    dssExportHistory.PartyTo = rctinp.PartyTo;
+                    //if(rctinp.TransactionType=="RCT-INP")
+                    //dssExportHistory.PartyTo = rctinp.RefLocation!=string.Empty?
+                    //    locationMgr.LoadLocation(rctinp.RefLocation).Region.Code:rctinp.PartyTo;//20120829 djin
+                    //else
+                    //    dssExportHistory.PartyTo = rctinp.PartyTo;
                     dssExportHistory.Location = rctinp.Location;
-                    dssExportHistory.ReferenceLocation =rctinp.RefLocation;
+                    dssExportHistory.ReferenceLocation = rctinp.RefLocation;
                     dssExportHistory.EffectiveDate = rctinp.EffectiveDate;
                     dssExportHistory.Item = rctinp.Item;
                     dssExportHistory.Qty = rctinp.Qty;
@@ -203,31 +206,83 @@ namespace com.Sconit.Service.Dss.Impl
                 }
             }
 
+            #region 映射
+            //先得出refloc的值，在遍历mapping
+            var refLocation = (from a in dssExportHistoryList select a.ReferenceLocation).Distinct().ToList();
+            foreach (var rf in refLocation)
+            {
+                string regionCode = string.Empty;
+                Location loc = locationMgr.LoadLocation(rf);
+                if (loc != null)
+                {
+                    regionCode = loc.Region.Code;
+                    foreach (DssExportHistory dss in dssExportHistoryList)
+                    {
+                        if (dss.ReferenceLocation == rf)
+                            dss.PartyTo = regionCode;
+                    }
+                }
+                else//refLoc没有region的不转换
+                {
+                    ArrayList delList = new ArrayList();
+                    for (int i = 0; i < dssExportHistoryList.Count; i++)
+                    {
+                        if (dssExportHistoryList[i].ReferenceLocation == rf)
+                            delList.Add(dssExportHistoryList[i]);
+                    }
+                    foreach (DssExportHistory item in delList)
+                    {
+                        log.Error("没有找到" + item.ReferenceLocation + "的Region;ID:" + item.Id);
+                        dssExportHistoryList.Remove(item);
+                    }
+                }
+            }
+            #endregion
+
             return dssExportHistoryList;
         }
 
-        private IList<DssExportHistory> GetRctTrLocationTransaction(int mark)
+        private IList<DssExportHistory> GetRctTrLocationTransaction(int mark, string tranType)
         {
             DetachedCriteria criteria = DetachedCriteria.For(typeof(LocationTransaction));
             criteria.Add(Expression.Gt("Id", mark));
-            criteria.Add(Expression.Eq("TransactionType", BusinessConstants.CODE_MASTER_LOCATION_TRANSACTION_TYPE_VALUE_RCT_TR));
+            criteria.Add(Expression.Eq("TransactionType", tranType));//BusinessConstants.CODE_MASTER_LOCATION_TRANSACTION_TYPE_VALUE_RCT_TR
             criteria.Add(Expression.IsNotNull("OrderNo"));//todo,过滤投料
-
-            criteria.SetProjection(Projections.ProjectionList()
-                .Add(Projections.Max("Id").As("OriginalId"))
-                .Add(Projections.GroupProperty("OrderNo").As("OrderNo"))
-                .Add(Projections.GroupProperty("OrderDetailId").As("OrderDetailId"))
-                //.Add(Projections.GroupProperty("ReceiptNo"))
-                .Add(Projections.GroupProperty("Item").As("Item"))
-                .Add(Projections.GroupProperty("Location").As("Location"))
-                .Add(Projections.Sum("Qty").As("Qty"))
-                .Add(Projections.GroupProperty("EffectiveDate").As("EffectiveDate"))
-                //.Add(Projections.GroupProperty("PartyFrom").As("PartyFrom"))
-                .Add(Projections.GroupProperty("PartyTo").As("PartyTo")));
-
+            if (tranType != "ISS-UNP")
+            {
+                criteria.SetProjection(Projections.ProjectionList()
+                    .Add(Projections.Max("Id").As("OriginalId"))
+                    .Add(Projections.GroupProperty("OrderNo").As("OrderNo"))
+                     .Add(Projections.GroupProperty("OrderDetailId").As("OrderDetailId"))
+                    //.Add(Projections.GroupProperty("ReceiptNo"))
+                    .Add(Projections.GroupProperty("Item").As("Item"))
+                    .Add(Projections.GroupProperty("Location").As("Location"))
+                    .Add(Projections.Sum("Qty").As("Qty"))
+                    .Add(Projections.GroupProperty("EffectiveDate").As("EffectiveDate"))
+                    //.Add(Projections.GroupProperty("PartyFrom").As("PartyFrom"))
+                    .Add(Projections.GroupProperty("PartyTo").As("PartyTo")));
+            }
+            else
+            {
+                criteria.SetProjection(Projections.ProjectionList()
+                     .Add(Projections.Max("Id").As("OriginalId"))
+                     .Add(Projections.GroupProperty("OrderNo").As("OrderNo"))
+                    //.Add(Projections.GroupProperty("OrderDetailId").As("OrderDetailId"))
+                    //.Add(Projections.GroupProperty("ReceiptNo"))
+                     .Add(Projections.GroupProperty("Item").As("Item"))
+                     .Add(Projections.GroupProperty("Location").As("Location"))
+                     .Add(Projections.Sum("Qty").As("Qty"))
+                     .Add(Projections.GroupProperty("EffectiveDate").As("EffectiveDate"))
+                     .Add(Projections.GroupProperty("PartyFrom").As("PartyFrom"))
+                     .Add(Projections.GroupProperty("PartyTo").As("PartyTo")));
+                     //.Add(Projections.GroupProperty("RefLocation").As("ReferenceLocation")));
+                   
+            }
             criteria.SetResultTransformer(Transformers.AliasToBean(typeof(DssExportHistory)));
             return criteriaMgr.FindAll<DssExportHistory>(criteria);
         }
+
+
 
         private IList<LocationTransaction> GetInpLocationTransaction(int mark)
         {
@@ -260,7 +315,7 @@ namespace com.Sconit.Service.Dss.Impl
         private IList<DssExportHistory> GroupData(IList<DssExportHistory> list, DssOutboundControl dssOutboundControl)
         {
             var query = from l in list
-                        group l by new { l.Item, l.PartyFrom, l.ReferenceLocation, l.PartyTo, l.Location, l.EffectiveDate } into g
+                        group l by new { l.Item, l.PartyFrom, l.ReferenceLocation, l.PartyTo, l.Location, l.EffectiveDate,l.Comments } into g
                         select new DssExportHistory
                         {
                             Item = g.Key.Item,
@@ -275,12 +330,37 @@ namespace com.Sconit.Service.Dss.Impl
                             DssOutboundControl = dssOutboundControl,
                             EventCode = BusinessConstants.DSS_EVENT_CODE_CREATE,
                             IsActive = true,
-                            CreateDate = DateTime.Now
+                            CreateDate = DateTime.Now,
+                            Comments=g.Key.Comments
                         };
 
             return query.Where(q => q.Qty != 0).ToList();
         }
-
+        //获取issunp djin
+        private IList<DssExportHistory> GetIssUnpLocationTransaction(int mark, DssOutboundControl outCon)
+        {
+            DssOutboundControl dc = dssOutboundControlMgr.LoadDssOutboundControl(9);
+            IList<DssExportHistory> result = GetRctTrLocationTransaction(dc.Mark, "ISS-UNP");
+            string[] delCCode = { "0000" };
+            DetachedCriteria subjectList = DetachedCriteria.For(typeof(SubjectList));
+            subjectList.Add(Expression.In("CostCenterCode", delCCode));
+            subjectList.Add(Expression.Eq("SubjectCode", "11111111"));
+            IList subjectListCode = criteriaMgr.FindAll(subjectList);
+            var miscoOrder = (from l in result select l.OrderNo).Distinct().ToList();
+            DetachedCriteria misOrderCriteria = DetachedCriteria.For(typeof(MiscOrder));//需要删除的miscorder
+            misOrderCriteria.Add(Expression.In("OrderNo", miscoOrder));
+            misOrderCriteria.Add(Expression.In("SubjectList", subjectListCode));
+            IList<MiscOrder> miscOrderList = criteriaMgr.FindAll<MiscOrder>(misOrderCriteria);
+            IList<DssExportHistory> addList = (from l in result join n in miscOrderList on l.OrderNo equals n.OrderNo select l).ToList();
+            foreach(DssExportHistory dssExp in addList)
+            {
+                dssExp.Qty = dssExp.Qty * -1;
+                dssExp.Comments = "ISS-UNP2RCT-TR";
+                dssExp.ReferenceLocation = dssExp.Location;
+                dssExp.Location = "LXXS";
+            }
+            return addList;
+        }
         #endregion
     }
 }

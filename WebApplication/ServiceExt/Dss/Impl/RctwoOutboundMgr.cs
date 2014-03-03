@@ -177,6 +177,7 @@ namespace com.Sconit.Service.Dss.Impl
 
         private IList<LocationTransaction> GetVirtualRCTWO(List<int> orderDetIdList)
         {
+             
             DetachedCriteria criteria = DetachedCriteria.For(typeof(OrderLocationTransaction));
             criteria.CreateAlias("OrderDetail", "od");
             criteria.CreateAlias("od.OrderHead", "oh");
@@ -196,6 +197,11 @@ namespace com.Sconit.Service.Dss.Impl
             return criteriaMgr.FindAll<LocationTransaction>(criteria);
         }
 
+
+
+
+
+
         private IList<DssExportHistory> GroupData(IList<LocationTransaction> locTrans, DssOutboundControl dssOutboundControl, DateTime effectiveDate)
         {
             #region 补充0成品工单
@@ -211,7 +217,9 @@ namespace com.Sconit.Service.Dss.Impl
             #region 添加虚拟RCT-WO
             if (addList.Count > 0)
             {
-                IList<LocationTransaction> virtualWOList = this.GetVirtualRCTWO(addList);
+
+
+                IList<LocationTransaction> virtualWOList = this.GetVirRctWo(addList);//GetVirtualRCTWO 修改为 GetVirRctWo
                 if (virtualWOList.Count > 0)
                 {
                     foreach (var virtualWO in virtualWOList)
@@ -236,17 +244,57 @@ namespace com.Sconit.Service.Dss.Impl
 
             return dssExportHistoryList;
         }
+        /// <summary>
+        /// orderdetid大于2000分段 djin 2013 11 07
+        /// </summary>
+        /// <param name="orderDetIdList"></param>
+        /// <returns></returns>
+        private IList<LocationTransaction> GetVirRctWo(List<int> orderDetIdList)
+        {
+            if (orderDetIdList.Count < 2000)
+                return this.GetVirtualRCTWO(orderDetIdList);
+            else
+            {
+                int count = orderDetIdList.Count / 2000;
+                IList<LocationTransaction> lt = new List<LocationTransaction>();
+                for (int i = 0; i <= count; i++)
+                {
+                    int interval = i * 2000;
+                    int maxCount = i == count ? orderDetIdList.Count - interval : 2000;
+                    List<int> tempOrderDetIdList = orderDetIdList.GetRange(interval, maxCount);
+                    IList<LocationTransaction> tempIssList = this.GetVirtualRCTWO(tempOrderDetIdList);
+                    lt = lt.Concat(tempIssList).ToList();
+                }
+                return lt;
+            }
+        }
 
         private IList<DssExportHistory> GroupSingleDssExportHistory(IList<LocationTransaction> fgLocTrans, IList<LocationTransaction> rmLocTrans, DssOutboundControl dssOutboundControl, DateTime effectiveDate)
         {
+            var refLoc = (from l in fgLocTrans where l.Location == "Reject" select l.RefLocation).Distinct().ToList();
+            Dictionary<string, string> refDic = new Dictionary<string, string>();
+
+            foreach (var i in refLoc)
+            {
+                if (i == null) continue;
+                Location loc = locMgr.LoadLocation(i);
+                if (loc != null && !refDic.ContainsKey(i))
+                    refDic.Add(i, loc.Region.Code);
+
+            }
+            Dictionary<string, IList<int>> orderdet = new Dictionary<string, IList<int>>();
+
+            var x = (from xxxx in fgLocTrans where xxxx.Item== "" select xxxx).ToList();
+
             var query = from l in fgLocTrans
                         group l by new { l.PartyFrom, l.PartyTo, l.Location, l.Item, l.RefLocation } into g
                         select new DssExportHistory
                         {
                             PartyFrom = g.Key.PartyFrom,
-                            PartyTo = getPartTo(g.Key.Location, g.Key.PartyTo, g.Key.RefLocation),
+                            PartyTo = getPartTo(g.Key.Location, g.Key.PartyTo, g.Key.RefLocation, refDic),//10-15
                             Location = g.Key.Location,
                             Item = g.Key.Item,
+                            // ReferenceLocation=g.Key.RefLocation,
                             Qty = g.Sum(d => d.Qty),
                             EffectiveDate = effectiveDate,
                             OriginalId = g.Max(d => d.Id),
@@ -254,41 +302,101 @@ namespace com.Sconit.Service.Dss.Impl
                             EventCode = BusinessConstants.DSS_EVENT_CODE_CREATE,
                             IsActive = true,
                             CreateDate = DateTime.Now,
-                            DssExportHistoryDetails = this.GroupSingleDssExportHistoryDetail(g.Select(d => d.OrderDetailId).Distinct().ToList(), rmLocTrans, dssOutboundControl, effectiveDate),
+                            DssExportHistoryDetails = this.GroupSingleDssExportHistoryDetail(g.Select(d => d.OrderDetailId).Distinct().ToList(), rmLocTrans, dssOutboundControl, effectiveDate, orderdet,
+                            g.Key.PartyFrom + g.Key.PartyTo + g.Key.Location + g.Key.Item
+                            ),
                             UndefinedString1 = dssOutboundControl.ExternalSystem.UndefinedString1,//Site,备用
                             UndefinedString2 = dssOutboundControl.UndefinedString1,//雇员
                             UndefinedString3 = dssOutboundControl.UndefinedString2,//工序
                             KeyCode = g.Max(d => d.Id).ToString()//Max LocTransId
+                            ,
+                            Comments = g.Key.PartyFrom + g.Key.PartyTo + g.Key.Location + g.Key.Item
                         };
 
-            return query.ToList();
+            var list = query.ToList();
+            //djin ISS-wo重复删除 
+            //var comments = (from i in list select i.Comments).Distinct().ToList();
+            //foreach (var com in comments)
+            //{
+            //    var dsss = (from dss in list where dss.Comments == com select dss).ToList();
+
+            //    bool flag = true;
+            //    foreach (DssExportHistory dss in dsss)
+            //    {
+            //        if (!flag)
+            //        {
+
+            //            dss.DssExportHistoryDetails = null;
+            //        }
+            //        else
+            //        {
+            //            flag = false;
+
+            //        }
+
+            //    }
+            //}
+
+            return list;
         }
         //djin 20120907 add
-        private string getPartTo(string location, string partyTo, string refLoc)
+        private string getPartTo(string location, string partyTo, string refLoc, Dictionary<string, string> refDic)
         {
-            if (location == "Reject")
+            if (refLoc != null && refDic.Count > 0)
             {
-                return locMgr.LoadLocation(refLoc).Region.Code;
+                if (location == "Reject" && refDic.ContainsKey(refLoc))
+                {
+                    return refDic[refLoc];
+                }
             }
             return partyTo;
+
+
         }
 
-        private IList<DssExportHistoryDetail> GroupSingleDssExportHistoryDetail(List<int> orderDetIdList, IList<LocationTransaction> rmLocTrans, DssOutboundControl dssOutboundControl, DateTime effectiveDate)
+
+        private IList<DssExportHistoryDetail> GroupSingleDssExportHistoryDetail(List<int> orderDetIdList, IList<LocationTransaction> rmLocTrans, DssOutboundControl dssOutboundControl, DateTime effectiveDate, Dictionary<string, IList<int>> orderdet, string fcol)
         {
+            if (orderdet.ContainsKey(fcol))//包含同类
+            {
+                IList<int> orderdetid = (IList<int>)orderdet[fcol];
+                foreach (int i in orderdetid)
+                {
+                    if (orderDetIdList.Contains(i))
+                        orderDetIdList.Remove(i);
+                }
+                if (orderDetIdList != null && orderDetIdList.Count > 0)
+                {
+                    foreach (int i in orderDetIdList)
+                    {
+                        orderdetid.Add(i);
+                    }
+                    orderdet[fcol] = orderdetid;
+                }
+            }
+            else
+            {
+                orderdet.Add(fcol, orderDetIdList);
+            }
+
+            
             var details = rmLocTrans.Where(r => orderDetIdList.Contains(r.OrderDetailId)).ToList();
 
+           
+
             var query = from d in details
-                        group d by new { d.PartyFrom, d.PartyTo, d.Location, d.Item } into g
+                        group d by new { d.PartyFrom, d.PartyTo, d.Location, d.Item  } into g
                         select new DssExportHistoryDetail
                         {
                             PartyFrom = g.Key.PartyFrom,
                             PartyTo = g.Key.PartyTo,
                             Location = this.GetMappingExternalCode(BusinessConstants.DSS_ENTITY_LOCATION, dssOutboundControl.ExternalSystem.Code, g.Key.Location, g.Key.Location),
                             Item = g.Key.Item,
-                            Qty = -g.Sum(d => d.Qty),//生产消耗事务数为负
+                            Qty = -g.Sum(d => d.Qty),//生产消耗事务数为负   需要修改
                             EffDate = effectiveDate,
                             OriginalId = g.Max(d => d.Id),
                             KeyCode = g.Max(d => d.Id).ToString()
+                        
                         };
 
             return query.ToList();

@@ -132,7 +132,7 @@ public partial class Finance_Bill_NewList : ListModuleBase
             decimal unitPrice = actingBill.UnitPrice;
 
             decimal remailQty = actingBill.BillQty - actingBill.BilledQty;
-            decimal remailAmount = billAmount - actingBill.BilledAmount;
+            decimal remailAmount =   unitPrice * remailQty;
             decimal discount = unitPrice * remailQty - remailAmount;
 
             TextBox tbQty = e.Row.FindControl("tbQty") as TextBox;

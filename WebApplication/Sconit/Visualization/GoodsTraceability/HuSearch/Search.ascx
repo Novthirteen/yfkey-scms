@@ -23,10 +23,11 @@
         </tr>
         <tr>
             <td class="td01">
-                <asp:Literal ID="ltlLotNo" runat="server" Text="${Common.Business.LotNo}:" />
-            </td>
+                <asp:Literal ID="ltlLotNo" runat="server" Text="库位" />
+                :</td> 
             <td class="td02">
-                <asp:TextBox ID="tbLotNo" runat="server" />
+               <uc3:textbox ID="tbLotNo" runat="server" Visible="true" DescField="Name" Width="280"
+                    ValueField="Code" ServicePath="LocationMgr.service" ServiceMethod="GetLocationByUserCode" />
             </td>
             <td class="td01">
                 <asp:Literal ID="ltlOrderNo" runat="server" Text="${Common.Business.OrderNo}:" />
@@ -55,6 +56,8 @@
                 <div class="buttons">
                     <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" CssClass="query"
                         OnClick="btnSearch_Click" />
+                        <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" CssClass="query"
+                        OnClick="btnExport_Click" />
                 </div>
             </td>
         </tr>

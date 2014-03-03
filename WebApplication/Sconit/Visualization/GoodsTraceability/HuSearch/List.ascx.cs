@@ -43,4 +43,11 @@ public partial class Visualization_GoodsTraceability_HuSearch_List : ListModuleB
             ViewEvent(new object[] { HuId }, null);
         }
     }
+
+    public void Export()
+    {
+        string dateTime = DateTime.Now.ToString("ddhhmmss");
+        this.ExportXLS(this.GV_List, "GoodsTraceability" + dateTime + ".xls");
+    }
+
 }

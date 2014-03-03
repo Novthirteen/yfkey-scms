@@ -342,6 +342,7 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
             TransportationOrder to = TheTransportationOrderMgr.LoadTransportationOrder(OrderNo);
             to.Status = "Close";
             to.Remark = ((TextBox)(this.FV_Order.FindControl("tbRemark"))).Text.Trim();
+            to.IsValuated = true;
             TheTransportationOrderMgr.UpdateTransportationOrder(to);
         }
         //BusinessErrorException
@@ -512,13 +513,19 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
             return ;
     
     }
-    protected DataSet needCaluate()
+    protected string  getCONN()
     {
         XmlTextReader reader = new XmlTextReader(Server.MapPath("Config/properties.config"));
         XmlDocument doc = new XmlDocument();
         doc.Load(reader);//  
         reader.Close();//
-        connstring = doc.SelectSingleNode("/configuration/properties/connectionString").InnerText.Trim();
+        return doc.SelectSingleNode("/configuration/properties/connectionString").InnerText.Trim();
+    }
+    protected DataSet needCaluate()
+    {
+
+
+        connstring = getCONN();
         ds_torder = SqlHelper.ExecuteDataset(connstring, CommandType.Text, "select * from torderdet where orderno='" + this.OrderNo + "'");
         if (ds_torder.Tables[0].Rows.Count == 0)
             return null;
@@ -544,6 +551,52 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
 
     }
     #endregion
+
+    protected void btnRestore_Click(object sender, EventArgs e)
+    {
+        TransportationOrder to = TheTransportationOrderMgr.LoadTransportationOrder(this.OrderNo,true);
+        if (to.IsValuated == true)
+        {
+            try
+            {
+
+                string connstring = getCONN();
+                string sql = "select * from tactbill where orderno ='" + to.OrderNo + "' and status='Create'";
+                DataSet ds = SqlHelper.ExecuteDataset(connstring, CommandType.Text, sql);
+                DataTable dt = ds.Tables[0];
+                if (dt.Rows.Count == 0)
+                {
+                    ShowErrorMessage("该运单已经开票，无法还原状态！");
+                }
+                else
+                {
+                    string updSql = "update tactbill set status='Close' where id='" + dt.Rows[0]["id"].ToString() + "'";
+                    SqlHelper.ExecuteNonQuery(connstring, CommandType.Text, updSql);
+                    to.IsValuated = false;
+                    to.Status = "Create";
+                    TheTransportationOrderMgr.UpdateTransportationOrder(to);
+                    UpdateView();
+                    UpdateViewButton();
+                    ShowSuccessMessage("运单状态还原成功！");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex.Message);
+            }
+        }
+        else
+        {
+            ShowSuccessMessage("运单状态还原成功！");
+            to.Status = "Create";
+            TheTransportationOrderMgr.UpdateTransportationOrder(to);
+            UpdateView();
+            UpdateViewButton();
+        }
+        
+         
+    
+    }
 
     private TransportationOrder PrepareOrder()
     {
@@ -646,12 +699,14 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
         Button btnComplete = ((Button)(this.FV_Order.FindControl("btnComplete")));
         Button btnValuate = ((Button)(this.FV_Order.FindControl("btnValuate")));
         Button btnCheck = ((Button)(this.FV_Order.FindControl("btnCheck")));
+        Button btnRestore = ((Button)(this.FV_Order.FindControl("btnRestore")));
         btnSave.Visible = false;
         btnStart.Visible = false;
         btnCancel.Visible = false;
         btnPrint.Visible = false;
         btnComplete.Visible = false;
         btnCheck.Visible = false;
+        btnRestore.Visible = false;
         btnValuate.Visible = !order.IsValuated && (order.Status != BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE
                                                     && order.Status != BusinessConstants.CODE_MASTER_STATUS_VALUE_CANCEL);
 
@@ -672,6 +727,7 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
         {
             btnCancel.Visible = true;
             btnPrint.Visible = true;
+            btnRestore.Visible = true;
             if (currentUser.HasPermission("btnIPStart"))
                 btnComplete.Visible = true;
         }
@@ -680,18 +736,20 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
             btnPrint.Visible = true;
             btnValuate.Visible = false;
             btnCancel.Visible = false;
+            btnRestore.Visible = true;
         }
         else if (order.Status == "Checked")//已审核
         {
             btnStart.Visible = true;
             btnValuate.Visible = false;
             btnCancel.Visible = true;
+            btnRestore.Visible = true;
         }
         else if (order.Status == "Close")
         {
             btnComplete.Visible = true;
             btnPrint.Visible = true;
-
+            btnRestore.Visible = true;
         }
 
     }

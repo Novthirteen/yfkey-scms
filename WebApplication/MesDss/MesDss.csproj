@@ -69,10 +69,6 @@
     <Reference Include="Castle.Windsor">
       <HintPath>..\DllLib\Castle.Windsor.dll</HintPath>
     </Reference>
-    <Reference Include="com.Sconit.Service, Version=1.0.4480.18692, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DllLib\com.Sconit.Service.dll</HintPath>
-    </Reference>
     <Reference Include="log4net">
       <HintPath>..\DllLib\log4net.dll</HintPath>
     </Reference>
@@ -90,6 +86,8 @@
   <ItemGroup>
     <Compile Include="Batch\MesDssInJob.cs" />
     <Compile Include="Batch\MesDssOutJob.cs" />
+    <Compile Include="Entity\ScmsWorkOrderNewKQ.cs" />
+    <Compile Include="Entity\ScmsWorkOrderNew.cs" />
     <Compile Include="Entity\MesScmsCompletedIssue.cs" />
     <Compile Include="Entity\MesDssConstants.cs" />
     <Compile Include="Entity\MesScmsBom.cs" />
@@ -105,6 +103,8 @@
     <Compile Include="Entity\ScmsPart.cs" />
     <Compile Include="Entity\ScmsTableIndex.cs" />
     <Compile Include="Entity\ScmsWorkOrder.cs" />
+    <Compile Include="Persistence\IScmsWorkOrderDaoNewKQ.cs" />
+    <Compile Include="Persistence\IScmsWorkOrderDaoNew.cs" />
     <Compile Include="Persistence\IMesScmsCompletedIssueDao.cs" />
     <Compile Include="Persistence\IMesScmsBomDao.cs" />
     <Compile Include="Persistence\IMesScmsCompletedBoxDao.cs" />
@@ -121,6 +121,8 @@
     <Compile Include="Persistence\IScmsTableIndexDao.cs" />
     <Compile Include="Persistence\IScmsWorkOrderDao.cs" />
     <Compile Include="Persistence\NHDaoBase.cs" />
+    <Compile Include="Persistence\NH\NHScmsWorkOrderDaoNewKQ.cs" />
+    <Compile Include="Persistence\NH\NHScmsWorkOrderDaoNew.cs" />
     <Compile Include="Persistence\NH\NHMesScmsCompletedIssueDao.cs" />
     <Compile Include="Persistence\NH\NHMesScmsBomDao.cs" />
     <Compile Include="Persistence\NH\NHMesScmsCompletedBoxDao.cs" />
@@ -136,6 +138,9 @@
     <Compile Include="Persistence\NH\NHScmsTableIndexDao.cs" />
     <Compile Include="Persistence\NH\NHScmsWorkOrderDao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\IScmsWorkOrderNewKQMgr.cs" />
+    <Compile Include="Service\Impl\ScmsWorkOrderNewKQMgr.cs" />
+    <Compile Include="Service\IScmsWorkOrderNewMgr.cs" />
     <Compile Include="Service\IMesScmsCompletedIssueMgr.cs" />
     <Compile Include="Service\IMesDssInMgr.cs" />
     <Compile Include="Service\IMesDssOutMgr.cs" />
@@ -147,6 +152,7 @@
     <Compile Include="Service\IMesScmsStationBoxMgr.cs" />
     <Compile Include="Service\IMesScmsStationShelfMgr.cs" />
     <Compile Include="Service\IMesScmsTableIndexMgr.cs" />
+    <Compile Include="Service\Impl\ScmsWorkOrderMgr.cs" />
     <Compile Include="Service\Impl\MesDssInMgr.cs" />
     <Compile Include="Service\Impl\MesDssOutMgr.cs" />
     <Compile Include="Service\Impl\MesScmsBomMgr.cs" />
@@ -162,7 +168,7 @@
     <Compile Include="Service\Impl\ScmsMaterialBarcodeMgr.cs" />
     <Compile Include="Service\Impl\ScmsPartMgr.cs" />
     <Compile Include="Service\Impl\ScmsTableIndexMgr.cs" />
-    <Compile Include="Service\Impl\ScmsWorkOrderMgr.cs" />
+    <Compile Include="Service\Impl\ScmsWorkOrderNewMgr.cs" />
     <Compile Include="Service\IScmsBomMgr.cs" />
     <Compile Include="Service\IScmsMaterialBarcodeMgr.cs" />
     <Compile Include="Service\IScmsPartMgr.cs" />
@@ -182,10 +188,16 @@
       <Project>{6D7268F1-24AA-4D0A-B73A-F9E0E2456F95}</Project>
       <Name>ServiceExt</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service\Service.csproj">
+      <Project>{1D995C1B-A6A9-4C85-BDB4-D3D2381937BF}</Project>
+      <Name>Service</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Entity\MesScmsBom.hbm.xml" />
-    <EmbeddedResource Include="Entity\MesScmsCompletedBox.hbm.xml" />
+    <EmbeddedResource Include="Entity\MesScmsCompletedBox.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Entity\MesScmsCompletedOrder.hbm.xml" />
     <EmbeddedResource Include="Entity\MesScmsRepairMaterial.hbm.xml" />
     <EmbeddedResource Include="Entity\MesScmsShelfPart.hbm.xml" />
@@ -217,6 +229,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Entity\MesScmsCompletedIssue.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entity\ScmsWorkOrderNew.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entity\ScmsWorkOrderNewKQ.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

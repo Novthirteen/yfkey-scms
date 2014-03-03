@@ -28,9 +28,11 @@
                         <td class="td02">
                             <asp:CheckBox ID="tbIsActive" runat="server" Checked='<%#Bind("IsActive") %>' Width="250" />
                         </td>
-                        <td class="td01">
+                           <td class="td01">
+                            <asp:Literal ID="lblIsIntern" runat="server" Text="${MasterData.Customer.IsIntern}:" />
                         </td>
                         <td class="td02">
+                            <asp:CheckBox ID="tbIsIntern" runat="server" Checked='<%#Bind("IsIntern") %>' />
                         </td>
                     </tr>
                     <tr>

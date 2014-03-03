@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.UnWHQueryView, com.Sconit.Entity" table="UnWHQueryView" lazy="false">
+    <composite-id>
+      <!--<key-property name="ItemCode" column="Item" type="String" length="50"  />-->
+      <key-property name="HuId" column="HuId" type="String" length="50"   />
+    </composite-id>
+    <property name="Location" column="Location" type="String" length="50" />
+    <property name="ItemCode" column="Item" type="String" length="50" />	
+		<property name="Desc1" column="Desc1" type="String" length="250"    />	
+		<!--<property name="HuId" column="HuId" type="String" length="100" />-->	
+		<property name="LotNo" column="LotNo" type="String" length="50"  />	
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<property name="Qty" column="Qty" type="Decimal"  />	
+  	</class>
+</hibernate-mapping>

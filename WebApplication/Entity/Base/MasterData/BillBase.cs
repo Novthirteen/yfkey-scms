@@ -35,6 +35,13 @@ namespace com.Sconit.Entity.MasterData
 				_externalBillNo = value;
 			}
 		}
+        private string _memo;
+        public string Memo
+        {
+            get { return _memo; }
+            set { _memo = value; }        
+        }
+
         private string _refBillNo;
         public string ReferenceBillNo
         {

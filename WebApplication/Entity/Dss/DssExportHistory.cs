@@ -16,6 +16,19 @@ namespace com.Sconit.Entity.Dss
 
         public int OrderDetailId { get; set; }
 
+        public override bool Equals(object obj)
+        {
+            DssExportHistory another = obj as DssExportHistory;
+
+            if (another == null)
+            {
+                return false;
+            }
+            else
+            {
+                return (this.OriginalId == another.OriginalId);
+            }
+        }
         #endregion
     }
 }

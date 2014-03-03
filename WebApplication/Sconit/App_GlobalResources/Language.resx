@@ -1080,4 +1080,22 @@
   <data name="LocInvQuery" xml:space="preserve">
     <value>不合格品库位查询</value>
   </data>
+  <data name="InvR" xml:space="preserve">
+    <value>可用库存报表</value>
+  </data>
+  <data name="BillQuery" xml:space="preserve">
+    <value>运单成本中心分摊</value>
+  </data>
+  <data name="CostCenterFilter" xml:space="preserve">
+    <value>运单成本中心分摊</value>
+  </data>
+  <data name="BatchShelf" xml:space="preserve">
+    <value>盘点下架</value>
+  </data>
+  <data name="UnWHQuery" xml:space="preserve">
+    <value>完工未入库查询</value>
+  </data>
+  <data name="CheckASN" xml:space="preserve">
+    <value>单据确认</value>
+  </data>
 </root>

@@ -44,7 +44,7 @@ public partial class Finance_Bill_List : ListModuleBase
             this.GV_List.Execute();
         }
     }
-
+    public decimal amount = 0;
     protected void GV_List_RowDataBound(object sender, GridViewRowEventArgs e)
     {
         if (e.Row.RowType == DataControlRowType.DataRow)

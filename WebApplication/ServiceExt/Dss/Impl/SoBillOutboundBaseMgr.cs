@@ -113,6 +113,13 @@ namespace com.Sconit.Service.Dss.Impl
                 //dssExportHistory.Location = orderLocationTransaction.Location != null ? orderLocationTransaction.Location.Code : null;//发出库位
                 dssExportHistory.PartyFrom = orderLocationTransaction.OrderDetail.OrderHead.PartyFrom.Code;//发出区域
             }
+            else
+            {
+                  orderLocationTransaction =
+    commonOutboundMgr.GetOrderLocationTransactionInfo(dssExportHistory.OrderNo, dssExportHistory.Item, BusinessConstants.IO_TYPE_OUT);
+
+                dssExportHistory.PartyFrom = dssExportHistory.PartyFrom;
+            }
         }
         #endregion
     }

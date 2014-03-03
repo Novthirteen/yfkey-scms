@@ -40,6 +40,15 @@ namespace com.Mes.Dss.Service.Impl
             return entityDao.FindAllWithCustomQuery<MesScmsCompletedBox>("FROM MesScmsCompletedBox ENTITY WHERE ENTITY.Flag IN (" + MesDssConstants.MES_SCMS_FLAG_FTPC_UPDATED + "," + MesDssConstants.MES_SCMS_FLAG_FTPC_DELETED + ")");
         }
 
+        public virtual int GetMesScmsCompletedBox(string orderno)
+        {
+            IList<MesScmsCompletedBox> result = entityDao.FindAllWithCustomQuery<MesScmsCompletedBox>("FROM MesScmsCompletedBox ENTITY WHERE ENTITY.Flag IN (" + MesDssConstants.MES_SCMS_FLAG_FTPC_UPDATED + "," + MesDssConstants.MES_SCMS_FLAG_FTPC_DELETED + ") and ENTITY.OrderNo in ('"+orderno+"') ");
+            if (result != null && result.Count > 0)
+                return result.Count;
+            else
+                return 0;
+        }
+
         [Transaction(TransactionMode.Requires)]
         public void Complete(MesScmsCompletedBox mesScmsCompletedBox)
         {

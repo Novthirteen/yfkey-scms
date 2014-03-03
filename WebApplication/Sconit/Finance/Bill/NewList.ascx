@@ -1,6 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="NewList.ascx.cs" Inherits="Finance_Bill_NewList" %>
 <script language="javascript" type="text/javascript" src="Js/calcamount.js"></script>
-<%--<script type="text/javascript" language="javascript">
+<%-- <script type="text/javascript" language="javascript">
     function GVCheckClick_new() {
 
         if ($("input:[tag='isIntern']").val() == "False") {
@@ -94,7 +94,7 @@
             }
         }
     }
-</script>--%>
+</script> --%>
 
 
 <script type="text/javascript" language="javascript">

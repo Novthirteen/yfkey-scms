@@ -106,6 +106,9 @@ public partial class MasterData_Item_Edit : EditModuleBase
         string routing = ((Controls_TextBox)(this.FV_Item.FindControl("tbRouting"))).Text.Trim();
         item.Routing = TheRoutingMgr.LoadRouting(routing);
 
+        string plant = ((CodeMstrDropDownList)(this.FV_Item.FindControl("ddlPlantType"))).Text.Trim();
+        item.Plant = plant;
+
         decimal uc = item.UnitCount;
         uc = System.Decimal.Round(uc, 8);
         if (uc == 0)

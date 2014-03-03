@@ -9,6 +9,13 @@ namespace com.Sconit.Entity.MasterData
     {
         #region Non O/R Mapping Properties
 
+        public decimal Amount
+        {
+            get { 
+            return TotalAmount-base.CLN_amount;
+            }
+        }
+
         public decimal TotalAmount
         {
             get

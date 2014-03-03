@@ -31,7 +31,7 @@ public partial class Finance_Bill_Main : MainModuleBase
         this.ucNewMain.CreateEvent += new EventHandler(ucNewMain_CreateEvent);
         this.ucEdit.BackEvent += new EventHandler(ucEdit_BackEvent);
         this.ucList.ViewEvent += new EventHandler(ListView_Render);
-
+        
         if (!IsPostBack)
         {
             if (this.ModuleType == null)

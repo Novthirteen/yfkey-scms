@@ -1,22 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Xml.Linq;
-using com.Sconit.Web;
-using com.Sconit.Service.MasterData;
+using Castle.Services.Transaction;
+using com.Sconit.Entity;
 using com.Sconit.Entity.Exception;
 using com.Sconit.Entity.MasterData;
-using com.Sconit.Entity;
 using com.Sconit.Utility;
+using com.Sconit.Web;
 
+[Transactional]
 public partial class Order_OrderHead_List : ListModuleBase
 {
     public EventHandler EditEvent;
@@ -36,6 +27,7 @@ public partial class Order_OrderHead_List : ListModuleBase
 
     }
 
+    [Transaction(TransactionMode.Unspecified, IsolationMode.ReadUncommitted)]
     public override void UpdateView()
     {
         this.isExport = false;

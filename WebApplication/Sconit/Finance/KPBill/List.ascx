@@ -15,7 +15,12 @@
                     SortExpression="ORDER_TYPE_NAME" />
                 <asp:BoundField DataField="ORDER_PUB_DATE" DataFormatString="{0:yyyy-MM-dd HH:mm}"
                     HeaderText="${MasterData.KBBill.PublicDate}" SortExpression="CreateDate" />
-                <asp:BoundField DataField="TotalAmount" DataFormatString="{0:0.########}" HeaderText="${MasterData.Bill.TotalAmount}" />
+                  <asp:TemplateField HeaderText="${MasterData.Bill.TotalAmount}">
+                    <ItemTemplate>
+                        <%# DataBinder.Eval(Container.DataItem, "Amount") %>
+                      
+                    </ItemTemplate>
+                </asp:TemplateField>
                 <asp:BoundField DataField="ORDER_PRINT" HeaderText="${MasterData.KPBill.Printed}"
                     SortExpression="ORDER_PRINT" />
                 <asp:TemplateField HeaderText="${MasterData.KPBill.InvoiceStatus}">

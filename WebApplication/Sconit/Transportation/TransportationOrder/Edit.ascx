@@ -217,6 +217,8 @@
                             ValidationGroup="vgSaveGroup" FunctionId="btnIPCheck" />
                         <cc1:Button ID="btnCancel" runat="server" Text="${Common.Button.Cancel}" OnClick="btnCancel_Click"
                             CssClass="button2" FunctionId="btnIPCancel" />
+                        <cc1:Button ID="btnRestore" runat="server" Text="状态恢复" OnClick="btnRestore_Click"
+                            CssClass="button2" FunctionId="btnIPRestore" />
                         <asp:Button ID="btnPrint" runat="server" Text="${Common.Button.Print}" OnClick="btnPrint_Click"
                             CssClass="button2" />
                         <asp:Button ID="btnComplete" runat="server" Text="${Common.Button.Complete}" OnClick="btnComplete_Click"

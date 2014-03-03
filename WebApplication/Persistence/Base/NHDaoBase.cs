@@ -11,7 +11,7 @@ using NHibernate.Expression;
 using NHibernate.Proxy;
 using NHibernate.Type;
 using System.Collections.Generic;
-
+ 
 namespace com.Sconit.Persistence
 {
     /// <summary>

@@ -10,7 +10,7 @@
     <property name="Country" column="Country" type="String" length="50" />
 		<many-to-one name="ParentParty" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" column="ParentCode" cascade="none" />
 		<property name="IsActive" column="IsActive" type="Boolean"  />
-    <!--<property name="IsIntern" type="Boolean" column="IsIntern"/>--><!--20120828 wurui-->
+    <property name="IsIntern" type="Boolean" column="IsIntern"/><!--20120828 wurui-->
     <joined-subclass name="com.Sconit.Entity.MasterData.Customer, com.Sconit.Entity" table="Customer" lazy="false">
       <key column="Code"/>
     </joined-subclass>

@@ -35,7 +35,8 @@ namespace com.Mes.Dss.Service.Impl
         public IMesBomMgr mesBomMgr { get; set; }
         public IFlowMgr flowMgr { get; set; }
         public ICriteriaMgr criteriaMgr { get; set; }
-
+        public IScmsWorkOrderNewMgr scmsWorkOrderNewMgr { get; set; }
+        public IScmsWorkOrderNewKQMgr scmsWorkOrderNewKQMgr { get; set; }
         private static log4net.ILog log = log4net.LogManager.GetLogger("Log.MesDssOut");
 
         public void ProcessOut(ScmsTableIndex scmsTableIndex)
@@ -56,6 +57,7 @@ namespace com.Mes.Dss.Service.Impl
             {
                 this.ProcessMesBomDetailOut(scmsTableIndex);
             }
+            
         }
 
         [Transaction(TransactionMode.Requires)]
@@ -152,10 +154,13 @@ namespace com.Mes.Dss.Service.Impl
                     try
                     {
                         ScmsWorkOrder workOrder = scmsWorkOrderMgr.LoadScmsWorkOrder(orderDetail.OrderHead.OrderNo, orderDetail.Item.Code);
-                         if (orderDetail.OrderHead.SubType != "Rwo")//返工工单不许传递  djin 2012-4-28
+                        ScmsWorkOrderNew newwo = scmsWorkOrderNewMgr.LoadScmsWorkOrder(orderDetail.OrderHead.OrderNo, orderDetail.Item.Code);
+                        ScmsWorkOrderNewKQ kqwo = scmsWorkOrderNewKQMgr.LoadScmsWorkOrder(orderDetail.OrderHead.OrderNo,orderDetail.Item.Code);
+                        if (orderDetail.OrderHead.SubType != "Rwo")//返工工单不许传递  djin 2012-4-28
                          {
                             if (workOrder == null)
                             {
+                                #region SCMS_WO
                                 workOrder = new ScmsWorkOrder();
                                 workOrder.Bom = orderDetail.Bom.Code;
                                 workOrder.Flag = MesDssConstants.SCMS_MES_FLAG_SCMS_UPDATED;
@@ -175,7 +180,62 @@ namespace com.Mes.Dss.Service.Impl
                                 workOrder.WindowTime = orderDetail.OrderHead.WindowTime;
                                 workOrder.ShiftCode = orderDetail.OrderHead.Shift.Code;
                                 scmsWorkOrderMgr.CreateScmsWorkOrder(workOrder);
+                                #endregion
                             }
+
+                            if (newwo == null)
+                            {
+                                #region scms_wo_new
+                                newwo = new ScmsWorkOrderNew();
+                                newwo.Bom = orderDetail.Bom.Code;
+                                newwo.Flag = MesDssConstants.SCMS_MES_FLAG_SCMS_UPDATED;
+                                newwo.IsAdditional = orderDetail.OrderHead.IsAdditional ? "1" : "0";
+                                newwo.ItemCode = orderDetail.Item.Code;
+                                newwo.LastModifyDate = orderDetail.OrderHead.LastModifyDate;
+                                newwo.LastModifyUser = orderDetail.OrderHead.LastModifyUser.Code;
+                                newwo.OrderNo = orderDetail.OrderHead.OrderNo;
+                                newwo.ProductLine = flowMgr.LoadFlow(orderDetail.OrderHead.Flow).Description;
+                                newwo.Qty = Convert.ToInt32(orderDetail.OrderedQty);
+                                newwo.RefItemCode = orderDetail.ReferenceItemCode;
+                                newwo.RefOrderNo = orderDetail.OrderHead.ReferenceOrderNo;
+                                newwo.Shift = orderDetail.OrderHead.Shift.ShiftName;
+                                newwo.StartTime = orderDetail.OrderHead.StartTime;
+                                newwo.UC = Convert.ToInt32(orderDetail.UnitCount);
+                                //workOrder.Version = orderDetail.ItemVersion;
+                                newwo.WindowTime = orderDetail.OrderHead.WindowTime;
+                                newwo.ShiftCode = orderDetail.OrderHead.Shift.Code;
+                                scmsWorkOrderNewMgr.CreateScmsWorkOrder(newwo);
+                                 
+                                #endregion
+                            }
+
+
+                            if (kqwo == null)
+                            {
+                                #region scms_wo_kq
+                                kqwo = new ScmsWorkOrderNewKQ();
+                                kqwo.Bom = orderDetail.Bom.Code;
+                                kqwo.Flag = MesDssConstants.SCMS_MES_FLAG_SCMS_UPDATED;
+                                kqwo.IsAdditional = orderDetail.OrderHead.IsAdditional ? "1" : "0";
+                                kqwo.ItemCode = orderDetail.Item.Code;
+                                kqwo.LastModifyDate = orderDetail.OrderHead.LastModifyDate;
+                                kqwo.LastModifyUser = orderDetail.OrderHead.LastModifyUser.Code;
+                                kqwo.OrderNo = orderDetail.OrderHead.OrderNo;
+                                kqwo.ProductLine = flowMgr.LoadFlow(orderDetail.OrderHead.Flow).Description;
+                                kqwo.Qty = Convert.ToInt32(orderDetail.OrderedQty);
+                                kqwo.RefItemCode = orderDetail.ReferenceItemCode;
+                                kqwo.RefOrderNo = orderDetail.OrderHead.ReferenceOrderNo;
+                                kqwo.Shift = orderDetail.OrderHead.Shift.ShiftName;
+                                kqwo.StartTime = orderDetail.OrderHead.StartTime;
+                                kqwo.UC = Convert.ToInt32(orderDetail.UnitCount);
+                                //workOrder.Version = orderDetail.ItemVersion;
+                                kqwo.WindowTime = orderDetail.OrderHead.WindowTime;
+                                kqwo.ShiftCode = orderDetail.OrderHead.Shift.Code;
+                                scmsWorkOrderNewKQMgr.CreateScmsWorkOrder(kqwo);
+                                #endregion
+                            }
+
+
                             orderDetail.TransferFlag = false;
                             orderDetailMgr.UpdateOrderDetail(orderDetail);
                          }
@@ -187,7 +247,13 @@ namespace com.Mes.Dss.Service.Impl
                     }
                 }
             }
+            ScmsTableIndex newTable = scmsTableIndexMgr.LoadScmsTableIndex("SCMS_WO_NEW");
+            if (newTable != null)
+                scmsTableIndexMgr.Complete(newTable);
 
+            ScmsTableIndex kqTable = scmsTableIndexMgr.LoadScmsTableIndex("SCMS_WO_TOSH");
+            if (kqTable != null)
+                scmsTableIndexMgr.Complete(kqTable);
             scmsTableIndexMgr.Complete(scmsTableIndex);
         }
 
@@ -271,8 +337,9 @@ namespace com.Mes.Dss.Service.Impl
         private IList<OrderDetail> GetTransferOrderDetail()
         {
             DetachedCriteria criteria = DetachedCriteria.For(typeof(OrderDetail));
+            criteria.CreateAlias("OrderHead", "b");
             criteria.Add(Expression.Eq("TransferFlag", true));
-            
+            criteria.Add(Expression.In("b.Status", new string[] { "Create", "In-Process" }));
             return criteriaMgr.FindAll<OrderDetail>(criteria);
         }
 

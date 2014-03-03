@@ -39,7 +39,7 @@ public partial class Reports_InvDetail_Search : SearchModuleBase
     private void InitialUI()
     {
         this.tbLocation.ServiceParameter = "string:" + this.CurrentUser.Code;
-
+          
         if (ModuleType == BusinessConstants.INVENTORY_REPORTS_INVDET)
         {
             this.lblEffDate.Visible = false;

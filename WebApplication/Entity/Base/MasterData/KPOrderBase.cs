@@ -10,163 +10,163 @@ namespace com.Sconit.Entity.MasterData
     public abstract class KPOrderBase : EntityBase
     {
         #region O/R Mapping Properties
-		
-		private Decimal _oRDER_ID;
-		public Decimal ORDER_ID
-		{
-			get
-			{
-				return _oRDER_ID;
-			}
-			set
-			{
-				_oRDER_ID = value;
-			}
-		}
-		private string _oRDER_TYPE_ID;
-		public string ORDER_TYPE_ID
-		{
-			get
-			{
-				return _oRDER_TYPE_ID;
-			}
-			set
-			{
-				_oRDER_TYPE_ID = value;
-			}
-		}
-		private string _oRDER_TYPE_NAME;
-		public string ORDER_TYPE_NAME
-		{
-			get
-			{
-				return _oRDER_TYPE_NAME;
-			}
-			set
-			{
-				_oRDER_TYPE_NAME = value;
-			}
-		}
-		private DateTime? _oRDER_PUB_DATE;
-		public DateTime? ORDER_PUB_DATE
-		{
-			get
-			{
-				return _oRDER_PUB_DATE;
-			}
-			set
-			{
-				_oRDER_PUB_DATE = value;
-			}
-		}
-		private string _oRDER_PRINT;
-		public string ORDER_PRINT
-		{
-			get
-			{
-				return _oRDER_PRINT;
-			}
-			set
-			{
-				_oRDER_PRINT = value;
-			}
-		}
-		private DateTime? _pRINT_MODIFY_DATE;
-		public DateTime? PRINT_MODIFY_DATE
-		{
-			get
-			{
-				return _pRINT_MODIFY_DATE;
-			}
-			set
-			{
-				_pRINT_MODIFY_DATE = value;
-			}
-		}
-		private string _qAD_ORDER_ID;
-		public string QAD_ORDER_ID
-		{
-			get
-			{
-				return _qAD_ORDER_ID;
-			}
-			set
-			{
-				_qAD_ORDER_ID = value;
-			}
-		}
-		private string _pARTY_FROM_ID;
-		public string PARTY_FROM_ID
-		{
-			get
-			{
-				return _pARTY_FROM_ID;
-			}
-			set
-			{
-				_pARTY_FROM_ID = value;
-			}
-		}
-		private string _pARTY_TO_ID;
-		public string PARTY_TO_ID
-		{
-			get
-			{
-				return _pARTY_TO_ID;
-			}
-			set
-			{
-				_pARTY_TO_ID = value;
-			}
-		}
-		private DateTime? _oRDER_DATE;
-		public DateTime? ORDER_DATE
-		{
-			get
-			{
-				return _oRDER_DATE;
-			}
-			set
-			{
-				_oRDER_DATE = value;
-			}
-		}
-		private string _sYS_CODE;
-		public string SYS_CODE
-		{
-			get
-			{
-				return _sYS_CODE;
-			}
-			set
-			{
-				_sYS_CODE = value;
-			}
-		}
-		private string _sHIPPER;
-		public string SHIPPER
-		{
-			get
-			{
-				return _sHIPPER;
-			}
-			set
-			{
-				_sHIPPER = value;
-			}
-		}
-		private DateTime? _oRDER_READ_DATE;
-		public DateTime? ORDER_READ_DATE
-		{
-			get
-			{
-				return _oRDER_READ_DATE;
-			}
-			set
-			{
-				_oRDER_READ_DATE = value;
-			}
-		}
+
+        private Decimal _oRDER_ID;
+        public Decimal ORDER_ID
+        {
+            get
+            {
+                return _oRDER_ID;
+            }
+            set
+            {
+                _oRDER_ID = value;
+            }
+        }
+        private string _oRDER_TYPE_ID;
+        public string ORDER_TYPE_ID
+        {
+            get
+            {
+                return _oRDER_TYPE_ID;
+            }
+            set
+            {
+                _oRDER_TYPE_ID = value;
+            }
+        }
+        private string _oRDER_TYPE_NAME;
+        public string ORDER_TYPE_NAME
+        {
+            get
+            {
+                return _oRDER_TYPE_NAME;
+            }
+            set
+            {
+                _oRDER_TYPE_NAME = value;
+            }
+        }
+        private DateTime? _oRDER_PUB_DATE;
+        public DateTime? ORDER_PUB_DATE
+        {
+            get
+            {
+                return _oRDER_PUB_DATE;
+            }
+            set
+            {
+                _oRDER_PUB_DATE = value;
+            }
+        }
+        private string _oRDER_PRINT;
+        public string ORDER_PRINT
+        {
+            get
+            {
+                return _oRDER_PRINT;
+            }
+            set
+            {
+                _oRDER_PRINT = value;
+            }
+        }
+        private DateTime? _pRINT_MODIFY_DATE;
+        public DateTime? PRINT_MODIFY_DATE
+        {
+            get
+            {
+                return _pRINT_MODIFY_DATE;
+            }
+            set
+            {
+                _pRINT_MODIFY_DATE = value;
+            }
+        }
+        private string _qAD_ORDER_ID;
+        public string QAD_ORDER_ID
+        {
+            get
+            {
+                return _qAD_ORDER_ID;
+            }
+            set
+            {
+                _qAD_ORDER_ID = value;
+            }
+        }
+        private string _pARTY_FROM_ID;
+        public string PARTY_FROM_ID
+        {
+            get
+            {
+                return _pARTY_FROM_ID;
+            }
+            set
+            {
+                _pARTY_FROM_ID = value;
+            }
+        }
+        private string _pARTY_TO_ID;
+        public string PARTY_TO_ID
+        {
+            get
+            {
+                return _pARTY_TO_ID;
+            }
+            set
+            {
+                _pARTY_TO_ID = value;
+            }
+        }
+        private DateTime? _oRDER_DATE;
+        public DateTime? ORDER_DATE
+        {
+            get
+            {
+                return _oRDER_DATE;
+            }
+            set
+            {
+                _oRDER_DATE = value;
+            }
+        }
+        private string _sYS_CODE;
+        public string SYS_CODE
+        {
+            get
+            {
+                return _sYS_CODE;
+            }
+            set
+            {
+                _sYS_CODE = value;
+            }
+        }
+        private string _sHIPPER;
+        public string SHIPPER
+        {
+            get
+            {
+                return _sHIPPER;
+            }
+            set
+            {
+                _sHIPPER = value;
+            }
+        }
+        private DateTime? _oRDER_READ_DATE;
+        public DateTime? ORDER_READ_DATE
+        {
+            get
+            {
+                return _oRDER_READ_DATE;
+            }
+            set
+            {
+                _oRDER_READ_DATE = value;
+            }
+        }
         private Int32 _invoiceCount;
         public Int32 InvoiceCount
         {
@@ -278,11 +278,25 @@ namespace com.Sconit.Entity.MasterData
                 _kpItems = value;
             }
         }
+
+        private string cln_order;
+        public string CLN_ORDER
+        {
+            get { return cln_order; }
+            set { cln_order = value; }
+        }
+
+        private decimal cln_amount;
+        public decimal CLN_amount
+        {
+            get { return cln_amount; }
+            set { cln_amount = value; }
+        }
         #endregion
 
-		public override int GetHashCode()
+        public override int GetHashCode()
         {
-			if (ORDER_ID != null)
+            if (ORDER_ID != null)
             {
                 return ORDER_ID.GetHashCode();
             }
@@ -302,9 +316,9 @@ namespace com.Sconit.Entity.MasterData
             }
             else
             {
-            	return (this.ORDER_ID == another.ORDER_ID);
+                return (this.ORDER_ID == another.ORDER_ID);
             }
-        } 
+        }
     }
-	
+
 }

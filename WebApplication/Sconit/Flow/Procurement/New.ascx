@@ -1,6 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="New.ascx.cs" Inherits="MasterData_Flow_New" %>
 <%@ Register Src="~/Controls/TextBox.ascx" TagName="textbox" TagPrefix="uc3" %>
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="cc1" %>
+
 <div id="divFV" runat="server">
     <asp:FormView ID="FV_Flow" runat="server" DataSourceID="ODS_Flow" DefaultMode="Insert"
         DataKeyNames="Code">
@@ -107,8 +108,10 @@
                             <asp:Literal ID="lbCurrency" runat="server" Text="${MasterData.Flow.Currency}:" />
                         </td>
                         <td class="td02">
-                            <uc3:textbox ID="tbCurrency" runat="server" Visible="true" DescField="Name" ValueField="Code"
-                                ServicePath="CurrencyMgr.service" ServiceMethod="GetAllCurrency" />
+                            <uc3:textbox ID="tbCurrency"  runat="server" Visible="true" DescField="Name" ValueField="Code"
+                                ServicePath="CurrencyMgr.service" ServiceMethod="GetAllCurrency"  CssClass="inputRequired" />
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="请选择币种！"
+                                Display="Dynamic" ControlToValidate="tbCurrency" ValidationGroup="vgSave" />
                         </td>
                         <td class="td01">
                             <asp:Literal ID="lblCarrierBillAddress" runat="server" Text="${MasterData.Flow.Carrier.BillAddress}:" />
@@ -169,7 +172,7 @@
                         <td class="td02">
                             <uc3:textbox ID="tbPriceListFrom" runat="server" Visible="true" Width="250" DescField="Code"
                                 ServiceParameter="string:#tbBillFrom" ValueField="Code" ServicePath="PurchasePriceListMgr.service"
-                                ServiceMethod="GetAllPurchasePriceList" CssClass="inputRequired" />
+                                ServiceMethod="GetAllPurchasePriceList" CssClass="inputRequired" MustMatch="true"   />
                             <asp:RequiredFieldValidator ID="rfvPriceListFrom" runat="server" ErrorMessage="${MasterData.Flow.PriceListFrom.Required}"
                                 Display="Dynamic" ControlToValidate="tbPriceListFrom" ValidationGroup="vgSave" />
                         </td>
@@ -416,3 +419,6 @@
         <asp:Parameter Type="String" Name="code" />
     </SelectParameters>
 </asp:ObjectDataSource>
+<script type="text/javascript">
+    document.getElementById("ctl01_ucNew_FV_Flow_tbCurrency_suggest").value = "";
+</script>

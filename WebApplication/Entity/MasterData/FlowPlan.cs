@@ -10,7 +10,7 @@ namespace com.Sconit.Entity.MasterData
         #region Non O/R Mapping Properties
 
         //TODO: Add Non O/R Mapping Properties here. 
-
+        public string RefOrderNo { get; set; }
         #endregion
     }
 }

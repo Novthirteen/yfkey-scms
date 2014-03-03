@@ -13,7 +13,7 @@ using System.IO;
 using com.Sconit.Utility;
 using com.Sconit.Entity.Dss;
 using System.Text;
-
+using NHibernate.Expression;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -60,7 +60,7 @@ public partial class Finance_Bill_Edit : ListModuleBase
             {
                 barCodeUrl = WriteToFile("Bill_BJ.xls", list);
             }
-                Page.ClientScript.RegisterStartupScript(GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + barCodeUrl + "'); </script>");
+            Page.ClientScript.RegisterStartupScript(GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + barCodeUrl + "'); </script>");
 
             kpOrder.ORDER_PRINT = "Y";
             kpOrder.PRINT_MODIFY_DATE = DateTime.Now;
@@ -74,7 +74,7 @@ public partial class Finance_Bill_Edit : ListModuleBase
         }
     }
 
-    public string WriteToFile(string template,IList<object> list)
+    public string WriteToFile(string template, IList<object> list)
     {
         string path = Server.MapPath(".") + @"\Reports\Templates\YFKExcelTemplates\" + template;
         if (File.Exists(path))
@@ -94,10 +94,10 @@ public partial class Finance_Bill_Edit : ListModuleBase
             Cell cell = sheet.GetRow(8).GetCell(2);
             cell.SetCellValue(kpOrder.PARTY_FROM_ID);
             cell = sheet.GetRow(8).GetCell(10);
-            cell.SetCellValue(kpOrder.QAD_ORDER_ID); 
+            cell.SetCellValue(kpOrder.QAD_ORDER_ID);
             int i = 10;
             decimal cnt = 0;
-           
+
             foreach (KPItem kpitem in kpOrder.KPItems)
             {
                 Row row = sheet.CreateRow(i);
@@ -126,10 +126,10 @@ public partial class Finance_Bill_Edit : ListModuleBase
                 row.CreateCell(11).SetCellValue((DateTime)kpitem.INCOMING_DATE);    //入库日期
                 row.GetCell(11).CellStyle = dateStyle;
 
-                cnt =(decimal)kpitem.PRICE2 + cnt;                
+                cnt = (decimal)kpitem.PRICE2 + cnt;
 
                 i++;
-            }            
+            }
 
             Row _row = sheet.CreateRow(i);
             _row.CreateCell(1).SetCellValue("采购员：");
@@ -152,7 +152,7 @@ public partial class Finance_Bill_Edit : ListModuleBase
             hssfworkbook = null;
             ms.Close();
             ms.Dispose();
-            return "http://" + Request.Url.Authority +  filename;
+            return "http://" + Request.Url.Authority + filename;
         }
 
         return "";
@@ -214,10 +214,11 @@ public partial class Finance_Bill_Edit : ListModuleBase
             KPOrder kpOrder = TheKPOrderMgr.LoadKPOrder(this.OrderId, true);
 
             decimal invoiceAmountWithoutTax = Convert.ToDecimal(tbInvoiceAmountWithoutTax.Text.Trim());
-            
+            if (kpOrder.CLN_ORDER == null)
+                process(kpOrder);
 
             #region 只校验不含税金额
-            if (System.Math.Abs(kpOrder.TotalAmount  - invoiceAmountWithoutTax) > 1)
+            if (System.Math.Abs(kpOrder.TotalAmount - invoiceAmountWithoutTax-kpOrder.CLN_amount) > 1)
             {
                 ShowErrorMessage("MasterData.Bill.InvoiceAmountWithoutTax.AmountMustLessThanOne");
                 return;
@@ -226,14 +227,14 @@ public partial class Finance_Bill_Edit : ListModuleBase
             #endregion
 
             kpOrder.InvoiceCount = Convert.ToInt32(tbInvoceCount.Text.Trim());
-      
+
             kpOrder.InvoiceDate = DateTime.Parse(tbInvoiceDate.Text.Trim());
             kpOrder.InvoiceNumber = tbInvoiceNumber.Text.Trim();
             kpOrder.InvoiceRemark = tbInvoiceRemark.Text.Trim();
             kpOrder.InvoiceTax = tbInvoiceTax.Text.Trim();
             kpOrder.InvoiceAmountWithoutTax = invoiceAmountWithoutTax;
 
-            kpOrder.InvoiceAmount =Convert.ToDecimal(tbInvoiceAmount.Text.Trim());
+            kpOrder.InvoiceAmount = Convert.ToDecimal(tbInvoiceAmount.Text.Trim());
             kpOrder.InvoiceStatus = BusinessConstants.CODE_MASTER_INVOICE_STATUS_VALUE_INPROCESS;
             TheKPOrderMgr.UpdateKPOrder(kpOrder);
             this.ShowSuccessMessage("MasterData.Bill.SubmitInvoice.Successful");
@@ -251,6 +252,8 @@ public partial class Finance_Bill_Edit : ListModuleBase
         {
             KPOrder kpOrder = TheKPOrderMgr.LoadKPOrder(this.OrderId, true);
             kpOrder.InvoiceStatus = BusinessConstants.CODE_MASTER_INVOICE_STATUS_VALUE_REJECTED;
+            //if (kpOrder.CLN_ORDER != null)
+            //    UnBindSP(kpOrder);
             TheKPOrderMgr.UpdateKPOrder(kpOrder);
             this.ShowSuccessMessage("MasterData.Bill.RejectInvoice.Successful");
             UpdateView();
@@ -267,6 +270,8 @@ public partial class Finance_Bill_Edit : ListModuleBase
         {
             KPOrder kpOrder = TheKPOrderMgr.LoadKPOrder(this.OrderId, true);
             kpOrder.InvoiceStatus = BusinessConstants.CODE_MASTER_INVOICE_STATUS_VALUE_APPROVED;
+            //if (kpOrder.CLN_ORDER == null)
+            //    process(kpOrder);
             TheKPOrderMgr.UpdateKPOrder(kpOrder);
             CreateFile(kpOrder);
             this.ShowSuccessMessage("MasterData.Bill.ApproveInvoice.Successful");
@@ -278,6 +283,24 @@ public partial class Finance_Bill_Edit : ListModuleBase
         }
     }
 
+    protected void UnBindSP(KPOrder kpOrder)
+    {
+        string[] cln_order = kpOrder.CLN_ORDER.Split(new char[] { ',' });
+
+        foreach (string orderno in cln_order)
+        {
+            KPOrder ko = TheKPOrderMgr.LoadKPOrder(decimal.Parse(orderno));
+            if (ko != null)
+            {
+                ko.CLN_ORDER = null;
+
+                TheKPOrderMgr.UpdateKPOrder(ko);
+            }
+        }
+        kpOrder.CLN_ORDER = null;
+        kpOrder.CLN_amount = 0;
+        TheKPOrderMgr.UpdateKPOrder(kpOrder);
+    }
 
     protected void btnExport_Click(object sender, EventArgs e)
     {
@@ -291,7 +314,12 @@ public partial class Finance_Bill_Edit : ListModuleBase
         this.OrderId = orderId;
         KPOrder kpOrder = TheKPOrderMgr.LoadKPOrder(orderId, true);
         this.tbOrderId.Text = kpOrder.QAD_ORDER_ID;
-        this.tbTotalAmount.Text = kpOrder.TotalAmount.ToString("0.########");
+        if (kpOrder.InvoiceStatus == null)
+        {
+            process(kpOrder);
+        }
+        //this.tbTotalAmount.Text = kpOrder.TotalAmount.ToString("0.########");
+      //  this.tbTotalAmount.Text = (kpOrder.TotalAmount - kpOrder.CLN_amount).ToString("0.########");
         if (kpOrder.ORDER_PUB_DATE != null)
         {
             this.tbCreateDate.Text = ((DateTime)kpOrder.ORDER_PUB_DATE).ToString("yyyy-MM-dd");
@@ -306,7 +334,8 @@ public partial class Finance_Bill_Edit : ListModuleBase
 
     public override void UpdateView()
     {
-        KPOrder kpOrder = TheKPOrderMgr.LoadKPOrder(this.OrderId);
+        KPOrder kpOrder = TheKPOrderMgr.LoadKPOrder(this.OrderId,true);
+
         this.tbInvoceCount.Text = kpOrder.InvoiceCount.ToString();
         this.tbInvoiceAmount.Text = kpOrder.InvoiceAmount.ToString("F2");
         this.tbInvoiceDate.Text = kpOrder.InvoiceDate.ToString();
@@ -314,8 +343,27 @@ public partial class Finance_Bill_Edit : ListModuleBase
         this.tbInvoiceRemark.Text = kpOrder.InvoiceRemark;
         this.tbInvoiceTax.Text = Convert.ToDecimal(kpOrder.InvoiceTax).ToString("F2");
         this.tbInvoiceAmountWithoutTax.Text = kpOrder.InvoiceAmountWithoutTax.ToString("F2");
+        this.tbTotalAmount.Text = (kpOrder.TotalAmount - kpOrder.CLN_amount).ToString("0.########");
+        this.tbCln.Text = kpOrder.CLN_ORDER;
+        div_inv.Visible = true;
+        if (kpOrder.ORDER_TYPE_ID == "SP")
+        {
 
-        if ( kpOrder.InvoiceStatus == null || kpOrder.InvoiceStatus == string.Empty||
+            this.btnSubmitInvoice.Visible = false;
+            this.btnRejectInvoice.Visible = false;
+            this.btnApproveInvoice.Visible = false;
+            this.tbInvoceCount.ReadOnly = false;
+            this.tbInvoiceAmountWithoutTax.ReadOnly = false;
+            this.tbInvoiceDate.ReadOnly = false;
+            this.tbInvoiceNumber.ReadOnly = false;
+            this.tbInvoiceRemark.ReadOnly = false;
+            this.tbInvoiceTax.ReadOnly = false;
+            this.lblCln.Text = "绑定账单:";
+            div_inv.Visible = false;
+
+        }
+
+        else if (kpOrder.InvoiceStatus == null || kpOrder.InvoiceStatus == string.Empty ||
             kpOrder.InvoiceStatus == BusinessConstants.CODE_MASTER_INVOICE_STATUS_VALUE_REJECTED)
         {
             this.btnSubmitInvoice.Visible = true;
@@ -366,6 +414,54 @@ public partial class Finance_Bill_Edit : ListModuleBase
 
     }
 
+    protected void process(KPOrder kpOrder)
+    {
+        if (string.IsNullOrEmpty(kpOrder.CLN_ORDER) 
+               && kpOrder.ORDER_TYPE_ID == "KP")
+        {
+            DetachedCriteria clnorder = DetachedCriteria.For<KPOrder>()
+                .Add(Expression.Eq("ORDER_TYPE_ID", "SP"))
+                .Add(Expression.IsNull("CLN_ORDER"))
+                .Add(Expression.Eq("PARTY_FROM_ID", kpOrder.PARTY_FROM_ID))
+                .Add(Expression.Eq("SYS_CODE",kpOrder.SYS_CODE));
+            IList<KPOrder> kpcln = TheCriteriaMgr.FindAll<KPOrder>(clnorder);
+            if (kpcln != null && kpcln.Count > 0)
+            {
+                decimal? tempamount = 0;
+                decimal offsetamount = 0;
+                decimal tempOrderAmount = kpOrder.TotalAmount;
+                string _clnorder = string.Empty;
+                // tempamount = kpOrder.InvoiceAmountWithoutTax;
+                foreach (KPOrder kp in kpcln)
+                {
+                    tempamount = kp.TotalAmount;
+                    if (tempamount.HasValue)
+                    {
+                        if (tempOrderAmount - tempamount > 0)
+                        {
+                            _clnorder += kp.ORDER_ID.ToString() + ",";
+                            kp.CLN_ORDER = kpOrder.ORDER_ID.ToString();
+                            offsetamount += (decimal)tempamount;
+                            TheKPOrderMgr.UpdateKPOrder(kp);
+                        }
+                    }
+                }
+                //kpOrder.InvoiceAmountWithoutTax += offsetamount;
+                kpOrder.CLN_amount = offsetamount;
+                kpOrder.CLN_ORDER = _clnorder.Trim(new char[] { ',' });
+                TheKPOrderMgr.UpdateKPOrder(kpOrder);
+            }
+        }
+    }
+
+    protected void Page_PreRender(object sender, EventArgs e)
+    {
+        // KPOrder kpOrder = TheKPOrderMgr.LoadKPOrder(this.OrderId, true);
+
+
+
+
+    }
 
 
     protected void btnBack_Click(object sender, EventArgs e)
@@ -378,10 +474,10 @@ public partial class Finance_Bill_Edit : ListModuleBase
 
     private void CreateFile(KPOrder kpOrder)
     {
-        
+
         //随便写写，谁叫他们不给钱的
         #region 抽取数据导入文件
-        string fileFolder="D:\\Dss\\out\\";
+        string fileFolder = "D:\\Dss\\out\\";
         string fileName = "SCONIT_QAD_" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_KPCONF.REQ";
         string[] line1 = new string[] 
             { 

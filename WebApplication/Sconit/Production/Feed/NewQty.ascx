@@ -137,7 +137,7 @@
                         <asp:TextBox ID="tbQty" runat="server" onmouseup="if(!readOnly)select();" Text='<%# Bind("Qty","{0:0.########}") %>'
                             Width="50"></asp:TextBox>
                         <asp:RangeValidator ID="rvQty" runat="server" ControlToValidate="tbQty" ErrorMessage="${Common.Validator.Valid.Number}"
-                            Display="Dynamic" Type="Double" MinimumValue="0" MaximumValue="100000" ValidationGroup="vgSaveGroup" />
+                            Display="Dynamic" Type="Double" MinimumValue="0" MaximumValue="10000000" ValidationGroup="vgSaveGroup" />
                     </ItemTemplate>
                 </asp:TemplateField>
             </Columns>

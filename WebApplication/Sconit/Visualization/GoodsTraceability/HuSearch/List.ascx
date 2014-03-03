@@ -13,46 +13,53 @@
                         <asp:Label ID="lblHuId" runat="server" Text='<%# Eval("HuId")%>' />
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="${Common.Business.LotNo}" SortExpression="LotNo">
+                
+                <asp:TemplateField HeaderText="${Common.Business.ItemCode}" SortExpression="Item">
                     <ItemTemplate>
-                        <asp:Label ID="lblLotNo" runat="server" Text='<%# Eval("LotNo")%>' />
+                        <asp:Label ID="lblItemCode" runat="server" Text='<%# Eval("Item")%>' />
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="${Common.Business.ItemCode}" SortExpression="Item.Code">
+                <asp:TemplateField HeaderText="${Common.Business.ItemDescription}" SortExpression="Desc">
                     <ItemTemplate>
-                        <asp:Label ID="lblItemCode" runat="server" Text='<%# Eval("Item.Code")%>' />
+                        <asp:Label ID="lblItemDescription" runat="server" Text='<%# Eval("Desc")%>' />
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="${Common.Business.ItemDescription}" SortExpression="Item.Description">
-                    <ItemTemplate>
-                        <asp:Label ID="lblItemDescription" runat="server" Text='<%# Eval("Item.Description")%>' />
-                    </ItemTemplate>
-                </asp:TemplateField>
-                <asp:TemplateField HeaderText="${Common.Business.Uom}" SortExpression="Uom.Code">
+               <%-- <asp:TemplateField HeaderText="${Common.Business.Uom}" SortExpression="Uom.Code">
                     <ItemTemplate>
                         <asp:Label ID="lblUOM" runat="server" Text='<%# Eval("Uom.Code")%>' />
                     </ItemTemplate>
-                </asp:TemplateField>
+                </asp:TemplateField>--%>
                 <asp:TemplateField HeaderText="${Common.Business.Qty}" SortExpression="Qty">
                     <ItemTemplate>
                         <asp:Label ID="lblQty" runat="server" Text='<%# Eval("Qty","{0:0.########}")%>' />
                     </ItemTemplate>
                 </asp:TemplateField>
+                <asp:TemplateField HeaderText="${Common.Business.Location}" SortExpression="Location">
+                    <ItemTemplate>
+                        <asp:Label ID="lblLotNo" runat="server" Text='<%# Eval("Location")%>' />
+                    </ItemTemplate>
+                </asp:TemplateField>
+           
                 <asp:TemplateField HeaderText="${Common.Business.OrderNo}" SortExpression="OrderNo">
                     <ItemTemplate>
                         <asp:Label ID="lblOrderNo" runat="server" Text='<%# Eval("OrderNo")%>' />
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="${Common.Business.ManufactureDate}" SortExpression="ManufactureDate">
+                     <asp:TemplateField HeaderText="${Common.Business.CreateUser}" SortExpression="CreateUser">
                     <ItemTemplate>
-                        <asp:Label ID="lblManufactureDate" runat="server" Text='<%# Eval("ManufactureDate","{0:yyyy-MM-dd}")%>' />
+                        <asp:Label ID="lblCreateUser" runat="server" Text='<%# Eval("CreateUser")%>' />
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="${Common.Business.ManufactureParty}" SortExpression="ManufactureParty.Name">
+                <asp:TemplateField HeaderText="${Common.Business.ManufactureDate}" SortExpression="CreateDate">
+                    <ItemTemplate>
+                        <asp:Label ID="lblManufactureDate" runat="server" Text='<%# Eval("CreateDate","{0:yyyy-MM-dd HH:mm:ss}")%>' />
+                    </ItemTemplate>
+                </asp:TemplateField>
+               <%-- <asp:TemplateField HeaderText="${Common.Business.ManufactureParty}" SortExpression="ManufactureParty.Name">
                     <ItemTemplate>
                         <asp:Label ID="lblManufactureParty" runat="server" Text='<%# Eval("ManufactureParty.Name")%>' />
                     </ItemTemplate>
-                </asp:TemplateField>
+                </asp:TemplateField>--%>
                 <asp:TemplateField HeaderText="${Common.GridView.Action}">
                     <ItemTemplate>
                         <asp:LinkButton ID="lbtnView" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "HuId") %>'

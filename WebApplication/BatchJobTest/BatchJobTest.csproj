@@ -96,9 +96,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DllLib\Castle.Windsor.dll</HintPath>
     </Reference>
-    <Reference Include="com.Sconit.Service">
-      <HintPath>..\DllLib\com.Sconit.Service.dll</HintPath>
-    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DllLib\log4net.dll</HintPath>
@@ -167,6 +164,7 @@
     </None>
     <None Include="Config\properties.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -194,6 +192,10 @@
     <ProjectReference Include="..\ServiceExt\ServiceExt.csproj">
       <Project>{6D7268F1-24AA-4D0A-B73A-F9E0E2456F95}</Project>
       <Name>ServiceExt</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service\Service.csproj">
+      <Project>{1D995C1B-A6A9-4C85-BDB4-D3D2381937BF}</Project>
+      <Name>Service</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utility\Utility.csproj">
       <Project>{49EED42C-851F-4F50-B7D0-59C6C5A6F21E}</Project>

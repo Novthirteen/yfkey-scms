@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
     <class name="com.Sconit.Entity.View.LeanEngineView, com.Sconit.Entity" table="LeanEngineView" lazy="false">
-        <id name="FlowDetId" column="FlowDetId" type="Int32" unsaved-value="0" >
+        <id name="FlowDetId" column="FlowDetId" type="Int32" unsaved-value="0"    >
             <generator class="assigned" />
         </id>
         <property name="Flow" column="Flow" type="String" length="50" />

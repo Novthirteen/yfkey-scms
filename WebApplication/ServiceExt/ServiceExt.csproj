@@ -49,10 +49,6 @@
     <Reference Include="Castle.Windsor">
       <HintPath>..\DllLib\Castle.Windsor.dll</HintPath>
     </Reference>
-    <Reference Include="com.Sconit.Service, Version=1.0.4480.18692, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DllLib\com.Sconit.Service.dll</HintPath>
-    </Reference>
     <Reference Include="log4net, Version=1.2.0.30714, Culture=neutral, PublicKeyToken=b32731d11ce58905">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DllLib\log4net.dll</HintPath>
@@ -217,6 +213,7 @@
     <Compile Include="Report\Yfk\Impl\RepBelowBradeMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepBillMarketMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepBillMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepDasAutoAsnMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepDeliveryNoteMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepInsideBarCodeA4Mgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepInsideBarCodeMgr.cs" />
@@ -260,6 +257,10 @@
     <ProjectReference Include="..\Persistence\Persistence.csproj">
       <Project>{C8D4D3DC-F7B1-4AC8-B123-5B319E99C2D3}</Project>
       <Name>Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Service\Service.csproj">
+      <Project>{1D995C1B-A6A9-4C85-BDB4-D3D2381937BF}</Project>
+      <Name>Service</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utility\Utility.csproj">
       <Project>{49EED42C-851F-4F50-B7D0-59C6C5A6F21E}</Project>

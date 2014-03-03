@@ -41,6 +41,12 @@
             <td class="td02">
                 <sc1:ReadonlyTextBox ID="tbTotalAmount" runat="server" />
             </td>
+            <td class="td01">
+                   <asp:Literal ID="lblCln" runat="server" Text="索赔发票：" />
+            </td>
+            <td class="td02">
+             <sc1:ReadonlyTextBox ID="tbCln" runat="server" />
+            </td>
         </tr>
     </table>
     <div class="tablefooter">
@@ -129,6 +135,7 @@
         </asp:GridView>
     </div>
 </fieldset>
+<div runat="server" id="div_inv">
 <fieldset>
     <legend>${MasterData.KPBill.InvoiceDetail}</legend>
     <table class="mtable">
@@ -203,4 +210,4 @@
             </td>
         </tr>
     </table>
-</fieldset>
+</fieldset></div>

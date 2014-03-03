@@ -80,7 +80,7 @@ public partial class Finance_Bill_Edit : EditModuleBase
         {
             barCodeUrl = TheReportMgr.WriteToFile("BillMarket.xls", list);
         }
-        
+
         Page.ClientScript.RegisterStartupScript(GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + barCodeUrl + "'); </script>");
         this.ShowSuccessMessage("MasterData.Bill.Print.Successful");
     }
@@ -157,6 +157,14 @@ public partial class Finance_Bill_Edit : EditModuleBase
             IList<BillDetail> billDetailList = PopulateData(false);
             Bill bill = this.TheBillMgr.LoadBill(this.BillNo);
             TextBox tbExternalBillNo = this.FV_Bill.FindControl("tbExternalBillNo") as TextBox;
+            TextBox tbMemo = this.FV_Bill.FindControl("tbMemo") as TextBox;
+
+            if (tbMemo.Text.Trim() != string.Empty)
+            {
+                bill.Memo = tbMemo.Text.Trim();
+            }
+            else
+                bill.Memo = string.Empty;
             if (tbExternalBillNo.Text.Trim() != string.Empty)
             {
                 bill.ExternalBillNo = tbExternalBillNo.Text.Trim();
@@ -176,6 +184,7 @@ public partial class Finance_Bill_Edit : EditModuleBase
             }
             bill.BillDetails = billDetailList;
             this.TheBillMgr.UpdateBill(bill, this.CurrentUser);
+            
             this.ShowSuccessMessage("MasterData.Bill.UpdateSuccessfully", this.BillNo);
             this.FV_Bill.DataBind();
         }
@@ -183,6 +192,46 @@ public partial class Finance_Bill_Edit : EditModuleBase
         {
             this.ShowErrorMessage(ex);
         }
+    }
+
+    protected void btnTongji_Click(object sender, EventArgs e)
+    {
+        IList<BillDetail> result = TheBillMgr.LoadBill(this.BillNo, true).BillDetails;
+        var gp = (from i in result group i by new { i.ActingBill.Item.Code,i.ActingBill.ReferenceItemCode, i.ActingBill.Item.Description } into g select new { g.Key.Code,g.Key.ReferenceItemCode, g.Key.Description, Amount = g.Sum(i => i.BilledQty) }).ToList();
+        HZ.DataSource = gp;
+        HZ.DataBind();
+        HZ.Visible = true;
+        field.Visible = true;
+        mx.Visible = true;
+        tbshowTotal.Text = "零件总数:" + gp.Sum(i => i.Amount).ToString("0");
+        itemInList.DataSource = gp.Select(i => i.Code);
+        itemInList.DataBind();
+        itemMX.Visible = false;
+        btnClearMX.Visible = false;
+    }
+
+
+
+    protected void btnQuery_Click(object sender, EventArgs e)
+    {
+        btnClearMX.Visible = true;
+
+        itemMX.Visible = true;
+        HZ.Visible = false;
+        IList<BillDetail> result = TheBillMgr.LoadBill(this.BillNo, true).BillDetails;
+        IList<BillDetail> ds = (from i in result where i.ActingBill.Item.Code == itemInList.SelectedValue select i).ToList();
+        itemMX.DataSource = ds;
+        itemMX.DataBind();
+        tbshowTotal.Text = "零件总数:" + ds.Sum(i => i.BilledQty).ToString("0");
+    }
+
+    protected void btnClear_Click(object sender, EventArgs e)
+    {
+        HZ.DataSource = null;
+        HZ.DataBind();
+        HZ.Visible = false;
+        field.Visible = false;
+        mx.Visible = false;
     }
 
     protected void btnSubmit_Click(object sender, EventArgs e)
@@ -393,7 +442,7 @@ public partial class Finance_Bill_Edit : EditModuleBase
         this.tbTotalDiscountRate.Text = bill.TotalBillDiscountRate.ToString("F4");
         #endregion
 
-        #region 初始化弹出窗口  
+        #region 初始化弹出窗口
         this.PartyCode = bill.BillAddress.Party.Code;
         this.ucNewSearch.InitPageParameter(true, bill);
         #endregion

@@ -20,6 +20,8 @@
                 CssClass="button2" OnClick="btnUpdate_Click" />
             <asp:Button ID="btnPrint" runat="server" Text="${Common.Button.Print}" OnClick="btnPrint_Click"
                 CssClass="button2" />
+                 <asp:Button ID="btnPrintDasAuto" runat="server" Text="打印大众送货单" OnClick="PrintDasAuto"
+                CssClass="button2" />
         </div>
     </fieldset>
     <uc2:DetailList ID="ucDetailList" runat="server" Visible="true" />

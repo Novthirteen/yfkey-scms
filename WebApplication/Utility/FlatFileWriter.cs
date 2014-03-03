@@ -134,6 +134,21 @@ namespace com.Sconit.Utility
                 this.Write(value);
             }
         }
+        public void WriteWithNewLine(string[] values)
+        {
+            if (values == null)
+            {
+                throw new ArgumentNullException("values");
+            }
+
+            foreach (string value in values)
+            {
+                this.Write(value);
+            }
+            this.WriteNewLine();
+        }
+
+
 
         public void Write(string[][] values)
         {

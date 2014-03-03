@@ -123,7 +123,7 @@
                 <td class="td01">
                     <asp:Literal ID="lblProjectCode" runat="server" Text="${MasterData.MiscOrder.ProjectCode}:" />
                 </td>
-                <td class="td02"><%--mod by djin --%>
+                <td class="td02">
                  <uc3:textbox ID="tbProjectCode" runat="server" Visible="true" Width="250" DescField="ProjectDesc"
                         ValueField="ProjectID" ServicePath="VehicleMgr.service" ServiceMethod="GetAllProject" MustMatch="true" 
                            CssClass="inputRequired" />

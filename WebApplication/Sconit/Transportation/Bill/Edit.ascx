@@ -1,8 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Edit.ascx.cs" Inherits="Transportation_Bill_Edit" %>
-
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="sc1" %>
 <%@ Register Src="NewSearch.ascx" TagName="NewSearch" TagPrefix="uc" %>
-
 <script language="javascript" type="text/javascript" src="Js/calcamount.js"></script>
 <script type="text/javascript" language="javascript">
     function GVCheckClick() {
@@ -15,36 +13,31 @@
             $(".GVAlternatingRow input:checkbox").attr("checked", false);
         }
     }
-    function discountChanged(obj)
-    {    
-         CalCulateRowAmount(obj, "tbDiscount", "BaseOnDiscount", "hfUnitPrice", "tbQty", "tbDiscount", "tbDiscountRate", "tbAmount",'#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>','#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>',false);
+    function discountChanged(obj) {
+        CalCulateRowAmount(obj, "tbDiscount", "BaseOnDiscount", "hfUnitPrice", "tbQty", "tbDiscount", "tbDiscountRate", "tbAmount", '#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>', '#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>', false);
     }
-    function qtyChanged(obj)
-    {
-         CalCulateRowAmount(obj, "tbQty", "BaseOnDiscountRate", "hfUnitPrice", "tbQty", "tbDiscount", "tbDiscountRate", "tbAmount",'#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>','#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>',false);
+    function qtyChanged(obj) {
+        CalCulateRowAmount(obj, "tbQty", "BaseOnDiscountRate", "hfUnitPrice", "tbQty", "tbDiscount", "tbDiscountRate", "tbAmount", '#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>', '#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>', false);
     }
-    function discountRateChanged(obj)
-    {       
-        CalCulateRowAmount(obj, "tbDiscountRate", "BaseOnDiscountRate", "hfUnitPrice", "tbQty", "tbDiscount", "tbDiscountRate", "tbAmount",'#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>','#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>',false);
+    function discountRateChanged(obj) {
+        CalCulateRowAmount(obj, "tbDiscountRate", "BaseOnDiscountRate", "hfUnitPrice", "tbQty", "tbDiscount", "tbDiscountRate", "tbAmount", '#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>', '#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>', false);
     }
-     function orderDiscountChanged(obj)
-    {       
-        CalCulateTotalAmount("BaseOnDiscount", '#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>','#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>', 0) ;
+    function orderDiscountChanged(obj) {
+        CalCulateTotalAmount("BaseOnDiscount", '#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>', '#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>', 0);
     }
-    
-  function orderDiscountRateChanged(obj)
-    {       
-        CalCulateTotalAmount("BaseOnDiscountRate", '#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>','#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>', 0) ;
+
+    function orderDiscountRateChanged(obj) {
+        CalCulateTotalAmount("BaseOnDiscountRate", '#<%= tbTotalDiscount.ClientID %>', '#<%= tbTotalDiscountRate.ClientID %>', '#<%= tbTotalDetailAmount.ClientID %>', '#<%= tbTotalAmount.ClientID %>', 0);
     }
 </script>
-
 <fieldset>
     <legend>${Transportation.TransportationBill.TransportationBill}</legend>
-    <asp:FormView ID="FV_TransportationBill" runat="server" DataSourceID="ODS_TransportationBill" DefaultMode="Edit" DataKeyNames="BillNo" OnDataBound="FV_TransportationBill_DataBound">
+    <asp:FormView ID="FV_TransportationBill" runat="server" DataSourceID="ODS_TransportationBill"
+        DefaultMode="Edit" DataKeyNames="BillNo" OnDataBound="FV_TransportationBill_DataBound">
         <EditItemTemplate>
             <table class="mtable">
                 <tr>
-                    <td class="td01">                        
+                    <td class="td01">
                         <asp:Literal ID="lblBillNo" runat="server" Text="${Transportation.TransportationBill.BillNo}:" />
                     </td>
                     <td class="td02">
@@ -100,7 +93,7 @@
                         <asp:Literal ID="lblExternalBillNo" runat="server" Text="${Transportation.TransportationBill.ExternalBillNo}:" />
                     </td>
                     <td class="td02">
-                        <asp:TextBox ID="tbExternalBillNo" runat="server" Text='<%# Bind("ExternalBillNo") %>'/>
+                        <asp:TextBox ID="tbExternalBillNo" runat="server" Text='<%# Bind("ExternalBillNo") %>' />
                     </td>
                 </tr>
             </table>
@@ -108,23 +101,25 @@
     </asp:FormView>
     <div class="tablefooter">
         <sc1:Button ID="btnSave" runat="server" Text="${Common.Button.Save}" Width="59px"
-            OnClick="btnSave_Click"  FunctionId="EditBill" />
+            OnClick="btnSave_Click" FunctionId="EditBill" />
         <sc1:Button ID="btnSubmit" runat="server" Text="${Common.Button.Submit}" Width="59px"
             OnClick="btnSubmit_Click" FunctionId="EditBill" />
-        <asp:Button ID="btnPrint" runat="server" Text="${Common.Button.Print}" Width="59px"  
+        <asp:Button ID="btnPrint" runat="server" Text="${Common.Button.Print}" Width="59px"
             OnClick="btnPrint_Click" />
         <sc1:Button ID="btnDelete" runat="server" Text="${Common.Button.Delete}" Width="59px"
-            OnClientClick="return confirm('${Common.Button.Delete.Confirm}')" OnClick="btnDelete_Click" 
-            FunctionId="EditBill"/>
+            OnClientClick="return confirm('${Common.Button.Delete.Confirm}')" OnClick="btnDelete_Click"
+            FunctionId="EditBill" />
         <sc1:Button ID="btnClose" runat="server" Text="${Common.Button.Close}" Width="59px"
             OnClientClick="return confirm('${Common.Button.Close.Confirm}')" OnClick="btnClose_Click"
-             FunctionId="CloseBill" />
+            FunctionId="CloseBill" />
+        <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" Width="59px"
+            OnClick="btnExport_Click" />
         <sc1:Button ID="btnCancel" runat="server" Text="${Common.Button.Cancel}" Width="59px"
-            OnClientClick="return confirm('${Common.Button.Cancel.Confirm}')" OnClick="btnCancel_Click" 
-             FunctionId="CancelBill"/>
+            OnClientClick="return confirm('${Common.Button.Cancel.Confirm}')" OnClick="btnCancel_Click"
+            FunctionId="CancelBill" />
         <sc1:Button ID="btnVoid" runat="server" Text="${Common.Button.Void}" Width="59px"
             OnClientClick="return confirm('${Common.Button.Void.Confirm}')" OnClick="btnVoid_Click"
-             FunctionId="VoidBill"/>
+            FunctionId="VoidBill" />
         <asp:Button ID="btnBack" runat="server" Text="${Common.Button.Back}" Width="59px"
             OnClick="btnBack_Click" />
     </div>
@@ -153,27 +148,28 @@
                         <asp:CheckBox ID="CheckBoxGroup" name="CheckBoxGroup" runat="server" />
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="运输日期"  ItemStyle-HorizontalAlign="Center"   >
+                <asp:TemplateField HeaderText="运输日期" ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <asp:Label ID="lb_createDate" runat="server" Text=""></asp:Label>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="运输路线" ItemStyle-HorizontalAlign="Center" >
+                <asp:TemplateField HeaderText="运输路线" ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <asp:Label ID="lb_route" runat="server" Text=""></asp:Label>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="运输方式" ItemStyle-HorizontalAlign="Center" >
+                <asp:TemplateField HeaderText="运输方式" ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <asp:Label ID="lb_pricingMethod" runat="server" Text=""></asp:Label>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="运单号码"  ItemStyle-HorizontalAlign="Center" >
+                <asp:TemplateField HeaderText="运单号码" ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <asp:Label ID="lb_OrderNo" runat="server" Text=""></asp:Label>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="${Transportation.TransportationActBill.EffectiveDate}" SortExpression="ActBill.EffectiveDate">
+                <asp:TemplateField HeaderText="${Transportation.TransportationActBill.EffectiveDate}"
+                    SortExpression="ActBill.EffectiveDate">
                     <ItemTemplate>
                         <%# DataBinder.Eval(Container.DataItem, "ActBill.EffectiveDate", "{0:yyyy-MM-dd}")%>
                     </ItemTemplate>
@@ -201,16 +197,16 @@
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="${Transportation.TransportationActBill.CurrentBillQty}">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbQty" runat="server" Width="50" Text='<%# Bind("BilledQty","{0:0.########}") %>' ></asp:TextBox>
-                            <span style="display:none">
-                            <asp:TextBox ID="tbDiscountRate" runat="server" Text="0"/>
-                            <asp:TextBox ID="tbDiscount" runat="server"  Text="0"/>
+                        <asp:TextBox ID="tbQty" runat="server" Width="50" Text='<%# Bind("BilledQty","{0:0.########}") %>'></asp:TextBox>
+                        <span style="display: none">
+                            <asp:TextBox ID="tbDiscountRate" runat="server" Text="0" />
+                            <asp:TextBox ID="tbDiscount" runat="server" Text="0" />
                         </span>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="${Transportation.TransportationActBill.Amount}">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbAmount" runat="server" Width="80px" Text='<%# Bind("Amount","{0:0.########}") %>'/>
+                        <asp:TextBox ID="tbAmount" runat="server" Width="80px" Text='<%# Bind("Amount","{0:0.########}") %>' />
                     </ItemTemplate>
                 </asp:TemplateField>
             </Columns>
@@ -228,10 +224,11 @@
                 </td>
                 <td class="td02">
                     <asp:TextBox ID="tbTotalDetailAmount" runat="server" onfocus="this.blur();" Width="150px" />
-                      <span style="display:none">
+                    <span style="display: none">
                         <asp:TextBox ID="tbTotalDiscountRate" runat="server" Text="0" />
                         <asp:TextBox ID="tbTotalDiscount" runat="server" Text="0" />
-                        <asp:TextBox ID="tbTotalAmount" runat="server" Visible="true" onfocus="this.blur();" Width="150px" />
+                        <asp:TextBox ID="tbTotalAmount" runat="server" Visible="true" onfocus="this.blur();"
+                            Width="150px" />
                     </span>
                 </td>
             </tr>

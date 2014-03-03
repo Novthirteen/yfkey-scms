@@ -101,7 +101,7 @@ public partial class MasterData_FlowDetail_View : ModuleBase
             this.FV_FlowDetail.FindControl("lblBillSettleTerm").Visible = false;
             this.FV_FlowDetail.FindControl("ddlBillSettleTerm").Visible = false;
             this.FV_FlowDetail.FindControl("lblOddShipOption").Visible = true;
-            this.FV_FlowDetail.FindControl("ddlOddShipOption").Visible = true;
+            this.FV_FlowDetail.FindControl("ddlShipOption").Visible = true;
 
         }
         else if (this.ModuleType == BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION)

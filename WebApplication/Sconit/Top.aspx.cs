@@ -89,16 +89,16 @@ public partial class Top : System.Web.UI.Page
         }
 
         //[{ desc: '愛彼思塑膠-原材料仓库', value: 'ABSS' },{ desc: '上海阿仨希-外购件二楼仓库', value: 'ABXG' }]
-        IList<Item> items = TheItemMgr.GetAllItem();
-        string data = "[";
-        for (int i = 0; i < items.Count; i++)
-        {
-            Item item = items[i];
-            string desc = item.Desc1;
-            desc = desc.Replace("'", "");
-            data += TextBoxHelper.GenSingleData(desc, item.Code) + (i < (items.Count - 1) ? "," : string.Empty);
-        }
-        data += "]";
-        this.data.Value = Server.HtmlEncode(data);
+        //IList<Item> items = TheItemMgr.GetAllItem();
+        //string data = "[";
+        //for (int i = 0; i < items.Count; i++)
+        //{
+        //    Item item = items[i];
+        //    string desc = item.Desc1;
+        //    desc = desc.Replace("'", "");
+        //    data += TextBoxHelper.GenSingleData(desc, item.Code) + (i < (items.Count - 1) ? "," : string.Empty);
+        //}
+        //data += "]";
+        this.data.Value = TheItemMgr.GetCacheAllItemString();
     }
 }

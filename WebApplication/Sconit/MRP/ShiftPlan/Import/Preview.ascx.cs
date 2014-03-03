@@ -120,13 +120,13 @@ public partial class MRP_ShiftPlan_Import_Preview : ModuleBase
             string flowCode = ((Label)gvr.FindControl("lblFlow")).Text;
             DateTime startTime = DateTime.Parse(((TextBox)gvr.FindControl("tbStartTime")).Text);
             DateTime windowTime = DateTime.Parse(((TextBox)gvr.FindControl("tbWindowTime")).Text);
-
+            string refOrderNo = ((HiddenField)gvr.FindControl("tbRefOrderNo")).Value;//客户参考订单号 
             OrderHead oh = new OrderHead();
             oh = TheOrderMgr.TransferFlow2Order(flowCode);
             oh.Priority = BusinessConstants.CODE_MASTER_ORDER_PRIORITY_VALUE_NORMAL;
             oh.StartTime = startTime;
             oh.WindowTime = windowTime;
-
+            oh.ReferenceOrderNo = refOrderNo;
             this.GetDetailControl(gvr).CollectData(oh);
             OrderHelper.FilterZeroOrderQty(oh);
             orderHeadList.Add(oh);

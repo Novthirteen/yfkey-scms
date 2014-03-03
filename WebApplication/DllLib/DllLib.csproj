@@ -77,7 +77,32 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="*.dll" />
+    <Content Include="AjaxControlToolkit.dll" />
+    <Content Include="Antlr3.Runtime.dll" />
+    <Content Include="ASTreeView.dll" />
+    <Content Include="Bamboo.Prevalence.dll" />
+    <Content Include="Bamboo.Prevalence.Util.dll" />
+    <Content Include="CasClient.dll" />
+    <Content Include="Castle.Core.dll" />
+    <Content Include="Castle.DynamicProxy.dll" />
+    <Content Include="Castle.DynamicProxy2.dll" />
+    <Content Include="Castle.Facilities.AutomaticTransactionManagement.dll" />
+    <Content Include="Castle.Facilities.NHibernateIntegration.dll" />
+    <Content Include="Castle.Facilities.QuartzIntegration.dll" />
+    <Content Include="Castle.MicroKernel.dll" />
+    <Content Include="Castle.Services.Transaction.dll" />
+    <Content Include="Castle.Windsor.dll" />
+    <Content Include="CodeSmith.Engine.dll" />
+    <Content Include="Common.Logging.dll" />
+    <Content Include="Iesi.Collections.dll" />
+    <Content Include="Interop.DSOFile.dll" />
+    <Content Include="Ionic.Zip.dll" />
+    <Content Include="log4net.dll" />
+    <Content Include="NHibernate.Caches.Prevalence.dll" />
+    <Content Include="NHibernate.dll" />
+    <Content Include="NHibernate.Mapping.Attributes.dll" />
+    <Content Include="NPOI.dll" />
+    <Content Include="Whidsoft.WebControls.OrgChart.dll" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

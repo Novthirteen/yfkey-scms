@@ -36,7 +36,8 @@ namespace com.Sconit.Service.Dss.Impl
         private string[] fields = new string[] 
             { 
                 "UnitPrice",
-                "EndDate"
+                "EndDate",
+                "IsProvisionalEstimate"
             };
 
         public PriceListInboundMgr(IPriceListMgr priceListMgr,
@@ -119,6 +120,9 @@ namespace com.Sconit.Service.Dss.Impl
         protected override void CreateOrUpdateObject(object obj)
         {
             PriceListDetail priceListDetail = (PriceListDetail)obj;
+
+            priceListDetail.IsProvisionalEstimate = CheckProvisionalEstimate(priceListDetail.UnitPrice);
+
 
             PriceListDetail newPriceListDetail =
                 this.priceListDetailMgr.LoadPriceListDetail(priceListDetail.PriceList.Code, priceListDetail.Currency.Code,

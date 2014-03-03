@@ -17,12 +17,12 @@ using NHibernate.Expression;
 public partial class Visualization_GoodsTraceability_HuSearch_Main : MainModuleBase
 {
     public event EventHandler ViewEvent;
-
+    
     protected void Page_Load(object sender, EventArgs e)
     {
         this.ucSearch.SearchEvent += new System.EventHandler(this.Search_Render);
         this.ucList.ViewEvent += new EventHandler(View_Render);
-
+        this.ucSearch.ExportEvent += new System.EventHandler(this.Search_ExportEvent);
         if (!IsPostBack)
         {
             if (this.Action == BusinessConstants.PAGE_LIST_ACTION)
@@ -46,5 +46,12 @@ public partial class Visualization_GoodsTraceability_HuSearch_Main : MainModuleB
         {
             ViewEvent(sender, null);
         }
+    }
+
+    void Search_ExportEvent(object sender, EventArgs e)
+    {
+        this.ucList.SetSearchCriteria((DetachedCriteria)((object[])sender)[0], (DetachedCriteria)((object[])sender)[1]);
+        this.ucList.UpdateView();
+        this.ucList.Export();
     }
 }

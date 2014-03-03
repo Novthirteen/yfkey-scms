@@ -16,7 +16,8 @@
 		<property name="SYS_CODE" column="SYS_CODE" type="String" length="10" />	
 		<property name="SHIPPER" column="SHIPPER" type="String" length="50" />	
 		<property name="ORDER_READ_DATE" column="ORDER_READ_DATE" type="DateTime"  />
-
+    <property name="CLN_ORDER" column="CLN_ORDER" type="String" length="2000"  />
+    <property name="CLN_amount" column="CLN_AMOUNT" type="Decimal"   />
     <property name="InvoiceCount" column="InvoiceCount" type="Int32"  />
     <property name="InvoiceDate" column="InvoiceDate" type="DateTime"  />
     <property name="InvoiceTax" column="InvoiceTax" type="String" length="50"  />

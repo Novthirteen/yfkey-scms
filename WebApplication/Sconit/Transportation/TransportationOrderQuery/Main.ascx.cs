@@ -56,14 +56,14 @@ public partial class Transportation_TransportationOrderQuery_Main : MainModuleBa
             if (CurrentUser.HasPermission("btnTransportationOrderQuery"))
             {
                 ddlStatus.Items.Add("Checked");
-                sqlText = "select * from TransportationOrderQuery  order by CreateDate desc";
+               // sqlText = "exec('select * from TransportationOrderQuery  order by CreateDate desc')";
             }
-            else
-            {
-                sqlText = "select * from TransportationOrderQuery where isnull(status,' ') not in ('Checked') order by CreateDate desc";
+           // else
+           // {
+              //  sqlText = "exec('select * from TransportationOrderQuery where isnull(status,' ') not in ('Checked') order by CreateDate desc')";
 
-            }
-            BindData(sqltods(sqlText));
+           // }
+          //  BindData(sqltods(sqlText));
         }
     }
 
@@ -140,7 +140,7 @@ public partial class Transportation_TransportationOrderQuery_Main : MainModuleBa
         sheet1.GetRow(0).CreateCell(4).SetCellValue("运单号");
         sheet1.GetRow(0).CreateCell(5).SetCellValue("状态");
         sheet1.GetRow(0).CreateCell(6).SetCellValue("发货路线");
-
+        sheet1.GetRow(0).CreateCell(7).SetCellValue("创建人");
         
 
         DataSet ds = (DataSet)Session["ds"];
@@ -153,6 +153,7 @@ public partial class Transportation_TransportationOrderQuery_Main : MainModuleBa
             sheet1.GetRow(i).CreateCell(4).SetCellValue(ds.Tables[0].Rows[i - 1][3].ToString());
             sheet1.GetRow(i).CreateCell(5).SetCellValue(ds.Tables[0].Rows[i - 1][4].ToString());
             sheet1.GetRow(i).CreateCell(6).SetCellValue(ds.Tables[0].Rows[i - 1][5].ToString());
+            sheet1.GetRow(i).CreateCell(7).SetCellValue(ds.Tables[0].Rows[i - 1][6].ToString());
         }
         sheet1.AutoSizeColumn(0);
         sheet1.AutoSizeColumn(1);

@@ -1,26 +1,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Castle.Services.Transaction;
+using com.Mes.Dss.Entity;
 using com.Sconit.Entity;
 using com.Sconit.Entity.MasterData;
-using com.Sconit.Persistence.MasterData;
-using NHibernate.Expression;
-using com.Sconit.Entity.Exception;
-using com.Mes.Dss.Persistence;
-using com.Mes.Dss.Entity;
+using com.Sconit.Entity.Mes;
+using com.Sconit.Service;
+using com.Sconit.Service.Criteria;
 using com.Sconit.Service.MasterData;
 using com.Sconit.Service.Mes;
-using com.Sconit.Entity.Mes;
-using com.Sconit.Service.Criteria;
-using System.Linq;
+using NHibernate.Expression;
 
 //TODO: Add other using statements here.
 
 namespace com.Mes.Dss.Service.Impl
 {
     [Transactional]
-    public class MesDssInMgr : IMesDssInMgr
+    public class MesDssInMgr : SessionBase, IMesDssInMgr
     {
         public IMesScmsTableIndexMgr mesScmsTableIndexMgr { get; set; }
         public IMesScmsCompletedOrderMgr mesScmsCompletedOrderMgr { get; set; }
@@ -90,7 +88,6 @@ namespace com.Mes.Dss.Service.Impl
         }
 
 
-        [Transaction(TransactionMode.Requires)]
         private void ProcessOrderIn(MesScmsTableIndex mesScmsTableIndex)
         {
             if (mesScmsTableIndex.TableName == MesDssConstants.MES_SCMS_TABLEINDEX_TABLE_NAME_MES_SCMS_COMPLETED_ORDER)
@@ -100,14 +97,17 @@ namespace com.Mes.Dss.Service.Impl
                 {
                     foreach (MesScmsCompletedOrder mesScmsCompletedOrder in orderList)
                     {
+                        
                         try
                         {
+                            if (mesScmsCompletedBoxMgr.GetMesScmsCompletedBox(mesScmsCompletedOrder.OrderNo) > 0) continue;
                             orderMgr.ManualCompleteOrder(mesScmsCompletedOrder.OrderNo, userMgr.GetMonitorUser());
                             mesScmsCompletedOrderMgr.Complete(mesScmsCompletedOrder);
                          
                         }
                         catch (Exception e)
                         {
+                            this.CleanSession();
                             log.Error(mesScmsCompletedOrder.OrderNo + " complete exception", e);
                             continue;
                         }
@@ -146,6 +146,7 @@ namespace com.Mes.Dss.Service.Impl
                         }
                         catch (Exception e)
                         {
+                            this.CleanSession();
                             log.Error(mesScmsCompletedBox.HuId + " complete exception", e);
                             continue;
                         }
@@ -154,7 +155,6 @@ namespace com.Mes.Dss.Service.Impl
             }
             mesScmsTableIndexMgr.Complete(mesScmsTableIndex);
         }
-
 
         //private Bom BomCompare(IList<BomDetail> bomScms, IList<MesScmsCompletedIssue> bomMes)
         //{
@@ -174,7 +174,6 @@ namespace com.Mes.Dss.Service.Impl
         //    return null;
         // }
 
-        [Transaction(TransactionMode.Requires)]
         private void ProcessInspectOrderIn(MesScmsTableIndex mesScmsTableIndex)
         {
 
@@ -223,6 +222,7 @@ namespace com.Mes.Dss.Service.Impl
                     }
                     catch (Exception e)
                     {
+                        this.CleanSession();
                         log.Error(repairMaterialList[0].RejectNo + " complete exception", e);
                         continue;
                     }
@@ -232,8 +232,6 @@ namespace com.Mes.Dss.Service.Impl
             mesScmsTableIndexMgr.Complete(mesScmsTableIndex);
         }
 
-
-        [Transaction(TransactionMode.Requires)]
         private void ProcessShelfIn(MesScmsTableIndex mesScmsTableIndex)
         {
             #region 工位货架
@@ -290,6 +288,7 @@ namespace com.Mes.Dss.Service.Impl
                         }
                         catch (Exception e)
                         {
+                            this.CleanSession();
                             log.Error(mesScmsStationShelf.ShelfNo + " delete exception", e);
                             continue;
                         }
@@ -301,6 +300,7 @@ namespace com.Mes.Dss.Service.Impl
                     }
                     catch (Exception e)
                     {
+                        this.CleanSession();
                         log.Error(mesScmsStationShelf.ShelfNo + " complete exception", e);
                         continue;
                     }
@@ -311,8 +311,6 @@ namespace com.Mes.Dss.Service.Impl
             mesScmsTableIndexMgr.Complete(mesScmsTableIndex);
         }
 
-
-        [Transaction(TransactionMode.Requires)]
         private void ProcessOrderLocationTransactionIn(MesScmsTableIndex mesScmsTableIndex)
         {
             #region 物料消耗
@@ -351,6 +349,7 @@ namespace com.Mes.Dss.Service.Impl
                     }
                     catch (Exception e)
                     {
+                        this.CleanSession();
                         log.Error(stationBox.Id + " complete exception", e);
                         continue;
                     }
@@ -361,9 +360,7 @@ namespace com.Mes.Dss.Service.Impl
             mesScmsTableIndexMgr.Complete(mesScmsTableIndex);
         }
 
-
-        [Transaction(TransactionMode.Requires)]
-        public void ProcessBomDetailIn(MesScmsTableIndex mesScmsTableIndex)
+        private void ProcessBomDetailIn(MesScmsTableIndex mesScmsTableIndex)
         {
             IList<MesScmsBom> bomDetailList = mesScmsBomMgr.GetUpdateMesScmsBom();
             if (bomDetailList != null && bomDetailList.Count > 0)
@@ -452,6 +449,7 @@ namespace com.Mes.Dss.Service.Impl
                     }
                     catch (Exception e)
                     {
+                        this.CleanSession();
                         log.Error(mesScmsBom.Bom + "," + mesScmsBom.ItemCode + "," + mesScmsBom.ProductLine + "," + mesScmsBom.TagNo + " complete exception", e);
                         continue;
                     }
@@ -461,7 +459,6 @@ namespace com.Mes.Dss.Service.Impl
             mesScmsTableIndexMgr.Complete(mesScmsTableIndex);
         }
 
-        [Transaction(TransactionMode.Requires)]
         private void ProcessShelfItemIn(MesScmsTableIndex mesScmsTableIndex)
         {
             IList<MesScmsShelfPart> mesScmsShelfPartList = mesScmsShelfPartMgr.GetUpdateMesScmsShelfPart();
@@ -511,6 +508,7 @@ namespace com.Mes.Dss.Service.Impl
                         }
                         catch (Exception e)
                         {
+                            this.CleanSession();
                             log.Error(mesScmsShelfPart.ShelfNo + "-" + mesScmsShelfPart.ItemCode + " delete exception", e);
                             continue;
                         }
@@ -522,6 +520,7 @@ namespace com.Mes.Dss.Service.Impl
                     }
                     catch (Exception e)
                     {
+                        this.CleanSession();
                         log.Error(mesScmsShelfPart.ShelfNo + " complete exception", e);
                         continue;
                     }
@@ -531,9 +530,6 @@ namespace com.Mes.Dss.Service.Impl
             mesScmsTableIndexMgr.Complete(mesScmsTableIndex);
         }
 
-
-
-        [Transaction(TransactionMode.Unspecified)]
         private BomDetail LoadBomDetail(string bomCode, string itemCode, int op, DateTime effDate)
         {
             DetachedCriteria criteria = DetachedCriteria.For(typeof(BomDetail));
@@ -554,7 +550,5 @@ namespace com.Mes.Dss.Service.Impl
                 return null;
             }
         }
-
-
     }
 }

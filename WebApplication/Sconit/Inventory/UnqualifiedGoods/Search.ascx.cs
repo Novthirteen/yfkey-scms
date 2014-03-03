@@ -84,6 +84,7 @@ public partial class Inventory_UnqualifiedGoods_Search : ModuleBase
         {
             selectCriteria.Add(Expression.Eq("d.LocationFrom.Code", tbLocation.Text.Trim()));
         }
+        selectCriteria.AddOrder(Order.Asc("o.InspectNo"));
         SearchEvent(selectCriteria, e);
 
     }
