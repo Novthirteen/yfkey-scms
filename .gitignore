@@ -1,0 +1,8 @@
+*.suo
+*.user
+obj
+bin
+*.datasource
+/src/WebApp.5.0.0/WebApp/WebApp.Publish.xml
+/src/SI.5.0.0/Web.SI/Web.SI.Publish.xml
+/src/WebApp.5.0.0/WebApp/Config/*.config
