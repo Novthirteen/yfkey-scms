@@ -1,0 +1,30 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="C#" Description="Generate the service class." %>
+<%@ Property Name="AssemblyName" Type="String" Default="com.Sconit" Category="EntityClass" Description="The assembly that contains the entity class." %>
+<%@ Property Name="EntityClassName" Type="String" Category="EntityClass" Description="The entity class name." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The module group which contains the entity, for example, Security." %>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using Castle.Services.Transaction;
+using com.Sconit.Persistence.<%=ModuleGroupName%>;
+
+//TODO: Add other using statements here.
+
+namespace <%=this.AssemblyName%>.Service.<%=ModuleGroupName%>.Impl
+{
+    [Transactional]
+    public class <%=EntityClassName%>Mgr : <%=EntityClassName%>BaseMgr, I<%=EntityClassName%>Mgr
+    {
+        public <%=EntityClassName%>Mgr(I<%=EntityClassName%>Dao entityDao)
+            : base(entityDao)
+        {
+        }
+
+        #region Customized Methods
+
+        //TODO: Add other methods here.
+
+        #endregion Customized Methods
+    }
+}

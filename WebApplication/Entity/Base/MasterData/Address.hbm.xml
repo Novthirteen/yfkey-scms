@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+	<class name="com.Sconit.Entity.MasterData.Address, com.Sconit.Entity" table="PartyAddr" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      <generator class="assigned" />
+		</id>
+		<discriminator column="AddrType" type="String" />
+		<property name="Sequence" column="SeqNo" type="Int32" />
+		<property name="IsPrimary" column="IsPrimary" type="Boolean" />
+		<property name="Address" column="Address" type="String" length="255" />
+		<property name="PostalCode" column="PostalCode" type="String" length="50" />
+		<property name="PostalCodeExtention" column="PostalCodeExt" type="String" length="50" />
+		<property name="TelephoneNumber" column="TelNumber" type="String" length="50" />
+		<property name="MobilePhone" column="MobilePhone" type="String" length="50" />
+		<property name="ContactPersonName" column="ContactPsnName" type="String" length="100" />
+		<property name="Fax" column="Fax" type="String" length="50" />
+		<property name="Email" column="Email" type="String" length="50" />
+		<property name="WebSite" column="WebSite" type="String" length="50" />
+		<property name="IsActive" column="IsActive" type="Boolean" />
+		<many-to-one name="Party" column="PartyCode" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		
+		<subclass name="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" discriminator-value="BillAddr" lazy="false"/>
+		<subclass name="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" discriminator-value="ShipAddr" lazy="false"/>
+	</class>
+</hibernate-mapping>

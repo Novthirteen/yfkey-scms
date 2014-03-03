@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.InspectOrder, com.Sconit.Entity" table="InspectMstr" lazy="false">
+		<id name="InspectNo" column="InspNo" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Status" column="Status" type="String" length="50" />	
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="IsDetailHasHu" column="IsDetHasHu" type="Boolean" />
+    <property name="IpNo" column="IpNo" type="String" length="50" />
+    <property name="ReceiptNo" column="RecNo" type="String" length="50" />
+    <property name="IsSeperated" column="IsSeperated" type="Boolean"  />
+    <many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />	
+		<many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="IsPrinted" column="IsPrinted" type="Boolean"  />
+    <property name="Region" column="Region" type="String" length="50" />
+    <property name="EstimateInspectDate" column="EstInspectDate" type="DateTime" />
+    <bag name="InspectOrderDetails" table="InspectDet" inverse="true" lazy="true">
+      <key column="InspNo" />
+      <one-to-many class="com.Sconit.Entity.MasterData.InspectOrderDetail, com.Sconit.Entity" />
+    </bag>
+  	</class>
+</hibernate-mapping>

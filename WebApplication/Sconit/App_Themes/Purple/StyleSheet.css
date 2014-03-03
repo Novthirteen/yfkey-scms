@@ -1,0 +1,40 @@
+﻿/*颜色定义
+#800080
+#957353
+#AFAD94
+#FFF4DD
+#D6B7A3
+#DAD6C5
+*/
+
+body
+{
+	background-color:#FFFFFF;
+}
+a 
+{
+	color:Blue
+}
+
+/*定义GridView表格颜色*/
+.lefttop{
+	background: #800080 url(tr_purple_bg.png) repeat-x;
+	color: #FFFFFF;
+}
+
+.GVHeader{
+	background-color: #800080;
+	color: #FFFFFF;
+}
+
+.GVHeader a,.lefttop a{
+	color: #FFFFFF;
+}
+.GVRow {
+	color: #000000;
+	background-color: #FFFFFF;
+}
+.GVAlternatingRow{
+    background-color: #FFEBFF;
+}
+.GVSelectedRow{background-color: #DAD6C5;}

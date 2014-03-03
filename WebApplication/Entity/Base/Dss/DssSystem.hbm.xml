@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Dss.DssSystem, com.Sconit.Entity" table="DssSysMstr" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+        <property name="SysAlias" column="SysAlias" type="String" length="50" />
+		<property name="Description" column="Desc1" type="String" length="255" />	
+		<property name="Type" column="Type" type="String" length="50" />	
+        <property name="Flag" column="Flag" type="String" length="50" />
+        <property name="UndefinedString1" column="UndefStr1" type="String" length="255" />
+        <property name="UndefinedString2" column="UndefStr2" type="String" length="255" />
+        <property name="UndefinedString3" column="UndefStr3" type="String" length="255" />
+        <property name="UndefinedString4" column="UndefStr4" type="String" length="255" />
+        <property name="UndefinedString5" column="UndefStr5" type="String" length="255" />
+        <property name="Prefix1" column="Prefix1" type="String" length="50" />
+        <property name="Prefix2" column="Prefix2" type="String" length="50" />
+        <property name="Prefix3" column="Prefix3" type="String" length="50" />
+        <property name="Prefix4" column="Prefix4" type="String" length="50" />
+        <property name="Prefix5" column="Prefix5" type="String" length="50" />
+  	</class>
+</hibernate-mapping>

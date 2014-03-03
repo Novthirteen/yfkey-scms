@@ -1,0 +1,634 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="C#" Description="Generates the entity related interfaces and classes." %>
+<%@ Property Name="EntityClassName" Type="String" Category="EntityClass" Description="The entity class name." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The module group which contains the entity, for example, Security." %>
+<%@ Property Name="ModuleName" Type="String" Category="Module" Description="The module name of current module, for example, 'User Admin'" %>
+<%@ Property Name="Mapping" Type="com.Sconit.CodeSmith.MappingProperty" Category="Mapping" Description="The O/R mapping settings." %>
+<%@ Property Name="AssemblyName" Type="String" Default="com.Sconit" Category="EntityClass" Description="The assembly that contains the entity class." %>
+<%@ Property Name="TableName" Type="String" Category="Table" Description="The table name." %>
+<%@ Property Name="OnlyGenerateBase" Type="Boolean" Category="OnlyGenerateBase" Description="Only Generate Base." Default="false"%>
+<%@ Assembly Name="com.Sconit.CodeSmith" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Import Namespace="com.Sconit.CodeSmith" %>
+<%@ Import Namespace="System.Text" %>
+<%@ Import Namespace="System.IO" %>
+<%@ Import Namespace="System.Windows.Forms.Design" %>
+<script runat="template">
+	private string _solutionDirectory;
+	
+	private CodeTemplate _entityBase_cs_Template;
+    private CodeTemplate _entity_cs_Template;
+	private CodeTemplate _entity_hbm_xml_Template;
+	
+	private CodeTemplate _ientityBaseDao_cs_Template;
+    private CodeTemplate _ientityDao_cs_Template;
+	private CodeTemplate _nhentityBaseDao_cs_Template;
+    private CodeTemplate _nhentityDao_cs_Template;
+	
+	private CodeTemplate _ientityBaseMgr_cs_Template;
+    private CodeTemplate _ientityMgr_cs_Template;
+	private CodeTemplate _entityBaseMgr_cs_Template;
+    private CodeTemplate _entityMgr_cs_Template;
+	
+	//private CodeTemplate _entitydaotest_cs_Template;
+	//private CodeTemplate _entitymgrtest_cs_Template;
+	
+	//private CodeTemplate _main_ascx_cs_Template;
+	//private CodeTemplate _new_ascx_cs_Template;
+	//private CodeTemplate _edit_ascx_cs_Template;
+	
+	//private CodeTemplate _main_ascx_Template;
+	//private CodeTemplate _new_ascx_Template;
+	//private CodeTemplate _edit_ascx_Template;
+	
+	[Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
+	[Category("Class")]
+    [Description("The folder which contains the whole solution.")]
+	public string SolutionDirectory
+	{
+		get {return _solutionDirectory;}
+		set {_solutionDirectory = value;}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate EntityBase_cs_Template
+	{
+		get
+		{
+			if (_entityBase_cs_Template == null)
+				_entityBase_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\EntityBase.cs.cst");
+
+			return _entityBase_cs_Template;
+		}
+	}
+    
+    [Browsable(false)]
+	public CodeTemplate Entity_cs_Template
+	{
+		get
+		{
+			if (_entity_cs_Template == null)
+				_entity_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\Entity.cs.cst");
+
+			return _entity_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate Entity_hbm_xml_Template
+	{
+		get
+		{
+			if (_entity_hbm_xml_Template == null)
+				_entity_hbm_xml_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\Entity.hbm.xml.cst");
+
+			return _entity_hbm_xml_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate EntityBaseMgr_cs_Template
+	{
+		get
+		{
+			if (_entityBaseMgr_cs_Template == null)
+				_entityBaseMgr_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\EntityBaseMgr.cs.cst");
+
+			return _entityBaseMgr_cs_Template;
+		}
+	}
+    
+    [Browsable(false)]
+	public CodeTemplate EntityMgr_cs_Template
+	{
+		get
+		{
+			if (_entityMgr_cs_Template == null)
+				_entityMgr_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\EntityMgr.cs.cst");
+
+			return _entityMgr_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate IentityBaseDao_cs_Template
+	{
+		get
+		{
+			if (_ientityBaseDao_cs_Template == null)
+				_ientityBaseDao_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\IEntityBaseDao.cs.cst");
+
+			return _ientityBaseDao_cs_Template;
+		}
+	}
+    
+    [Browsable(false)]
+	public CodeTemplate IentityDao_cs_Template
+	{
+		get
+		{
+			if (_ientityDao_cs_Template == null)
+				_ientityDao_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\IEntityDao.cs.cst");
+
+			return _ientityDao_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate IentityBaseMgr_cs_Template
+	{
+		get
+		{
+			if (_ientityBaseMgr_cs_Template == null)
+				_ientityBaseMgr_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\IEntityBaseMgr.cs.cst");
+
+			return _ientityBaseMgr_cs_Template;
+		}
+	}
+    
+    [Browsable(false)]
+	public CodeTemplate IentityMgr_cs_Template
+	{
+		get
+		{
+			if (_ientityMgr_cs_Template == null)
+				_ientityMgr_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\IEntityMgr.cs.cst");
+
+			return _ientityMgr_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate NhentityBaseDao_cs_Template
+	{
+		get
+		{
+			if (_nhentityBaseDao_cs_Template == null)
+				_nhentityBaseDao_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\NHEntityBaseDao.cs.cst");
+
+			return _nhentityBaseDao_cs_Template;
+		}
+	}
+    
+    [Browsable(false)]
+	public CodeTemplate NhentityDao_cs_Template
+	{
+		get
+		{
+			if (_nhentityDao_cs_Template == null)
+				_nhentityDao_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\NHEntityDao.cs.cst");
+
+			return _nhentityDao_cs_Template;
+		}
+	}
+	
+	/*
+	[Browsable(false)]
+	public CodeTemplate Entitydaotest_cs_Template
+	{
+		get
+		{
+			if (_entitydaotest_cs_Template == null)
+				_entitydaotest_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\EntityDaoTest.cs.cst");
+
+			return _entitydaotest_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate Entitymgrtest_cs_Template
+	{
+		get
+		{
+			if (_entitymgrtest_cs_Template == null)
+				_entitymgrtest_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Entity\\EntityMgrTest.cs.cst");
+
+			return _entitymgrtest_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate Main_ascx_cs_Template
+	{
+		get
+		{
+			if (_main_ascx_cs_Template == null)
+				_main_ascx_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Module\\Module.Main.ascx.cs.cst");
+
+			return _main_ascx_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate New_ascx_cs_Template
+	{
+		get
+		{
+			if (_new_ascx_cs_Template == null)
+				_new_ascx_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Module\\Module.New.ascx.cs.cst");
+
+			return _new_ascx_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate Edit_ascx_cs_Template
+	{
+		get
+		{
+			if (_edit_ascx_cs_Template == null)
+				_edit_ascx_cs_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Module\\Module.Edit.ascx.cs.cst");
+
+			return _edit_ascx_cs_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate Main_ascx_Template
+	{
+		get
+		{
+			if (_main_ascx_Template == null)
+				_main_ascx_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Module\\Module.Main.ascx.cst");
+
+			return _main_ascx_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate New_ascx_Template
+	{
+		get
+		{
+			if (_new_ascx_Template == null)
+				_new_ascx_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Module\\Module.New.ascx.cst");
+
+			return _new_ascx_Template;
+		}
+	}
+	
+	[Browsable(false)]
+	public CodeTemplate Edit_ascx_Template
+	{
+		get
+		{
+			if (_edit_ascx_Template == null)
+				_edit_ascx_Template = CompileTemplate(CodeTemplateInfo.DirectoryName + "Module\\Module.Edit.ascx.cst");
+
+			return _edit_ascx_Template;
+		}
+	}
+	*/
+	
+	public CodeTemplate CompileTemplate(string templateName)
+	{
+		CodeTemplateCompiler compiler = new CodeTemplateCompiler(templateName);
+		compiler.Compile();
+
+		if (compiler.Errors.Count == 0)
+		{
+			return compiler.CreateInstance();
+		}
+		else
+		{
+			for (int i = 0; i < compiler.Errors.Count; i++)
+			{
+				Response.WriteLine(compiler.Errors[i].ToString());
+			}
+			return null;
+		}
+	}
+	
+	[Browsable(false)]
+	public string EntityBaseClassDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Entity\\Base\\" + this.ModuleGroupName);
+		}
+	}
+    
+    [Browsable(false)]
+	public string EntityClassDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Entity\\" + this.ModuleGroupName);
+		}
+	}
+    
+    [Browsable(false)]
+	public string IEntityBaseMgrDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Service\\Base\\" + this.ModuleGroupName);
+		}
+	}
+	
+	[Browsable(false)]
+	public string IEntityMgrDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Service\\" + this.ModuleGroupName);
+		}
+	}
+	
+    [Browsable(false)]
+	public string EntityBaseMgrDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Service\\Base\\" + this.ModuleGroupName + "\\Impl");
+		}
+	}
+    
+	[Browsable(false)]
+	public string EntityMgrDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Service\\" + this.ModuleGroupName + "\\Impl");
+		}
+	}
+	
+    [Browsable(false)]
+	public string IEntityBaseDaoDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Persistence\\Base\\" + this.ModuleGroupName);
+		}
+	}
+    
+	[Browsable(false)]
+	public string IEntityDaoDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Persistence\\" + this.ModuleGroupName);
+		}
+	}
+	
+    [Browsable(false)]
+	public string EntityBaseDaoDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Persistence\\Base\\" + this.ModuleGroupName + "\\NH");
+		}
+	}
+    
+	[Browsable(false)]
+	public string EntityDaoDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Persistence\\" + this.ModuleGroupName + "\\NH");
+		}
+	}
+	
+	/*
+	[Browsable(false)]
+	public string EntityDaoTestDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Persistence.UnitTest\\Dao\\" + this.ModuleGroupName);
+		}
+	}
+	
+	[Browsable(false)]
+	public string EntityMgrTestDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Service.UnitTest\\" + this.ModuleGroupName);
+		}
+	}
+	
+	[Browsable(false)]
+	public string ModuleDir
+	{
+		get
+		{
+			return Path.Combine(SolutionDirectory, "Web\\Modules\\" + this.ModuleGroupName + "\\" + this.ModuleName.Replace(" ", ""));
+		}
+	}
+	*/
+	
+	public void CheckAndCreateDir(string dir)
+	{
+		if (!Directory.Exists(dir))
+		{
+			Directory.CreateDirectory(dir);
+		}
+	}
+	
+	public void CreateDir()
+	{
+        CheckAndCreateDir(EntityBaseClassDir);
+		CheckAndCreateDir(IEntityBaseDaoDir);
+		CheckAndCreateDir(EntityBaseDaoDir);
+		CheckAndCreateDir(IEntityBaseMgrDir);
+		CheckAndCreateDir(EntityBaseMgrDir);
+		CheckAndCreateDir(EntityClassDir);
+		CheckAndCreateDir(IEntityDaoDir);
+		CheckAndCreateDir(EntityDaoDir);
+		CheckAndCreateDir(IEntityMgrDir);
+		CheckAndCreateDir(EntityMgrDir);
+		//CheckAndCreateDir(EntityDaoTestDir);
+		//CheckAndCreateDir(EntityMgrTestDir);
+		//CheckAndCreateDir(ModuleDir);
+	}
+	
+	public void Generate()
+	{
+		CreateDir();
+		
+		string _entityBase_cs_FileName = Path.Combine(EntityBaseClassDir, this.EntityClassName + "Base.cs");
+		this.EntityBase_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+		this.EntityBase_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.EntityBase_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.EntityBase_cs_Template.SetProperty("Mapping", this.Mapping);
+		this.EntityBase_cs_Template.RenderToFile(_entityBase_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", _entityBase_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+        
+        if (!this.OnlyGenerateBase)
+        {
+            string _entity_cs_FileName = Path.Combine(EntityClassDir, this.EntityClassName + ".cs");
+            this.Entity_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+            this.Entity_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+            this.Entity_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+            this.Entity_cs_Template.RenderToFile(_entity_cs_FileName, true);
+            Response.Write(string.Format("Sucessfully generate file {0} ", _entity_cs_FileName));
+            Response.Write(System.Environment.NewLine);
+        }
+		
+		
+		string _entity_hbm_xml_FileName = Path.Combine(EntityBaseClassDir, this.EntityClassName + ".hbm.xml");
+		this.Entity_hbm_xml_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.Entity_hbm_xml_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.Entity_hbm_xml_Template.SetProperty("Mapping", this.Mapping);
+		this.Entity_hbm_xml_Template.SetProperty("AssemblyName", this.AssemblyName);
+		this.Entity_hbm_xml_Template.SetProperty("TableName", this.TableName);
+		this.Entity_hbm_xml_Template.RenderToFile(_entity_hbm_xml_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", _entity_hbm_xml_FileName));
+		Response.Write(System.Environment.NewLine);
+		
+		
+		string _ientityBaseDao_cs_FileName = Path.Combine(IEntityBaseDaoDir, "I" + this.EntityClassName + "BaseDao.cs");
+		this.IentityBaseDao_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+		this.IentityBaseDao_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.IentityBaseDao_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.IentityBaseDao_cs_Template.SetProperty("Mapping", this.Mapping);
+		this.IentityBaseDao_cs_Template.RenderToFile(_ientityBaseDao_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", _ientityBaseDao_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+        
+        
+        if (!this.OnlyGenerateBase)
+        {
+            string _ientityDao_cs_FileName = Path.Combine(IEntityDaoDir, "I" + this.EntityClassName + "Dao.cs");
+            this.IentityDao_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+            this.IentityDao_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+            this.IentityDao_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+            this.IentityDao_cs_Template.RenderToFile(_ientityDao_cs_FileName, true);
+            Response.Write(string.Format("Sucessfully generate file {0} ", _ientityDao_cs_FileName));
+            Response.Write(System.Environment.NewLine);
+        }
+		
+		
+		string _nhentityBaseDao_cs_FileName = Path.Combine(EntityBaseDaoDir, "NH" + this.EntityClassName + "BaseDao.cs");
+		this.NhentityBaseDao_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+		this.NhentityBaseDao_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.NhentityBaseDao_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.NhentityBaseDao_cs_Template.SetProperty("Mapping", this.Mapping);
+		this.NhentityBaseDao_cs_Template.RenderToFile(_nhentityBaseDao_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", _nhentityBaseDao_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+        
+        
+        if (!this.OnlyGenerateBase)
+        {
+            string _nhentityDao_cs_FileName = Path.Combine(EntityDaoDir, "NH" + this.EntityClassName + "Dao.cs");
+            this.NhentityDao_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+            this.NhentityDao_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+            this.NhentityDao_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+            this.NhentityDao_cs_Template.RenderToFile(_nhentityDao_cs_FileName, true);
+            Response.Write(string.Format("Sucessfully generate file {0} ", _nhentityDao_cs_FileName));
+            Response.Write(System.Environment.NewLine);
+        }
+		
+		
+		string _ientityBaseMgr_cs_FileName = Path.Combine(IEntityBaseMgrDir, "I" + this.EntityClassName + "BaseMgr.cs");
+		this.IentityBaseMgr_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+		this.IentityBaseMgr_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.IentityBaseMgr_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.IentityBaseMgr_cs_Template.SetProperty("Mapping", this.Mapping);
+		this.IentityBaseMgr_cs_Template.RenderToFile(_ientityBaseMgr_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", _ientityBaseMgr_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+        
+        
+        if (!this.OnlyGenerateBase)
+        {
+            string _ientityMgr_cs_FileName = Path.Combine(IEntityMgrDir, "I" + this.EntityClassName + "Mgr.cs");
+            this.IentityMgr_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+            this.IentityMgr_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+            this.IentityMgr_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+            this.IentityMgr_cs_Template.RenderToFile(_ientityMgr_cs_FileName, true);
+            Response.Write(string.Format("Sucessfully generate file {0} ", _ientityMgr_cs_FileName));
+            Response.Write(System.Environment.NewLine);
+        }
+		
+		
+		string _entityBaseMgr_cs_FileName = Path.Combine(EntityBaseMgrDir, this.EntityClassName + "BaseMgr.cs");
+		this.EntityBaseMgr_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+		this.EntityBaseMgr_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.EntityBaseMgr_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.EntityBaseMgr_cs_Template.SetProperty("Mapping", this.Mapping);
+		this.EntityBaseMgr_cs_Template.RenderToFile(_entityBaseMgr_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", _entityBaseMgr_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+        
+        
+        if (!this.OnlyGenerateBase)
+        {
+            string _entityMgr_cs_FileName = Path.Combine(EntityMgrDir, this.EntityClassName + "Mgr.cs");
+            this.EntityMgr_cs_Template.SetProperty("AssemblyName", this.AssemblyName);
+            this.EntityMgr_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+            this.EntityMgr_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+            this.EntityMgr_cs_Template.RenderToFile(_entityMgr_cs_FileName, true);
+            Response.Write(string.Format("Sucessfully generate file {0} ", _entityMgr_cs_FileName));
+            Response.Write(System.Environment.NewLine);
+        }
+		
+		/*
+		string _entitydaotest_cs_FileName = Path.Combine(EntityDaoTestDir, this.EntityClassName + "DaoTest.cs");
+		this.Entitydaotest_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.Entitydaotest_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.Entitydaotest_cs_Template.RenderToFile(_entitydaotest_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", _entitydaotest_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+		
+		string _entitymgrtest_cs_FileName = Path.Combine(EntityMgrTestDir, this.EntityClassName + "MgrTest.cs");
+		this.Entitymgrtest_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.Entitymgrtest_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.Entitymgrtest_cs_Template.RenderToFile(_entitymgrtest_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", _entitymgrtest_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+		
+		string main_ascx_cs_FileName = Path.Combine(ModuleDir, "Main.ascx.cs");
+		this.Main_ascx_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.Main_ascx_cs_Template.SetProperty("ModuleName", this.ModuleName);
+		this.Main_ascx_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.Main_ascx_cs_Template.RenderToFile(main_ascx_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", main_ascx_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+		
+		string new_ascx_cs_FileName = Path.Combine(ModuleDir, "New.ascx.cs");
+		this.New_ascx_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.New_ascx_cs_Template.SetProperty("ModuleName", this.ModuleName);
+		this.New_ascx_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.New_ascx_cs_Template.RenderToFile(new_ascx_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", new_ascx_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+		
+		string edit_ascx_cs_FileName = Path.Combine(ModuleDir, "Edit.ascx.cs");
+		this.Edit_ascx_cs_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.Edit_ascx_cs_Template.SetProperty("ModuleName", this.ModuleName);
+		this.Edit_ascx_cs_Template.SetProperty("EntityClassName", this.EntityClassName);
+		this.Edit_ascx_cs_Template.RenderToFile(edit_ascx_cs_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", edit_ascx_cs_FileName));
+		Response.Write(System.Environment.NewLine);
+		
+		string main_ascx_FileName = Path.Combine(ModuleDir, "Main.ascx");
+		this.Main_ascx_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.Main_ascx_Template.SetProperty("ModuleName", this.ModuleName);
+		this.Main_ascx_Template.SetProperty("Mapping", this.Mapping);
+		this.Main_ascx_Template.RenderToFile(main_ascx_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", main_ascx_FileName));
+		Response.Write(System.Environment.NewLine);
+		
+		string new_ascx_FileName = Path.Combine(ModuleDir, "New.ascx");
+		this.New_ascx_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.New_ascx_Template.SetProperty("ModuleName", this.ModuleName);
+		this.New_ascx_Template.SetProperty("Mapping", this.Mapping);
+		this.New_ascx_Template.RenderToFile(new_ascx_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", new_ascx_FileName));
+		Response.Write(System.Environment.NewLine);
+		
+		string edit_ascx_FileName = Path.Combine(ModuleDir, "Edit.ascx");
+		this.Edit_ascx_Template.SetProperty("ModuleGroupName", this.ModuleGroupName);
+		this.Edit_ascx_Template.SetProperty("ModuleName", this.ModuleName);
+		this.Edit_ascx_Template.SetProperty("Mapping", this.Mapping);
+		this.Edit_ascx_Template.RenderToFile(edit_ascx_FileName, true);
+		Response.Write(string.Format("Sucessfully generate file {0} ", edit_ascx_FileName));
+		Response.Write(System.Environment.NewLine);
+		*/
+	}
+</script>
+
+<% this.Generate(); %>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.OrderDetailView, com.Sconit.Entity" table="OrderDetView" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Flow" column="Flow" type="String" length="50" />	
+		<property name="Description" column="Desc1" type="String" length="255" />	
+		<property name="Type" column="Type" type="String" length="50" />	
+		<many-to-one name="PartyFrom" column="PartyFrom" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="PartyTo" column="PartyTo" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		<property name="EffDate" column="EffDate" type="DateTime"  />	
+		<many-to-one name="Shift" column="Shift" class="com.Sconit.Entity.MasterData.Shift, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="Uom" column="Uom" type="String" length="5" />	
+		<property name="RequiredQty" column="ReqQty" type="Decimal"  />	
+		<property name="OrderedQty" column="OrderQty" type="Decimal"  />	
+		<property name="ShippedQty" column="ShipQty" type="Decimal"  />	
+		<property name="ReceivedQty" column="RecQty" type="Decimal"  />	
+		<property name="RejectedQty" column="RejQty" type="Decimal"  />	
+		<property name="ScrapQty" column="ScrapQty" type="Decimal"  />
+        <property name="Status" column="Status" type="String" length="50" />
+  	</class>
+</hibernate-mapping>

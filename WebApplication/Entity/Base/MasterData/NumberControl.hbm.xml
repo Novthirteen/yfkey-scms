@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.NumberControl, com.Sconit.Entity" table="NumCtrl" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="IntValue" column="IntValue" type="Int32" />	
+		<property name="StringValue" column="StrValue" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

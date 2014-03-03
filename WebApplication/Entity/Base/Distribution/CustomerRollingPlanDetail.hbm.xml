@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Distribution.CustomerRollingPlanDetail, com.Sconit.Entity" table="RollingPlanDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="CustomerRollingPlan" column="MstrId" class="com.Sconit.Entity.Distribution.CustomerRollingPlan, com.Sconit.Entity" cascade="none" />
+		<property name="ScheduleDate" column="ScheduleDate" type="DateTime"  />	
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="Type" column="Type" type="String" length="50" />	
+		<property name="Qty" column="Qty" type="Decimal" />	
+  	</class>
+</hibernate-mapping>

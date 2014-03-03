@@ -1,0 +1,237 @@
+/* CSS Document */
+
+/* BUTTONS */
+
+.buttons a, .buttons input
+{
+    display: block;
+    float: left;
+    margin: 0 7px 0 0;
+    background-color: #f5f5f5;
+    border: 1px solid #dedede;
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    font-family: "Lucida Grande" , Tahoma, Arial, Verdana, sans-serif;
+    font-size: 12px;
+    line-height: 130%;
+    text-decoration: none;
+    font-weight: bold;
+    color: #565656;
+    cursor: pointer;
+    padding: 3px 10px 1px 2px; /* Links */
+}
+.buttons input
+{
+    width: auto;
+    overflow: visible;
+    padding: 2px 10px 1px 24px; /* IE6 */
+}
+.buttons input[type]
+{
+    padding: 4px 10px 2px 24px; /* Firefox */
+    line-height: 17px; /* Safari */
+}
+.buttons input img, .buttons a img
+{
+    margin: 0 3px -3px 0 !important;
+    padding: 0;
+    border: none;
+    width: 16px;
+    height: 16px;
+}
+
+/* apply */
+input.apply, .buttons a.apply
+{
+    background-image: url('../../Images/Button/apply.png');
+    background-repeat: no-repeat;
+}
+.buttons a.apply:hover, input.apply:hover
+{
+    background-color: #dff4ff;
+    border: 1px solid #c2e1ef;
+    color: #336699;
+}
+.buttons a.apply:active
+{
+    background-color: #6299c5;
+    border: 1px solid #6299c5;
+    color: #fff;
+}
+
+/* add */
+input.add, .buttons a.add
+{
+    color: #529214;
+    background-image: url('../../Images/Button/add.png');
+    background-repeat: no-repeat;
+}
+.buttons a.add:hover, input.add:hover
+{
+    background-color: #E6EFC2;
+    border: 1px solid #C6D880;
+    color: #529214;
+}
+.buttons a.add:active
+{
+    background-color: #529214;
+    border: 1px solid #529214;
+    color: #fff;
+}
+
+/* back */
+.buttons a.back, input.back
+{
+    color: #875516;
+    background-image: url('../../Images/Button/back.png');
+    background-repeat: no-repeat;
+}
+.buttons a.back:hover, input.back:hover
+{
+    background-color: #ebdbc7;
+    border: 1px solid #c3893f;
+    color: #d12f19;
+}
+.buttons a.back:active
+{
+    background-color: #d12f19;
+    border: 1px solid #d12f19;
+    color: #fff;
+}
+
+/* query */
+input.query, .buttons a.query
+{
+    color: #336699;
+    background-image: url('../../Images/Button/query.png');
+    background-repeat: no-repeat;
+}
+.buttons a.query:hover, input.query:hover
+{
+    background-color: #dff4ff;
+    border: 1px solid #c2e1ef;
+    color: #336699;
+}
+.buttons a.query:active,input.query:active
+{
+    background-color: #6299c5;
+    border: 1px solid #6299c5;
+    color: #fff;
+}
+
+/* edit */
+input.edit, .buttons a.edit
+{
+    color: #529214;
+    background-image: url('../../Images/Button/edit.png');
+    background-repeat: no-repeat;
+}
+.buttons a.edit:hover, input.edit:hover
+{
+    background-color: #E6EFC2;
+    border: 1px solid #C6D880;
+    color: #529214;
+}
+.buttons a.edit:active
+{
+    background-color: #529214;
+    border: 1px solid #529214;
+    color: #fff;
+}
+
+/* delete */
+.buttons a.delete, input.delete
+{
+    color: #d12f19;
+    background-image: url('../../Images/Button/delete.png');
+    background-repeat: no-repeat;
+}
+.buttons a.delete:hover, input.delete:hover
+{
+    background-color: #fbe3e4;
+    border: 1px solid #fbc2c4;
+    color: #d12f19;
+}
+.buttons a.delete:active
+{
+    background-color: #d12f19;
+    border: 1px solid #d12f19;
+    color: #fff;
+}
+
+/* cancel */
+.buttons a.cancel, input.cancel
+{
+    color: #d12f19;
+    background-image: url('../../Images/Button/cancel.png');
+    background-repeat: no-repeat;
+}
+.buttons a.cancel:hover, input.cancel:hover
+{
+    background-color: #fbe3e4;
+    border: 1px solid #fbc2c4;
+    color: #d12f19;
+}
+.buttons a.cancel:active
+{
+    background-color: #d12f19;
+    border: 1px solid #d12f19;
+    color: #fff;
+}
+
+/* complete */
+input.complete, .buttons a.complete
+{
+    background-image: url('../../Images/Button/complete.png');
+    background-repeat: no-repeat;
+}
+.buttons a.complete:hover, input.complete:hover
+{
+    background-color: #dff4ff;
+    border: 1px solid #c2e1ef;
+    color: #336699;
+}
+.buttons a.complete:active
+{
+    background-color: #6299c5;
+    border: 1px solid #6299c5;
+    color: #fff;
+}
+
+/* print */
+input.print, .buttons a.print
+{
+    background-image: url('../../Images/Button/print.png');
+    background-repeat: no-repeat;
+}
+.buttons a.print:hover, input.print:hover
+{
+    background-color: #F9F4CE;
+    border: 1px solid #c2b550;
+    color: #a89a2c;
+}
+.buttons a.print:active
+{
+    background-color: #d0bc28;
+    border: 1px solid #d0bc28;
+    color: #fff;
+}
+
+/* password */
+input.password, .buttons a.password
+{
+    background-image: url('../../Images/Button/password.png');
+    background-repeat: no-repeat;
+}
+.buttons a.password:hover, input.password:hover
+{
+    background-color: #F9F4CE;
+    border: 1px solid #c2b550;
+    color: #a89a2c;
+}
+.buttons a.password:active
+{
+    background-color: #d0bc28;
+    border: 1px solid #d0bc28;
+    color: #fff;
+}

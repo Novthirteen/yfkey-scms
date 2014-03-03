@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.RoutingDetail, com.Sconit.Entity" table="RoutingDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Routing" column="Routing" class="com.Sconit.Entity.MasterData.Routing, com.Sconit.Entity" cascade="none" />
+		<property name="Operation" column="Op" type="Int32"  />	
+		<property name="Reference" column="Ref" type="String" length="50" />	
+		<property name="Activity" column="Activity" type="String" length="50" />	
+		<property name="StartDate" column="StartDate" type="DateTime"  />	
+		<property name="EndDate" column="EndDate" type="DateTime" />	
+		<many-to-one name="WorkCenter" column="WorkCenter" class="com.Sconit.Entity.MasterData.WorkCenter, com.Sconit.Entity" cascade="none" />
+		<property name="SetupTime" column="SetupTime" type="Decimal"  />	
+		<property name="RunTime" column="RunTime" type="Decimal"  />	
+		<property name="MoveTime" column="MoveTime" type="Decimal"  />	
+		<property name="TactTime" column="TactTime" type="Decimal"  />
+    <property name="TagNo" column="TagNo" type="String" length="50" />
+    <many-to-one name="Location" column="LocFrom" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

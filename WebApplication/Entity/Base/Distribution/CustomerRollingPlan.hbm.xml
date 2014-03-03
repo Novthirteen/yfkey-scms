@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Distribution.CustomerRollingPlan, com.Sconit.Entity" table="RollingPlanMstr" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Flow" column="Flow" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
+		<property name="ExternalOrderNo" column="ExtOrderNo" type="String" length="50" />	
+		<property name="ReleaseDate" column="ReleaseDate" type="DateTime" />	
+		<many-to-one name="FileUpload" column="FileUploadId" class="com.Sconit.Entity.MasterData.FileUpload, com.Sconit.Entity" cascade="none" />
+		<property name="Status" column="Status" type="String" length="40" />	
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime" />	
+		<property name="LastModifyUser" column="LastModifyUser" type="Int32" />	
+		<property name="ActiveStatus" column="ActiveStatus" type="String" length="40" />	
+		<bag name="CustomerRollingPlanDetails" table="RollingPlanDet" inverse="true" lazy="true">
+			<key column="MstrId" />
+			<one-to-many class="com.Sconit.Entity.Distribution.CustomerRollingPlanDetail, com.Sconit.Entity" />
+		</bag>
+  	</class>
+</hibernate-mapping>

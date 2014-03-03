@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7345C696-110E-404A-B055-A43436C9C1FB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>com.Mes.Dss</RootNamespace>
+    <AssemblyName>com.Mes.Dss</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\DllLib\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Facilities.NHibernateIntegration">
+      <HintPath>..\DllLib\Castle.Facilities.NHibernateIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Services.Transaction">
+      <HintPath>..\DllLib\Castle.Services.Transaction.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\DllLib\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="com.Sconit.Service, Version=1.0.4480.18692, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DllLib\com.Sconit.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\DllLib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\DllLib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Batch\MesDssInJob.cs" />
+    <Compile Include="Batch\MesDssOutJob.cs" />
+    <Compile Include="Entity\MesScmsCompletedIssue.cs" />
+    <Compile Include="Entity\MesDssConstants.cs" />
+    <Compile Include="Entity\MesScmsBom.cs" />
+    <Compile Include="Entity\MesScmsCompletedBox.cs" />
+    <Compile Include="Entity\MesScmsCompletedOrder.cs" />
+    <Compile Include="Entity\MesScmsRepairMaterial.cs" />
+    <Compile Include="Entity\MesScmsShelfPart.cs" />
+    <Compile Include="Entity\MesScmsStationBox.cs" />
+    <Compile Include="Entity\MesScmsStationShelf.cs" />
+    <Compile Include="Entity\MesScmsTableIndex.cs" />
+    <Compile Include="Entity\ScmsBom.cs" />
+    <Compile Include="Entity\ScmsMaterialBarcode.cs" />
+    <Compile Include="Entity\ScmsPart.cs" />
+    <Compile Include="Entity\ScmsTableIndex.cs" />
+    <Compile Include="Entity\ScmsWorkOrder.cs" />
+    <Compile Include="Persistence\IMesScmsCompletedIssueDao.cs" />
+    <Compile Include="Persistence\IMesScmsBomDao.cs" />
+    <Compile Include="Persistence\IMesScmsCompletedBoxDao.cs" />
+    <Compile Include="Persistence\IMesScmsCompletedOrderDao.cs" />
+    <Compile Include="Persistence\IMesScmsRepairMaterialDao.cs" />
+    <Compile Include="Persistence\IMesScmsShelfPartDao.cs" />
+    <Compile Include="Persistence\IMesScmsStationBoxDao.cs" />
+    <Compile Include="Persistence\IMesScmsStationShelfDao.cs" />
+    <Compile Include="Persistence\IMesScmsTableIndexDao.cs" />
+    <Compile Include="Persistence\INHDao.cs" />
+    <Compile Include="Persistence\IScmsBomDao.cs" />
+    <Compile Include="Persistence\IScmsMaterialBarcodeDao.cs" />
+    <Compile Include="Persistence\IScmsPartDao.cs" />
+    <Compile Include="Persistence\IScmsTableIndexDao.cs" />
+    <Compile Include="Persistence\IScmsWorkOrderDao.cs" />
+    <Compile Include="Persistence\NHDaoBase.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsCompletedIssueDao.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsBomDao.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsCompletedBoxDao.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsCompletedOrderDao.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsRepairMaterialDao.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsShelfPartDao.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsStationBoxDao.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsStationShelfDao.cs" />
+    <Compile Include="Persistence\NH\NHMesScmsTableIndexDao.cs" />
+    <Compile Include="Persistence\NH\NHScmsBomDao.cs" />
+    <Compile Include="Persistence\NH\NHScmsMaterialBarcodeDao.cs" />
+    <Compile Include="Persistence\NH\NHScmsPartDao.cs" />
+    <Compile Include="Persistence\NH\NHScmsTableIndexDao.cs" />
+    <Compile Include="Persistence\NH\NHScmsWorkOrderDao.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\IMesScmsCompletedIssueMgr.cs" />
+    <Compile Include="Service\IMesDssInMgr.cs" />
+    <Compile Include="Service\IMesDssOutMgr.cs" />
+    <Compile Include="Service\IMesScmsBomMgr.cs" />
+    <Compile Include="Service\IMesScmsCompletedBoxMgr.cs" />
+    <Compile Include="Service\IMesScmsCompletedOrderMgr.cs" />
+    <Compile Include="Service\IMesScmsRepairMaterialMgr.cs" />
+    <Compile Include="Service\IMesScmsShelfPartMgr.cs" />
+    <Compile Include="Service\IMesScmsStationBoxMgr.cs" />
+    <Compile Include="Service\IMesScmsStationShelfMgr.cs" />
+    <Compile Include="Service\IMesScmsTableIndexMgr.cs" />
+    <Compile Include="Service\Impl\MesDssInMgr.cs" />
+    <Compile Include="Service\Impl\MesDssOutMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsBomMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsCompletedBoxMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsCompletedIssueMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsCompletedOrderMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsRepairMaterialMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsShelfPartMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsStationBoxMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsStationShelfMgr.cs" />
+    <Compile Include="Service\Impl\MesScmsTableIndexMgr.cs" />
+    <Compile Include="Service\Impl\ScmsBomMgr.cs" />
+    <Compile Include="Service\Impl\ScmsMaterialBarcodeMgr.cs" />
+    <Compile Include="Service\Impl\ScmsPartMgr.cs" />
+    <Compile Include="Service\Impl\ScmsTableIndexMgr.cs" />
+    <Compile Include="Service\Impl\ScmsWorkOrderMgr.cs" />
+    <Compile Include="Service\IScmsBomMgr.cs" />
+    <Compile Include="Service\IScmsMaterialBarcodeMgr.cs" />
+    <Compile Include="Service\IScmsPartMgr.cs" />
+    <Compile Include="Service\IScmsTableIndexMgr.cs" />
+    <Compile Include="Service\IScmsWorkOrderMgr.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Entity\Entity.csproj">
+      <Project>{CADA5382-5233-4D03-9F4F-655382538AB1}</Project>
+      <Name>Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Persistence\Persistence.csproj">
+      <Project>{C8D4D3DC-F7B1-4AC8-B123-5B319E99C2D3}</Project>
+      <Name>Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceExt\ServiceExt.csproj">
+      <Project>{6D7268F1-24AA-4D0A-B73A-F9E0E2456F95}</Project>
+      <Name>ServiceExt</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entity\MesScmsBom.hbm.xml" />
+    <EmbeddedResource Include="Entity\MesScmsCompletedBox.hbm.xml" />
+    <EmbeddedResource Include="Entity\MesScmsCompletedOrder.hbm.xml" />
+    <EmbeddedResource Include="Entity\MesScmsRepairMaterial.hbm.xml" />
+    <EmbeddedResource Include="Entity\MesScmsShelfPart.hbm.xml" />
+    <EmbeddedResource Include="Entity\MesScmsStationBox.hbm.xml" />
+    <EmbeddedResource Include="Entity\MesScmsStationShelf.hbm.xml" />
+    <EmbeddedResource Include="Entity\MesScmsTableIndex.hbm.xml" />
+    <EmbeddedResource Include="Entity\ScmsBom.hbm.xml" />
+    <EmbeddedResource Include="Entity\ScmsMaterialBarcode.hbm.xml" />
+    <EmbeddedResource Include="Entity\ScmsPart.hbm.xml" />
+    <EmbeddedResource Include="Entity\ScmsTableIndex.hbm.xml" />
+    <EmbeddedResource Include="Entity\ScmsWorkOrder.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entity\MesScmsCompletedIssue.hbm.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)$(SolutionName)\bin</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

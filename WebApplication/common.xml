@@ -1,0 +1,45 @@
+<Project  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<!-- <CompanyName>$(CompanyName)</CompanyName>-->
+		<!-- 项目根目录,默认当前目录 -->
+		<!--<SolutionDir>.\..\..\..\</SolutionDir>-->
+		<ExtRootDir></ExtRootDir>
+		<Optimize>true</Optimize>
+		<OutputPath>$(ExtRootDir)$(CompanyName)</OutputPath>
+		<ServicePath>$(OutputPath)/Service</ServicePath>
+		<EntityPath>$(OutputPath)/Entity</EntityPath>
+		<PersistencePath>$(OutputPath)/Persistence</PersistencePath>
+		<UtilityPath>$(OutputPath)/Utility</UtilityPath>
+		<DllLibPath>$(OutputPath)/DllLib</DllLibPath>
+		<WebPath>$(OutputPath)/Sconit</WebPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<SolutionFiles Include="Ext/Ext.sln;Ext/Ext.suo" ></SolutionFiles>
+		<ServiceFiles Include="Service/Service.csproj"  ></ServiceFiles>
+		<EntityFiles Include="Entity/Entity.csproj" ></EntityFiles>
+		<PersistenceFiles Include="Persistence/Persistence.csproj"  ></PersistenceFiles>
+		<UtilityFiles Include="Utility/Utility.csproj" ></UtilityFiles>
+		<!--DllLib/**/bin/*.*|DllLib/**/ojb/*.*|-->
+		<ProjectFiles Include="Ext/Projects/**/*.*" ></ProjectFiles>
+		<DllLibFiles Include="DllLib/**/*.*" Exclude="DllLib/**/bin/**/*.*;DllLib/**/obj/**/*.*;DllLib/**/.svn/**/*.*;"></DllLibFiles>
+		<WebFiles Include="Sconit/**/*.*" Exclude="Sconit/**/.svn/**/*.*;Sconit/**/bin/**/*.*"></WebFiles>
+		<LanguageFiles Include="Ext/ApplicationResourcesExt_en.properties;Ext/ApplicationResourcesExt_zh-CN.properties"></LanguageFiles>
+		<!--Entity/Entity.csproj;Persistence/Persistence.csproj;Utility/Utility.csproj;Control/Control.csproj;Service/Service.csproj;-->
+		<!-- 需要发布的项目 -->
+		<ProjectReferences Include="Entity/Entity.csproj;Persistence/Persistence.csproj;Utility/Utility.csproj;Control/Control.csproj;Service/Service.csproj;" />
+		<ReleaseDllFiles Include="Entity/bin/Release/com.Sconit.Entity.dll;Persistence/bin/Release/com.Sconit.Persistence.dll;Utility/bin/Release/com.Sconit.Utility.dll;Control/bin/Release/com.Sconit.Control.dll;Service/bin/Release/com.Sconit.Service.dll;" />
+	</ItemGroup>
+
+	<Target Name="Clean">
+		<RemoveDir Directories="$(OutputPath)" Condition="Exists('$(OutputPath)')"/>
+		<!--
+		<RemoveDir Directories="$(ServicePath)" Condition="Exists('$(ServicePath)')"/>
+		<RemoveDir Directories="$(EntityPath)" Condition="Exists('$(EntityPath)')"/>
+		<RemoveDir Directories="$(PersistencePath)" Condition="Exists('$(PersistencePath)')"/>
+		<RemoveDir Directories="$(UtilityPath)" Condition="Exists('$(UtilityPath)')"/>
+		<RemoveDir Directories="$(DllLibPath)" Condition="Exists('$(DllLibPath)')"/>
+		-->
+	</Target>
+</Project>

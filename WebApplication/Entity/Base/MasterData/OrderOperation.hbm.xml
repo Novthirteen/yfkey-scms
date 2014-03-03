@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.OrderOperation, com.Sconit.Entity" table="OrderOp" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="OrderHead" column="OrderNo" class="com.Sconit.Entity.MasterData.OrderHead, com.Sconit.Entity" cascade="none" />
+		<property name="Operation" column="Op" type="Int32"  />
+		<property name="Reference" column="Ref" type="String" length="50" />
+		<property name="Activity" column="Activity" type="String" length="50" />	
+		<many-to-one name="WorkCenter" column="WorkCenter" class="com.Sconit.Entity.MasterData.WorkCenter, com.Sconit.Entity" cascade="none" />
+		<property name="UnitTime" column="UnitTime" type="Decimal" />	
+		<property name="WorkTime" column="WorkTime" type="Decimal" />	
+  	</class>
+</hibernate-mapping>

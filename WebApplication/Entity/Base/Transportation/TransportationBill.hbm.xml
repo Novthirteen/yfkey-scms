@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Transportation.TransportationBill, com.Sconit.Entity" table="TBillMstr" lazy="false">
+		<id name="BillNo" column="BillNo" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="ExternalBillNo" column="ExtBillNo" type="String" length="50" />	
+		<property name="ReferenceBillNo" column="RefBillNo" type="String" length="50" />	
+		<property name="Status" column="Status" type="String" length="50" />	
+		<many-to-one name="BillAddress" column="BillAddr" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Currency" column="Currency" class="com.Sconit.Entity.MasterData.Currency, com.Sconit.Entity" cascade="none" />
+		<property name="IsIncludeTax" column="IsIncludeTax" type="Boolean"  />	
+		<property name="TaxCode" column="TaxCode" type="String" length="50" />	
+		<property name="Discount" column="Discount" type="Decimal"  />	
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />	
+		<many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="BillType" column="BillType" type="String" length="50" />
+    <bag name="TransportationBillDetails" table="TBillDet" inverse="true" lazy="true">
+      <key column="BillNo" />
+      <one-to-many class="com.Sconit.Entity.Transportation.TransportationBillDetail, com.Sconit.Entity" />
+    </bag>
+  	</class>
+</hibernate-mapping>

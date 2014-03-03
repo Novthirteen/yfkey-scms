@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MRP.MrpRunLog, com.Sconit.Entity" table="MRP_RunLog" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="RunDate" column="RunDate" type="DateTime"  />	
+		<property name="StartTime" column="StartTime" type="DateTime"  />	
+		<property name="EndTime" column="EndTime" type="DateTime"  />	
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<property name="CreateUser" column="CreateUser" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

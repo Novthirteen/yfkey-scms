@@ -1,0 +1,1 @@
+﻿<%@ WebService Language="C#" CodeBehind="~/App_Code/Webservice/Svp/BillingMgrWS.cs" Class="BillingMgrWS" %>

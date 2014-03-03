@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.LocationLotDetail, com.Sconit.Entity" table="LocationLotDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <timestamp name="LastModifyDate" column="LastModifyDate" unsaved-value="null"/>
+		<many-to-one name="Location" column="Location" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="StorageBin" column="Bin" class="com.Sconit.Entity.MasterData.StorageBin, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="Hu" column="HuId" class="com.Sconit.Entity.MasterData.Hu, com.Sconit.Entity" cascade="none" />
+    <property name="LotNo" column="LotNo" type="String" length="50" />
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<property name="IsConsignment" column="IsCS" type="Boolean"  />
+    <!--<many-to-one name="PlannedBill" column="PlanBillId" class="com.Sconit.Entity.MasterData.PlannedBill, com.Sconit.Entity" cascade="none" />-->
+    <property name="PlannedBill" column="PlanBillId" type="Int32"  />
+    <property name="Qty" column="Qty" type="Decimal"  />
+    <property name="RefLocation" column="RefLoc" type="String" length="50" />
+  </class>
+</hibernate-mapping>

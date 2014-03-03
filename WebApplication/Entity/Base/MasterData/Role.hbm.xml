@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.Role, com.Sconit.Entity" table="ACC_Role" lazy="false">
+		<id name="Code" column="ROLE_Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Description" column="ROLE_Desc" type="String" length="50" />	
+		<property name="AllowDelete" column="ROLE_AllowDel" type="Boolean" />	
+  	</class>
+</hibernate-mapping>

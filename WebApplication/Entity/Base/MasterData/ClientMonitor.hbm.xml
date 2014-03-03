@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ClientMonitor, com.Sconit.Entity" table="ClientMonitor" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Client" column="ClientId" class="com.Sconit.Entity.MasterData.Client, com.Sconit.Entity" cascade="none" />
+		<property name="BeatTime" column="BeatTime" type="DateTime"  />	
+  	</class>
+</hibernate-mapping>

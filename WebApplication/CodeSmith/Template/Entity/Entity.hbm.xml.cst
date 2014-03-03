@@ -1,0 +1,101 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="XML" Description="Generate entity class mapping xml file." %>
+<%@ Property Name="EntityClassName" Type="String" Category="EntityClass" Description="The entity class name." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The module group which contains the entity, for example, Security." %>
+<%@ Property Name="AssemblyName" Type="String" Default="com.Sconit" Category="EntityClass" Description="The assembly that contains the entity class." %>
+<%@ Property Name="TableName" Type="String" Category="Table" Description="The table name." %>
+<%@ Property Name="Mapping" Type="com.Sconit.CodeSmith.MappingProperty" Category="Mapping" Description="The O/R mapping settings." %>
+<%@ Assembly Name="com.Sconit.CodeSmith" %>
+<%@ Import Namespace="com.Sconit.CodeSmith" %>
+<%@ Import Namespace="System.Text" %>
+<script runat="template">
+	public string GenLengthClause(string dataType, int dataLength)
+	{
+		if (dataType == "String")
+		{
+			return "length=\"" + dataLength + "\"";
+		}
+		else
+		{
+			return string.Empty;
+		}
+	}
+    
+    public string FirstCharacterToLowerCase(string target)
+	{
+		if (target == null || target.Length == 0)
+			return string.Empty;
+			
+		char firstChar = target[0];
+		firstChar = char.ToLower(firstChar);
+		
+		return firstChar + target.Substring(1);
+	}
+</script>
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="<%=AssemblyName + ".Entity." + ModuleGroupName + "." + EntityClassName%>, <%=AssemblyName%>.Entity" table="<%=TableName%>" lazy="false">
+	<%
+		if (this.Mapping.MappingPKInfoCollectionCount == 1)
+		{
+			foreach (MappingInfo mappingInfo in this.Mapping.MappingPKInfoCollection)
+			{
+	%>
+		<id name="<%=mappingInfo.ClassPropertyName%>" column="<%=mappingInfo.TableColumnName%>" type="<%=mappingInfo.DataType%>" unsaved-value="<%=mappingInfo.UnsavedValue%>" >
+      		<generator class="<%=mappingInfo.PKGenerator%>" />
+        </id>
+	<%
+			}
+		} 
+		else if (this.Mapping.MappingPKInfoCollectionCount > 1)
+		{
+	%>
+		<composite-id>
+	<%
+			foreach (MappingInfo mappingInfo in this.Mapping.MappingPKInfoCollection)
+			{
+				if (mappingInfo.IsBaseDataType)
+				{
+	%>
+			<key-property name="<%=mappingInfo.ClassPropertyName%>" column="<%=mappingInfo.TableColumnName%>" type="<%=mappingInfo.DataType%>" <%=GenLengthClause(mappingInfo.DataType, mappingInfo.DataLength)%> />
+	<%
+				} 
+				else
+				{
+	%>
+			<key-many-to-one name="<%=mappingInfo.ClassPropertyName%>" column="<%=mappingInfo.TableColumnName%>" class="<%=mappingInfo.DataType%>, <%=AssemblyName + ".Entity"%>"/>
+	<%
+				}
+			}
+	%>
+		</composite-id>
+	<%
+		}
+	%>
+    <% 
+		foreach (MappingInfo mappingInfo in this.Mapping.MappingFieldInfoCollection)
+		{
+			if (mappingInfo.IsOne2Many)
+			{
+	%>
+		<bag name="<%=mappingInfo.ClassPropertyName%>" table="<%=mappingInfo.One2ManyTable%>" inverse="<%=FirstCharacterToLowerCase(mappingInfo.One2ManyInverse.ToString())%>" lazy="<%=FirstCharacterToLowerCase(mappingInfo.One2ManyLazy.ToString())%>">
+			<key column="<%=mappingInfo.One2ManyColumn%>" />
+			<one-to-many class="<%=mappingInfo.DataType.ToString()%>, <%=AssemblyName + ".Entity"%>" />
+		</bag>
+	<%
+			}
+			else if (mappingInfo.IsBaseDataType)
+			{			
+	%>
+		<property name="<%=mappingInfo.ClassPropertyName%>" column="<%=mappingInfo.TableColumnName%>" type="<%=mappingInfo.DataType.ToString()%>" <%=GenLengthClause(mappingInfo.DataType, mappingInfo.DataLength)%> />	
+	<%
+			}
+			else 
+			{
+	%>
+		<many-to-one name="<%=mappingInfo.ClassPropertyName%>" column="<%=mappingInfo.TableColumnName%>" class="<%=mappingInfo.DataType.ToString()%>, <%=AssemblyName + ".Entity"%>" cascade="none" />
+	<%
+			}
+		}
+	%>
+  	</class>
+</hibernate-mapping>

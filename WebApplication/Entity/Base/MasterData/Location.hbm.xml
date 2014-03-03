@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" table="Location" lazy="false">
+    <id name="Code" column="Code" type="String" unsaved-value="null" >
+      <generator class="assigned" />
+    </id>
+    <property name="AllowNegativeInventory" column="AllowNegaInv" type="Boolean"  />
+    <property name="IsActive" column="IsActive" type="Boolean" />
+    <property name="Name" column="Name" type="String" length="50" />
+    <property name="Type" column="Type" type="String" length="50" />
+    <many-to-one name="Region" column="Region" class="com.Sconit.Entity.MasterData.Region, com.Sconit.Entity" cascade="none" />
+    <property name="Volume" column="Volume" type="Decimal" />
+    <property name="EnableAdvWM" column="EnableAdvWM" type="Boolean" />
+    <property name="IsSettleConsignment" column="IsSetCS" type="Boolean" />
+    <property name="IsMRP" column="IsMRP" type="Boolean"  />
+    <property name="IsAutoConfirm" column="IsAutoConfirm" type="Boolean"  />
+  </class>
+</hibernate-mapping>

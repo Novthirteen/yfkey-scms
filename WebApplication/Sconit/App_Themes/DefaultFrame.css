@@ -1,0 +1,15 @@
+.topbody
+{
+    background-image:url('../Images/Frames/Gray/Top_bg.jpg');	
+    background-repeat:repeat-x;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.switch
+{
+    height:100%;
+    background-color:#879294;
+    background-image:url('../Images/Frames/Default/Switch_bg.jpg');
+    background-repeat: repeat-y;
+ }

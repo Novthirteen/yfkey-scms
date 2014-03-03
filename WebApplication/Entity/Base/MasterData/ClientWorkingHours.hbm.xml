@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ClientWorkingHours, com.Sconit.Entity" table="ClientWorkingHours" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="ClientOrderHead" column="OrderHeadId" class="com.Sconit.Entity.MasterData.ClientOrderHead, com.Sconit.Entity" cascade="none" />
+		<property name="OrderNo" column="OrderNo" type="String" length="50" />	
+		<property name="Employee" column="Employee" type="String" length="50" />	
+		<property name="Hours" column="Hours" type="Decimal"  />	
+  	</class>
+</hibernate-mapping>

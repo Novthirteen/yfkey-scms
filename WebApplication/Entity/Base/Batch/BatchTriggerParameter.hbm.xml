@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Batch.BatchTriggerParameter, com.Sconit.Entity" table="BatchTriggerParam" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="BatchTrigger" column="TriggerId" class="com.Sconit.Entity.Batch.BatchTrigger, com.Sconit.Entity" cascade="none" />
+		<property name="ParameterName" column="ParamName" type="String" length="50" />	
+		<property name="ParameterValue" column="ParamValue" type="String" length="255" />	
+  	</class>
+</hibernate-mapping>

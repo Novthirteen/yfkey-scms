@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.Permission, com.Sconit.Entity" table="ACC_Permission" lazy="false">
+		<id name="Id" column="PM_ID" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="Code" column="PM_Code" type="String" length="255" />
+		<property name="Description" column="PM_Desc" type="String" length="100" />	
+		<many-to-one name="Category" column="PM_CateCode" class="com.Sconit.Entity.MasterData.PermissionCategory, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

@@ -1,0 +1,59 @@
+﻿/*颜色定义
+EBFFEB
+*/
+
+body
+{
+	background-color:#FFFFFF;
+}
+a 
+{
+	color:Blue
+}
+
+/*定义GridView表格颜色*/
+.lefttop{
+	background: #00B400 url(tr_green_bg.png) repeat-x;
+	color: #F5F7F7;
+}
+.GVHeader{
+	background-color: #00B400;
+	color: #F5F7F7;
+}
+.GVHeader a,.lefttop a{
+	color: #F5F7F7;
+}
+.GVRow {
+	color: #000000;
+	background-color: #FFFFFF;
+}
+.GVAlternatingRow{
+    background-color: #DAFF9F;
+}
+.GVSelectedRow{background-color: #D2DACE;}
+.GVPager{background-color: #D2DACE;}
+
+/*定义overbox样式,add by QQ*/
+.obhd {
+	  background:#F0F7E3;
+	  font-family:arial;
+	  font-size:12px;
+	  font-weight:bold;
+	  color:#006633;
+	  border:1px solid #DEEBC6;
+	  padding:5px;
+	  width:350px;
+}
+
+.obbd {
+	  background:#FFFFFF;
+	  font-family:arial;
+	  font-size:12px;
+	  color:#006633;
+	  border-left:1px solid #DEEBC6;
+	  border-right:1px solid #DEEBC6;
+	  border-bottom:1px solid #DEEBC6;
+	  padding:5px;
+	  width:350px;
+	  filter:alpha(opacity=90);
+}

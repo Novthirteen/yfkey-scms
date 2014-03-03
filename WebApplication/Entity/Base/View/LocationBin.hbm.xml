@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.View.LocationBin, com.Sconit.Entity" table="LocBinMstr" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="assigned" />
+        </id>
+        <property name="Region" column="Region" type="String" length="50" />
+        <property name="Location" column="Location" type="String" length="50" />
+        <property name="LocationName" column="LocationName" type="String" length="50" />
+        <property name="Area" column="Area" type="String" length="50" />
+        <property name="AreaDescription" column="AreaDesc" type="String" length="50" />
+        <property name="Bin" column="Bin" type="String" length="50" />
+        <property name="BinDescription" column="BinDesc" type="String" length="50" />
+        <property name="ItemCount" column="ItemCount" type="Int32" />
+        <property name="HuCount" column="HuCount" type="Int32" />
+    </class>
+</hibernate-mapping>

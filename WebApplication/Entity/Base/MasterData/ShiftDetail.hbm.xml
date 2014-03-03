@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ShiftDetail, com.Sconit.Entity" table="ShiftDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Shift" column="Shift" class="com.Sconit.Entity.MasterData.Shift, com.Sconit.Entity" cascade="none" />
+		<property name="ShiftTime" column="ShiftTime" type="String" length="255" />	
+		<property name="StartDate" column="StartDate" type="DateTime"  />	
+		<property name="EndDate" column="EndDate" type="DateTime"  />
+    <property name="DaysAdd" column="DaysAdd" type="String" length="50"  />
+  </class>
+</hibernate-mapping>

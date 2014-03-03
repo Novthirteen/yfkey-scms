@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.EntityPreference, com.Sconit.Entity" table="EntityOpt" lazy="false">
+    <id name="Code" column="PreCode" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Value" column="PreValue" type="String" length="255" />	
+		<property name="Description" column="CodeDesc" type="String" length="255" />
+        <property name="Seq" column="Seq" type="Int32"/>			
+  	</class>
+</hibernate-mapping>

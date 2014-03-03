@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.KPOrder, com.Sconit.Entity" table="KP_ORDER" lazy="false">
+		<id name="ORDER_ID" column="ORDER_ID" type="Decimal" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<property name="ORDER_TYPE_ID" column="ORDER_TYPE_ID" type="String" length="50" />	
+		<property name="ORDER_TYPE_NAME" column="ORDER_TYPE_NAME" type="String" length="50" />	
+		<property name="ORDER_PUB_DATE" column="ORDER_PUB_DATE" type="DateTime"  />	
+		<property name="ORDER_PRINT" column="ORDER_PRINT" type="String" length="10" />	
+		<property name="PRINT_MODIFY_DATE" column="PRINT_MODIFY_DATE" type="DateTime"  />	
+		<property name="QAD_ORDER_ID" column="QAD_ORDER_ID" type="String" length="50" />	
+		<property name="PARTY_FROM_ID" column="PARTY_FROM_ID" type="String" length="50" />	
+		<property name="PARTY_TO_ID" column="PARTY_TO_ID" type="String" length="50" />	
+		<property name="ORDER_DATE" column="ORDER_DATE" type="DateTime"  />	
+		<property name="SYS_CODE" column="SYS_CODE" type="String" length="10" />	
+		<property name="SHIPPER" column="SHIPPER" type="String" length="50" />	
+		<property name="ORDER_READ_DATE" column="ORDER_READ_DATE" type="DateTime"  />
+
+    <property name="InvoiceCount" column="InvoiceCount" type="Int32"  />
+    <property name="InvoiceDate" column="InvoiceDate" type="DateTime"  />
+    <property name="InvoiceTax" column="InvoiceTax" type="String" length="50"  />
+    <property name="InvoiceAmount" column="InvoiceAmount" type="Decimal"  />
+    <property name="InvoiceNumber" column="InvoiceNumber" type="String" length="2000"  />
+    <property name="InvoiceRemark" column="InvoiceRemark" type="String" length="100"  />
+    <property name="InvoiceStatus" column="InvoiceStatus" type="String" length="50"  />
+    <property name="InvoiceAmountWithoutTax" column="InvoiceAmountWithoutTax" type="Decimal"  />
+    <bag name="KPItems" table="KPItem" inverse="true" lazy="true" order-by="PART_CODE desc,INCOMING_DATE desc">
+      <key column="ORDER_ID" />
+      <one-to-many class="com.Sconit.Entity.MasterData.KPItem, com.Sconit.Entity" />
+    </bag>
+  	</class>
+</hibernate-mapping>

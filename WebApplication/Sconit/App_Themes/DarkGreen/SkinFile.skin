@@ -1,0 +1,16 @@
+﻿<asp:FormView runat="server" Width=100%   CellPadding="4" >
+    <FooterStyle Font-Bold="True"  />
+    <EditRowStyle  />
+    <RowStyle />
+    <PagerStyle HorizontalAlign="Center" />
+    <HeaderStyle Font-Bold="True" />
+</asp:FormView>
+
+<asp:GridView runat="server" CssClass="GV" CellPadding="4" CellSpacing="0" GridLines="Both" >
+    <HeaderStyle CssClass="GVHeader"/>
+    <RowStyle CssClass="GVRow" />
+    <AlternatingRowStyle CssClass="GVAlternatingRow" />
+    <EditRowStyle  CssClass="GVSelectedRow" />
+    <SelectedRowStyle CssClass="GVSelectedRow" />
+    <PagerStyle CssClass="GVPager" />
+</asp:GridView>

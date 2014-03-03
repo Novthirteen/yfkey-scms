@@ -1,0 +1,89 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using com.Sconit.Web;
+using com.Sconit.Service.MasterData;
+
+public partial class MasterData_Routing_RoutingDetail_List : ListModuleBase
+{
+
+    public event EventHandler NewEvent;
+    public event EventHandler EditEvent;
+    public event EventHandler BackEvent;
+
+    protected string code
+    {
+        get
+        {
+            return (string)ViewState["code"];
+        }
+        set
+        {
+            ViewState["code"] = value;
+        }
+    }
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+       
+    }
+
+    public override void UpdateView()
+    {
+        this.GV_List.Execute();
+    }
+
+    protected void btnNew_Click(object sender, EventArgs e)
+    {
+        NewEvent(sender, e);
+    }
+
+    protected void GV_List_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow && code == null)
+        {
+            code = (string)(DataBinder.Eval(e.Row.DataItem, "Routing.Code"));
+            this.lgdRouting.Text = this.code;
+        }
+    }
+    protected void lbtnEdit_Click(object sender, EventArgs e)
+    {
+        if (EditEvent != null)
+        {
+            string code = ((LinkButton)sender).CommandArgument;
+            EditEvent(code, e);
+        }
+    }
+
+    protected void lbtnDelete_Click(object sender, EventArgs e)
+    {
+        string code = ((LinkButton)sender).CommandArgument;
+        try
+        {
+            TheRoutingDetailMgr.DeleteRoutingDetail(Convert.ToInt32(code));
+            ShowSuccessMessage("Common.Business.Result.Delete.Successfully");
+            UpdateView();
+        }
+        catch (Castle.Facilities.NHibernateIntegration.DataException ex)
+        {
+            ShowErrorMessage("Common.Business.Result.Delete.Failed");
+        }
+    }
+
+    protected void btnBack_Click(object sender, EventArgs e)
+    {
+        if (BackEvent != null)
+        {
+            BackEvent(this, e);
+        }
+    }
+}

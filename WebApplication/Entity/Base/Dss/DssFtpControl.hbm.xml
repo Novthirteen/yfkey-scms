@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Dss.DssFtpControl, com.Sconit.Entity" table="DssFtpCtrl" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="FtpServer" column="FtpServer" type="String" length="255" />	
+		<property name="FtpPort" column="FtpPort" type="Int32"  />	
+		<property name="FtpUser" column="FtpUser" type="String" length="255" />	
+		<property name="FtpPassword" column="FtpPass" type="String" length="255" />	
+		<property name="FtpTempFolder" column="FtpTempFolder" type="String" length="255" />	
+		<property name="FtpFolder" column="FtpFolder" type="String" length="255" />	
+		<property name="FilePattern" column="FilePattern" type="String" length="255" />	
+		<property name="LocalTempFolder" column="LocalTempFolder" type="String" length="255" />	
+		<property name="LocalFolder" column="LocalFolder" type="String" length="255" />	
+		<property name="IOType" column="IOType" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

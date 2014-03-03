@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ClientOrderDetail, com.Sconit.Entity" table="ClientOrderDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="Seq" column="Seq" type="Int32"  />	
+		<many-to-one name="ClientOrderHead" column="OrderHeadId" class="com.Sconit.Entity.MasterData.ClientOrderHead, com.Sconit.Entity" cascade="none" />
+		<property name="ItemCode" column="ItemCode" type="String" length="50" />	
+		<property name="ItemDescription" column="ItemDescription" type="String" length="255" />	
+		<property name="UomCode" column="UomCode" type="String" length="50" />	
+		<property name="UomDescription" column="UomDescription" type="String" length="255" />	
+		<property name="UnitCount" column="UnitCount" type="Decimal"  />	
+		<property name="OrderedQty" column="OrderedQty" type="Decimal"  />	
+		<property name="ShippedQty" column="ShippedQty" type="Decimal"  />	
+		<property name="ReceivedQty" column="ReceivedQty" type="Decimal"  />	
+		<property name="ReceiveQty" column="ReceiveQty" type="Decimal"  />	
+		<property name="RejectQty" column="RejectQty" type="Decimal"  />	
+		<property name="ScrapQty" column="ScrapQty" type="Decimal"  />	
+  	</class>
+</hibernate-mapping>

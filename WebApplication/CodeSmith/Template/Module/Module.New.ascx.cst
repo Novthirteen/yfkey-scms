@@ -1,0 +1,31 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="C#" Description="Generates the module New page." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The moudule group name" %>
+<%@ Property Name="ModuleName" Type="String" Category="Module" Description="The module name of current module, for example, 'User Admin'" %>
+<%@ Property Name="Mapping" Type="Dndp.CodeSmith.MappingProperty" Category="Mapping" Description="The O/R mapping settings." %>
+<%@ Assembly Name="Dndp.CodeSmith" %>
+<%@ Import Namespace="Dndp.CodeSmith" %>
+<%@ Import Namespace="System.Text" %>
+<%%@ Control Language="C#" AutoEventWireup="true" CodeFile="New.ascx.cs" Inherits="Modules_<%=ModuleGroupName%>_<%=ModuleName.Replace(" ", "")%>_New" %>
+<table border="0">
+	<% foreach (MappingInfo mappingInfo in Mapping.MappingInfoCollection) %>
+	<% { %>
+		<% if (mappingInfo.ClassPropertyName.ToLower() != "id") %>
+		<% { %>
+	<tr>
+        <td><%=mappingInfo.ClassPropertyName%>:</td>
+        <td><asp:TextBox ID="txt<%=mappingInfo.ClassPropertyName%>" runat="server"></asp:TextBox></td>
+    </tr>
+		<% } %>
+	<% } %>
+    <tr>
+        <td>
+            <asp:Label ID="lblMessage" runat="server" Visible="false" CssClass="error"></asp:Label>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
+            <asp:Button ID="btnBack" runat="server" Text="Back" OnClick="btnBack_Click" />
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.WorkdayShift, com.Sconit.Entity" table="WorkdayShift" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Workday" column="WorkdayId" class="com.Sconit.Entity.MasterData.Workday, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Shift" column="Shift" class="com.Sconit.Entity.MasterData.Shift, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

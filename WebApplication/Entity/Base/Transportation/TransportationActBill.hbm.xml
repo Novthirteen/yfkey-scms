@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Transportation.TransportationActBill, com.Sconit.Entity" table="TActBill" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="OrderNo" column="OrderNo" type="String" length="50" />	
+		<property name="ReceiptNo" column="RecNo" type="String" length="50" />	
+		<property name="ExpenseNo" column="ExpenseNo" type="String" length="50" />	
+		<property name="ExternalReceiptNo" column="ExtRecNo" type="String" length="50" />	
+		<many-to-one name="BillAddress" column="BillAddr" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+		<property name="BillQty" column="BillQty" type="Decimal"  />	
+		<property name="BilledQty" column="BilledQty" type="Decimal"  />	
+		<property name="BillAmount" column="BillAmount" type="Decimal"  />	
+		<property name="BilledAmount" column="BilledAmount" type="Decimal"  />
+    <property name="UnitPrice" column="UnitPrice" type="Decimal"  />
+    <many-to-one name="PriceList" column="PriceList" class="com.Sconit.Entity.Transportation.TransportPriceList, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="PriceListDetail" column="PriceListDet" class="com.Sconit.Entity.Transportation.TransportPriceListDetail, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Currency" column="Currency" class="com.Sconit.Entity.MasterData.Currency, com.Sconit.Entity" cascade="none" />
+		<property name="TaxCode" column="TaxCode" type="String" length="50" />	
+		<property name="IsProvisionalEstimate" column="IsProvEst" type="Boolean"  />	
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />	
+		<many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="Status" column="Status" type="String" length="50" />	
+		<property name="EffectiveDate" column="EffDate" type="DateTime"  />	
+		<property name="TransType" column="TransType" type="String" length="50" />	
+		<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
+    <property name="IsIncludeTax" column="IsIncludeTax" type="Boolean"  />
+    <many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+    <property name="PricingMethod" column="PricingMethod" type="String" length="50" />
+    <many-to-one name="ShipFrom" column="ShipFrom" class="com.Sconit.Entity.Transportation.TransportationAddress, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="ShipTo" column="ShipTo" class="com.Sconit.Entity.Transportation.TransportationAddress, com.Sconit.Entity" cascade="none" />
+    <property name="VehicleType" column="VehicleType" type="String" length="50" />
+  </class>
+</hibernate-mapping>

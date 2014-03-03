@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.Dss.DssImportHistory, com.Sconit.Entity" table="DssImpHis" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <many-to-one name="DssInboundCtrl" column="DssInboundCtrl" class="com.Sconit.Entity.Dss.DssInboundControl, com.Sconit.Entity" cascade="none" />
+        <property name="EventCode" column="EventCode" type="String" length="50" />
+        <property name="IsActive" column="IsActive" type="Boolean"  />
+        <property name="KeyCode" column="KeyCode" type="String" length="50" />
+        <property name="ItemCode" column="Item" type="String" length="50" />
+        <property name="HuId" column="HuId" type="String" length="50" />
+        <property name="Qty" column="Qty" type="Decimal"  />
+        <property name="CreateDate" column="CreateDate" type="DateTime"  />
+        <property name="Memo" column="Memo" type="String" length="255" />
+        <property name="ErrorCount" column="ErrCount" type="Int32" />
+        <property name="data0" column="data0" type="String" length="255" />
+        <property name="data1" column="data1" type="String" length="255" />
+        <property name="data2" column="data2" type="String" length="255" />
+        <property name="data3" column="data3" type="String" length="255" />
+        <property name="data4" column="data4" type="String" length="255" />
+        <property name="data5" column="data5" type="String" length="255" />
+        <property name="data6" column="data6" type="String" length="255" />
+        <property name="data7" column="data7" type="String" length="255" />
+        <property name="data8" column="data8" type="String" length="255" />
+        <property name="data9" column="data9" type="String" length="255" />
+        <property name="data10" column="data10" type="String" length="255" />
+        <property name="data11" column="data11" type="String" length="255" />
+        <property name="data12" column="data12" type="String" length="255" />
+        <property name="data13" column="data13" type="String" length="255" />
+        <property name="data14" column="data14" type="String" length="255" />
+        <property name="data15" column="data15" type="String" length="255" />
+        <property name="data16" column="data16" type="String" length="255" />
+        <property name="data17" column="data17" type="String" length="255" />
+        <property name="data18" column="data18" type="String" length="255" />
+        <property name="data19" column="data19" type="String" length="255" />
+        <property name="data20" column="data20" type="String" length="255" />
+    </class>
+</hibernate-mapping>

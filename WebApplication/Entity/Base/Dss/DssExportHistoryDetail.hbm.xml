@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Dss.DssExportHistoryDetail, com.Sconit.Entity" table="DssExpHisDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="MstrId" column="MstrId" type="Int32"  />
+        <property name="KeyCode" column="KeyCode" type="String" length="50" />
+		<property name="OrderNo" column="OrderNo" type="String" length="50" />	
+		<property name="RecNo" column="RecNo" type="String" length="50" />	
+		<property name="PartyFrom" column="PartyFrom" type="String" length="50" />	
+		<property name="PartyTo" column="PartyTo" type="String" length="50" />	
+		<property name="Location" column="Location" type="String" length="50" />	
+		<property name="RefLocation" column="RefLocation" type="String" length="50" />	
+		<property name="EffDate" column="EffDate" type="DateTime"  />	
+		<property name="Item" column="Item" type="String" length="50" />	
+		<property name="Uom" column="Uom" type="String" length="50" />	
+		<property name="Qty" column="Qty" type="Decimal"  />	
+		<property name="Comments" column="Comments" type="String" length="255" />	
+		<property name="DefStr1" column="DefStr1" type="String" length="255" />	
+		<property name="DefStr2" column="DefStr2" type="String" length="255" />	
+		<property name="DefStr3" column="DefStr3" type="String" length="255" />	
+		<property name="DefStr4" column="DefStr4" type="String" length="255" />	
+		<property name="DefStr5" column="DefStr5" type="String" length="255" />	
+		<property name="UndefStr1" column="UndefStr1" type="String" length="255" />	
+		<property name="UndefStr2" column="UndefStr2" type="String" length="255" />	
+		<property name="UndefStr3" column="UndefStr3" type="String" length="255" />	
+		<property name="UndefStr4" column="UndefStr4" type="String" length="255" />	
+		<property name="UndefStr5" column="UndefStr5" type="String" length="255" />	
+  	</class>
+</hibernate-mapping>

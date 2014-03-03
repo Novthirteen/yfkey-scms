@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MRP.MrpShipPlan, com.Sconit.Entity" table="MRP_ShipPlan" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="Flow" column="Flow" type="String" length="50" />
+    <property name="FlowType" column="FlowType" type="String" length="50" />
+    <property name="Item" column="Item" type="String" length="50" />
+    <property name="ItemDescription" column="ItemDesc" type="String" length="50" />
+		<property name="StartTime" column="StartTime" type="DateTime"  />	
+		<property name="WindowTime" column="WindowTime" type="DateTime"  />	
+		<property name="LocationFrom" column="LocFrom" type="String" length="50" />	
+		<property name="LocationTo" column="LocTo" type="String" length="50" />	
+		<property name="SourceType" column="SourceType" type="String" length="50" />
+    <property name="SourceDateType" column="SourceDateType" type="String" length="50" />
+		<property name="SourceId" column="SourceId" type="String" length="50" />	
+		<property name="IsExpire" column="IsExpire" type="Boolean"  />
+    <property name="EffectiveDate" column="EffDate" type="DateTime"  />
+    <property name="Qty" column="Qty" type="Decimal"  />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="CreateUser" column="CreateUser" type="String" length="50" />
+    <property name="ExpireStartTime" column="ExpireStartTime" type="DateTime"  />
+    <property name="Bom" column="Bom" type="String" length="50" />
+    <property name="Routing" column="Routing" type="String" length="50" />
+    <property name="Uom" column="Uom" type="String" length="5" />
+    <property name="BaseUom" column="BaseUom" type="String" length="5" />
+    <property name="UnitCount" column="UC" type="Decimal" />
+    <property name="UnitQty" column="UnitQty" type="Decimal" />
+    <property name="SourceUnitQty" column="SourceUnitQty" type="Decimal" />
+    <property name="SourceItemCode" column="SourceItem" type="String" length="50" />
+    <property name="SourceItemDescription" column="SourceItemDesc" type="String" length="50" />
+  	</class>
+</hibernate-mapping>

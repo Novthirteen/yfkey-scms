@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.BillAgingView, com.Sconit.Entity" table="BillAgingView" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<property name="TransactionType" column="TransType" type="String" length="50" />	
+		<many-to-one name="BillAddress" column="BillAddr" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
+		<property name="UnitCount" column="UC" type="Decimal"  />	
+		<property name="Qty1" column="Qty1" type="Decimal"  />	
+		<property name="Qty2" column="Qty2" type="Decimal"  />	
+		<property name="Qty3" column="Qty3" type="Decimal"  />	
+		<property name="Qty4" column="Qty4" type="Decimal"  />	
+		<property name="Qty5" column="Qty5" type="Decimal"  />	
+		<property name="Qty6" column="Qty6" type="Decimal"  />	
+		<property name="Qty7" column="Qty7" type="Decimal"  />	
+		<property name="Qty8" column="Qty8" type="Decimal"  />	
+		<property name="Qty9" column="Qty9" type="Decimal"  />	
+  	</class>
+</hibernate-mapping>

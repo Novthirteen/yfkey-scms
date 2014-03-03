@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.InspectResult, com.Sconit.Entity" table="InspectResult" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="QualifiedQty" column="QualifyQty" type="Decimal"  />	
+		<property name="RejectedQty" column="RejectQty" type="Decimal"  />
+    <property name="InspectResultNo" column="InspResultNo" type="String"  length="50" />
+
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="IsPrinted" column="IsPrinted" type="Boolean" />
+    <property name="PrintNo" column="PrintNo" type="String" length="50" />
+    <property name="PrintCount" column="PrintCount" type="Int32"  />
+    <many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+
+    <many-to-one name="InspectOrderDetail" column="InspectDetId" class="com.Sconit.Entity.MasterData.InspectOrderDetail, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" table="ACC_User" lazy="false">
+        <id name="Code" column="USR_Code" type="String" unsaved-value="null" >
+            <generator class="assigned" />
+        </id>
+        <property name="Password" column="USR_Pwd" type="String" length="50" />
+        <property name="FirstName" column="USR_FirstName" type="String" length="50" />
+        <property name="LastName" column="USR_LastName" type="String" length="50" />
+        <property name="Email" column="USR_Email" type="String" length="50" />
+        <property name="Address" column="USR_Address" type="String" length="100" />
+        <property name="Gender" column="USR_Sex" type="String" length="1" />
+        <property name="Phone" column="USR_Phone" type="String" length="20" />
+        <property name="MobliePhone" column="USR_MPhone" type="String" length="20" />
+        <property name="IsActive" column="IsActive" type="Boolean"  />
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+        <many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+
+        <bag name="UserPreferences" table="UserPreference" inverse="true" lazy="true">
+            <key column="USR_Code" />
+            <one-to-many class="com.Sconit.Entity.MasterData.UserPreference, com.Sconit.Entity" />
+        </bag>
+        <bag name="UserPermissions" table="ACC_UserPermission" inverse="true" lazy="true">
+            <key column="UP_USRCode" />
+            <one-to-many class="com.Sconit.Entity.MasterData.UserPermission, com.Sconit.Entity" />
+        </bag>
+        <bag name="Roles" table="ACC_Role" inverse="true" lazy="true">
+            <key column="ROLE_Code" />
+            <one-to-many class="com.Sconit.Entity.MasterData.Role, com.Sconit.Entity" />
+        </bag>
+    </class>
+</hibernate-mapping>

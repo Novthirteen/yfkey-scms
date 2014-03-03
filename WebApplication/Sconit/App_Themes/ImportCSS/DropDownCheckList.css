@@ -1,0 +1,61 @@
+﻿.Default
+{
+	font-size:smaller;
+	font-family:Tahoma; 
+}
+
+table 
+{ 
+	padding:0px;
+	border-collapse:collapse; 
+}
+
+.DropDownLook
+{
+	padding:0px;
+	border-style:solid;
+	border-width:1px;
+}
+
+.DivClose
+{
+	display:none;
+	position:absolute;
+	width:250px;
+	height:220px;
+	border-style:solid;
+	border-color:Gray; 
+	border-width:1px;
+	background-color:#99A479;
+}
+
+.LabelClose
+{
+	vertical-align:text-top; 
+	position:absolute;
+	bottom:0px;
+	font-family:Verdana;
+}
+
+.DivCheckBoxList
+{
+	display:none;
+	background-color:White;
+	width:250px;
+	position:absolute;
+	height:200px;
+	overflow-y:auto; 
+	overflow-x:hidden;
+	border-style:solid;
+	border-color:Gray; 
+	border-width:1px;
+}
+
+.CheckBoxList
+{
+	position:relative;
+	width:250px;
+	height:10px; 
+	overflow:scroll;
+	font-size:small;
+}

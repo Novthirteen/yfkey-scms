@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Batch.BatchTrigger, com.Sconit.Entity" table="BatchTrigger" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="Name" column="Name" type="String" length="50" />	
+		<property name="Description" column="Desc1" type="String" length="255" />	
+		<many-to-one name="BatchJobDetail" column="JobId" class="com.Sconit.Entity.Batch.BatchJobDetail, com.Sconit.Entity" cascade="none" />
+		<property name="NextFireTime" column="NextFireTime" type="DateTime"  />	
+		<property name="PreviousFireTime" column="PrevFireTime" type="DateTime"  />	
+		<property name="RepeatCount" column="RepeatCount" type="Int32"  />	
+		<property name="Interval" column="Interval" type="Int32"  />	
+		<property name="IntervalType" column="IntervalType" type="String" length="50" />	
+		<property name="TimesTriggered" column="TimesTriggered" type="Int64"  />	
+		<property name="Status" column="Status" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

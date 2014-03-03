@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ItemReference, com.Sconit.Entity" table="ItemRef" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Party" column="Party" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		<property name="ReferenceCode" column="RefCode" type="String" length="50" />	
+		<property name="Description" column="Desc1" type="String" length="255" />	
+		<property name="Remark" column="Remark" type="String" length="255" />	
+		<property name="IsActive" column="IsActive" type="Boolean"  />	
+  	</class>
+</hibernate-mapping>

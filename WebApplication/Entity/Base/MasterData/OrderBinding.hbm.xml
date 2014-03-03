@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.OrderBinding, com.Sconit.Entity" table="OrderBinding" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="OrderHead" column="OrderNo" class="com.Sconit.Entity.MasterData.OrderHead, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="BindedFlow" column="BindFlow" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
+		<property name="BindingType" column="BindType" type="String" length="50" />
+        <property name="BindedOrderNo" column="BindOrderNo" type="String" length="50" />
+        <!--<many-to-one name="BindedOrderHead" column="BindOrderNo" class="com.Sconit.Entity.MasterData.OrderHead, com.Sconit.Entity" cascade="none" />-->
+		<property name="Remark" column="Remark" type="String" length="255" />	
+  	</class>
+</hibernate-mapping>

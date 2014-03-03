@@ -1,0 +1,229 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="C#" Description="Generate the entity base class." %>
+<%@ Property Name="AssemblyName" Type="String" Default="com.Sconit" Category="EntityClass" Description="The assembly that contains the entity class." %>
+<%@ Property Name="EntityClassName" Type="String" Category="EntityClass" Description="The entity class name." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The module group which contains the entity, for example, Security." %>
+<%@ Property Name="Mapping" Type="com.Sconit.CodeSmith.MappingProperty" Category="Mapping" Description="The O/R mapping settings." %>
+<%@ Assembly Name="com.Sconit.CodeSmith" %>
+<%@ Import Namespace="com.Sconit.CodeSmith" %>
+<%@ Import Namespace="System.Text" %>
+<script runat="template">
+	public string GenType(MappingInfo mappingInfo)
+	{
+		string dataType = mappingInfo.DataType;
+		if (Enum.IsDefined(typeof(com.Sconit.CodeSmith.DataType), dataType))
+		{
+			string returnType;
+			com.Sconit.CodeSmith.DataType df = (com.Sconit.CodeSmith.DataType)Enum.Parse(typeof(com.Sconit.CodeSmith.DataType), dataType.ToString());
+			switch (df)
+			{
+				case com.Sconit.CodeSmith.DataType.BinaryBlob:
+					returnType = "byte[]";
+					break;
+				case com.Sconit.CodeSmith.DataType.Boolean:
+					returnType = "Boolean";
+					break;
+				case com.Sconit.CodeSmith.DataType.Byte:
+					returnType = "Byte";
+					break;
+				case com.Sconit.CodeSmith.DataType.DateTime:
+					returnType = "DateTime";
+					break;
+				case com.Sconit.CodeSmith.DataType.Decimal:
+					returnType = "Decimal";
+					break;
+				case com.Sconit.CodeSmith.DataType.Double:
+					returnType = "Double";
+					break;
+				case com.Sconit.CodeSmith.DataType.Single:
+					returnType = "Float";
+					break;
+				case com.Sconit.CodeSmith.DataType.Guid:
+					returnType = "Guid";
+					break;
+				case com.Sconit.CodeSmith.DataType.Int16:
+					returnType = "Int16";
+					break;
+				case com.Sconit.CodeSmith.DataType.Int32:
+					returnType = "Int32";
+					break;
+				case com.Sconit.CodeSmith.DataType.Int64:
+					returnType = "Int64";
+					break;
+				case com.Sconit.CodeSmith.DataType.String:
+					returnType = "string";
+					break;
+				case com.Sconit.CodeSmith.DataType.UInt16:
+					returnType = "UInt16";
+					break;
+				case com.Sconit.CodeSmith.DataType.UInt32:
+					returnType = "UInt32";
+					break;
+				case com.Sconit.CodeSmith.DataType.UInt64:
+					returnType = "UInt64";
+					break;
+				default:
+					throw new ApplicationException(string.Format("Data type {0} is unsupported.", dataType));
+			}
+			if (mappingInfo.IsNullable)
+			{
+				returnType = returnType + "?";
+			}
+			
+			return returnType;
+		}
+		else
+		{
+			return dataType.ToString();
+		}
+	}
+	
+	public string GenPrivatePropertyName(string classPropertyName)
+	{
+		if (classPropertyName.Length == 0)
+			return string.Empty;
+			
+		char firstChar = classPropertyName[0];
+		firstChar = char.ToLower(firstChar);
+		
+		return "_" + firstChar + classPropertyName.Substring(1);
+	}
+	
+	public string GenEqualsBody()
+	{
+		StringBuilder body = new StringBuilder();
+		body.Append("return BeginFlag");
+		foreach (MappingInfo mappingInfo in this.Mapping.MappingPKInfoCollection)
+		{
+			body.Append(" && (this.");
+			body.Append(mappingInfo.ClassPropertyName);
+			body.Append(" == ");
+			body.Append("another.");
+			body.Append(mappingInfo.ClassPropertyName);
+			body.Append(")");
+		}
+		body.Append(";");
+		
+		return body.ToString().Replace(" BeginFlag &&", "");
+	}
+	
+	public string GenHashCodeJudgement()
+	{
+		StringBuilder judgement = new StringBuilder();
+		int i = 0;
+		foreach (MappingInfo mappingInfo in this.Mapping.MappingPKInfoCollection)
+		{
+			if (i == 0)
+			{
+				judgement.Append(mappingInfo.ClassPropertyName + " != null");
+			} 
+			else
+			{
+				judgement.Append(" && " + mappingInfo.ClassPropertyName + " != null");
+			}
+			i++;
+		}
+		return judgement.ToString();
+	}
+	
+	public string GenHashCode()
+	{
+		StringBuilder hashCode = new StringBuilder();
+		int i = 0;
+		foreach (MappingInfo mappingInfo in this.Mapping.MappingPKInfoCollection)
+		{
+			if (i == 0)
+			{
+				hashCode.Append(mappingInfo.ClassPropertyName + ".GetHashCode()");
+			} 
+			else
+			{
+				hashCode.Append(" ^ " + mappingInfo.ClassPropertyName + ".GetHashCode()");
+			}
+			i++;
+		}
+		return hashCode.ToString();
+	}
+</script>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+//TODO: Add other using statements here
+
+namespace <%=this.AssemblyName%>.Entity.<%=this.ModuleGroupName%>
+{
+    [Serializable]
+    public abstract class <%= EntityClassName%>Base : EntityBase
+    {
+        #region O/R Mapping Properties
+		
+		<% 
+			foreach (MappingInfo mappingInfo in this.Mapping.MappingInfoCollection) 
+			{
+				if (mappingInfo.IsOne2Many)
+				{
+		%>
+		private IList <%= GenPrivatePropertyName(mappingInfo.ClassPropertyName)%>;
+        public IList <%= mappingInfo.ClassPropertyName %>
+        {
+            get
+            {
+                return <%= GenPrivatePropertyName(mappingInfo.ClassPropertyName)%>;
+            }
+            set
+            {
+                <%= GenPrivatePropertyName(mappingInfo.ClassPropertyName)%> = value;
+            }
+        }
+		<%
+				}
+				else
+				{
+		%>
+		private <%= GenType(mappingInfo)%> <%= GenPrivatePropertyName(mappingInfo.ClassPropertyName)%>;
+		public <%= GenType(mappingInfo)%> <%= mappingInfo.ClassPropertyName %>
+		{
+			get
+			{
+				return <%= GenPrivatePropertyName(mappingInfo.ClassPropertyName)%>;
+			}
+			set
+			{
+				<%= GenPrivatePropertyName(mappingInfo.ClassPropertyName)%> = value;
+			}
+		}
+		<%
+				}
+			} 
+		%>
+        
+        #endregion
+
+		public override int GetHashCode()
+        {
+			if (<%= GenHashCodeJudgement() %>)
+            {
+                return <%= GenHashCode() %>;
+            }
+            else
+            {
+                return base.GetHashCode();
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            <%= EntityClassName %>Base another = obj as <%= EntityClassName %>Base;
+
+            if (another == null)
+            {
+                return false;
+            }
+            else
+            {
+            	<%= GenEqualsBody() %>
+            }
+        } 
+    }
+	
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.RolePermission, com.Sconit.Entity" table="ACC_RolePermission" lazy="false">
+		<id name="Id" column="RP_ID" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Role" column="RP_RoleCode" class="com.Sconit.Entity.MasterData.Role, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Permission" column="RP_PMID" class="com.Sconit.Entity.MasterData.Permission, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

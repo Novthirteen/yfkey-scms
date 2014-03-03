@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.LocationDetail, com.Sconit.Entity" table="LocationDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<many-to-one name="Location" column="Location" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="ConsignmentQty" column="CsQty" type="Decimal"  />	
+		<property name="NormalQty" column="NmlQty" type="Decimal"  />	
+		<property name="Qty" column="Qty" type="Decimal"  />
+  	</class>
+</hibernate-mapping>

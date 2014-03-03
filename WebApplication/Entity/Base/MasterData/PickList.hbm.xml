@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.PickList, com.Sconit.Entity" table="PickListMstr" lazy="false">
+		<id name="PickListNo" column="PLNo" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Status" column="Status" type="String" length="50" />
+    <property name="PickBy" column="PickBy" type="String" length="50" />
+    <property name="OrderType" column="OrderType" type="String" length="50" />
+    <many-to-one name="PartyFrom" column="PartyFrom" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="PartyTo" column="PartyTo" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="ShipFrom" column="ShipFrom" class="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="ShipTo" column="ShipTo" class="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" cascade="none" />
+    <property name="DockDescription" column="DockDesc" type="String" length="50" />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />	
+		<many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="IsShipScanHu" column="IsShipScan" type="Boolean"  />
+    <property name="IsReceiptScanHu" column="IsRecScan" type="Boolean"  />
+    <property name="IsAutoReceive" column="IsAutoReceive" type="Boolean"  />
+    <property name="CompleteLatency" column="CompleteLatency" type="Decimal" />
+    <property name="GoodsReceiptGapTo" column="GrGapTo" type="String" length="50" />
+    <property name="AsnTemplate" column="AsnTemplate" type="String" length="100" />
+    <property name="ReceiptTemplate" column="RecTemplate" type="String" length="100" />
+    <!--<many-to-one name="Flow" column="Flow" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />-->
+    <property name="Flow" column="Flow" type="String" length="50" />
+    <property name="StartDate" column="StartDate" type="DateTime"  />
+    <many-to-one name="StartUser" column="StartUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="IsPrinted" column="IsPrinted" type="Boolean"  />
+    <property name="WindowTime" column="WinTime" type="DateTime"  />
+    <property name="IsAsnUniqueReceipt" column="IsAsnUniqueReceipt" type="Boolean"  />
+    <bag name="PickListDetails" table="PickListDet" inverse="true" lazy="true" order-by="Id asc">
+      <key column="PLNo" />
+      <one-to-many class="com.Sconit.Entity.MasterData.PickListDetail, com.Sconit.Entity" />
+    </bag>	
+  </class>
+</hibernate-mapping>

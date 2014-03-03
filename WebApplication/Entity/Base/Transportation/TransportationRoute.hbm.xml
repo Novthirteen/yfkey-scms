@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Transportation.TransportationRoute, com.Sconit.Entity" table="TRouteMstr" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="IsActive" column="IsActive" type="Boolean"  />	
+		<property name="Description" column="Description" type="String" length="50" />	
+		<many-to-one name="ShipFrom" column="ShipFrom" class="com.Sconit.Entity.Transportation.TransportationAddress, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="ShipTo" column="ShipTo" class="com.Sconit.Entity.Transportation.TransportationAddress, com.Sconit.Entity" cascade="none" />
+    <bag name="TransportationRouteDetails" table="TRouteDet" inverse="true" lazy="true">
+      <key column="TRoute" />
+      <one-to-many class="com.Sconit.Entity.Transportation.TransportationRouteDetail, com.Sconit.Entity" />
+    </bag>
+  	</class>
+</hibernate-mapping>

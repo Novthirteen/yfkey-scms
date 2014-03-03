@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ReceiptInProcessLocation, com.Sconit.Entity" table="ReceiptIp" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="InProcessLocation" column="IpNo" class="com.Sconit.Entity.Distribution.InProcessLocation, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Receipt" column="RecNo" class="com.Sconit.Entity.MasterData.Receipt, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.KPItem, com.Sconit.Entity" table="KP_ITEM" lazy="false">
+		<id name="ITEM_SEQ_ID" column="ITEM_SEQ_ID" type="Decimal" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<property name="PART_CODE" column="PART_CODE" type="String" length="50" />	
+		<property name="PURCHASE_ORDER_ID" column="PURCHASE_ORDER_ID" type="String" length="50" />	
+		<property name="INCOMING_ORDER_ID" column="INCOMING_ORDER_ID" type="String" length="50" />	
+		<property name="SEQ_ID" column="SEQ_ID" type="String" length="10" />	
+		<property name="INCOMING_QTY" column="INCOMING_QTY" type="Double"  />	
+		<property name="PRICE" column="PRICE" type="Double"  />	
+		<property name="UM" column="UM" type="String" length="10" />	
+		<property name="PRICE1" column="PRICE1" type="Double"  />	
+		<property name="PRICE2" column="PRICE2" type="Decimal"  />	
+		<property name="PART_NAME" column="PART_NAME" type="String" length="250" />	
+		<property name="DELIVER_ORDER_ID" column="DELIVER_ORDER_ID" type="String" length="50" />	
+		<property name="INCOMING_DATE" column="INCOMING_DATE" type="DateTime"  />	
+		<property name="LOCATION_ID" column="LOCATION_ID" type="String" length="20" />	
+		<property name="ORDER_ID" column="ORDER_ID" type="Decimal"  />	
+  	</class>
+</hibernate-mapping>

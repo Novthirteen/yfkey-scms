@@ -1,0 +1,117 @@
+<Project DefaultTargets="BuildExt"  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<Import Project="Common.xml" />
+
+	<Target Name="All">
+		<CallTarget Targets="Clean"/>
+		<CallTarget Targets="BuildExt"/>
+	</Target>
+
+	<Target Name="Compile" >
+		<!--
+		Architecture=x86;
+		Architecture=ia64;
+		-->
+		<MSBuild
+		   Projects="@(ProjectReferences)"  Targets="Clean;Build"
+		   Properties="Configuration=Release;Optimize=$(Optimize);SolutionDir=.\..\..\..\;" StopOnFirstFailure="true" >
+		</MSBuild>
+	</Target>
+
+	<Target Name="BuildExtDir">
+		<!--Error  Condition="Exists('$(OutputPath)')"  Text="目录$(OutputPath)已存在"></Error-->
+		<MakeDir Directories="$(OutputPath)"  Condition="!Exists('$(OutputPath)')" />
+		<!--MakeDir Directories="$(OutputPath)/bin"  Condition="!Exists('$(OutputPath)/bin')" /-->
+		<MakeDir Directories="$(ServicePath)"  Condition="!Exists('$(ServicePath)')" />
+		<MakeDir Directories="$(ServicePath)/Properties"  Condition="!Exists('$(ServicePath)/Properties')" />
+		<MakeDir Directories="$(EntityPath)"  Condition="!Exists('$(EntityPath)')" />
+		<MakeDir Directories="$(EntityPath)/Properties"  Condition="!Exists('$(EntityPath)/Properties')" />
+		<MakeDir Directories="$(PersistencePath)"  Condition="!Exists('$(PersistencePath)')" />
+		<MakeDir Directories="$(PersistencePath)/Properties"  Condition="!Exists('$(PersistencePath)/Properties')" />
+		<MakeDir Directories="$(UtilityPath)"  Condition="!Exists('$(UtilityPath)')" />
+		<MakeDir Directories="$(UtilityPath)/Properties"  Condition="!Exists('$(UtilityPath)/Properties')" />
+		<MakeDir Directories="$(DllLibPath)"  Condition="!Exists('$(DllLibPath)')" />
+	</Target>
+
+	<Target Name="BuildExt" DependsOnTargets="BuildExtDir" >
+
+		<Copy
+		   SourceFiles="@(SolutionFiles)"
+		   DestinationFiles="$(OutputPath)/$(CompanyName).sln;$(OutputPath)/$(CompanyName).suo"
+		/>
+
+		<!--<CallTarget Targets="BuildProjectFiles"/>-->
+		<Copy
+            SourceFiles="@(ProjectFiles)"
+            DestinationFiles="@(ProjectFiles->'$(OutputPath)/%(RecursiveDir)/%(Filename)%(Extension)')"
+        />
+
+		<Copy
+            SourceFiles="@(DllLibFiles)"
+            DestinationFiles="@(DllLibFiles->'$(DllLibPath)/%(RecursiveDir)/%(Filename)%(Extension)')"
+        />
+
+		<Copy
+            SourceFiles="@(WebFiles)"
+            DestinationFiles="@(WebFiles->'$(WebPath)/%(RecursiveDir)/%(Filename)%(Extension)')"
+        />
+
+		<Copy
+		   SourceFiles="@(LanguageFiles)"
+		   DestinationFolder="$(WebPath)/Languages"
+        />
+
+		<MakeDir Directories="$(WebPath)/bin"  Condition="!Exists('$(WebPath)/bin')" />
+
+		<MakeDir Directories="$(WebPath)/Ext"  Condition="!Exists('$(WebPath)/Ext')" />
+
+		<CallTarget Targets="Compile"/>
+
+		<Copy SourceFiles="@(ReleaseDllFiles)" DestinationFolder="$(DllLibPath)" />
+
+	</Target>
+
+
+	<!-- 不使用此Target,因为直接复制项目文件,项目文件中有程序集名称与默认命名空间,会导致冲突 -->
+	<Target Name="BuildProjectFiles">
+		<Copy
+		   SourceFiles="@(ServiceFiles)"
+		   DestinationFolder="$(ServicePath)"
+        />
+
+		<Copy
+		   SourceFiles="Service/Properties/AssemblyInfo.cs"
+		   DestinationFolder="$(ServicePath)/Properties"
+        />
+
+		<Copy
+		   SourceFiles="@(EntityFiles)"
+		   DestinationFolder="$(EntityPath)"
+        />
+
+		<Copy
+		   SourceFiles="Entity/Properties/AssemblyInfo.cs"
+		   DestinationFolder="$(EntityPath)/Properties"
+        />
+
+		<Copy
+		   SourceFiles="@(PersistenceFiles)"
+		   DestinationFolder="$(PersistencePath)"
+        />
+
+		<Copy
+		   SourceFiles="Persistence/Properties/AssemblyInfo.cs"
+		   DestinationFolder="$(PersistencePath)/Properties"
+        />
+
+		<Copy
+		   SourceFiles="@(UtilityFiles)"
+		   DestinationFolder="$(UtilityPath)"
+        />
+
+		<Copy
+		   SourceFiles="Utility/Properties/AssemblyInfo.cs"
+		   DestinationFolder="$(UtilityPath)/Properties"
+        />
+	</Target>
+</Project>

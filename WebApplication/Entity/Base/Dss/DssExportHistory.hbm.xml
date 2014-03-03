@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.Dss.DssExportHistory, com.Sconit.Entity" table="DssExpHis" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <many-to-one name="DssOutboundControl" column="DssOutboundCtrl" class="com.Sconit.Entity.Dss.DssOutboundControl, com.Sconit.Entity" cascade="none" />
+        <property name="EventCode" column="EventCode" type="String" length="50" />
+        <property name="IsActive" column="IsActive" type="Boolean"  />
+        <property name="KeyCode" column="KeyCode" type="String" length="50" />
+        <property name="ReferenceKeyCode" column="RefKeyCode" type="String" length="50" />
+        <property name="OrderNo" column="OrderNo" type="String" length="50" />
+        <property name="ReceiptNo" column="RecNo" type="String" length="50" />
+        <property name="PartyFrom" column="PartyFrom" type="String" length="50" />
+        <property name="PartyTo" column="PartyTo" type="String" length="50" />
+        <property name="Location" column="Location" type="String" length="50" />
+        <property name="ReferenceLocation" column="RefLocation" type="String" length="50" />
+        <property name="EffectiveDate" column="EffDate" type="DateTime"  />
+        <property name="Item" column="Item" type="String" length="50" />
+        <property name="Uom" column="Uom" type="String" length="50" />
+        <property name="Qty" column="Qty" type="Decimal"  />
+        <property name="Comments" column="Comments" type="String" length="255" />
+        <property name="DefinedString1" column="DefStr1" type="String" length="255" />
+        <property name="DefinedString2" column="DefStr2" type="String" length="255" />
+        <property name="DefinedString3" column="DefStr3" type="String" length="255" />
+        <property name="DefinedString4" column="DefStr4" type="String" length="255" />
+        <property name="DefinedString5" column="DefStr5" type="String" length="255" />
+        <property name="UndefinedString1" column="UndefStr1" type="String" length="255" />
+        <property name="UndefinedString2" column="UndefStr2" type="String" length="255" />
+        <property name="UndefinedString3" column="UndefStr3" type="String" length="255" />
+        <property name="UndefinedString4" column="UndefStr4" type="String" length="255" />
+        <property name="UndefinedString5" column="UndefStr5" type="String" length="255" />
+        <property name="CreateDate" column="CreateDate" type="DateTime"  />
+        <property name="TransNo" column="TransNo" type="String" length="50" />
+    </class>
+</hibernate-mapping>

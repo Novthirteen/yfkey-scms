@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Mes.Shelf, com.Sconit.Entity" table="Mes_Shelf" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+    </id>
+		<many-to-one name="ProductLine" column="ProdLine" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
+		<property name="TagNo" column="TagNo" type="String" length="50" />	
+		<property name="Capacity" column="Capacity" type="Int32"  />	
+		<property name="CurrentCartons" column="CurrentCartons" type="Int32"  />	
+		<property name="OriginalCartonNo" column="OriginalCartonNo" type="String" length="50" />
+    <property name="IsActive" column="IsActive" type="Boolean"  />
+  	</class>
+</hibernate-mapping>

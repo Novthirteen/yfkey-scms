@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Distribution.InProcessLocationTrack, com.Sconit.Entity" table="IpTrack" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="IpProcessLocation" column="IpNo" class="com.Sconit.Entity.Distribution.InProcessLocation, com.Sconit.Entity" cascade="none" />
+		<property name="Operation" column="Op" type="Int32"  />	
+		<property name="Activity" column="Activity" type="String" length="50" />	
+		<many-to-one name="WorkCenter" column="WorkCenter" class="com.Sconit.Entity.MasterData.WorkCenter, com.Sconit.Entity" cascade="none" />
+		<property name="ActiveDate" column="ActDate" type="DateTime"  />	
+		<many-to-one name="ActiveUser" column="ActUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="Remark" column="Remark" type="String" length="255" />	
+  	</class>
+</hibernate-mapping>

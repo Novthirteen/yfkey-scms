@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.Procurement.ItemFlowPlanTrack, com.Sconit.Entity" table="ItemFlowPlanTrack" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <many-to-one name="ItemFlowPlanDetail" column="ItemFlowPlanDetId" class="com.Sconit.Entity.Procurement.ItemFlowPlanDetail, com.Sconit.Entity" cascade="none" />
+        <many-to-one name="OrderLocationTransaction" column="RefOrderLocTransId" class="com.Sconit.Entity.MasterData.OrderLocationTransaction, com.Sconit.Entity" cascade="none" />
+        <many-to-one name="ReferencePlanDetail" column="RefPlanDetId" class="com.Sconit.Entity.Procurement.ItemFlowPlanDetail, com.Sconit.Entity" cascade="none" />
+        <property name="Rate" column="Rate" type="Decimal"  />
+    </class>
+</hibernate-mapping>

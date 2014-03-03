@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.FlowDetail, com.Sconit.Entity" table="FlowDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Flow" column="Flow" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="ReferenceItemCode" column="RefItemCode" type="String" length="50" />
+    <property name="CustomerItemCode" column="CustomerItemCode" type="String" length="50" />
+		<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
+		<property name="UnitCount" column="UC" type="Decimal" />	
+		<many-to-one name="Bom" column="Bom" class="com.Sconit.Entity.MasterData.Bom, com.Sconit.Entity" cascade="none" />
+		<property name="Sequence" column="Seq" type="Int32"  />	
+		<many-to-one name="LocationFrom" column="LocFrom" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="LocationTo" column="LocTo" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="BillFrom" column="BillFrom" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="BillTo" column="BillTo" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+		<property name="IsAutoCreate" column="IsAutoCreate" type="Boolean"  />	
+		<property name="SafeStock" column="SafeStock" type="Decimal" />	
+		<property name="MaxStock" column="MaxStock" type="Decimal" />	
+		<property name="MinLotSize" column="MinLotSize" type="Decimal" />	
+		<property name="OrderLotSize" column="OrderLotSize" type="Decimal" />	
+		<property name="GoodsReceiptLotSize" column="OrderGrLotSize" type="Decimal" />
+    <property name="BatchSize" column="BatchSize" type="Decimal" />
+		<property name="RoundUpOption" column="RoundUpOpt" type="String" length="50" />
+    <property name="TimeUnit" column="TimeUnit" type="String" length="50" />
+		<property name="HuLotSize" column="HuLotSize" type="Int32" />	
+		<property name="PackageVolumn" column="PackVol" type="Decimal" />	
+		<property name="PackageType" column="PackType" type="String" length="50" />	
+		<property name="ProjectDescription" column="ProjectDesc" type="String" length="50" />	
+		<property name="Remark" column="Remark" type="String" length="50" />
+    <property name="BillSettleTerm" column="BillSettleTerm" type="String" length="50" />
+    <many-to-one name="PriceListFrom" column="PriceListFrom" class="com.Sconit.Entity.Procurement.PurchasePriceList, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="PriceListTo" column="PriceListTo" class="com.Sconit.Entity.Distribution.SalesPriceList, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="Customer" column="Customer" class="com.Sconit.Entity.MasterData.Customer, com.Sconit.Entity" cascade="none" />
+    <property name="NeedInspection" column="NeedInspect" type="Boolean"  />
+    <property name="IdMark" column="IdMark" type="String" length="50" />
+    <property name="BarCodeType" column="BarCodeType" type="String" length="50" />
+    <property name="StartDate" column="StartDate" type="DateTime"  />
+    <property name="EndDate" column="EndDate" type="DateTime" />
+    <property name="OddShipOption" column="OddShipOpt" type="String" length="50" />
+    <property name="Version" column="Version" type="Int32"  />
+    <many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="MRPWeight" column="MRPWeight" type="Int32"  />
+    <many-to-one name="Routing" column="Routing" class="com.Sconit.Entity.MasterData.Routing, com.Sconit.Entity" cascade="none"  lazy="proxy"/>
+    <many-to-one name="ReturnRouting" column="ReturnRouting" class="com.Sconit.Entity.MasterData.Routing, com.Sconit.Entity" cascade="none" lazy="proxy" />
+  </class>
+</hibernate-mapping>

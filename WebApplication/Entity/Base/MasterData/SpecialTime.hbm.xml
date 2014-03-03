@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.SpecialTime, com.Sconit.Entity" table="SpecialTime" lazy="false">
+		<id name="ID" column="ID" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Region" column="Region" class="com.Sconit.Entity.MasterData.Region, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="WorkCenter" column="WorkCenter" class="com.Sconit.Entity.MasterData.WorkCenter, com.Sconit.Entity" cascade="none" />
+		<property name="StartTime" column="StartTime" type="DateTime"  />	
+		<property name="EndTime" column="EndTime" type="DateTime"  />	
+		<property name="Description" column="Desc1" type="String" length="255" />	
+		<property name="Type" column="Type" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

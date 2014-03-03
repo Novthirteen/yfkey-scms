@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.PriceList, com.Sconit.Entity" table="PriceListMstr" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<discriminator column="Type" type="String" />
+		<property name="IsActive" column="IsActive" type="Boolean"  />
+		<many-to-one name="Party" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" column="Party" cascade="none" />
+		<bag name="PriceListDetails" table="PriceListDet" inverse="true" lazy="true">
+			<key column="PriceList" />
+			<one-to-many class="com.Sconit.Entity.MasterData.PriceListDetail, com.Sconit.Entity" />
+		</bag>
+
+		<subclass name="com.Sconit.Entity.Procurement.PurchasePriceList, com.Sconit.Entity" discriminator-value="Purchase" lazy="false"/>
+		<subclass name="com.Sconit.Entity.Distribution.SalesPriceList, com.Sconit.Entity" discriminator-value="Sales" lazy="false"/>
+  	</class>
+</hibernate-mapping>

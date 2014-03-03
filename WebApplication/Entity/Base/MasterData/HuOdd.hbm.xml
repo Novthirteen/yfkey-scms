@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.HuOdd, com.Sconit.Entity" table="HuOdd" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="OrderDetail" column="OrderDetId" class="com.Sconit.Entity.MasterData.OrderDetail, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="LocationLotDetail" column="LocLotDetId" class="com.Sconit.Entity.MasterData.LocationLotDetail, com.Sconit.Entity" cascade="none" />
+		<property name="OddQty" column="OddQty" type="Decimal"  />	
+		<property name="Status" column="Status" type="String" length="50" />	
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />	
+		<many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="CreatedQty" column="CreateQty" type="Decimal"  />	
+  	</class>
+</hibernate-mapping>

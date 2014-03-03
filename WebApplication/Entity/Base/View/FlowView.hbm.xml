@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.FlowView, com.Sconit.Entity" table="FlowView" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<many-to-one name="FlowDetail" column="FlowDetId" class="com.Sconit.Entity.MasterData.FlowDetail, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Flow" column="Flow" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
+		<property name="IsAutoCreate" column="IsAutoCreate" type="Boolean"  />	
+		<many-to-one name="LocationFrom" column="LocFrom" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="LocationTo" column="LocTo" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<property name="ReferenceFlow" column="RefFlow" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

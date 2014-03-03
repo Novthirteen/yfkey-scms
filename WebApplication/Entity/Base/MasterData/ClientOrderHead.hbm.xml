@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ClientOrderHead, com.Sconit.Entity" table="ClientOrderMstr" lazy="false">
+		<id name="Id" column="Id" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<many-to-one name="Client" column="ClientId" class="com.Sconit.Entity.MasterData.Client, com.Sconit.Entity" cascade="none" />
+		<property name="OrderNo" column="OrderNo" type="String" length="50" />	
+		<property name="UserCode" column="UserCode" type="String" length="50" />	
+		<property name="OrderType" column="OrderType" type="String" length="50" />	
+		<property name="Flow" column="Flow" type="String" length="50" />	
+		<property name="SynStatus" column="SynStatus" type="String" length="50" />
+        <property name="SynTime" column="SynTime" type="DateTime"  />
+    </class>
+</hibernate-mapping>

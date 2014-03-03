@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Mes.Dss.Entity.ScmsMaterialBarcode, com.Mes.Dss" table="SCMS_MATERIAL_BARCODE" lazy="false">
+    <id name="HuId" column="BARCODE" type="String" unsaved-value="null" length="64">
+      <generator class="assigned" />
+    </id>
+    <property name="ItemCode" column="PART_NUMBER" type="String" length="64" />
+    <property name="ItemDesc" column="PART_DES" type="String" length="512" />
+    <property name="Flag" column="INTER_FLAG" type="Int32"  />
+    <property name="Qty" column="QTY" type="Int32"  />
+  </class>
+</hibernate-mapping>

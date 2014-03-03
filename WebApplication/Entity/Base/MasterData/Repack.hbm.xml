@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.Repack, com.Sconit.Entity" table="RepackMstr" lazy="false">
+		<id name="RepackNo" column="RepNo" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="Type" column="Type" type="String" length="50" />
+    <many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <bag name="RepackDetails" table="RepackDet" inverse="true" lazy="true" order-by="Id asc">
+      <key column="RepNo" />
+      <one-to-many class="com.Sconit.Entity.MasterData.RepackDetail, com.Sconit.Entity" />
+    </bag>
+  </class>
+</hibernate-mapping>

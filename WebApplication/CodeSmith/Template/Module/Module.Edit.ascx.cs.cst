@@ -1,0 +1,91 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="C#" Description="Generates the code behind file for a module Edit page." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The moudule group name" %>
+<%@ Property Name="ModuleName" Type="String" Category="Module" Description="The module name of current module, for example, 'User Admin'" %>
+<%@ Property Name="EntityClassName" Type="String"  Category="EntityClass" Description="The editing entity class name, for example, 'User'" %>
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+
+using log4net;
+
+using Dndp.Web;
+using Dndp.Persistence.Dao.<%=ModuleGroupName%>;
+using Dndp.Persistence.Entity.<%=ModuleGroupName%>;
+using Dndp.Service.<%=ModuleGroupName%>;
+
+//TODO: Add other using statements here.
+
+public partial class Modules_<%=ModuleGroupName%>_<%=ModuleName.Replace(" ", "")%>_Edit : ModuleBase
+{
+    public event EventHandler Back;
+	
+	//Get the logger
+	private static ILog log = LogManager.GetLogger("<%= ModuleName%>");
+	
+	//The entity service
+	protected I<%=EntityClassName%>Mgr TheService
+    {
+        get
+        {
+            return GetService("<%=EntityClassName%>Mgr.service") as I<%=EntityClassName%>Mgr;
+        }
+    }
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+		//TODO: Add code for Page_Load here.
+    }
+
+    protected override void InitByPermission()
+    {
+        base.InitByPermission();
+
+        btnUpdate.Visible = PermissionUpdate;   
+		
+		//TODO: Add other permission init codes here.
+    }
+
+    public <%= EntityClassName %> The<%= EntityClassName %>
+    {
+        get
+        {
+            return (<%= EntityClassName %>)ViewState["The<%= EntityClassName %>"];
+        }
+        set
+        {
+            ViewState["The<%= EntityClassName %>"] = value;
+        }
+    }
+
+	//Update the view by the entity class stored in ViewState
+    public void UpdateView()
+    {
+        //TODO: Add code here.
+    }
+
+	//Event handler when user click button "Back"
+    protected void btnBack_Click(object sender, EventArgs e)
+    {
+        if (Back != null)
+        {
+            Back(this, e);
+        }
+    }
+
+    //Event handler when user click button "Update"
+    protected void btnUpdate_Click(object sender, EventArgs e)
+    {
+        //TODO: Check input
+		
+		//TODO: Perform "New" action.
+		
+		//TODO: Show feedback message to user.
+    }
+}

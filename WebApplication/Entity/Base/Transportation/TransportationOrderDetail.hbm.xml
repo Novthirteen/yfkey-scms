@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Transportation.TransportationOrderDetail, com.Sconit.Entity" table="TOrderDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <many-to-one name="TransportationOrder" column="OrderNo" class="com.Sconit.Entity.Transportation.TransportationOrder, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="InProcessLocation" column="IpNo" class="com.Sconit.Entity.Distribution.InProcessLocation, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

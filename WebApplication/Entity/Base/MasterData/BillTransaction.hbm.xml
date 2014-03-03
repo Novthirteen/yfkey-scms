@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.MasterData.BillTransaction, com.Sconit.Entity" table="BillTrans" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <property name="OrderNo" column="OrderNo" type="String" length="50" />
+        <property name="ExternalReceiptNo" column="ExtRecNo" type="String" length="50" />
+        <property name="ReceiptNo" column="RecNo" type="String" length="50" />
+        <property name="Item" column="Item" type="String" length="50" />
+        <property name="ItemDescription" column="ItemDesc" type="String" length="255" />
+        <property name="Uom" column="Uom" type="String" length="5" />
+        <property name="BillAddress" column="BillAddr" type="String" length="50" />
+        <property name="BillAddressDescription" column="BillAddrDesc" type="String" length="255" />
+        <property name="Location" column="Loc" type="String" length="50" />
+        <property name="LocationName" column="LocName" type="String" length="50" />
+        <property name="HuId" column="HuId" type="String" length="50" />
+        <property name="LotNo" column="LotNo" type="String" length="50" />
+        <property name="BatchNo" column="BatchNo" type="Int32" />
+        <property name="Qty" column="Qty" type="Decimal"  />
+        <property name="EffectiveDate" column="EffDate" type="DateTime"  />
+        <property name="PlannedBill" column="PlanBill" type="Int32"  />
+        <property name="TransactionType" column="TransType" type="String" length="50" />
+        <property name="CreateDate" column="CreateDate" type="DateTime"  />
+        <property name="CreateUser" column="CreateUser" type="String" length="50" />
+        <property name="ActingBill" column="ActBill" type="Int32"  />
+        <property name="Party" column="Party" type="String" length="50" />
+        <property name="PartyName" column="PartyName" type="String" length="255" />
+        <property name="LocationFrom" column="LocFrom" type="String" length="50" />
+        <property name="IpNo" column="IpNo" type="String" length="50" />
+        <property name="ReferenceItemCode" column="RefItemCode" type="String" length="50" />
+        <property name="BillDetail" column="BillDet" type="Int32" />
+        <property name="PartyFrom" column="PartyFrom" type="String" length="50" />
+    </class>
+</hibernate-mapping>

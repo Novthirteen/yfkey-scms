@@ -1,0 +1,109 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="C#" Description="Generates the code behind file for a module Main page." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The moudule group name" %>
+<%@ Property Name="ModuleName" Type="String" Category="Module" Description="The module name of current module, for example, 'User Admin'" %>
+<%@ Property Name="EntityClassName" Type="String"  Category="EntityClass" Description="The editing entity class name, for example, 'User'" %>
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.Collections.Generic;
+
+using log4net;
+
+using Dndp.Web;
+using Dndp.Persistence.Dao.<%=ModuleGroupName%>;
+using Dndp.Persistence.Entity.<%=ModuleGroupName%>;
+using Dndp.Service.<%=ModuleGroupName%>;
+
+//TODO: Add other using statements here.
+
+public partial class Modules_<%=ModuleGroupName%>_<%=ModuleName.Replace(" ", "")%>_Main : ModuleBase
+{
+    //Get the logger
+	private static ILog log = LogManager.GetLogger("<%= ModuleName%>");
+	
+	//The entity service
+	protected I<%=EntityClassName%>Mgr TheService
+    {
+        get
+        {
+            return GetService("<%=EntityClassName%>Mgr.service") as I<%=EntityClassName%>Mgr;
+        }
+    }
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+		//TODO: Add code for Page_Load here.
+    }
+	
+	protected override void OnInit(EventArgs e)
+    {
+        base.OnInit(e);
+        Edit1.Back += new System.EventHandler(this.Edit1_Back);
+        New1.Back += new EventHandler(New1_Back);
+		
+		//TODO: Add other init code here.
+    }
+
+	//Init the page by current user permissions
+    protected override void InitByPermission()
+    {
+		base.InitByPermission();
+        
+		btnNew.Visible = PermissionAdd;
+		
+		//TODO: Add other permission init codes here.
+    }
+
+    //The event handler when user click button "Back" button on New page.
+    void New1_Back(object sender, EventArgs e)
+    {
+        New1.Visible = false;
+		
+		//TODO: Add other event handler code here.
+    }
+	
+	//The event handler when user button "Search".
+    protected void btnSearch_Click(object sender, EventArgs e)
+    {
+        UpdateView();
+		
+		//TODO: Add other event handler code here.
+    }
+
+	//Do data query and binding.
+    private void UpdateView()
+    {
+        //TODO: Add your code to do data query and binding here.
+    }
+
+	//The event handler when user click button "Back" on New page.
+    protected void Edit1_Back(object sender, EventArgs e)
+    {
+        Edit1.Visible = false;
+        
+		//TODO: Add other code here.
+    }
+
+    protected void btnNew_Click(object sender, EventArgs e)
+    {
+        New1.Visible = true;
+        New1.UpdateView();
+		
+		//TODO: Add othere code here.
+    }
+
+	//The event handler when user click button "Delete".
+    protected void btnDelete_Click(object sender, EventArgs e)
+    {
+        //TODO: Add code here to perform the delete action.
+
+        UpdateView();
+    }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Mes.Dss.Entity.MesScmsTableIndex, com.Mes.Dss" table="MES_SCMS_TABLEINDEX" lazy="false">
+		<id name="TableName" column="TABLE_NAME" type="String" unsaved-value="null" length="64">
+      		<generator class="assigned" />
+        </id>
+        <property name="Flag" column="UPDATED_FLAG" type="Int32"  />
+        <property name="Sequence" column="SEQUENCE" type="Int32"  />
+        <property name="LastModifyDate" column="LAST_MODIFIED_TIME" type="DateTime"  />
+    </class>
+</hibernate-mapping>

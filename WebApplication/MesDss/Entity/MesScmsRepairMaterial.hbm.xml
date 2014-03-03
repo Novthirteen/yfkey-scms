@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Mes.Dss.Entity.MesScmsRepairMaterial, com.Mes.Dss" table="MES_SCMS_REPAIR_MATERIAL" lazy="false">
+    <id name="Id" column="REPAIR_MATERIAL_ID" type="Int32" unsaved-value="null" >
+      <generator class="assigned" />
+    </id>
+    <property name="RejectNo" column="DEAL_NUMBER" type="String" length="64" />
+    <property name="ItemCode" column="MATERIAL_NUMBER" type="String" length="64" />
+    <property name="ProductLine" column="LINE_NAME" type="String" length="64" />
+    <property name="Type" column="DEAL_TYPE" type="Int32" />
+    <property name="Qty" column="QTY" type="Int32"  />
+    <property name="CreateDate" column="RECORD_TIME" type="DateTime"  />
+    <property name="Flag" column="INTER_FLAG" type="Int32"  />
+  </class>
+</hibernate-mapping>

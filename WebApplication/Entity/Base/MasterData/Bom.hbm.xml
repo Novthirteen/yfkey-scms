@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.Bom, com.Sconit.Entity" table="BomMstr" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Description" column="Desc1" type="String" length="255" />	
+		<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Region" column="Region" class="com.Sconit.Entity.MasterData.Region, com.Sconit.Entity" cascade="none" />
+		<property name="IsActive" column="IsActive" type="Boolean"  />
+		<bag name="BomDetails" table="BomDet" inverse="true" lazy="true">
+			<key column="Bom" />
+			<one-to-many class="com.Sconit.Entity.MasterData.BomDetail, com.Sconit.Entity" />
+		</bag>
+  	</class>
+</hibernate-mapping>

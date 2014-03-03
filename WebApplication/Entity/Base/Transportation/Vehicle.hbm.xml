@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Transportation.Vehicle, com.Sconit.Entity" table="Vehicle" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="IsActive" column="IsActive" type="Boolean"  />	
+		<many-to-one name="Carrier" column="Carrier" class="com.Sconit.Entity.Transportation.Carrier, com.Sconit.Entity" cascade="none" />
+		<property name="Type" column="Type" type="String" length="50" />	
+		<property name="Driver" column="Driver" type="String" length="50" />	
+		<property name="Phone" column="Phone" type="String" length="50" />	
+		<property name="MobilePhone" column="MPhone" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

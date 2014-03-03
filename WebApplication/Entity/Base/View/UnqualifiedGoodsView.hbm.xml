@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.UnqualifiedGoodsView, com.Sconit.Entity" table="UnqualifiedGoodsView" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<property name="InspectQty" column="InspQty" type="Decimal"  />	
+		<property name="QualifiedQty" column="QualifyQty" type="Decimal"  />	
+		<property name="RejectedQty" column="RejectQty" type="Decimal"  />	
+		<property name="Disposition" column="Disposition" type="String" length="50" />
+    <property name="DefectClassification" column="DefectClassification" type="String" length="50" />
+    <property name="DefectFactor" column="DefectFactor" type="String" length="50" />
+    <many-to-one name="InspectOrder" column="InspNo" class="com.Sconit.Entity.MasterData.InspectOrder, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="LocationFrom" column="LocFrom" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="FinishGoods" column="FGCode" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

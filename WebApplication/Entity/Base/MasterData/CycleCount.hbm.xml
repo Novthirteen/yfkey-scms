@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.MasterData.CycleCount, com.Sconit.Entity" table="CycleCountMstr" lazy="false">
+        <id name="Code" column="Code" type="String" unsaved-value="null" >
+            <generator class="assigned" />
+        </id>
+        <property name="Type" column="Type" type="String" length="50" />
+        <many-to-one name="Location" column="Location" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+        <property name="EffectiveDate" column="EffDate" type="DateTime"  />
+        <property name="Status" column="Status" type="String" length="50" />
+        <property name="CreateUser" column="CreateUser" type="String" length="50" />
+        <property name="CreateDate" column="CreateDate" type="DateTime"  />
+        <many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+        <property name="ReleaseUser" column="ReleaseUser" type="String" length="50" />
+        <property name="ReleaseDate" column="ReleaseDate" type="DateTime"  />
+        <property name="CancelUser" column="CancelUser" type="String" length="50" />
+        <property name="CancelDate" column="CancelDate" type="DateTime"  />
+        <many-to-one name="CloseUser" column="CloseUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+        <property name="CloseDate" column="CloseDate" type="DateTime"  />
+        <bag name="CycleCountDetails" table="CycleCountDet" inverse="true" lazy="true" order-by="Item asc">
+            <key column="OrderNo" />
+            <one-to-many class="com.Sconit.Entity.MasterData.CycleCountDetail, com.Sconit.Entity" />
+        </bag>
+      <property name="Bins" column="Bins" type="StringClob" />
+      <property name="Items" column="Items" type="StringClob" />
+      <property name="IsScanHu" column="IsScanHu" type="Boolean" />
+      <property name="StartUser" column="StartUser" type="String" length="50" />
+      <property name="StartDate" column="StartDate" type="DateTime"  />
+      <property name="CompleteUser" column="CompleteUser" type="String" length="50" />
+      <property name="CompleteDate" column="CompleteDate" type="DateTime"  />
+      <property name="PhyCntGroupBy" column="PhyCntGroupBy" type="String" length="50" />
+    </class>
+</hibernate-mapping>

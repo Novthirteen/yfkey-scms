@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.View.LocationTransactionView, com.Sconit.Entity" table="LocTransView" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="assigned" />
+        </id>
+        <property name="OrderNo" column="OrderNo" type="String" length="50" />
+        <property name="ExtOrderNo" column="ExtOrderNo" type="String" length="50" />
+        <property name="RefOrderNo" column="RefOrderNo" type="String" length="50" />
+        <property name="IpNo" column="IpNo" type="String" length="50" />
+        <property name="RecNo" column="RecNo" type="String" length="50" />
+        <property name="BillTransId" column="BillTransId" type="Int32"  />
+        <property name="TransType" column="TransType" type="String" length="50" />
+        <property name="Item" column="Item" type="String" length="50" />
+        <property name="ItemDescription" column="ItemDesc" type="String" length="255" />
+        <property name="Uom" column="Uom" type="String" length="5" />
+        <property name="Qty" column="Qty" type="Decimal"  />
+        <property name="PartyFrom" column="PartyFrom" type="String" length="50" />
+        <property name="PartyFromName" column="PartyFromName" type="String" length="255" />
+        <property name="PartyTo" column="PartyTo" type="String" length="50" />
+        <property name="PartyToName" column="PartyToName" type="String" length="255" />
+        <property name="ShipFrom" column="ShipFrom" type="String" length="50" />
+        <property name="ShipFromAddr" column="ShipFromAddr" type="String" length="255" />
+        <property name="ShipTo" column="ShipTo" type="String" length="50" />
+        <property name="ShipToAddr" column="ShipToAddr" type="String" length="255" />
+        <property name="Loc" column="Loc" type="String" length="50" />
+        <!--djin 20120802-->
+        <property name="RefLoc" column="RefLoc" type="String" length="50" />
+      <!--end-->
+        <property name="LocName" column="LocName" type="String" length="50" />
+        <property name="LotNo" column="LotNo" type="String" length="50" />
+        <!--<many-to-one name="Location" column="Loc" class="com.Sconit.Entity.MasterData.Location,com.Sconit.Entity" cascade="none" />-->
+        <property name="LocIOReason" column="LocIOReason" type="String" length="50" />
+        <property name="LocIOReasonDescription" column="LocIOReasonDesc" type="String" length="255" />
+        <property name="EffDate" column="EffDate" type="DateTime"  />
+        <many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User,com.Sconit.Entity" cascade="none" />
+    </class>
+</hibernate-mapping>

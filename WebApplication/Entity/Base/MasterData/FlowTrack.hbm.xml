@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.FlowTrack, com.Sconit.Entity" table="FlowMstrTrack" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="Code" column="Code" type="String" length="50" />
+    <property name="Description" column="Desc1" type="String" length="255" />
+    <property name="IsActive" column="IsActive" type="Boolean"  />
+    <property name="Type" column="Type" type="String" length="50" />
+    <property name="ReferenceFlow" column="RefFlow" type="String" length="50" />
+    <property name="PartyFrom" column="PartyFrom" type="String" length="50" />
+    <property name="PartyTo" column="PartyTo" type="String" length="50" />
+    <property name="ShipFrom" column="ShipFrom" type="String" length="50" />
+    <property name="ShipTo" column="ShipTo" type="String" length="50" />
+    <property name="LocationFrom" column="LocFrom" type="String" length="50" />
+    <property name="LocationTo" column="LocTo" type="String" length="50" />
+    <property name="BillFrom" column="BillFrom" type="String" length="50" />
+    <property name="BillTo" column="BillTo" type="String" length="50" />
+    <property name="Carrier" column="Carrier" type="String" length="50" />
+    <property name="CarrierBillAddress" column="CarrierBillAddr" type="String" length="50" />
+    <property name="DockDescription" column="DockDesc" type="String" length="50" />
+    <property name="Routing" column="Routing" type="String" length="50" />
+    <property name="ReturnRouting" column="ReturnRouting" type="String" length="50" />
+    <property name="FlowStrategy" column="FlowStrategy" type="String" length="50" />
+    <property name="LotGroup" column="LotGroup" type="String" length="50" />
+    <property name="BillSettleTerm" column="BillSettleTerm" type="String" length="50" />
+    <property name="LeadTime" column="LeadTime" type="Decimal" />
+    <property name="EmTime" column="EmTime" type="Decimal" />
+    <property name="MaxCirTime" column="MaxCirTime" type="Decimal" />
+    <property name="WinTime1" column="WinTime1" type="String" length="255" />
+    <property name="WinTime2" column="WinTime2" type="String" length="255" />
+    <property name="WinTime3" column="WinTime3" type="String" length="255" />
+    <property name="WinTime4" column="WinTime4" type="String" length="255" />
+    <property name="WinTime5" column="WinTime5" type="String" length="255" />
+    <property name="WinTime6" column="WinTime6" type="String" length="255" />
+    <property name="WinTime7" column="WinTime7" type="String" length="255" />
+    <property name="NextOrderTime" column="NextOrderTime" type="DateTime" />
+    <property name="NextWinTime" column="NextWinTime" type="DateTime" />
+    <property name="WeekInterval" column="WeekInterval" type="Int32" />
+    <property name="IsAutoCreate" column="IsAutoCreate" type="Boolean"  />
+    <property name="IsAutoRelease" column="IsAutoRelease" type="Boolean"  />
+    <property name="IsAutoStart" column="IsAutoStart" type="Boolean"  />
+    <property name="IsAutoShip" column="IsAutoShip" type="Boolean"  />
+    <property name="IsAutoReceive" column="IsAutoReceive" type="Boolean"  />
+    <property name="IsAutoBill" column="IsAutoBill" type="Boolean"  />
+    <property name="IsListDetail" column="IsListDet" type="Boolean"  />
+    <property name="IsShipScanHu" column="IsShipScan" type="Boolean"  />
+    <property name="IsReceiptScanHu" column="IsRecScan" type="Boolean"  />
+    <property name="AutoPrintHu" column="AutoPrintHu" type="Boolean"  />
+    <property name="IsOddCreateHu" column="IsOddCreateHu" type="Boolean"  />
+    <property name="CreateHuOption" column="CreateHuOpt" type="String" length="50" />
+    <property name="CheckDetailOption" column="CheckDetOpt" type="String" length="50" />
+    <property name="StartLatency" column="StartLatency" type="Decimal" />
+    <property name="CompleteLatency" column="CompleteLatency" type="Decimal" />
+    <property name="NeedPrintOrder" column="NeedPrintOrder" type="Boolean"  />
+    <property name="NeedPrintAsn" column="NeedPrintAsn" type="Boolean"  />
+    <property name="NeedPrintReceipt" column="NeedPrintRcpt" type="Boolean"  />
+    <property name="GoodsReceiptGapTo" column="GrGapTo" type="String" length="50" />
+    <property name="AllowExceed" column="AllowExceed" type="Boolean"  />
+    <property name="AllowCreateDetail" column="AllowCreateDetail" type="Boolean"  />
+    <property name="FulfillUnitCount" column="FulfillUC" type="Boolean"  />
+    <property name="ReceiptTemplate" column="RecTemplate" type="String" length="100" />
+    <property name="OrderTemplate" column="OrderTemplate" type="String" length="100" />
+    <property name="HuTemplate" column="HuTemplate" type="String" length="100" />
+    <property name="AsnTemplate" column="AsnTemplate" type="String" length="100" />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="IsShowPrice" column="IsShowPrice" type="Boolean"  />
+    <property name="IsPickFromBin" column="IsPickFromBin" type="Boolean"  />
+    <property name="AllowRepeatlyExceed" column="AllowRepeatlyExceed" type="Boolean"  />
+    <property name="IsShipByOrder" column="IsShipByOrder" type="Boolean"  />
+    <property name="Currency" column="Currency" type="String" length="50" />
+    <property name="CreateUser" column="CreateUser" type="String" length="50" />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
+    <property name="PriceListFrom" column="PriceListFrom" type="String" length="50" />
+    <property name="PriceListTo" column="PriceListTo" type="String" length="50" />
+    <property name="IsAutoCreatePickList" column="IsAutoCreatePL" type="Boolean"  />
+    <property name="NeedInspection" column="NeedInspect" type="Boolean"  />
+    <property name="IsGoodsReceiveFIFO" column="IsGrFifo" type="Boolean"  />
+    <property name="AntiResolveHu" column="AntiResolveHu" type="String" length="50" />
+    <property name="MaxOnlineQty" column="MaxOnlineQty" type="Int32"  />
+    <property name="IsAsnUniqueReceipt" column="IsAsnUniqueReceipt" type="Boolean"  />
+    <property name="Version" column="Version" type="Int32"  />
+    <property name="EventCode" column="EventCode" type="String" length="50" />
+  	</class>
+</hibernate-mapping>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Batch.BatchRunLog, com.Sconit.Entity" table="BatchRunLog" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="BatchJobDetail" column="JobId" class="com.Sconit.Entity.Batch.BatchJobDetail, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="BatchTrigger" column="TriggerId" class="com.Sconit.Entity.Batch.BatchTrigger, com.Sconit.Entity" cascade="none" />
+		<property name="StartTime" column="StartTime" type="DateTime"  />	
+		<property name="EndTime" column="EndTime" type="DateTime"  />	
+		<property name="Status" column="Status" type="String" length="50" />	
+		<property name="Message" column="Message" type="String" length="1000" />	
+  	</class>
+</hibernate-mapping>

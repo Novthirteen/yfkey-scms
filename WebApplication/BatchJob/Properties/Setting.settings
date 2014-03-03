@@ -1,0 +1,84 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OfflineReportGenerationService.Properties" GeneratedClassName="Setting">
+  <Profiles />
+  <Settings>
+    <Setting Name="IntervalValue" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">30</Value>
+    </Setting>
+    <Setting Name="InterruptTimer" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AutoRun" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AutoClose" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ServiceDisplayName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AO.Offline Report Generation Service</Value>
+    </Setting>
+    <Setting Name="ServiceDisplayDescription" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Offline Report Generation Service</Value>
+    </Setting>
+    <Setting Name="SenderAccount" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">spcn.webmaster@spcorp.com</Value>
+    </Setting>
+    <Setting Name="SenderDisplayName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Report Distribution</Value>
+    </Setting>
+    <Setting Name="ApplicationName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">OfflineReportGeneration</Value>
+    </Setting>
+    <Setting Name="ReportTemplateFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">D:\SP.OfflineReportService\Sp.OfflineReportServiceFiles\ReportTemplate\</Value>
+    </Setting>
+    <Setting Name="ReportBatchFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">D:\SP.OfflineReportService\Sp.OfflineReportServiceFiles\ReportBatch\</Value>
+    </Setting>
+    <Setting Name="ZipFileFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">D:\SP.OfflineReportService\Sp.OfflineReportServiceFiles\ZipFile\</Value>
+    </Setting>
+    <Setting Name="RunAtServiceStart" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="IntervalType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Seconds</Value>
+    </Setting>
+    <Setting Name="ConnectionString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Data Source=shadev01;Initial Catalog=SPStaging;Persist Security Info=True;User ID=spetl;Password=sa</Value>
+    </Setting>
+    <Setting Name="ReportDescriptionDisplayRowIndex" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">13</Value>
+    </Setting>
+    <Setting Name="ReportDescriptionDisplayColumnIndex" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="EmailAttachmentSize" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="PortalUploadFileSize" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="EncryptPassword" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PortalUserName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">intlwebprc</Value>
+    </Setting>
+    <Setting Name="PortalUserPassword" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">m30hTtC3CG98uROpOCof1A==</Value>
+    </Setting>
+    <Setting Name="PortalDomain" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">apac</Value>
+    </Setting>
+    <Setting Name="UploadingTimeOutSeconds" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">60</Value>
+    </Setting>
+    <Setting Name="NumOfEmailAttachment" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="TimeOutOfSendMail" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">300000</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

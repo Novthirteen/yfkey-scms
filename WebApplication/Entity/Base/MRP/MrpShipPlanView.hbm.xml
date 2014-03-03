@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.MRP.MrpShipPlanView, com.Sconit.Entity" table="Mrp_ShipPlanView" lazy="false">
+    <composite-id>
+      <key-property name="Flow" column="Flow" type="String" length="50" />
+      <key-property name="Item" column="Item" type="String" length="50" />
+      <key-property name="Uom" column="Uom" type="String" length="5" />
+      <key-property name="UnitCount" column="UC" type="Decimal"  />
+      <key-property name="Location" column="Loc" type="String" length="50" />
+      <key-property name="StartTime" column="StartTime" type="DateTime"  />
+      <key-property name="WindowTime" column="WindowTime" type="DateTime"  />
+      <key-property name="EffectiveDate" column="EffDate" type="DateTime"  />
+    </composite-id>
+    <property name="ItemDescription" column="ItemDesc" type="String" length="510" />
+    <property name="ItemReference" column="ItemRef" type="String" length="50" />
+    <property name="FlowType" column="FlowType" type="String" length="50" />
+    <property name="Qty" column="Qty" type="Decimal"  />
+  </class>
+</hibernate-mapping>

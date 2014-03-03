@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" enableLocalization="true">
+  <siteMapNode url="" title="Sconit Home"  description="Home">
+
+    <!--应用管理-->
+    <siteMapNode url="" title="$Resources:Language,Application"  description="Application" >
+      <siteMapNode url="~/Main.aspx?mid=Security.UserPreference" title="$Resources:Language,Preference"  description="Preference"  />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.GeneralCode" title="$Resources:Language,GeneralCode" description="GeneralCode" />
+      <siteMapNode url="" title="$Resources:Language,Permission"  description="Permission" >
+        <siteMapNode url="~/Main.aspx?mid=Security.User" title="$Resources:Language,User"  description="User" />
+        <siteMapNode url="~/Main.aspx?mid=Security.Role" title="$Resources:Language,Role"  description="Role"  />
+      </siteMapNode>
+      <siteMapNode url="~/Main.aspx?mid=ManageSconit.PrintSetup" title="$Resources:Language,PrintSetup"  description="Print" />
+      <siteMapNode url="~/Main.aspx?mid=ManageSconit.LeanEngine" title="$Resources:Language,LeanEngine"  description="LeanEngine"  />
+      <siteMapNode url="~/Main.aspx?mid=Jobs.Trigger" title="$Resources:Language,Trigger"  description="Trigger"  />
+      <!--<siteMapNode url="" title="$Resources:Language,OfflineTerminal"  description="OfflineTerminal"  >
+                <siteMapNode url="~/Main.aspx?mid=OfflineTerminal.Client" title="$Resources:Language,Client"  description="Client" />
+                <siteMapNode url="~/Main.aspx?mid=OfflineTerminal.Monitor" title="$Resources:Language,TerminalMonitor"  description="TerminalMonitor" />
+                <siteMapNode url="~/Main.aspx?mid=OfflineTerminal.Log" title="$Resources:Language,TerminalLog"  description="TerminalLog" />
+            </siteMapNode>-->
+    </siteMapNode>
+
+    <!--基础数据-->
+    <siteMapNode url="" title="$Resources:Language,MasterData"  description="MasterData" >
+      <siteMapNode url="~/Main.aspx?mid=MasterData.Region" title="$Resources:Language,Region"  description="Region"  />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.Item" title="$Resources:Language,Item"  description="Item"  />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.Location" title="$Resources:Language,Location"  description="Location"  />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.WorkCalendar" title="$Resources:Language,WorkCalendar"  description="WorkCalendar" />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.Uom" title="$Resources:Language,Uom"  description="Uom"  />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.Currency" title="$Resources:Language,Currency"  description="Currency"  />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.Routing" title="$Resources:Language,Routing"  description="Routing"  />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.Employee" title="$Resources:Language,Employee"  description="Employee"  />
+    </siteMapNode>
+
+    <!--计划管理-->
+    <siteMapNode url="" title="$Resources:Language,Planning" description="Planning">
+        <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
+        <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.ProductionSchedule" title="$Resources:Language, ProductionSchedule" description="ProductionSchedule"/>
+        <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.DemandSchedule" title="$Resources:Language, DemandSchedule" description="DemandSchedule"/>
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Information" description="Information">
+        <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.ProductionScheduleReport" title="$Resources:Language, ProductionScheduleReport" description="ProductionScheduleReport"/>
+      </siteMapNode>
+    </siteMapNode>
+
+    <!--供货管理-->
+    <siteMapNode url="" title="$Resources:Language,Procurement" description="Procurement">
+      <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Procurement__mp--ModuleType-Procurement_ModuleSubType-Nml_StatusGroupId-4" title="$Resources:Language,ProcurementOrder"  description="ProcurementOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Procurement__mp--ModuleType-Procurement_ModuleSubType-Nml_StatusGroupId-4_NewItem-true" title="$Resources:Language,NewItemProcurementOrder"  description="NewItemProcurementOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderIssue__mp--ModuleType-Procurement" title="$Resources:Language,OrderIssue"  description="OrderIssue"  />
+        <siteMapNode url="~/Main.aspx?mid=Warehouse.InProcessLocation__mp--ModuleType-Procurement_Action-View" title="$Resources:Language,ASN"  description="ASN"  />
+        <siteMapNode url="~/Main.aspx?mid=Warehouse.InProcessLocation__mp--ModuleType-Procurement_Action-View_AsnType-Gap" title="$Resources:Language,ASNGap "  description="ASNGap"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.GoodsReceipt__mp--ModuleType-Procurement" title="$Resources:Language,GoodsReceipt" description="GoodsReceipt"/>
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Procurement__mp--ModuleType-Procurement_ModuleSubType-Nml_StatusGroupId-1_IsQuick-true__act--NewAction" title="$Resources:Language,RushPO"  description="RushPO"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Procurement__mp--ModuleType-Procurement_ModuleSubType-Rtn_StatusGroupId-1_IsQuick-true__act--NewAction" title="$Resources:Language,GRReturn"  description="GRReturn"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Procurement__mp--ModuleType-Procurement_ModuleSubType-Rtn_StatusGroupId-1_IsQuick-true_IsReject-true__act--NewAction" title="$Resources:Language,GRRejectReturn"  description="GRRejectReturn"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.ReceiptNotes__mp--ModuleType-Procurement_ModuleSubType-Adj" title="$Resources:Language,GRAdjustment"  description="GRAdjustment"  />
+        <siteMapNode url="~/Main.aspx?mid=Finance.PlanBill.PO__mp--ModuleType-PO" title="$Resources:Language,POPlanBill" description="POPlanBill"/>
+        <siteMapNode url="~/Main.aspx?mid=Finance.Bill__mp--ModuleType-PO" title="$Resources:Language,POBill" description="POBill"/>
+        <siteMapNode url="~/Main.aspx?mid=Procurement.RollingForecast" title="$Resources:Language,RollingForecast"  description="RollingForecast"  />
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Information" description="Information">
+        <siteMapNode url="~/Main.aspx?mid=Reports.IntransitDetail__mp--ModuleType-Procurement" title="$Resources:Language,ProcurementIntransitDetail" description="ProcurementIntransitDetail"/>
+        <siteMapNode url="~/Main.aspx?mid=Order.ReceiptNotes__mp--ModuleType-Procurement" title="$Resources:Language,ReceiptNotes" description="ReceiptNotes"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.CSLoc__mp--ModuleType-Procurement" title="$Resources:Language, POPlannedBillDetail" description="POPlannedBillDetail"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.ActBill__mp--ModuleType-Procurement" title="$Resources:Language, ActingPOBillDetail" description="ActingPOBillDetail"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.BillAging__mp--ModuleType-Procurement" title="$Resources:Language, ActingPurchaseBillAging" description="ActingPurchaseBillAging"/>
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
+        <siteMapNode url="~/Main.aspx?mid=MasterData.Supplier" title="$Resources:Language,Supplier"  description="Supplier"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.Procurement" title="$Resources:Language,ProcurementFlow"  description="ProcurementFlow"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.FlowDetail__mp--ModuleType-Procurement" title="$Resources:Language,ProcurementFlowDetail"  description="ProcurementFlowDetail"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.Subconctracting" title="$Resources:Language,SubconctractingFlow"  description="SubconctractingFlow"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.FlowDetail__mp--ModuleType-Subconctracting" title="$Resources:Language,SubconctractingFlowDetail"  description="SubconctractingFlowDetail"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.CustomerGoods" title="$Resources:Language,CustomerGoodsFlow"  description="CustomerGoodsFlow"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.FlowDetail__mp--ModuleType-CustomerGoods" title="$Resources:Language,CustomerGoodsFlowDetail"  description="CustomerGoodsFlowDetail"  />
+        <siteMapNode url="~/Main.aspx?mid=Procurement.PriceList" title="$Resources:Language,ProcurementPriceList"  description="ProcurementPriceList"  />
+        <!--siteMapNode url="~/Main.aspx?mid=Hu.Inbound" title="$Resources:Language,HuInbound"  description="HuInbound"  /-->
+        <!--siteMapNode url="~/Main.aspx?mid=BillInitiation" title="$Resources:Language,ActingPurchaseBillInitiation" description="ActingPurchaseBillInitiation" /-->
+      </siteMapNode>
+    </siteMapNode>
+
+    <!--生产管理-->
+    <siteMapNode url="" title="$Resources:Language,Production"  description="Production" >
+      <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Nml_StatusGroupId-4" title="$Resources:Language,WorkOrder"  description="WorkOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Nml_StatusGroupId-4_NewItem-true" title="$Resources:Language,NewItemWorkOrder"  description="NewItemWorkOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Production.WorkshopScrap" title="$Resources:Language,WorkshopScrap" description="WorkshopScrap" />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Adj_StatusGroupId-1_IsScrap-true__act--NewAction" title="$Resources:Language,ScrapMaterial"  description="ScrapMaterial"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Rwo_StatusGroupId-1_IsScrap-true_IsReuse-true__act--NewAction" title="$Resources:Language,MaterialReuse"  description="MaterialReuse"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.BatchCheckIn__mp--ModuleType-Production_ModuleSubType-Nml" title="$Resources:Language,WOCheckIn" description="WOCheckIn" />
+        <siteMapNode url="~/Main.aspx?mid=Order.BatchPrint__mp--ModuleType-Production_ModuleSubType-Nml" title="$Resources:Language,WOPrint" description="WOPrint" />
+        <siteMapNode url="~/Main.aspx?mid=Order.GoodsReceipt__mp--ModuleType-Production" title="$Resources:Language,WOGR" description="WOGR"/>
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Nml_StatusGroupId-1_IsQuick-true__act--NewAction" title="$Resources:Language,RushWO"  description="RushWO"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Rwo_StatusGroupId-1__act--NewAction" title="$Resources:Language,WOReturn"  description="WOReturn"  />
+        <siteMapNode url="~/Main.aspx?mid=Production.Feed" title="$Resources:Language,Feed"  description="Feed"  />
+        <siteMapNode url="~/Main.aspx?mid=Production.Backflush" title="$Resources:Language,Backflush"  description="Backflush"  />
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Information" description="Information">
+        <siteMapNode url="~/Main.aspx?mid=Order.ReceiptNotes__mp--ModuleType-Production" title="$Resources:Language,ProductionReceiptNotes" description="ProductionReceiptNotes"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.ProdIO" title="$Resources:Language,ProductionIOReport" description="ProductionIOReport"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.ShiftProd" title="$Resources:Language, ShiftProductionReport" description="ShiftProductionReport"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.WoReceipt" title="$Resources:Language, WoReceipt" description="WoReceipt"/>
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
+        <siteMapNode url="~/Main.aspx?mid=MasterData.Bom" title="$Resources:Language,Bom" description="Bom"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.Production" title="$Resources:Language,ProductionFlow"  description="ProductionFlow"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.FlowDetail__mp--ModuleType-Production" title="$Resources:Language,ProductionFlowDetail"  description="ProductionFlowDetail"  />
+      </siteMapNode>
+    </siteMapNode>
+
+    <!--发货管理-->
+    <siteMapNode url="" title="$Resources:Language,Distribution"  description="Distribution" >
+      <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Distribution__mp--ModuleType-Distribution_ModuleSubType-Nml_StatusGroupId-4" title="$Resources:Language,DistributionOrder"  description="DistributionOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Distribution__mp--ModuleType-Distribution_ModuleSubType-Nml_StatusGroupId-4_NewItem-true" title="$Resources:Language,NewItemDistributionOrder"  description="NewItemDistributionOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderIssue__mp--ModuleType-Distribution" title="$Resources:Language,OrderIssue"  description="OrderIssue"  />
+        <siteMapNode url="~/Main.aspx?mid=PickList" title="$Resources:Language,PickList" description="PickList" />
+        <siteMapNode url="~/Main.aspx?mid=PickList.Batch" title="$Resources:Language,BatchPickList" description="BatchPickList" />
+        <siteMapNode url="~/Main.aspx?mid=PickList.BatchStart" title="$Resources:Language,BatchStartPickList" description="BatchStart" />
+        <siteMapNode url="~/Main.aspx?mid=Warehouse.InProcessLocation__mp--ModuleType-Distribution_Action-View" title="$Resources:Language,ASN "  description="ASN"  />
+        <siteMapNode url="~/Main.aspx?mid=Warehouse.InProcessLocation__mp--ModuleType-Distribution_Action-View_AsnType-Gap" title="$Resources:Language,ASNGap "  description="ASNGap"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.GoodsReceipt__mp--ModuleType-Distribution" title="$Resources:Language,GIConfirm"  description="GIConfirm"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Distribution__mp--ModuleType-Distribution_ModuleSubType-Nml_StatusGroupId-1_IsQuick-true__act--NewAction" title="$Resources:Language,RushDO"  description="RushDO"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Distribution__mp--ModuleType-Distribution_ModuleSubType-Rtn_StatusGroupId-1_IsQuick-true__act--NewAction" title="$Resources:Language,ShipReturn"  description="ShipReturn"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Distribution__mp--ModuleType-Distribution_ModuleSubType-Adj_StatusGroupId-1_IsQuick-true__act--NewAction" title="$Resources:Language,ShipAdjustment"  description="ShipAdjustment"  />
+        <siteMapNode url="~/Main.aspx?mid=Finance.PlanBill.SO__mp--ModuleType-SO" title="$Resources:Language,SOPlanBill" description="SOPlanBill"/>
+        <siteMapNode url="~/Main.aspx?mid=Finance.Bill__mp--ModuleType-SO" title="$Resources:Language,SOBill" description="SOBill" />
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Information" description="Information">
+        <siteMapNode url="~/Main.aspx?mid=Reports.IntransitDetail__mp--ModuleType-Distribution" title="$Resources:Language,ShipmentMonitoring" description="ShipmentMonitoring"/>
+        <siteMapNode url="~/Main.aspx?mid=Order.ReceiptNotes__mp--ModuleType-Distribution" title="$Resources:Language,DistributionReceiptNotes" description="DistributionReceiptNotes"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.CSLoc__mp--ModuleType-Distribution" title="$Resources:Language, SOPlannedBillDetail" description="SOPlannedBillDetail"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.ActBill__mp--ModuleType-Distribution" title="$Resources:Language,ActingSalesBillDetail" description="ActingSalesBillDetail"/>
+        <siteMapNode url="~/Main.aspx?mid=Reports.BillAging__mp--ModuleType-Distribution" title="$Resources:Language,ActingSalesBillAging" description="ActingSalesBillAging"/>
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
+        <siteMapNode url="~/Main.aspx?mid=MasterData.Customer" title="$Resources:Language,Customer"  description="Customer"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.Distribution" title="$Resources:Language, DistributionFlow" description="DistributionFlow"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.FlowDetail__mp--ModuleType-Distribution" title="$Resources:Language,DistributionFlowDetail"  description="DistributionFlowDetail"  />
+        <siteMapNode url="~/Main.aspx?mid=Distribution.PriceList" title="$Resources:Language,DistributionPriceList" description="DistributionPriceList"  />
+        <!--siteMapNode url="~/Main.aspx?mid=Finance.ActingSalesBillInitiation" title="$Resources:Language,ActingSalesBillInitiation" description="ActingSalesBillInitiation" /-->
+      </siteMapNode>
+    </siteMapNode>
+
+    <!--库存管理-->
+    <siteMapNode url="" title="$Resources:Language,Inventory"  description="Inventory" >
+      <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
+        <siteMapNode url="~/Main.aspx?mid=Inventory.PrintHu__mp--ModuleType-Region" title="$Resources:Language, GoodsUniting" description="GoodsUniting"  />
+        <siteMapNode url="~/Main.aspx?mid=Warehouse.PutAway" title="$Resources:Language,PutAway" description="PutAway" />
+        <siteMapNode url="~/Main.aspx?mid=Warehouse.Pickup" title="$Resources:Language,Pickup" description="Pickup" />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.MiscOrder.__mp--ModuleType-Gr" title="$Resources:Language,InvIn"  description="InvIn"  />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.MiscOrder.__mp--ModuleType-Gi" title="$Resources:Language,InvOut" description="InvOut"  />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.Repack__mp--Type-Repack" title="$Resources:Language, Repack" description="Repack"  />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.Repack__mp--Type-Devanning" title="$Resources:Language, Devanning" description="Devanning"  />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.InspectOrder" title="$Resources:Language,InspectionOrder" description="InspectionOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.Stocktaking" title="$Resources:Language,CycleCount" description="CycleCount"  />
+        <!--<siteMapNode url="~/Main.aspx?mid=Inventory.InvAdjust" title="$Resources:Language,InvAdjustment" description="InvAdjustment"  />-->
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Transfer__mp--ModuleType-Transfer_ModuleSubType-Rtn_StatusGroupId-1_IsQuick-true_IsReject-true__act--NewAction" title="$Resources:Language,RejectReuse" description="RejectReuse"  />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.InspectOrder.PendingInspectOrder" title="$Resources:Language, PendingInspectOrder" description="PendingInspectOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.UnqualifiedGoods" title="$Resources:Language, PrintUnqualifiedGoods" description="PrintUnqualifiedGoods"  />
+        <siteMapNode url="~/Main.aspx?mid=Inventory.BatchTransfer" title="$Resources:Language, BatchTransfer" description="BatchTransfer"  />
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Information" description="Information">
+        <!--siteMapNode url="~/Main.aspx?mid=Inventory.RepackNotes" title="$Resources:Language,RepackNotes"  description="RepackNotes"  /-->
+        <siteMapNode url="~/Main.aspx?mid=Reports.LocInvQuery" title="$Resources:Language, LocInvQuery" description="LocInvQuery"></siteMapNode>
+        <siteMapNode url="~/Main.aspx?mid=Reports.InvDetail__mp--ModuleType-InvDet" title="$Resources:Language,InventoryDetail"  description="InventoryDetail"  />
+        <siteMapNode url="~/Main.aspx?mid=Reports.LocTrans" title="$Resources:Language,InventoryTrans" description="InventoryTrans"  />
+        <siteMapNode url="~/Main.aspx?mid=Reports.InvDetail__mp--ModuleType-HisInv" title="$Resources:Language,HistoricalInventory" description="HistoricalInventory"  />
+        <siteMapNode url="~/Main.aspx?mid=Reports.LocAging" title="$Resources:Language,InvAging" description="InvAging"  />
+        <siteMapNode url="~/Main.aspx?mid=Reports.InvTurn" title="$Resources:Language,InvTurnRate" description="InvTurnRate"  />
+        <siteMapNode url="~/Main.aspx?mid=Reports.InvIOB" title="$Resources:Language,InventoryIOB"  description="InventoryIOB"  />
+        <siteMapNode url="~/Main.aspx?mid=Reports.Inventory" title="$Resources:Language,ViewInventory" description="ViewInventory" />
+        <siteMapNode url="~/Main.aspx?mid=Reports.CycCntDiff" title="$Resources:Language,CycleCountDiff" description="CycleCountDiff" />
+        <siteMapNode url="~/Main.aspx?mid=Reports.WorkshopFinshGoods" title="$Resources:Language,WorkshopFinshGoods" description="WorkshopFinshGoods" />
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
+        <siteMapNode url="~/Main.aspx?mid=Flow.Transfer" title="$Resources:Language, TransferFlow" description="TransferFlow"  />
+        <siteMapNode url="~/Main.aspx?mid=Flow.FlowDetail__mp--ModuleType-Transfer" title="$Resources:Language,TransferFlowDetail"  description="TransferFlowDetail"  />
+        <!--siteMapNode url="~/Main.aspx?mid=~/Inventory/CheckSheet/InvIntial.aspx" title="$Resources:Language, InvIntiation"  description="InvIntiation"  /-->
+      </siteMapNode>
+    </siteMapNode>
+
+    <!--运输管理-->
+    <siteMapNode url="" title="$Resources:Language,Transportation"  description="Transportation" >
+      <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
+        <siteMapNode url="~/Main.aspx?mid=Transportation.TransportationOrder" title="$Resources:Language,TransportationOrder"  description="TransportationOrder"  />
+        <siteMapNode url="~/Main.aspx?mid=Transportation.TransportationFeesApply" title="$Resources:Language,TransportationFeesApply"  description="TransportationFeesApply"  />
+        <siteMapNode url="~/Main.aspx?mid=Transportation.Bill" title="$Resources:Language,TransportationBill" description="TransportationBill"/>
+        <siteMapNode url="~/Main.aspx?mid=Transportation.ValuateOrder" title="$Resources:Language,ValuateOrder" description="ValuateOrder"/>
+        <siteMapNode url="~/Main.aspx?mid=Transportation.TransportationOrderQuery" title="$Resources:Language,TranOrderQuery" description="TranOrderQuery"/>
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Information" description="Information">
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
+        <siteMapNode url="~/Main.aspx?mid=Transportation.Carrier" title="$Resources:Language,Carrier"  description="Carrier"  />
+        <siteMapNode url="~/Main.aspx?mid=Transportation.Vehicle" title="$Resources:Language,Vehicle"  description="Vehicle"  />
+        <siteMapNode url="~/Main.aspx?mid=Transportation.TransportationAddress" title="$Resources:Language,TransportationAddress"  description="TransportationAddress"  />
+        <siteMapNode url="~/Main.aspx?mid=Transportation.TransportationRoute" title="$Resources:Language,TransportationRoute"  description="TransportationRoute"  />
+        <siteMapNode url="~/Main.aspx?mid=Transportation.TransportPriceList" title="$Resources:Language,TransportPriceList"  description="TransportPriceList"  />
+        <siteMapNode url="~/Main.aspx?mid=Transportation.Expense" title="$Resources:Language,Expense"  description="Expense"  />
+      </siteMapNode>
+    </siteMapNode>
+    <!--Mes-->
+    <siteMapNode url="" title="$Resources:Language,Mes"  description="Mes" >
+      <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
+        <siteMapNode url="~/Main.aspx?mid=Mes.ByMaterial" title="$Resources:Language,ByMaterial"  description="ByMaterial"  />
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Information" description="Information">
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
+        <siteMapNode url="~/Main.aspx?mid=Mes.Shelf" title="$Resources:Language,Shelf"  description="Shelf"  />
+        <siteMapNode url="~/Main.aspx?mid=Mes.ProductLineUser" title="$Resources:Language,ProductLineUser"  description="ProductLineUser"  />
+      </siteMapNode>
+    </siteMapNode>
+
+    <!--目视管理-->
+    <siteMapNode url="" title="$Resources:Language,Visualization"  description="Visualization" >
+      <siteMapNode url="~/Main.aspx?mid=MainPage" title="$Resources:Language,OrderMonitoring" description="OrderMonitoring" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.SupplyChainRouting" title="$Resources:Language,SupplyChainRouting" description="SupplyChainRouting"  />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.InvVisualBoard" title="$Resources:Language,InvVisualBoard" description="InvVisualBoard"  />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.GoodsTraceability" title="$Resources:Language,GoodsTraceability" description="GoodsTraceability" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.LocationBin" title="$Resources:Language,LocationBin" description="LocationBin"  />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.NamedQueries" title="$Resources:Language,NamedQueries" description="NamedQueries" />
+      <siteMapNode url="~/Main.aspx?mid=MasterData.Item.Flow" title="$Resources:Language,ViewItemFlow" description="ViewItemFlow" />
+      <!--<siteMapNode url="~/Main.aspx?mid=Visualization.PickListDetail" title="$Resources:Language,ViewPickListDetail" description="ViewPickListDetail" />-->
+      <siteMapNode url="~/Main.aspx?mid=Visualization.InspectDetail" title="$Resources:Language,ViewInspectDetail" description="ViewInspectDetail" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.InprocessLocationDetail" title="$Resources:Language,ViewInprocessDetail" description="ViewInprocessDetail" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.DssImportHistory" title="$Resources:Language,ViewDssImportHistory" description="ViewDssImportHistory" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.NoSynchronizedData" title="$Resources:Language,ViewNoSynchronizedData" description="ViewNoSynchronizedData" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.CompletedWithoutStorage" title="$Resources:Language,ViewCompletedWithoutStorage" description="ViewCompletedWithoutStorage" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.UnfinishedPickList" title="$Resources:Language,ViewUnfinishedPickList" description="ViewUnfinishedPickList" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.OrderEfficiency" title="$Resources:Language,ViewOrderEfficiency" description="ViewOrderEfficiency" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.ProductLineInprocessLocation" title="$Resources:Language,ViewProductLineInprocessLocation" description="ViewProductLineInprocessLocation" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.FlowTrack" title="$Resources:Language,FlowTrack" description="FlowTrack" />
+      <siteMapNode url="~/Main.aspx?mid=Visualization.FlowDetailTrack" title="$Resources:Language,FlowDetailTrack" description="FlowDetailTrack" />
+    </siteMapNode>
+
+    <!--供应商管理-->
+    <siteMapNode url="" title="$Resources:Language,Supplier" description="Supplier">
+      <siteMapNode url="~/Main.aspx?mid=Inventory.PrintHu__mp--ModuleType-Supplier" title="$Resources:Language, SupplierHuPrint" description="SupplierHuPrint"  />
+      <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Procurement__mp--ModuleType-Distribution_ModuleSubType-Nml_StatusGroupId-6_IsSupplier-true" title="$Resources:Language,ViewProcurementOrder"  description="ViewProcurementOrder"  />
+      <siteMapNode url="~/Main.aspx?mid=Order.OrderIssue__mp--ModuleType-Distribution_IsSupplier-true" title="$Resources:Language,OrderIssue"  description="OrderIssue"  />
+      <siteMapNode url="~/Main.aspx?mid=Warehouse.InProcessLocation__mp--ModuleType-Distribution_Action-View_IsSupplier-true" title="$Resources:Language,ASN "  description="ASN"  />
+      <siteMapNode url="~/Main.aspx?mid=Order.ReceiptNotes__mp--ModuleType-Distribution_IsSupplier-true" title="$Resources:Language,ReceiptNotes" description="ReceiptNotes"/>
+      <siteMapNode url="~/Main.aspx?mid=Finance.KPBill" title="$Resources:Language,POBill" description="POBill"/>
+      <siteMapNode url="~/Main.aspx?mid=Finance.PlanBill.PO__mp--ModuleType-PO_IsSupplier-true" title="$Resources:Language,POPlanBill" description="POPlanBill"/>
+      <siteMapNode url="~/Main.aspx?mid=Warehouse.InProcessLocation__mp--ModuleType-Procurement_Action-View_IsCustomer-true" title="$Resources:Language,CustomerASN"  description="ASN"  />
+      <siteMapNode url="~/Main.aspx?mid=Procurement.RollingForecast__mp--IsSupplier-true" title="$Resources:Language,RollingForecast"  description="RollingForecast"  />
+      <siteMapNode url="~/Main.aspx?mid=Transportation.Bill__mp--IsSupplier-true" title="$Resources:Language,TransportationBill" description="TransportationBill"/>
+
+    </siteMapNode>
+  </siteMapNode>
+</siteMap>

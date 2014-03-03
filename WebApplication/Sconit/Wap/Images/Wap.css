@@ -1,0 +1,44 @@
+﻿*
+{
+    margin: 0;
+    padding: 0;
+}
+body
+{
+    font-size: 13px;
+    line-height: 1.5;
+    font-family: 宋体, Tahoma ;
+}
+a:link, a:visited
+{
+    color: #0044DD;
+}
+a img
+{
+    border: 0 none;
+}
+h1, h2, h3, h4, h5
+{
+    font-size: 13px;
+    font-weight: normal;
+}
+hr
+{
+    border-color: #73C0FC -moz-use-text-color -moz-use-text-color;
+    border-right: 0 none;
+    border-style: solid none none;
+    border-width: 1px 0 0;
+    height: 1px;
+    overflow: hidden;
+}
+table
+{
+    color: #333333;
+}
+.nav
+{
+    background-color: #FDF2DC;
+    border-color: #FED585;
+    border-style: solid;
+    border-width: 1px 0;
+}

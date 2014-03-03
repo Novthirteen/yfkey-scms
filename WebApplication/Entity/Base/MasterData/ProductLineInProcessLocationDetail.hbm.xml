@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ProductLineInProcessLocationDetail, com.Sconit.Entity" table="ProdLineIp" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="ProductLine" column="ProdLine" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
+		<property name="Operation" column="Op" type="Int32"  />	
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="HuId" column="HuId" type="String" length="50" />	
+		<property name="LotNo" column="LotNo" type="String" length="50" />	
+		<property name="Qty" column="Qty" type="Decimal"  />
+    <property name="BackflushQty" column="BackflushQty" type="Decimal"  />
+    <property name="IsConsignment" column="IsCS" type="Boolean"  />	
+		<!--<many-to-one name="PlannedBill" column="PlanBillId" class="com.Sconit.Entity.MasterData.PlannedBill, com.Sconit.Entity" cascade="none" />-->
+    <property name="PlannedBill" column="PlanBillId" type="Int32"  />
+		<property name="Status" column="Status" type="String" length="50" />
+    <many-to-one name="LocationFrom" column="LocFrom" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />    
+  	</class>
+</hibernate-mapping>

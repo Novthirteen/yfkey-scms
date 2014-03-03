@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.PriceListDetail, com.Sconit.Entity" table="PriceListDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="PriceList" column="PriceList" class="com.Sconit.Entity.MasterData.PriceList, com.Sconit.Entity" cascade="none" />
+		<property name="StartDate" column="StartDate" type="DateTime"  />	
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="EndDate" column="EndDate" type="DateTime" />	
+		<many-to-one name="Currency" column="Currency" class="com.Sconit.Entity.MasterData.Currency, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
+		<property name="UnitPrice" column="UnitPrice" type="Decimal"  />	
+		<property name="TaxCode" column="TaxCode" type="String" length="50" />	
+		<property name="IsIncludeTax" column="IsIncludeTax" type="Boolean"  />
+    <property name="IsProvisionalEstimate" column="IsProvEst" type="Boolean"  />
+  </class>
+</hibernate-mapping>

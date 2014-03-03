@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.PlannedBill, com.Sconit.Entity" table="PlanBill" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<!--<many-to-one name="OrderHead" column="OrderNo" class="com.Sconit.Entity.MasterData.OrderHead, com.Sconit.Entity" cascade="none" />-->
+    <property name="OrderNo" column="OrderNo" type="String" length="50" />
+    <property name="ExternalReceiptNo" column="ExtRecNo" type="String" length="50" />
+    <property name="ReceiptNo" column="RecNo" type="String" length="50" />
+		<property name="TransactionType" column="TransType" type="String" length="50" />	
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="BillAddress" column="BillAddr" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+		<property name="SettleTerm" column="SettleTerm" type="String" length="50" />	
+		<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
+    <property name="UnitCount" column="UC" type="Decimal" />
+		<property name="PlannedQty" column="PlanQty" type="Decimal"  />	
+		<property name="ActingQty" column="ActQty" type="Decimal"  />
+    <property name="UnitQty" column="UnitQty" type="Decimal"  />
+    <property name="UnitPrice" column="UnitPrice" type="Decimal"  />	
+		<many-to-one name="PriceList" column="PriceList" class="com.Sconit.Entity.MasterData.PriceList, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Currency" column="Currency" class="com.Sconit.Entity.MasterData.Currency, com.Sconit.Entity" cascade="none" />
+		<property name="IsIncludeTax" column="IsIncludeTax" type="Boolean"  />	
+		<property name="TaxCode" column="TaxCode" type="String" length="50" />
+    <property name="PlannedAmount" column="PlanAmount" type="Decimal"  />
+    <property name="ActingAmount" column="ActAmount" type="Decimal"  />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />	
+		<many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="IsProvisionalEstimate" column="IsProvEst" type="Boolean"  />
+    <property name="IsAutoBill" column="IsAutoBill" type="Boolean"  />
+    <property name="LotNo" column="LotNo" type="String" length="50" />
+    <property name="HuId" column="HuId" type="String" length="50" />
+    <property name="LocationFrom" column="LocFrom" type="String" length="50" />
+    <property name="IpNo" column="IpNo" type="String" length="50" />
+    <property name="ReferenceItemCode" column="RefItemCode" type="String" length="50" />
+    <property name="PartyFrom" column="PartyFrom" type="String" length="50" />
+    <property name="EffectiveDate" column="EffDate" type="DateTime"  />
+  	</class>
+</hibernate-mapping>

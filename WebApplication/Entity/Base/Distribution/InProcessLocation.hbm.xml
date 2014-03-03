@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Distribution.InProcessLocation, com.Sconit.Entity" table="IpMstr" lazy="false">
+		<id name="IpNo" column="IpNo" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+    <property name="OrderType" column="OrderType" type="String" length="50" />
+		<property name="CurrentOperation" column="CurrOp" type="Int32" />
+    <property name="CurrentActivity" column="CurrAct" type="String" length="50" />
+    <many-to-one name="PartyFrom" column="PartyFrom" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="PartyTo" column="PartyTo" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="ShipFrom" column="ShipFrom" class="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="ShipTo" column="ShipTo" class="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" cascade="none" />
+		<property name="DockDescription" column="DockDesc" type="String" length="50" />
+		<property name="Type" column="Type" type="String" length="50" />
+		<property name="Status" column="Status" type="String" length="50" />
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />	
+		<many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="GapReceipt" column="GapRecNo" class="com.Sconit.Entity.MasterData.Receipt, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="Flow" column="Flow" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
+    <property name="IsShipScanHu" column="IsShipScan" type="Boolean"  />
+    <property name="IsDetailContainHu" column="IsDetHasHu" type="Boolean"  />
+    <property name="IsReceiptScanHu" column="IsRecScan" type="Boolean"  />
+    <property name="IsAutoReceive" column="IsAutoReceive" type="Boolean"  />
+    <property name="CompleteLatency" column="CompleteLatency" type="Decimal" />
+    <property name="GoodsReceiptGapTo" column="GrGapTo" type="String" length="50" />
+    <property name="AsnTemplate" column="AsnTemplate" type="String" length="100" />
+    <property name="ReceiptTemplate" column="RecTemplate" type="String" length="100" />
+    <property name="HuTemplate" column="HuTemplate" type="String" length="100" />
+    <property name="ReferenceOrderNo" column="RefOrderNo" type="String" length="50" />
+    <property name="Disposition" column="Disposition" type="String" length="100" />
+    <property name="IsAsnUniqueReceipt" column="IsAsnUniqueReceipt" type="Boolean"  />
+    <property name="IsReferenced" column="IsReferenced" type="Boolean"  />
+     <property name="PrintCount" column="PrintCount" type="Int32"  />
+    <bag name="InProcessLocationDetails" table="IpDet" inverse="true" lazy="true">
+			<key column="IpNo" />
+			<one-to-many class="com.Sconit.Entity.Distribution.InProcessLocationDetail, com.Sconit.Entity" />
+		</bag>
+    <bag name="InProcessLocationTracks" table="IpTrack" inverse="true" lazy="true">
+      <key column="IpNo" />
+      <one-to-many class="com.Sconit.Entity.Distribution.InProcessLocationTrack, com.Sconit.Entity" />
+    </bag>
+    <property name="IsPrinted" column="IsPrinted" type="Boolean"  />
+    <property name="NeedPrintAsn" column="NeedPrintAsn" type="Boolean"  />
+    <property name="NeedPrintReceipt" column="NeedPrintReceipt" type="Boolean"  />
+    <property name="DepartTime" column="DepartTime" type="DateTime"  />
+    <property name="ArriveTime" column="ArriveTime" type="DateTime"  />
+  	</class>
+</hibernate-mapping>

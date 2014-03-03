@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+	<class name="com.Sconit.Entity.MRP.CustomerSchedule, com.Sconit.Entity" table="CustScheduleMstr" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+			<generator class="identity" />
+		</id>
+		<property name="ReferenceScheduleNo" column="RefScheduleNo" type="String" length="50" />
+		<property name="Flow" column="Flow" type="String" length="50" />
+		<property name="Status" column="Status" type="String" length="50" />
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />
+		<property name="CreateUser" column="CreateUser" type="String" length="50" />
+		<property name="ReleaseDate" column="ReleaseDate" type="DateTime"  />
+		<property name="ReleaseUser" column="ReleaseUser" type="String" length="50" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+		<property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
+		<bag name="CustomerScheduleDetails" table="CustScheduleDet" inverse="true" lazy="true" order-by="Id asc">
+			<key column="ScheduleId" />
+			<one-to-many class="com.Sconit.Entity.MRP.CustomerScheduleDetail, com.Sconit.Entity" />
+		</bag>
+	</class>
+</hibernate-mapping>

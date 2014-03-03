@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CADA5382-5233-4D03-9F4F-655382538AB1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>com.Sconit.Entity</RootNamespace>
+    <AssemblyName>com.Sconit.Entity</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="NHibernate, Version=1.2.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DllLib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="**\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\Batch\BatchJobDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Batch\BatchJobParameter.hbm.xml" />
+    <EmbeddedResource Include="Base\Batch\BatchRunLog.hbm.xml" />
+    <EmbeddedResource Include="Base\Batch\BatchTrigger.hbm.xml" />
+    <EmbeddedResource Include="Base\Batch\BatchTriggerParameter.hbm.xml" />
+    <EmbeddedResource Include="Base\Distribution\CustomerRollingPlan.hbm.xml" />
+    <EmbeddedResource Include="Base\Distribution\CustomerRollingPlanDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Distribution\InProcessLocation.hbm.xml" />
+    <EmbeddedResource Include="Base\Distribution\InProcessLocationDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Distribution\InProcessLocationTrack.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssExportHistory.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssExportHistoryDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssFtpControl.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssImportHistory.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssInboundControl.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssObjectMapping.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssOutboundControl.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssSystem.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ActingBill.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Address.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Bill.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\BillDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\BillTransaction.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Bom.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\BomDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Client.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ClientLog.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ClientMonitor.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ClientOrderDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ClientOrderHead.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ClientWorkingHours.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\CodeMaster.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Currency.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\CycleCount.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\CycleCountDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\CycleCountResult.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Employee.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\EntityPreference.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Favorites.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\FileUpload.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\FinanceCalendar.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Flow.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\FlowBinding.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\FlowDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\FlowDetailTrack.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\FlowPlan.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\FlowTrack.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Hu.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\HuOdd.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\InspectOrder.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\InspectOrderDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\InspectResult.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Item.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ItemKit.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ItemReference.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\KPItem.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\KPOrder.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Location.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\LocationDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\LocationLotDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\LocationTransaction.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\MiscOrder.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\MiscOrderDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\NamedQuery.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\NumberControl.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\OrderBinding.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\OrderDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\OrderHead.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\OrderLocationTransaction.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\OrderOperation.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\OrderPlannedBackflush.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Party.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Permission.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\PermissionCategory.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\PickList.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\PickListDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\PickListResult.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\PlannedBill.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\PriceList.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\PriceListDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ProductLineInProcessLocationDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Receipt.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ReceiptDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ReceiptInProcessLocation.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Repack.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\RepackDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Role.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\RolePermission.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\RollingForecast.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Routing.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\RoutingDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Shift.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ShiftDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ShiftPlanSchedule.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\SpecialTime.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\StorageArea.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\StorageBin.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\SubjectList.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Uom.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\UomConversion.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\User.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\UserPermission.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\UserPreference.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\UserRole.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\WorkCenter.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\Workday.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\WorkdayShift.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\WorkingHours.hbm.xml" />
+    <EmbeddedResource Include="Base\Mes\ByMaterial.hbm.xml" />
+    <EmbeddedResource Include="Base\Mes\MesBom.hbm.xml" />
+    <EmbeddedResource Include="Base\Mes\MesBomDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Mes\ProductLineUser.hbm.xml" />
+    <EmbeddedResource Include="Base\Mes\Shelf.hbm.xml" />
+    <EmbeddedResource Include="Base\Mes\ShelfItem.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\CustomerSchedule.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\CustomerScheduleDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\ExpectTransitInventory.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\ExpectTransitInventoryView.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\MrpReceivePlan.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\MrpRunLog.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\MrpShipPlan.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\MrpShipPlanView.hbm.xml" />
+    <EmbeddedResource Include="Base\Procurement\AutoOrderTrack.hbm.xml" />
+    <EmbeddedResource Include="Base\Procurement\ItemFlowPlan.hbm.xml" />
+    <EmbeddedResource Include="Base\Procurement\ItemFlowPlanDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Procurement\ItemFlowPlanTrack.hbm.xml" />
+    <EmbeddedResource Include="Base\Procurement\OrderTracer.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\Expense.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportationActBill.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportationAddress.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportationBill.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportationBillDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportationOrder.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportationOrderDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportationRoute.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportationRouteDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportPriceList.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\TransportPriceListDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\Transportation\Vehicle.hbm.xml" />
+    <EmbeddedResource Include="Base\View\ActingBillView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\BillAgingView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\CompletedWithoutStorageView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\FlowView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\InProcessLocationDetailTrackView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\InProcessLocationDetailView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\InspectDetailView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\InventoryAgingView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\LeanEngineView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\LocationBin.hbm.xml" />
+    <EmbeddedResource Include="Base\View\LocationBinDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\View\LocationBinItemDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\View\LocationLotDetailView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\LocationTransactionView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\OrderDetailView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\OrderLocTransView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\OrderView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\PlannedBillView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\SupllierLocationView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\UnqualifiedGoodsView.hbm.xml" />
+    <EmbeddedResource Include="Base\View\WoReceiptView.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MasterData\ProjectMstr.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\View\LocInvQueryView.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)$(SolutionName)\bin</PostBuildEvent>
+  </PropertyGroup>
+</Project>

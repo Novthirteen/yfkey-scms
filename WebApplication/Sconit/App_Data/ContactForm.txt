@@ -1,0 +1,18 @@
+﻿<pre>
+Hi,
+A user has left the following feedback at the site:
+
+Company name:    ##Company##
+
+Account:         ##Account##
+Name:            ##Name##
+E-mail address:  ##Email##
+Phone:           ##Phone##
+Mobile:          ##Mobile##
+Address:         ##Address##
+
+Url referrer:    <a href="##UrlReferrer##">##UrlReferrer##</a>
+Type:            ##Type##
+</pre>
+Comments:<br />
+##Comments##<br />

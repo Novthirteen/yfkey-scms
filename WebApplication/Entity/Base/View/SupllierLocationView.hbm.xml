@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.SupllierLocationView, com.Sconit.Entity" table="SupllierLocationView" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="Qty" column="Qty" type="Decimal"  />	
+		<many-to-one name="Location" column="Location" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="PartyFrom" column="PartyFrom" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="PartyTo" column="PartyTo" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.ReceiptDetail, com.Sconit.Entity" table="ReceiptDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Receipt" column="RecNo" class="com.Sconit.Entity.MasterData.Receipt, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="OrderLocationTransaction" column="OrderLocTransId" class="com.Sconit.Entity.MasterData.OrderLocationTransaction, com.Sconit.Entity" cascade="none" />
+    <property name="HuId" column="HuId" type="String" />
+    <property name="LotNo" column="LotNo" type="String" />
+    <!--<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />-->
+    <property name="IsConsignment" column="IsCS" type="Boolean"  />
+    <!--<many-to-one name="PlannedBill" column="PlanBillId" class="com.Sconit.Entity.MasterData.PlannedBill, com.Sconit.Entity" cascade="none" />-->
+    <property name="PlannedBill" column="PlanBillId" type="Int32" />
+    <property name="ShippedQty" column="ShipQty" type="Decimal" />
+    <property name="ReceivedQty" column="RecQty" type="Decimal" />	
+		<property name="RejectedQty" column="RejQty" type="Decimal" />	
+		<property name="ScrapQty" column="ScrapQty" type="Decimal" />	
+  	</class>
+</hibernate-mapping>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.OrderView, com.Sconit.Entity" table="OrderView" lazy="false">
+		<id name="OrderNo" column="OrderNo" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Date" column="Date" type="DateTime" />	
+		<property name="PickListNo" column="PLNo" type="String" length="50" />	
+		<property name="Flow" column="Flow" type="String" length="50" />	
+		<property name="OrderViewType" column="OrderViewType" type="String" length="6" />	
+		<property name="Status" column="Status" type="String" length="50" />	
+		<many-to-one name="PartyTo" column="PartyTo" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<property name="StartDate" column="StartDate" type="DateTime"  />	
+		<many-to-one name="StartUser" column="StartUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="CompleteDate" column="CompleteDate" type="DateTime"  />	
+		<many-to-one name="CompleteUser" column="CompleteUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

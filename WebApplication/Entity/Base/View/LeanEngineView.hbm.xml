@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.View.LeanEngineView, com.Sconit.Entity" table="LeanEngineView" lazy="false">
+        <id name="FlowDetId" column="FlowDetId" type="Int32" unsaved-value="0" >
+            <generator class="assigned" />
+        </id>
+        <property name="Flow" column="Flow" type="String" length="50" />
+        <property name="IsAutoCreate" column="IsAutoCreate" type="Boolean"  />
+        <property name="LocFrom" column="LocFrom" type="String" length="50" />
+        <property name="LocTo" column="LocTo" type="String" length="50" />
+        <property name="Item" column="Item" type="String" length="50" />
+        <property name="Uom" column="Uom" type="String" length="5" />
+        <property name="UC" column="UC" type="Decimal"  />
+        <property name="HuLotSize" column="HuLotSize" type="Int32"  />
+        <property name="Bom" column="Bom" type="String" length="50" />
+        <property name="SafeStock" column="SafeStock" type="Decimal"  />
+        <property name="MaxStock" column="MaxStock" type="Decimal"  />
+        <property name="MinLotSize" column="MinLotSize" type="Decimal"  />
+        <property name="OrderLotSize" column="OrderLotSize" type="Decimal"  />
+        <property name="BatchSize" column="BatchSize" type="Decimal"  />
+        <property name="RoundUpOpt" column="RoundUpOpt" type="String" length="50" />
+        <property name="Type" column="Type" type="String" length="50" />
+        <property name="PartyFrom" column="PartyFrom" type="String" length="50" />
+        <property name="PartyTo" column="PartyTo" type="String" length="50" />
+        <property name="FlowStrategy" column="FlowStrategy" type="String" length="50" />
+        <property name="LeadTime" column="LeadTime" type="Decimal"  />
+        <property name="EmTime" column="EmTime" type="Decimal"  />
+        <property name="MaxCirTime" column="MaxCirTime" type="Decimal"  />
+        <property name="WinTime1" column="WinTime1" type="String" length="255" />
+        <property name="WinTime2" column="WinTime2" type="String" length="255" />
+        <property name="WinTime3" column="WinTime3" type="String" length="255" />
+        <property name="WinTime4" column="WinTime4" type="String" length="255" />
+        <property name="WinTime5" column="WinTime5" type="String" length="255" />
+        <property name="WinTime6" column="WinTime6" type="String" length="255" />
+        <property name="WinTime7" column="WinTime7" type="String" length="255" />
+        <property name="NextOrderTime" column="NextOrderTime" type="DateTime"  />
+        <property name="NextWinTime" column="NextWinTime" type="DateTime"  />
+        <property name="WeekInterval" column="WeekInterval" type="Int32"  />
+    </class>
+</hibernate-mapping>

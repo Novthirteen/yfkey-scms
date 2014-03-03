@@ -1,0 +1,167 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="C#" Description="Generate the entity class." %>
+<%@ Property Name="AssemblyName" Type="String" Default="com.Sconit" Category="EntityClass" Description="The assembly that contains the entity class." %>
+<%@ Property Name="EntityClassName" Type="String" Category="EntityClass" Description="The entity class name." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The module group which contains the entity, for example, Security." %>
+<%@ Property Name="Mapping" Type="com.Sconit.CodeSmith.MappingProperty" Category="Mapping" Description="The O/R mapping settings." %>
+<%@ Assembly Name="com.Sconit.CodeSmith" %>
+<%@ Import Namespace="com.Sconit.CodeSmith" %>
+<%@ Import Namespace="System.Text" %>
+<script runat="template">
+  public string GenLowerCasePropertyName(string classPropertyName)
+  {
+    if (classPropertyName.Length == 0)
+      return string.Empty;
+      
+    char firstChar = classPropertyName[0];
+    firstChar = char.ToLower(firstChar);
+    
+    return firstChar + classPropertyName.Substring(1);
+  }
+  
+  public string GenPKPara(string perfix, string suffix, string paraDivision, bool inculdeType, bool includeName, string typeNameDivision, bool isNameLowerCase, bool isEntity2Pk, string entity2PkDivision)
+  {
+    StringBuilder pkPara = new StringBuilder();
+    int i = 0;
+    foreach (MappingInfo mappingInfo in this.Mapping.MappingPKInfoCollection)
+    {
+      if (i == 0)
+      {
+        pkPara.Append(perfix + (inculdeType ? GetDataType(mappingInfo, isEntity2Pk) + typeNameDivision : string.Empty) 
+          + (includeName ? GetClassPropertyName(mappingInfo, isNameLowerCase, isEntity2Pk, entity2PkDivision) : string.Empty) + suffix);
+      } 
+      else
+      {
+        pkPara.Append(paraDivision + perfix + (inculdeType ? GetDataType(mappingInfo, isEntity2Pk) + typeNameDivision : string.Empty) 
+          + (includeName ? GetClassPropertyName(mappingInfo, isNameLowerCase, isEntity2Pk, entity2PkDivision) : string.Empty) + suffix);
+      }
+      i++;
+    }
+    return pkPara.ToString();
+  }
+  
+  public string GenUniquePara(string perfix, string suffix, string paraDivision, bool inculdeType, bool includeName, string typeNameDivision, bool isNameLowerCase, bool isEntity2Pk, string entity2PkDivision)
+  {
+    StringBuilder pkPara = new StringBuilder();
+    int i = 0;
+    foreach (MappingInfo mappingInfo in this.Mapping.MappingUniqueInfoCollection)
+    {
+      if (i == 0)
+      {
+        pkPara.Append(perfix + (inculdeType ? GetDataType(mappingInfo, isEntity2Pk) + typeNameDivision : string.Empty) 
+          + (includeName ? GetClassPropertyName(mappingInfo, isNameLowerCase, isEntity2Pk, entity2PkDivision) : string.Empty) + suffix);
+      } 
+      else
+      {
+        pkPara.Append(paraDivision + perfix + (inculdeType ? GetDataType(mappingInfo, isEntity2Pk) + typeNameDivision : string.Empty) 
+          + (includeName ? GetClassPropertyName(mappingInfo, isNameLowerCase, isEntity2Pk, entity2PkDivision) : string.Empty) + suffix);
+      }
+      i++;
+    }
+    return pkPara.ToString();
+  }
+  
+  public string GetDataType(MappingInfo mappingInfo, bool isEntity2Pk)
+  {
+    return isEntity2Pk ? (!Enum.IsDefined(typeof(com.Sconit.CodeSmith.DataType), mappingInfo.DataType) ? mappingInfo.PKMany2OnePropertyDataType : mappingInfo.DataType) : mappingInfo.DataType;
+  }
+  
+  public string GetClassPropertyName(MappingInfo mappingInfo, bool isNameLowerCase, bool isEntity2Pk, string entity2PkDivision)
+  {
+    return isNameLowerCase? GenLowerCasePropertyName(
+      (isEntity2Pk ? (mappingInfo.ClassPropertyName + ((mappingInfo.PKMany2OnePropertyName != null && mappingInfo.PKMany2OnePropertyName != string.Empty) ? (entity2PkDivision + mappingInfo.PKMany2OnePropertyName) : string.Empty)) : mappingInfo.ClassPropertyName)) : 
+      (isEntity2Pk ? (mappingInfo.ClassPropertyName + ((mappingInfo.PKMany2OnePropertyName != null && mappingInfo.PKMany2OnePropertyName != string.Empty) ? (entity2PkDivision + mappingInfo.PKMany2OnePropertyName) : string.Empty)) : mappingInfo.ClassPropertyName);
+  }
+</script>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using <%=this.AssemblyName%>.Entity.<%=ModuleGroupName%>;
+//TODO: Add other using statements here.
+
+namespace <%=this.AssemblyName%>.Persistence.<%=this.ModuleGroupName%>
+{
+    public interface I<%=EntityClassName%>BaseDao
+    {
+        #region Method Created By CodeSmith
+
+        void Create<%=EntityClassName%>(<%=EntityClassName%> entity);
+
+        <%=EntityClassName%> Load<%=EntityClassName%>(<%=GenPKPara(string.Empty, string.Empty, ", ", true, true, " ", true, false, string.Empty)%>);
+    <%
+      if (this.Mapping.MappingPKInfoCollectionCount > 1 && this.Mapping.IsMappingPKContainObject)
+      {
+    %>
+        <%=EntityClassName%> Load<%=EntityClassName%>(<%=GenPKPara(string.Empty, string.Empty, ", ", true, true, " ", true, true, string.Empty)%>);
+    <%
+      }
+    %>
+  
+        IList<<%=EntityClassName%>> GetAll<%=EntityClassName%>();
+    <%
+      if (this.Mapping.IncludeIsActiveField)
+      {
+    %>
+  
+        IList<<%=EntityClassName%>> GetAll<%=EntityClassName%>(bool includeInactive);
+    <%
+      }
+    %>
+  
+        void Update<%=EntityClassName%>(<%=EntityClassName%> entity);
+        
+        void Delete<%=EntityClassName%>(<%=GenPKPara(string.Empty, string.Empty, ", ", true, true, " ", true, false, string.Empty)%>);
+    <%
+      if (this.Mapping.MappingPKInfoCollectionCount > 1)
+      {
+    %>
+    
+        void Delete<%=EntityClassName%>(<%=GenPKPara(string.Empty, string.Empty, ", ", true, true, " ", true, true, string.Empty)%>);
+    <%
+      }
+    %>
+    
+        void Delete<%=EntityClassName%>(<%=EntityClassName%> entity);
+    <%
+      if (this.Mapping.MappingPKInfoCollectionCount == 1)
+      {
+    %>
+    
+        void Delete<%=EntityClassName%>(IList<<%=GenPKPara(string.Empty, string.Empty, ", ", true, false, string.Empty, false, false, string.Empty)%>> pkList);
+    <%
+      }
+    %>
+    
+        void Delete<%=EntityClassName%>(IList<%= "<" + EntityClassName + ">" %> entityList);    
+    <%
+      if (this.Mapping.MappingUniqueInfoCollectionCount > 0)
+      {
+    %>
+        
+        <%=EntityClassName%> Load<%=EntityClassName%>(<%=GenUniquePara(string.Empty, string.Empty, ", ", true, true, " ", true, false, string.Empty)%>);
+    
+        void Delete<%=EntityClassName%>(<%=GenUniquePara(string.Empty, string.Empty, ", ", true, true, " ", true, true, string.Empty)%>);
+    <%
+      }
+    %>
+        <%
+      if (this.Mapping.IsMappingUniqueContainObject)
+      {
+    %>
+        
+        <%=EntityClassName%> Load<%=EntityClassName%>(<%=GenUniquePara(string.Empty, string.Empty, ", ", true, true, " ", true, true, string.Empty)%>);
+        <%
+      }
+    %>
+    <%
+      if (this.Mapping.MappingUniqueInfoCollectionCount == 1)
+      {
+    %>
+        
+        void Delete<%=EntityClassName%>(IList<<%=GenUniquePara(string.Empty, string.Empty, ", ", true, false, string.Empty, false, false, string.Empty)%>> UniqueList);   
+    <%
+      }
+    %>
+        #endregion Method Created By CodeSmith
+    }
+}

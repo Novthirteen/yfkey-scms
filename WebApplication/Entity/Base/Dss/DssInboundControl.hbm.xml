@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Dss.DssInboundControl, com.Sconit.Entity" table="DssInboundCtrl" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="InFloder" column="InFloder" type="String" length="255" />	
+		<property name="FilePattern" column="FilePattern" type="String" length="255" />	
+		<property name="ServiceName" column="ServiceName" type="String" length="255" />	
+		<property name="ArchiveFloder" column="ArchiveFloder" type="String" length="255" />	
+		<property name="ErrorFloder" column="ErrorFloder" type="String" length="255" />
+    <property name="Sequence" column="SeqNo" type="Int32" />
+    <property name="FileEncoding" column="FileEncoding" type="String" />
+  </class>
+</hibernate-mapping>

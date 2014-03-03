@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6D7268F1-24AA-4D0A-B73A-F9E0E2456F95}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>com.Sconit.ServiceExt</RootNamespace>
+    <AssemblyName>com.Sconit.ServiceExt</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\DllLib\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Services.Transaction">
+      <HintPath>..\DllLib\Castle.Services.Transaction.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\DllLib\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="com.Sconit.Service, Version=1.0.4480.18692, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DllLib\com.Sconit.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.0.30714, Culture=neutral, PublicKeyToken=b32731d11ce58905">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DllLib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\DllLib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI">
+      <HintPath>..\DllLib\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\Dss\IDssExportHistoryBaseMgr.cs" />
+    <Compile Include="Base\Dss\IDssExportHistoryDetailBaseMgr.cs" />
+    <Compile Include="Base\Dss\IDssFtpControlBaseMgr.cs" />
+    <Compile Include="Base\Dss\IDssImportHistoryBaseMgr.cs" />
+    <Compile Include="Base\Dss\IDssInboundControlBaseMgr.cs" />
+    <Compile Include="Base\Dss\IDssObjectMappingBaseMgr.cs" />
+    <Compile Include="Base\Dss\IDssOutboundControlBaseMgr.cs" />
+    <Compile Include="Base\Dss\IDssSystemBaseMgr.cs" />
+    <Compile Include="Base\Dss\Impl\DssExportHistoryBaseMgr.cs" />
+    <Compile Include="Base\Dss\Impl\DssExportHistoryDetailBaseMgr.cs" />
+    <Compile Include="Base\Dss\Impl\DssFtpControlBaseMgr.cs" />
+    <Compile Include="Base\Dss\Impl\DssImportHistoryBaseMgr.cs" />
+    <Compile Include="Base\Dss\Impl\DssInboundControlBaseMgr.cs" />
+    <Compile Include="Base\Dss\Impl\DssObjectMappingBaseMgr.cs" />
+    <Compile Include="Base\Dss\Impl\DssOutboundControlBaseMgr.cs" />
+    <Compile Include="Base\Dss\Impl\DssSystemBaseMgr.cs" />
+    <Compile Include="Base\Mes\IByMaterialBaseMgr.cs" />
+    <Compile Include="Base\Mes\IMesBomBaseMgr.cs" />
+    <Compile Include="Base\Mes\IMesBomDetailBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\ByMaterialBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\MesBomBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\MesBomDetailBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\ProductLineUserBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\ShelfBaseMgr.cs" />
+    <Compile Include="Base\Mes\Impl\ShelfItemBaseMgr.cs" />
+    <Compile Include="Base\Mes\IProductLineUserBaseMgr.cs" />
+    <Compile Include="Base\Mes\IShelfBaseMgr.cs" />
+    <Compile Include="Base\Mes\IShelfItemBaseMgr.cs" />
+    <Compile Include="Base\MRP\ICustomerScheduleBaseMgr.cs" />
+    <Compile Include="Base\MRP\ICustomerScheduleDetailBaseMgr.cs" />
+    <Compile Include="Base\MRP\IExpectTransitInventoryBaseMgr.cs" />
+    <Compile Include="Base\MRP\Impl\CustomerScheduleBaseMgr.cs" />
+    <Compile Include="Base\MRP\Impl\CustomerScheduleDetailBaseMgr.cs" />
+    <Compile Include="Base\MRP\Impl\ExpectTransitInventoryBaseMgr.cs" />
+    <Compile Include="Base\MRP\Impl\MrpReceivePlanBaseMgr.cs" />
+    <Compile Include="Base\MRP\Impl\MrpRunLogBaseMgr.cs" />
+    <Compile Include="Base\MRP\Impl\MrpShipPlanBaseMgr.cs" />
+    <Compile Include="Base\MRP\Impl\MrpShipPlanViewBaseMgr.cs" />
+    <Compile Include="Base\MRP\IMrpReceivePlanBaseMgr.cs" />
+    <Compile Include="Base\MRP\IMrpRunLogBaseMgr.cs" />
+    <Compile Include="Base\MRP\IMrpShipPlanBaseMgr.cs" />
+    <Compile Include="Base\MRP\IMrpShipPlanViewBaseMgr.cs" />
+    <Compile Include="Base\Transportation\IExpenseBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\ExpenseBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportationAddressBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportationBillBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportationBillDetailBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportationOrderBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportationOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportationRouteBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\TransportationRouteDetailBaseMgr.cs" />
+    <Compile Include="Base\Transportation\Impl\VehicleBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportationAddressBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportationBillBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportationBillDetailBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportationOrderBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportationOrderDetailBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportationRouteBaseMgr.cs" />
+    <Compile Include="Base\Transportation\ITransportationRouteDetailBaseMgr.cs" />
+    <Compile Include="Base\Transportation\IVehicleBaseMgr.cs" />
+    <Compile Include="Batch\Job\DssInboundJob.cs" />
+    <Compile Include="Batch\Job\DssOutboundJob.cs" />
+    <Compile Include="Batch\Job\MesJob.cs" />
+    <Compile Include="Batch\Job\TPriceList2TActBillJob.cs" />
+    <Compile Include="Batch\Job\TransportationOrderCloseJob.cs" />
+    <Compile Include="Batch\Job\TransportationOrderCompleteJob.cs" />
+    <Compile Include="Dss\AbstractInboundMgr.cs" />
+    <Compile Include="Dss\AbstractOutboundMgr.cs" />
+    <Compile Include="Dss\ICommonOutboundMgr.cs" />
+    <Compile Include="Dss\IDssExportHistoryDetailMgr.cs" />
+    <Compile Include="Dss\IDssExportHistoryMgr.cs" />
+    <Compile Include="Dss\IDssFtpControlMgr.cs" />
+    <Compile Include="Dss\IDssImportHistoryMgr.cs" />
+    <Compile Include="Dss\IDssInboundControlMgr.cs" />
+    <Compile Include="Dss\IDssObjectMappingMgr.cs" />
+    <Compile Include="Dss\IDssOutboundControlMgr.cs" />
+    <Compile Include="Dss\IDssSystemMgr.cs" />
+    <Compile Include="Dss\IInboundMgr.cs" />
+    <Compile Include="Dss\Impl\BomDetailInboundMgr.cs" />
+    <Compile Include="Dss\Impl\BomInboundMgr.cs" />
+    <Compile Include="Dss\Impl\CodeMasterInboundMgr.cs" />
+    <Compile Include="Dss\Impl\CommonOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\CustomerInboundMgr.cs" />
+    <Compile Include="Dss\Impl\DssExportHistoryDetailMgr.cs" />
+    <Compile Include="Dss\Impl\DssExportHistoryMgr.cs" />
+    <Compile Include="Dss\Impl\DssFtpControlMgr.cs" />
+    <Compile Include="Dss\Impl\DssImportHistoryMgr.cs" />
+    <Compile Include="Dss\Impl\DssInboundControlMgr.cs" />
+    <Compile Include="Dss\Impl\DssObjectMappingMgr.cs" />
+    <Compile Include="Dss\Impl\DssOutboundControlMgr.cs" />
+    <Compile Include="Dss\Impl\DssSystemMgr.cs" />
+    <Compile Include="Dss\Impl\IsssoOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\IssunpOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\ItemInboundMgr.cs" />
+    <Compile Include="Dss\Impl\ItemReferenceInboundMgr.cs" />
+    <Compile Include="Dss\Impl\PoBillOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\PoBillTransactionOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\PriceListInboundMgr.cs" />
+    <Compile Include="Dss\Impl\RcttrOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\RctunpOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\RctwoOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\SoBill1OutboundMgr.cs" />
+    <Compile Include="Dss\Impl\SoBillOutboundBaseMgr.cs" />
+    <Compile Include="Dss\Impl\SoBillOutboundMgr.cs" />
+    <Compile Include="Dss\Impl\SupplierInboundMgr.cs" />
+    <Compile Include="Dss\Impl\UnpOutboundBaseMgr.cs" />
+    <Compile Include="Dss\Impl\UomConversionInboundMgr.cs" />
+    <Compile Include="Dss\Impl\WoReceiptInboundMgr.cs" />
+    <Compile Include="Dss\IOutboundMgr.cs" />
+    <Compile Include="Mes\IByMaterialMgr.cs" />
+    <Compile Include="Mes\IMesBomDetailMgr.cs" />
+    <Compile Include="Mes\IMesBomMgr.cs" />
+    <Compile Include="Mes\IMesMgr.cs" />
+    <Compile Include="Mes\Impl\ByMaterialMgr.cs" />
+    <Compile Include="Mes\Impl\MesBomDetailMgr.cs" />
+    <Compile Include="Mes\Impl\MesBomMgr.cs" />
+    <Compile Include="Mes\Impl\MesMgr.cs" />
+    <Compile Include="Mes\Impl\ProductLineUserMgr.cs" />
+    <Compile Include="Mes\Impl\ShelfItemMgr.cs" />
+    <Compile Include="Mes\Impl\ShelfMgr.cs" />
+    <Compile Include="Mes\IProductLineUserMgr.cs" />
+    <Compile Include="Mes\IShelfItemMgr.cs" />
+    <Compile Include="Mes\IShelfMgr.cs" />
+    <Compile Include="MRP\ICustomerScheduleDetailMgr.cs" />
+    <Compile Include="MRP\ICustomerScheduleMgr.cs" />
+    <Compile Include="MRP\IExpectTransitInventoryMgr.cs" />
+    <Compile Include="MRP\Impl\CustomerScheduleDetailMgr.cs" />
+    <Compile Include="MRP\Impl\CustomerScheduleMgr.cs" />
+    <Compile Include="MRP\Impl\ExpectTransitInventoryMgr.cs" />
+    <Compile Include="MRP\Impl\MrpMgr.cs" />
+    <Compile Include="MRP\Impl\MrpReceivePlanMgr.cs" />
+    <Compile Include="MRP\Impl\MrpRunLogMgr.cs" />
+    <Compile Include="MRP\Impl\MrpShipPlanMgr.cs" />
+    <Compile Include="MRP\Impl\MrpShipPlanViewMgr.cs" />
+    <Compile Include="MRP\IMrpMgr.cs" />
+    <Compile Include="MRP\IMrpReceivePlanMgr.cs" />
+    <Compile Include="MRP\IMrpRunLogMgr.cs" />
+    <Compile Include="MRP\IMrpShipPlanMgr.cs" />
+    <Compile Include="MRP\IMrpShipPlanViewMgr.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\Yfk\Impl\RepASNMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepBarCodeA4Mgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepBarCodeMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepBelowBradeMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepBillMarketMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepBillMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepDeliveryNoteMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepInsideBarCodeA4Mgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepInsideBarCodeMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepInspectOrderMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepPickListMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepProductionMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepReceiptNoteMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepRepackMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepRequisitionOrderContractMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepRequisitionOrderInternalMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepRequisitionOrderMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepRequisitionOrderOverseaMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepSHPMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepStocktakingMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepUnqualifiedGoodsMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\RepWoReceiptMgr.cs" />
+    <Compile Include="Transportation\IExpenseMgr.cs" />
+    <Compile Include="Transportation\Impl\ExpenseMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportationAddressMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportationBillDetailMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportationBillMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportationOrderDetailMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportationOrderMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportationRouteDetailMgr.cs" />
+    <Compile Include="Transportation\Impl\TransportationRouteMgr.cs" />
+    <Compile Include="Transportation\Impl\VehicleMgr.cs" />
+    <Compile Include="Transportation\ITransportationAddressMgr.cs" />
+    <Compile Include="Transportation\ITransportationBillDetailMgr.cs" />
+    <Compile Include="Transportation\ITransportationBillMgr.cs" />
+    <Compile Include="Transportation\ITransportationOrderDetailMgr.cs" />
+    <Compile Include="Transportation\ITransportationOrderMgr.cs" />
+    <Compile Include="Transportation\ITransportationRouteDetailMgr.cs" />
+    <Compile Include="Transportation\ITransportationRouteMgr.cs" />
+    <Compile Include="Transportation\IVehicleMgr.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Entity\Entity.csproj">
+      <Project>{CADA5382-5233-4D03-9F4F-655382538AB1}</Project>
+      <Name>Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Persistence\Persistence.csproj">
+      <Project>{C8D4D3DC-F7B1-4AC8-B123-5B319E99C2D3}</Project>
+      <Name>Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{49EED42C-851F-4F50-B7D0-59C6C5A6F21E}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

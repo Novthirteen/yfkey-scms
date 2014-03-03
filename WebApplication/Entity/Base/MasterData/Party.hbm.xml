@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" table="Party" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Name" column="Name" type="String" length="255" />
+    <property name="PaymentTerm" column="PaymentTerm" type="String" length="100" />
+    <property name="TradeTerm" column="TradeTerm" type="String" length="100" />
+    <property name="Country" column="Country" type="String" length="50" />
+		<many-to-one name="ParentParty" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" column="ParentCode" cascade="none" />
+		<property name="IsActive" column="IsActive" type="Boolean"  />
+    <!--<property name="IsIntern" type="Boolean" column="IsIntern"/>--><!--20120828 wurui-->
+    <joined-subclass name="com.Sconit.Entity.MasterData.Customer, com.Sconit.Entity" table="Customer" lazy="false">
+      <key column="Code"/>
+    </joined-subclass>
+    <joined-subclass name="com.Sconit.Entity.MasterData.Supplier, com.Sconit.Entity" table="Supplier" lazy="false">
+      <key column="Code"/>
+    </joined-subclass>
+    <joined-subclass name="com.Sconit.Entity.MasterData.Region, com.Sconit.Entity" table="Region" lazy="false">
+      <key column="Code"/>
+      <property name="RegionType" column="Type" type="String" length="50" />
+    </joined-subclass>
+    <joined-subclass name="com.Sconit.Entity.Transportation.Carrier, com.Sconit.Entity" table="Carrier" lazy="false">
+      <key column="Code"/>
+      <property name="ReferenceSupplier" column="RefSupplier" type="String" length="50" />
+    </joined-subclass>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,781 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C8D4D3DC-F7B1-4AC8-B123-5B319E99C2D3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>com.Sconit.Persistence</RootNamespace>
+    <AssemblyName>com.Sconit.Persistence</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Facilities.NHibernateIntegration, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DllLib\Castle.Facilities.NHibernateIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=1.2.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DllLib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\Batch\IBatchJobDetailBaseDao.cs" />
+    <Compile Include="Base\Batch\IBatchJobParameterBaseDao.cs" />
+    <Compile Include="Base\Batch\IBatchRunLogBaseDao.cs" />
+    <Compile Include="Base\Batch\IBatchTriggerBaseDao.cs" />
+    <Compile Include="Base\Batch\IBatchTriggerParameterBaseDao.cs" />
+    <Compile Include="Base\Batch\NH\NHBatchJobDetailBaseDao.cs" />
+    <Compile Include="Base\Batch\NH\NHBatchJobParameterBaseDao.cs" />
+    <Compile Include="Base\Batch\NH\NHBatchRunLogBaseDao.cs" />
+    <Compile Include="Base\Batch\NH\NHBatchTriggerBaseDao.cs" />
+    <Compile Include="Base\Batch\NH\NHBatchTriggerParameterBaseDao.cs" />
+    <Compile Include="Base\Criteria\ICriteriaDao.cs" />
+    <Compile Include="Base\Criteria\NH\NHCriteriaDao.cs" />
+    <Compile Include="Base\Distribution\ICustomerRollingPlanBaseDao.cs" />
+    <Compile Include="Base\Distribution\ICustomerRollingPlanDetailBaseDao.cs" />
+    <Compile Include="Base\Distribution\IInProcessLocationBaseDao.cs" />
+    <Compile Include="Base\Distribution\IInProcessLocationDetailBaseDao.cs" />
+    <Compile Include="Base\Distribution\IInProcessLocationTrackBaseDao.cs" />
+    <Compile Include="Base\Distribution\ISalesPriceListBaseDao.cs" />
+    <Compile Include="Base\Distribution\NH\NHCustomerRollingPlanBaseDao.cs" />
+    <Compile Include="Base\Distribution\NH\NHCustomerRollingPlanDetailBaseDao.cs" />
+    <Compile Include="Base\Distribution\NH\NHInProcessLocationBaseDao.cs" />
+    <Compile Include="Base\Distribution\NH\NHInProcessLocationDetailBaseDao.cs" />
+    <Compile Include="Base\Distribution\NH\NHInProcessLocationTrackBaseDao.cs" />
+    <Compile Include="Base\Distribution\NH\NHSalesPriceListBaseDao.cs" />
+    <Compile Include="Base\Dss\IDssExportHistoryBaseDao.cs" />
+    <Compile Include="Base\Dss\IDssExportHistoryDetailBaseDao.cs" />
+    <Compile Include="Base\Dss\IDssFtpControlBaseDao.cs" />
+    <Compile Include="Base\Dss\IDssImportHistoryBaseDao.cs" />
+    <Compile Include="Base\Dss\IDssInboundControlBaseDao.cs" />
+    <Compile Include="Base\Dss\IDssObjectMappingBaseDao.cs" />
+    <Compile Include="Base\Dss\IDssOutboundControlBaseDao.cs" />
+    <Compile Include="Base\Dss\IDssSystemBaseDao.cs" />
+    <Compile Include="Base\Dss\NH\NHDssExportHistoryBaseDao.cs" />
+    <Compile Include="Base\Dss\NH\NHDssExportHistoryDetailBaseDao.cs" />
+    <Compile Include="Base\Dss\NH\NHDssFtpControlBaseDao.cs" />
+    <Compile Include="Base\Dss\NH\NHDssImportHistoryBaseDao.cs" />
+    <Compile Include="Base\Dss\NH\NHDssInboundControlBaseDao.cs" />
+    <Compile Include="Base\Dss\NH\NHDssObjectMappingBaseDao.cs" />
+    <Compile Include="Base\Dss\NH\NHDssOutboundControlBaseDao.cs" />
+    <Compile Include="Base\Dss\NH\NHDssSystemBaseDao.cs" />
+    <Compile Include="Base\Hql\IHqlDao.cs" />
+    <Compile Include="Base\Hql\NH\NHHqlDao.cs" />
+    <Compile Include="Base\IDao.cs" />
+    <Compile Include="Base\INHDao.cs" />
+    <Compile Include="Base\ISqlDao.cs" />
+    <Compile Include="Base\ISqlHelperDao.cs" />
+    <Compile Include="Base\MasterData\IActingBillBaseDao.cs" />
+    <Compile Include="Base\MasterData\IAddressBaseDao.cs" />
+    <Compile Include="Base\MasterData\IBillAddressBaseDao.cs" />
+    <Compile Include="Base\MasterData\IBillBaseDao.cs" />
+    <Compile Include="Base\MasterData\IBillDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IBillTransactionBaseDao.cs" />
+    <Compile Include="Base\MasterData\IBomBaseDao.cs" />
+    <Compile Include="Base\MasterData\IBomDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IClientBaseDao.cs" />
+    <Compile Include="Base\MasterData\IClientLogBaseDao.cs" />
+    <Compile Include="Base\MasterData\IClientMonitorBaseDao.cs" />
+    <Compile Include="Base\MasterData\IClientOrderDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IClientOrderHeadBaseDao.cs" />
+    <Compile Include="Base\MasterData\IClientWorkingHoursBaseDao.cs" />
+    <Compile Include="Base\MasterData\ICodeMasterBaseDao.cs" />
+    <Compile Include="Base\MasterData\ICurrencyBaseDao.cs" />
+    <Compile Include="Base\MasterData\ICustomerBaseDao.cs" />
+    <Compile Include="Base\MasterData\ICycleCountBaseDao.cs" />
+    <Compile Include="Base\MasterData\ICycleCountDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\ICycleCountResultBaseDao.cs" />
+    <Compile Include="Base\MasterData\IEmployeeBaseDao.cs" />
+    <Compile Include="Base\MasterData\IEntityPreferenceBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFavoritesBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFileUploadBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFinanceCalendarBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFlowBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFlowBindingBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFlowDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFlowDetailTrackBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFlowPlanBaseDao.cs" />
+    <Compile Include="Base\MasterData\IFlowTrackBaseDao.cs" />
+    <Compile Include="Base\MasterData\IHuBaseDao.cs" />
+    <Compile Include="Base\MasterData\IHuOddBaseDao.cs" />
+    <Compile Include="Base\MasterData\IInspectOrderBaseDao.cs" />
+    <Compile Include="Base\MasterData\IInspectOrderDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IInspectResultBaseDao.cs" />
+    <Compile Include="Base\MasterData\IItemBaseDao.cs" />
+    <Compile Include="Base\MasterData\IItemKitBaseDao.cs" />
+    <Compile Include="Base\MasterData\IItemReferenceBaseDao.cs" />
+    <Compile Include="Base\MasterData\IKPItemBaseDao.cs" />
+    <Compile Include="Base\MasterData\IKPOrderBaseDao.cs" />
+    <Compile Include="Base\MasterData\ILocationBaseDao.cs" />
+    <Compile Include="Base\MasterData\ILocationDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\ILocationLotDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\ILocationTransactionBaseDao.cs" />
+    <Compile Include="Base\MasterData\IMiscOrderBaseDao.cs" />
+    <Compile Include="Base\MasterData\IMiscOrderDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\INamedQueryBaseDao.cs" />
+    <Compile Include="Base\MasterData\INumberControlBaseDao.cs" />
+    <Compile Include="Base\MasterData\IOrderBindingBaseDao.cs" />
+    <Compile Include="Base\MasterData\IOrderDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IOrderHeadBaseDao.cs" />
+    <Compile Include="Base\MasterData\IOrderLocationTransactionBaseDao.cs" />
+    <Compile Include="Base\MasterData\IOrderOperationBaseDao.cs" />
+    <Compile Include="Base\MasterData\IOrderPlannedBackflushBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPartyBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPermissionBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPermissionCategoryBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPickListBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPickListDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPickListResultBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPlannedBillBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPriceListBaseDao.cs" />
+    <Compile Include="Base\MasterData\IPriceListDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IProductLineInProcessLocationDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IReceiptBaseDao.cs" />
+    <Compile Include="Base\MasterData\IReceiptDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IReceiptInProcessLocationBaseDao.cs" />
+    <Compile Include="Base\MasterData\IRegionBaseDao.cs" />
+    <Compile Include="Base\MasterData\IRepackBaseDao.cs" />
+    <Compile Include="Base\MasterData\IRepackDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IRoleBaseDao.cs" />
+    <Compile Include="Base\MasterData\IRolePermissionBaseDao.cs" />
+    <Compile Include="Base\MasterData\IRollingForecastBaseDao.cs" />
+    <Compile Include="Base\MasterData\IRoutingBaseDao.cs" />
+    <Compile Include="Base\MasterData\IRoutingDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IShiftBaseDao.cs" />
+    <Compile Include="Base\MasterData\IShiftDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\IShiftPlanScheduleBaseDao.cs" />
+    <Compile Include="Base\MasterData\IShipAddressBaseDao.cs" />
+    <Compile Include="Base\MasterData\ISpecialTimeBaseDao.cs" />
+    <Compile Include="Base\MasterData\IStorageAreaBaseDao.cs" />
+    <Compile Include="Base\MasterData\IStorageBinBaseDao.cs" />
+    <Compile Include="Base\MasterData\ISubjectListBaseDao.cs" />
+    <Compile Include="Base\MasterData\ISupplierBaseDao.cs" />
+    <Compile Include="Base\MasterData\IUomBaseDao.cs" />
+    <Compile Include="Base\MasterData\IUomConversionBaseDao.cs" />
+    <Compile Include="Base\MasterData\IUserBaseDao.cs" />
+    <Compile Include="Base\MasterData\IUserPermissionBaseDao.cs" />
+    <Compile Include="Base\MasterData\IUserPreferenceBaseDao.cs" />
+    <Compile Include="Base\MasterData\IUserRoleBaseDao.cs" />
+    <Compile Include="Base\MasterData\IWorkCenterBaseDao.cs" />
+    <Compile Include="Base\MasterData\IWorkdayBaseDao.cs" />
+    <Compile Include="Base\MasterData\IWorkdayShiftBaseDao.cs" />
+    <Compile Include="Base\MasterData\IWorkingHoursBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHActingBillBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHAddressBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHBillAddressBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHBillBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHBillDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHBillTransactionBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHBomBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHBomDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHClientBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHClientLogBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHClientMonitorBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHClientOrderDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHClientOrderHeadBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHClientWorkingHoursBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHCodeMasterBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHCurrencyBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHCustomerBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHCycleCountBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHCycleCountDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHCycleCountResultBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHEmployeeBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHEntityPreferenceBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFavoritesBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFileUploadBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFinanceCalendarBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFlowBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFlowBindingBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFlowDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFlowDetailTrackBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFlowPlanBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHFlowTrackBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHHuBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHHuOddBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHInspectOrderBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHInspectOrderDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHInspectResultBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHItemBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHItemKitBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHItemReferenceBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHKPItemBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHKPOrderBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHLocationBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHLocationDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHLocationLotDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHLocationTransactionBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHMiscOrderBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHMiscOrderDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHNamedQueryBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHNumberControlBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHOrderBindingBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHOrderDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHOrderHeadBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHOrderLocationTransactionBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHOrderOperationBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHOrderPlannedBackflushBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPartyBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPermissionBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPermissionCategoryBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPickListBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPickListDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPickListResultBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPlannedBillBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPriceListBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHPriceListDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHProductLineInProcessLocationDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHReceiptBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHReceiptDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHReceiptInProcessLocationBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHRegionBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHRepackBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHRepackDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHRoleBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHRolePermissionBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHRollingForecastBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHRoutingBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHRoutingDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHShiftBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHShiftDetailBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHShiftPlanScheduleBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHShipAddressBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHSpecialTimeBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHStorageAreaBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHStorageBinBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHSubjectListBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHSupplierBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHUomBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHUomConversionBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHUserBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHUserPermissionBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHUserPreferenceBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHUserRoleBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHWorkCenterBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHWorkdayBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHWorkdayShiftBaseDao.cs" />
+    <Compile Include="Base\MasterData\NH\NHWorkingHoursBaseDao.cs" />
+    <Compile Include="Base\Mes\IByMaterialBaseDao.cs" />
+    <Compile Include="Base\Mes\IMesBomBaseDao.cs" />
+    <Compile Include="Base\Mes\IMesBomDetailBaseDao.cs" />
+    <Compile Include="Base\Mes\IProductLineUserBaseDao.cs" />
+    <Compile Include="Base\Mes\IShelfBaseDao.cs" />
+    <Compile Include="Base\Mes\IShelfItemBaseDao.cs" />
+    <Compile Include="Base\Mes\NH\NHByMaterialBaseDao.cs" />
+    <Compile Include="Base\Mes\NH\NHMesBomBaseDao.cs" />
+    <Compile Include="Base\Mes\NH\NHMesBomDetailBaseDao.cs" />
+    <Compile Include="Base\Mes\NH\NHProductLineUserBaseDao.cs" />
+    <Compile Include="Base\Mes\NH\NHShelfBaseDao.cs" />
+    <Compile Include="Base\Mes\NH\NHShelfItemBaseDao.cs" />
+    <Compile Include="Base\MRP\ICustomerScheduleBaseDao.cs" />
+    <Compile Include="Base\MRP\ICustomerScheduleDetailBaseDao.cs" />
+    <Compile Include="Base\MRP\IExpectTransitInventoryBaseDao.cs" />
+    <Compile Include="Base\MRP\IMrpReceivePlanBaseDao.cs" />
+    <Compile Include="Base\MRP\IMrpRunLogBaseDao.cs" />
+    <Compile Include="Base\MRP\IMrpShipPlanBaseDao.cs" />
+    <Compile Include="Base\MRP\IMrpShipPlanViewBaseDao.cs" />
+    <Compile Include="Base\MRP\NH\NHCustomerScheduleBaseDao.cs" />
+    <Compile Include="Base\MRP\NH\NHCustomerScheduleDetailBaseDao.cs" />
+    <Compile Include="Base\MRP\NH\NHExpectTransitInventoryBaseDao.cs" />
+    <Compile Include="Base\MRP\NH\NHMrpReceivePlanBaseDao.cs" />
+    <Compile Include="Base\MRP\NH\NHMrpRunLogBaseDao.cs" />
+    <Compile Include="Base\MRP\NH\NHMrpShipPlanBaseDao.cs" />
+    <Compile Include="Base\MRP\NH\NHMrpShipPlanViewBaseDao.cs" />
+    <Compile Include="Base\NHDaoBase.cs" />
+    <Compile Include="Base\Procurement\IAutoOrderTrackBaseDao.cs" />
+    <Compile Include="Base\Procurement\IItemFlowPlanBaseDao.cs" />
+    <Compile Include="Base\Procurement\IItemFlowPlanDetailBaseDao.cs" />
+    <Compile Include="Base\Procurement\IItemFlowPlanTrackBaseDao.cs" />
+    <Compile Include="Base\Procurement\IOrderTracerBaseDao.cs" />
+    <Compile Include="Base\Procurement\IPurchasePriceListBaseDao.cs" />
+    <Compile Include="Base\Procurement\NH\NHAutoOrderTrackBaseDao.cs" />
+    <Compile Include="Base\Procurement\NH\NHItemFlowPlanBaseDao.cs" />
+    <Compile Include="Base\Procurement\NH\NHItemFlowPlanDetailBaseDao.cs" />
+    <Compile Include="Base\Procurement\NH\NHItemFlowPlanTrackBaseDao.cs" />
+    <Compile Include="Base\Procurement\NH\NHOrderTracerBaseDao.cs" />
+    <Compile Include="Base\Procurement\NH\NHPurchasePriceListBaseDao.cs" />
+    <Compile Include="Base\SqlDaoBase.cs" />
+    <Compile Include="Base\SQLHelper.cs" />
+    <Compile Include="Base\SqlHelperDao.cs" />
+    <Compile Include="Base\Transportation\ICarrierBaseDao.cs" />
+    <Compile Include="Base\Transportation\IExpenseBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportationActBillBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportationAddressBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportationBillBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportationBillDetailBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportationOrderBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportationOrderDetailBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportationRouteBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportationRouteDetailBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportPriceListBaseDao.cs" />
+    <Compile Include="Base\Transportation\ITransportPriceListDetailBaseDao.cs" />
+    <Compile Include="Base\Transportation\IVehicleBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHCarrierBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHExpenseBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportationActBillBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportationAddressBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportationBillBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportationBillDetailBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportationOrderBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportationOrderDetailBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportationRouteBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportationRouteDetailBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportPriceListBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHTransportPriceListDetailBaseDao.cs" />
+    <Compile Include="Base\Transportation\NH\NHVehicleBaseDao.cs" />
+    <Compile Include="Base\View\IActingBillViewBaseDao.cs" />
+    <Compile Include="Base\View\IBillAgingViewBaseDao.cs" />
+    <Compile Include="Base\View\IFlowViewBaseDao.cs" />
+    <Compile Include="Base\View\IInProcessLocationDetailTrackViewBaseDao.cs" />
+    <Compile Include="Base\View\IInProcessLocationDetailViewBaseDao.cs" />
+    <Compile Include="Base\View\IInventoryAgingViewBaseDao.cs" />
+    <Compile Include="Base\View\ILeanEngineViewBaseDao.cs" />
+    <Compile Include="Base\View\ILocationBinBaseDao.cs" />
+    <Compile Include="Base\View\ILocationBinDetailBaseDao.cs" />
+    <Compile Include="Base\View\ILocationBinItemDetailBaseDao.cs" />
+    <Compile Include="Base\View\ILocationLotDetailViewBaseDao.cs" />
+    <Compile Include="Base\View\ILocationTransactionViewBaseDao.cs" />
+    <Compile Include="Base\View\IOrderDetailViewBaseDao.cs" />
+    <Compile Include="Base\View\IOrderLocTransViewBaseDao.cs" />
+    <Compile Include="Base\View\IPlannedBillViewBaseDao.cs" />
+    <Compile Include="Base\View\ISupllierLocationViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHActingBillViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHBillAgingViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHFlowViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHInProcessLocationDetailTrackViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHInProcessLocationDetailViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHInventoryAgingViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHLeanEngineViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHLocationBinBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHLocationBinDetailBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHLocationBinItemDetailBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHLocationLotDetailViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHLocationTransactionViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHOrderDetailViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHOrderLocTransViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHPlannedBillViewBaseDao.cs" />
+    <Compile Include="Base\View\NH\NHSupllierLocationViewBaseDao.cs" />
+    <Compile Include="Batch\IBatchJobDetailDao.cs" />
+    <Compile Include="Batch\IBatchJobParameterDao.cs" />
+    <Compile Include="Batch\IBatchRunLogDao.cs" />
+    <Compile Include="Batch\IBatchTriggerDao.cs" />
+    <Compile Include="Batch\IBatchTriggerParameterDao.cs" />
+    <Compile Include="Batch\NH\NHBatchJobDetailDao.cs" />
+    <Compile Include="Batch\NH\NHBatchJobParameterDao.cs" />
+    <Compile Include="Batch\NH\NHBatchRunLogDao.cs" />
+    <Compile Include="Batch\NH\NHBatchTriggerDao.cs" />
+    <Compile Include="Batch\NH\NHBatchTriggerParameterDao.cs" />
+    <Compile Include="Distribution\ICustomerRollingPlanDao.cs" />
+    <Compile Include="Distribution\ICustomerRollingPlanDetailDao.cs" />
+    <Compile Include="Distribution\IInProcessLocationDao.cs" />
+    <Compile Include="Distribution\IInProcessLocationDetailDao.cs" />
+    <Compile Include="Distribution\IInProcessLocationTrackDao.cs" />
+    <Compile Include="Distribution\ISalesPriceListDao.cs" />
+    <Compile Include="Distribution\NH\NHCustomerRollingPlanDao.cs" />
+    <Compile Include="Distribution\NH\NHCustomerRollingPlanDetailDao.cs" />
+    <Compile Include="Distribution\NH\NHInProcessLocationDao.cs" />
+    <Compile Include="Distribution\NH\NHInProcessLocationDetailDao.cs" />
+    <Compile Include="Distribution\NH\NHInProcessLocationTrackDao.cs" />
+    <Compile Include="Distribution\NH\NHSalesPriceListDao.cs" />
+    <Compile Include="Dss\IDssExportHistoryDao.cs" />
+    <Compile Include="Dss\IDssExportHistoryDetailDao.cs" />
+    <Compile Include="Dss\IDssFtpControlDao.cs" />
+    <Compile Include="Dss\IDssImportHistoryDao.cs" />
+    <Compile Include="Dss\IDssInboundControlDao.cs" />
+    <Compile Include="Dss\IDssObjectMappingDao.cs" />
+    <Compile Include="Dss\IDssOutboundControlDao.cs" />
+    <Compile Include="Dss\IDssSystemDao.cs" />
+    <Compile Include="Dss\NH\NHDssExportHistoryDao.cs" />
+    <Compile Include="Dss\NH\NHDssExportHistoryDetailDao.cs" />
+    <Compile Include="Dss\NH\NHDssFtpControlDao.cs" />
+    <Compile Include="Dss\NH\NHDssImportHistoryDao.cs" />
+    <Compile Include="Dss\NH\NHDssInboundControlDao.cs" />
+    <Compile Include="Dss\NH\NHDssObjectMappingDao.cs" />
+    <Compile Include="Dss\NH\NHDssOutboundControlDao.cs" />
+    <Compile Include="Dss\NH\NHDssSystemDao.cs" />
+    <Compile Include="MasterData\IActingBillDao.cs" />
+    <Compile Include="MasterData\IAddressDao.cs" />
+    <Compile Include="MasterData\IBillAddressDao.cs" />
+    <Compile Include="MasterData\IBillDao.cs" />
+    <Compile Include="MasterData\IBillDetailDao.cs" />
+    <Compile Include="MasterData\IBillTransactionDao.cs" />
+    <Compile Include="MasterData\IBomDao.cs" />
+    <Compile Include="MasterData\IBomDetailDao.cs" />
+    <Compile Include="MasterData\IClientDao.cs" />
+    <Compile Include="MasterData\IClientLogDao.cs" />
+    <Compile Include="MasterData\IClientMonitorDao.cs" />
+    <Compile Include="MasterData\IClientOrderDetailDao.cs" />
+    <Compile Include="MasterData\IClientOrderHeadDao.cs" />
+    <Compile Include="MasterData\IClientWorkingHoursDao.cs" />
+    <Compile Include="MasterData\ICodeMasterDao.cs" />
+    <Compile Include="MasterData\ICurrencyDao.cs" />
+    <Compile Include="MasterData\ICustomerDao.cs" />
+    <Compile Include="MasterData\ICycleCountDao.cs" />
+    <Compile Include="MasterData\ICycleCountDetailDao.cs" />
+    <Compile Include="MasterData\ICycleCountResultDao.cs" />
+    <Compile Include="MasterData\IEmployeeDao.cs" />
+    <Compile Include="MasterData\IEntityPreferenceDao.cs" />
+    <Compile Include="MasterData\IFavoritesDao.cs" />
+    <Compile Include="MasterData\IFileUploadDao.cs" />
+    <Compile Include="MasterData\IFinanceCalendarDao.cs" />
+    <Compile Include="MasterData\IFlowBindingDao.cs" />
+    <Compile Include="MasterData\IFlowDao.cs" />
+    <Compile Include="MasterData\IFlowDetailDao.cs" />
+    <Compile Include="MasterData\IFlowDetailTrackDao.cs" />
+    <Compile Include="MasterData\IFlowPlanDao.cs" />
+    <Compile Include="MasterData\IFlowTrackDao.cs" />
+    <Compile Include="MasterData\IHuDao.cs" />
+    <Compile Include="MasterData\IHuOddDao.cs" />
+    <Compile Include="MasterData\IInspectOrderDao.cs" />
+    <Compile Include="MasterData\IInspectOrderDetailDao.cs" />
+    <Compile Include="MasterData\IInspectResultDao.cs" />
+    <Compile Include="MasterData\IItemDao.cs" />
+    <Compile Include="MasterData\IItemKitDao.cs" />
+    <Compile Include="MasterData\IItemReferenceDao.cs" />
+    <Compile Include="MasterData\IKPItemDao.cs" />
+    <Compile Include="MasterData\IKPOrderDao.cs" />
+    <Compile Include="MasterData\ILocationDao.cs" />
+    <Compile Include="MasterData\ILocationDetailDao.cs" />
+    <Compile Include="MasterData\ILocationLotDetailDao.cs" />
+    <Compile Include="MasterData\ILocationTransactionDao.cs" />
+    <Compile Include="MasterData\IMiscOrderDao.cs" />
+    <Compile Include="MasterData\IMiscOrderDetailDao.cs" />
+    <Compile Include="MasterData\INamedQueryDao.cs" />
+    <Compile Include="MasterData\INumberControlDao.cs" />
+    <Compile Include="MasterData\IOrderBindingDao.cs" />
+    <Compile Include="MasterData\IOrderDetailDao.cs" />
+    <Compile Include="MasterData\IOrderHeadDao.cs" />
+    <Compile Include="MasterData\IOrderLocationTransactionDao.cs" />
+    <Compile Include="MasterData\IOrderOperationDao.cs" />
+    <Compile Include="MasterData\IOrderPlannedBackflushDao.cs" />
+    <Compile Include="MasterData\IPartyDao.cs" />
+    <Compile Include="MasterData\IPermissionCategoryDao.cs" />
+    <Compile Include="MasterData\IPermissionDao.cs" />
+    <Compile Include="MasterData\IPickListDao.cs" />
+    <Compile Include="MasterData\IPickListDetailDao.cs" />
+    <Compile Include="MasterData\IPickListResultDao.cs" />
+    <Compile Include="MasterData\IPlannedBillDao.cs" />
+    <Compile Include="MasterData\IPriceListDao.cs" />
+    <Compile Include="MasterData\IPriceListDetailDao.cs" />
+    <Compile Include="MasterData\IProductLineInProcessLocationDetailDao.cs" />
+    <Compile Include="MasterData\IReceiptDao.cs" />
+    <Compile Include="MasterData\IReceiptDetailDao.cs" />
+    <Compile Include="MasterData\IReceiptInProcessLocationDao.cs" />
+    <Compile Include="MasterData\IRegionDao.cs" />
+    <Compile Include="MasterData\IRepackDao.cs" />
+    <Compile Include="MasterData\IRepackDetailDao.cs" />
+    <Compile Include="MasterData\IRoleDao.cs" />
+    <Compile Include="MasterData\IRolePermissionDao.cs" />
+    <Compile Include="MasterData\IRollingForecastDao.cs" />
+    <Compile Include="MasterData\IRoutingDao.cs" />
+    <Compile Include="MasterData\IRoutingDetailDao.cs" />
+    <Compile Include="MasterData\IShiftDao.cs" />
+    <Compile Include="MasterData\IShiftDetailDao.cs" />
+    <Compile Include="MasterData\IShiftPlanScheduleDao.cs" />
+    <Compile Include="MasterData\IShipAddressDao.cs" />
+    <Compile Include="MasterData\ISpecialTimeDao.cs" />
+    <Compile Include="MasterData\IStorageAreaDao.cs" />
+    <Compile Include="MasterData\IStorageBinDao.cs" />
+    <Compile Include="MasterData\ISubjectListDao.cs" />
+    <Compile Include="MasterData\ISupplierDao.cs" />
+    <Compile Include="MasterData\IUomConversionDao.cs" />
+    <Compile Include="MasterData\IUomDao.cs" />
+    <Compile Include="MasterData\IUserDao.cs" />
+    <Compile Include="MasterData\IUserPermissionDao.cs" />
+    <Compile Include="MasterData\IUserPreferenceDao.cs" />
+    <Compile Include="MasterData\IUserRoleDao.cs" />
+    <Compile Include="MasterData\IWorkCenterDao.cs" />
+    <Compile Include="MasterData\IWorkdayDao.cs" />
+    <Compile Include="MasterData\IWorkdayShiftDao.cs" />
+    <Compile Include="MasterData\IWorkingHoursDao.cs" />
+    <Compile Include="MasterData\NH\NHActingBillDao.cs" />
+    <Compile Include="MasterData\NH\NHAddressDao.cs" />
+    <Compile Include="MasterData\NH\NHBillAddressDao.cs" />
+    <Compile Include="MasterData\NH\NHBillDao.cs" />
+    <Compile Include="MasterData\NH\NHBillDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHBillTransactionDao.cs" />
+    <Compile Include="MasterData\NH\NHBomDao.cs" />
+    <Compile Include="MasterData\NH\NHBomDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHClientDao.cs" />
+    <Compile Include="MasterData\NH\NHClientLogDao.cs" />
+    <Compile Include="MasterData\NH\NHClientMonitorDao.cs" />
+    <Compile Include="MasterData\NH\NHClientOrderDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHClientOrderHeadDao.cs" />
+    <Compile Include="MasterData\NH\NHClientWorkingHoursDao.cs" />
+    <Compile Include="MasterData\NH\NHCodeMasterDao.cs" />
+    <Compile Include="MasterData\NH\NHCurrencyDao.cs" />
+    <Compile Include="MasterData\NH\NHCustomerDao.cs" />
+    <Compile Include="MasterData\NH\NHCycleCountDao.cs" />
+    <Compile Include="MasterData\NH\NHCycleCountDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHCycleCountResultDao.cs" />
+    <Compile Include="MasterData\NH\NHEmployeeDao.cs" />
+    <Compile Include="MasterData\NH\NHEntityPreferenceDao.cs" />
+    <Compile Include="MasterData\NH\NHFavoritesDao.cs" />
+    <Compile Include="MasterData\NH\NHFileUploadDao.cs" />
+    <Compile Include="MasterData\NH\NHFinanceCalendarDao.cs" />
+    <Compile Include="MasterData\NH\NHFlowBindingDao.cs" />
+    <Compile Include="MasterData\NH\NHFlowDao.cs" />
+    <Compile Include="MasterData\NH\NHFlowDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHFlowDetailTrackDao.cs" />
+    <Compile Include="MasterData\NH\NHFlowPlanDao.cs" />
+    <Compile Include="MasterData\NH\NHFlowTrackDao.cs" />
+    <Compile Include="MasterData\NH\NHHuDao.cs" />
+    <Compile Include="MasterData\NH\NHHuOddDao.cs" />
+    <Compile Include="MasterData\NH\NHInspectOrderDao.cs" />
+    <Compile Include="MasterData\NH\NHInspectOrderDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHInspectResultDao.cs" />
+    <Compile Include="MasterData\NH\NHItemDao.cs" />
+    <Compile Include="MasterData\NH\NHItemKitDao.cs" />
+    <Compile Include="MasterData\NH\NHItemReferenceDao.cs" />
+    <Compile Include="MasterData\NH\NHKPItemDao.cs" />
+    <Compile Include="MasterData\NH\NHKPOrderDao.cs" />
+    <Compile Include="MasterData\NH\NHLocationDao.cs" />
+    <Compile Include="MasterData\NH\NHLocationDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHLocationLotDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHLocationTransactionDao.cs" />
+    <Compile Include="MasterData\NH\NHMiscOrderDao.cs" />
+    <Compile Include="MasterData\NH\NHMiscOrderDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHNamedQueryDao.cs" />
+    <Compile Include="MasterData\NH\NHNumberControlDao.cs" />
+    <Compile Include="MasterData\NH\NHOrderBindingDao.cs" />
+    <Compile Include="MasterData\NH\NHOrderDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHOrderHeadDao.cs" />
+    <Compile Include="MasterData\NH\NHOrderLocationTransactionDao.cs" />
+    <Compile Include="MasterData\NH\NHOrderOperationDao.cs" />
+    <Compile Include="MasterData\NH\NHOrderPlannedBackflushDao.cs" />
+    <Compile Include="MasterData\NH\NHPartyDao.cs" />
+    <Compile Include="MasterData\NH\NHPermissionCategoryDao.cs" />
+    <Compile Include="MasterData\NH\NHPermissionDao.cs" />
+    <Compile Include="MasterData\NH\NHPickListDao.cs" />
+    <Compile Include="MasterData\NH\NHPickListDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHPickListResultDao.cs" />
+    <Compile Include="MasterData\NH\NHPlannedBillDao.cs" />
+    <Compile Include="MasterData\NH\NHPriceListDao.cs" />
+    <Compile Include="MasterData\NH\NHPriceListDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHProductLineInProcessLocationDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHReceiptDao.cs" />
+    <Compile Include="MasterData\NH\NHReceiptDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHReceiptInProcessLocationDao.cs" />
+    <Compile Include="MasterData\NH\NHRegionDao.cs" />
+    <Compile Include="MasterData\NH\NHRepackDao.cs" />
+    <Compile Include="MasterData\NH\NHRepackDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHRoleDao.cs" />
+    <Compile Include="MasterData\NH\NHRolePermissionDao.cs" />
+    <Compile Include="MasterData\NH\NHRollingForecastDao.cs" />
+    <Compile Include="MasterData\NH\NHRoutingDao.cs" />
+    <Compile Include="MasterData\NH\NHRoutingDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHShiftDao.cs" />
+    <Compile Include="MasterData\NH\NHShiftDetailDao.cs" />
+    <Compile Include="MasterData\NH\NHShiftPlanScheduleDao.cs" />
+    <Compile Include="MasterData\NH\NHShipAddressDao.cs" />
+    <Compile Include="MasterData\NH\NHSpecialTimeDao.cs" />
+    <Compile Include="MasterData\NH\NHStorageAreaDao.cs" />
+    <Compile Include="MasterData\NH\NHStorageBinDao.cs" />
+    <Compile Include="MasterData\NH\NHSubjectListDao.cs" />
+    <Compile Include="MasterData\NH\NHSupplierDao.cs" />
+    <Compile Include="MasterData\NH\NHUomConversionDao.cs" />
+    <Compile Include="MasterData\NH\NHUomDao.cs" />
+    <Compile Include="MasterData\NH\NHUserDao.cs" />
+    <Compile Include="MasterData\NH\NHUserPermissionDao.cs" />
+    <Compile Include="MasterData\NH\NHUserPreferenceDao.cs" />
+    <Compile Include="MasterData\NH\NHUserRoleDao.cs" />
+    <Compile Include="MasterData\NH\NHWorkCenterDao.cs" />
+    <Compile Include="MasterData\NH\NHWorkdayDao.cs" />
+    <Compile Include="MasterData\NH\NHWorkdayShiftDao.cs" />
+    <Compile Include="MasterData\NH\NHWorkingHoursDao.cs" />
+    <Compile Include="Mes\IByMaterialDao.cs" />
+    <Compile Include="Mes\IMesBomDao.cs" />
+    <Compile Include="Mes\IMesBomDetailDao.cs" />
+    <Compile Include="Mes\IProductLineUserDao.cs" />
+    <Compile Include="Mes\IShelfDao.cs" />
+    <Compile Include="Mes\IShelfItemDao.cs" />
+    <Compile Include="Mes\NH\NHByMaterialDao.cs" />
+    <Compile Include="Mes\NH\NHMesBomDao.cs" />
+    <Compile Include="Mes\NH\NHMesBomDetailDao.cs" />
+    <Compile Include="Mes\NH\NHProductLineUserDao.cs" />
+    <Compile Include="Mes\NH\NHShelfDao.cs" />
+    <Compile Include="Mes\NH\NHShelfItemDao.cs" />
+    <Compile Include="MRP\ICustomerScheduleDao.cs" />
+    <Compile Include="MRP\ICustomerScheduleDetailDao.cs" />
+    <Compile Include="MRP\IExpectTransitInventoryDao.cs" />
+    <Compile Include="MRP\IMrpReceivePlanDao.cs" />
+    <Compile Include="MRP\IMrpRunLogDao.cs" />
+    <Compile Include="MRP\IMrpShipPlanDao.cs" />
+    <Compile Include="MRP\IMrpShipPlanViewDao.cs" />
+    <Compile Include="MRP\NH\NHCustomerScheduleDao.cs" />
+    <Compile Include="MRP\NH\NHCustomerScheduleDetailDao.cs" />
+    <Compile Include="MRP\NH\NHExpectTransitInventoryDao.cs" />
+    <Compile Include="MRP\NH\NHMrpReceivePlanDao.cs" />
+    <Compile Include="MRP\NH\NHMrpRunLogDao.cs" />
+    <Compile Include="MRP\NH\NHMrpShipPlanDao.cs" />
+    <Compile Include="MRP\NH\NHMrpShipPlanViewDao.cs" />
+    <Compile Include="Procurement\IAutoOrderTrackDao.cs" />
+    <Compile Include="Procurement\IItemFlowPlanDao.cs" />
+    <Compile Include="Procurement\IItemFlowPlanDetailDao.cs" />
+    <Compile Include="Procurement\IItemFlowPlanTrackDao.cs" />
+    <Compile Include="Procurement\IOrderTracerDao.cs" />
+    <Compile Include="Procurement\IPurchasePriceListDao.cs" />
+    <Compile Include="Procurement\NH\NHAutoOrderTrackDao.cs" />
+    <Compile Include="Procurement\NH\NHItemFlowPlanDao.cs" />
+    <Compile Include="Procurement\NH\NHItemFlowPlanDetailDao.cs" />
+    <Compile Include="Procurement\NH\NHItemFlowPlanTrackDao.cs" />
+    <Compile Include="Procurement\NH\NHOrderTracerDao.cs" />
+    <Compile Include="Procurement\NH\NHPurchasePriceListDao.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Transportation\ICarrierDao.cs" />
+    <Compile Include="Transportation\IExpenseDao.cs" />
+    <Compile Include="Transportation\ITransportationActBillDao.cs" />
+    <Compile Include="Transportation\ITransportationAddressDao.cs" />
+    <Compile Include="Transportation\ITransportationBillDao.cs" />
+    <Compile Include="Transportation\ITransportationBillDetailDao.cs" />
+    <Compile Include="Transportation\ITransportationOrderDao.cs" />
+    <Compile Include="Transportation\ITransportationOrderDetailDao.cs" />
+    <Compile Include="Transportation\ITransportationRouteDao.cs" />
+    <Compile Include="Transportation\ITransportationRouteDetailDao.cs" />
+    <Compile Include="Transportation\ITransportPriceListDao.cs" />
+    <Compile Include="Transportation\ITransportPriceListDetailDao.cs" />
+    <Compile Include="Transportation\IVehicleDao.cs" />
+    <Compile Include="Transportation\NH\NHCarrierDao.cs" />
+    <Compile Include="Transportation\NH\NHExpenseDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportationActBillDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportationAddressDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportationBillDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportationBillDetailDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportationOrderDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportationOrderDetailDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportationRouteDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportationRouteDetailDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportPriceListDao.cs" />
+    <Compile Include="Transportation\NH\NHTransportPriceListDetailDao.cs" />
+    <Compile Include="Transportation\NH\NHVehicleDao.cs" />
+    <Compile Include="View\IActingBillViewDao.cs" />
+    <Compile Include="View\IBillAgingViewDao.cs" />
+    <Compile Include="View\IFlowViewDao.cs" />
+    <Compile Include="View\IInProcessLocationDetailTrackViewDao.cs" />
+    <Compile Include="View\IInProcessLocationDetailViewDao.cs" />
+    <Compile Include="View\IInventoryAgingViewDao.cs" />
+    <Compile Include="View\ILeanEngineViewDao.cs" />
+    <Compile Include="View\ILocationBinDao.cs" />
+    <Compile Include="View\ILocationBinDetailDao.cs" />
+    <Compile Include="View\ILocationBinItemDetailDao.cs" />
+    <Compile Include="View\ILocationLotDetailViewDao.cs" />
+    <Compile Include="View\ILocationTransactionViewDao.cs" />
+    <Compile Include="View\IOrderDetailViewDao.cs" />
+    <Compile Include="View\IOrderLocTransViewDao.cs" />
+    <Compile Include="View\IPlannedBillViewDao.cs" />
+    <Compile Include="View\ISupllierLocationViewDao.cs" />
+    <Compile Include="View\NH\NHActingBillViewDao.cs" />
+    <Compile Include="View\NH\NHBillAgingViewDao.cs" />
+    <Compile Include="View\NH\NHFlowViewDao.cs" />
+    <Compile Include="View\NH\NHInProcessLocationDetailTrackViewDao.cs" />
+    <Compile Include="View\NH\NHInProcessLocationDetailViewDao.cs" />
+    <Compile Include="View\NH\NHInventoryAgingViewDao.cs" />
+    <Compile Include="View\NH\NHLeanEngineViewDao.cs" />
+    <Compile Include="View\NH\NHLocationBinDao.cs" />
+    <Compile Include="View\NH\NHLocationBinDetailDao.cs" />
+    <Compile Include="View\NH\NHLocationBinItemDetailDao.cs" />
+    <Compile Include="View\NH\NHLocationLotDetailViewDao.cs" />
+    <Compile Include="View\NH\NHLocationTransactionViewDao.cs" />
+    <Compile Include="View\NH\NHOrderDetailViewDao.cs" />
+    <Compile Include="View\NH\NHOrderLocTransViewDao.cs" />
+    <Compile Include="View\NH\NHPlannedBillViewDao.cs" />
+    <Compile Include="View\NH\NHSupllierLocationViewDao.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Entity\Entity.csproj">
+      <Project>{CADA5382-5233-4D03-9F4F-655382538AB1}</Project>
+      <Name>Entity</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)$(SolutionName)\bin</PostBuildEvent>
+  </PropertyGroup>
+</Project>

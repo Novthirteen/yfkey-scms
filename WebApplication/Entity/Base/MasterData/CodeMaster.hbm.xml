@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.CodeMaster, com.Sconit.Entity" table="CodeMstr" lazy="false">
+		<composite-id>
+			<key-property name="Code" column="Code" type="String" length="50" />
+			<key-property name="Value" column="CodeValue" type="String" length="255" />
+		</composite-id>
+		<property name="Seq" column="Seq" type="Int32"  />	
+		<property name="IsDefault" column="IsDefault" type="Boolean"  />	
+		<property name="Description" column="Desc1" type="String" length="255" />	
+  	</class>
+</hibernate-mapping>

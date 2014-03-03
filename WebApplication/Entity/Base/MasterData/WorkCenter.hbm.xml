@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.WorkCenter, com.Sconit.Entity" table="WorkCenter" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Name" column="Name" type="String" length="50" />	
+		<property name="IsActive" column="IsActive" type="Boolean"  />	
+		<many-to-one name="Party" column="Party" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		<property name="Type" column="Type" type="String" length="50" />	
+		<property name="LaborBurdenPercent" column="LbrBdnPer" type="Decimal" />	
+		<property name="LaborBurdenRate" column="LbrBdnRate" type="Decimal" />	
+		<property name="SetupBurdenPercent" column="SetupBdnPer" type="Decimal" />	
+		<property name="SetupBurdenRate" column="SetupBdnRate" type="Decimal" />	
+		<property name="LaborRate" column="LaborRate" type="Decimal" />	
+		<property name="Machine" column="Machine" type="String" length="50" />	
+		<property name="MachineQty" column="MachQty" type="Decimal" />	
+		<property name="MachineBurdenRate" column="MachBdnRate" type="Decimal" />	
+		<property name="MachineSetupBurdenRate" column="MachSetupBdnRate" type="Decimal" />	
+		<property name="RunCrew" column="RunCrew" type="Decimal" />	
+		<property name="SetupCrew" column="SetupCrew" type="Decimal" />	
+		<property name="SetupRate" column="SetupRate" type="Decimal" />	
+		<property name="QueueTime" column="QueueTime" type="Decimal" />	
+		<property name="WaitTime" column="WaitTime" type="Decimal" />	
+		<property name="PercentEfficiency" column="PercentEfficiency" type="Decimal" />	
+		<property name="PercentUtilization" column="PercentUtilization" type="Decimal" />	
+  	</class>
+</hibernate-mapping>

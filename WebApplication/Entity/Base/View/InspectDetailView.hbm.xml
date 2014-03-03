@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.InspectDetailView, com.Sconit.Entity" table="InspectDetView" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<many-to-one name="InspectOrder" column="InspNo" class="com.Sconit.Entity.MasterData.InspectOrder, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="LocationFrom" column="LocFrom" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<property name="RemainQty" column="RemainQty" type="Decimal"  />	
+		<many-to-one name="LocationTo" column="LocTo" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

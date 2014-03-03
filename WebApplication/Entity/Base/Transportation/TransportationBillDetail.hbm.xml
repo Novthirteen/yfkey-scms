@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Transportation.TransportationBillDetail, com.Sconit.Entity" table="TBillDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <many-to-one name="Bill" column="BillNo" class="com.Sconit.Entity.Transportation.TransportationBill, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="ActBill" column="TransId" class="com.Sconit.Entity.Transportation.TransportationActBill, com.Sconit.Entity" cascade="none" />
+		<property name="BilledQty" column="BilledQty" type="Decimal"  />	
+		<property name="UnitPrice" column="UnitPrice" type="Decimal"  />	
+		<many-to-one name="Currency" column="Currency" class="com.Sconit.Entity.MasterData.Currency, com.Sconit.Entity" cascade="none" />
+		<property name="Discount" column="Discount" type="Decimal"  />	
+		<property name="IsIncludeTax" column="IsIncludeTax" type="Boolean"  />	
+		<property name="TaxCode" column="TaxCode" type="String" length="50" />	
+		<property name="Amount" column="Amount" type="Decimal"  />	
+		<property name="TransType" column="TransType" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

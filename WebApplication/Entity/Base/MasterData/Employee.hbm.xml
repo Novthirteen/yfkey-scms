@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.Employee, com.Sconit.Entity" table="Employee" lazy="false">
+		<id name="Code" column="Code" type="String" unsaved-value="null" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Name" column="Name" type="String" length="50" />	
+		<property name="Gender" column="Gender" type="String" length="50" />	
+		<property name="Department" column="Department" type="String" length="50" />	
+		<property name="WorkGroup" column="WorkGroup" type="String" length="50" />	
+		<property name="Post" column="Post" type="String" length="50" />	
+		<property name="Memo" column="Memo" type="String" length="255" />
+        <property name="IsActive" column="IsActive" type="Boolean" />
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+        <many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

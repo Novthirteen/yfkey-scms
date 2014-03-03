@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Transportation.TransportationRouteDetail, com.Sconit.Entity" table="TRouteDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<property name="Sequence" column="Seq" type="Int32"  />
+    <many-to-one name="TransportationAddress" column="TAddress" class="com.Sconit.Entity.Transportation.TransportationAddress, com.Sconit.Entity" cascade="none"  />	
+		<many-to-one name="TransportationRoute" column="TRoute" class="com.Sconit.Entity.Transportation.TransportationRoute, com.Sconit.Entity" cascade="none" />
+  	</class>
+</hibernate-mapping>

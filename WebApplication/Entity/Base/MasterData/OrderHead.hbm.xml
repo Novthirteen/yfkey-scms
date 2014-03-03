@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.MasterData.OrderHead, com.Sconit.Entity" table="OrderMstr" lazy="false">
+    <id name="OrderNo" column="OrderNo" type="String" unsaved-value="null" >
+      <generator class="assigned" />
+    </id>
+    <version name="Version" column="Version" type="Int32"  />
+    <property name="ReferenceOrderNo" column="RefOrderNo" type="String" length="50" />
+    <property name="ExternalOrderNo" column="ExtOrderNo" type="String" length="50" />
+    <property name="Sequence" column="Seq" type="Int32" />
+    <property name="StartTime" column="StartTime" type="DateTime"  />
+    <property name="WindowTime" column="WindowTime" type="DateTime"  />
+    <property name="Status" column="Status" type="String" length="50" />
+    <property name="Priority" column="Priority" type="String" length="50" />
+    <property name="Type" column="Type" type="String" length="50" />
+    <property name="SubType" column="SubType" type="String" length="50" />
+    <many-to-one name="PartyFrom" column="PartyFrom" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="PartyTo" column="PartyTo" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="ShipFrom" column="ShipFrom" class="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="ShipTo" column="ShipTo" class="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" cascade="none" />
+    <property name="DockDescription" column="DockDesc" type="String" length="50" />
+    <property name="IsAutoRelease" column="IsAutoRelease" type="Boolean"  />
+    <property name="IsAutoStart" column="IsAutoStart" type="Boolean"  />
+    <property name="IsAutoShip" column="IsAutoShip" type="Boolean"  />
+    <property name="IsAutoReceive" column="IsAutoReceive" type="Boolean"  />
+    <property name="IsAutoBill" column="IsAutoBill" type="Boolean"  />
+    <property name="StartLatency" column="StartLatency" type="Decimal" />
+    <property name="CompleteLatency" column="CompleteLatency" type="Decimal" />
+    <property name="NeedPrintOrder" column="NeedPrintOrder" type="Boolean"  />
+    <property name="NeedPrintAsn" column="NeedPrintAsn" type="Boolean"  />
+    <property name="NeedPrintReceipt" column="NeedPrintRcpt" type="Boolean"  />
+    <property name="GoodsReceiptGapTo" column="GrGapTo" type="String" length="50" />
+    <property name="AllowExceed" column="AllowExceed" type="Boolean"  />
+    <property name="AllowCreateDetail" column="AllowCreateDetail" type="Boolean"  />
+    <property name="IsPrinted" column="IsPrinted" type="Boolean"  />
+    <property name="CheckDetailOption" column="CheckDetOpt" type="String" length="50" />
+    <property name="FulfillUnitCount" column="FulfillUC" type="Boolean"  />
+    <property name="ReceiptTemplate" column="RecTemplate" type="String" length="100" />
+    <property name="OrderTemplate" column="OrderTemplate" type="String" length="100" />
+    <property name="AsnTemplate" column="AsnTemplate" type="String" length="100" />
+    <property name="HuTemplate" column="HuTemplate" type="String" length="100" />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="IsShowPrice" column="IsShowPrice" type="Boolean"  />
+    <property name="BillSettleTerm" column="BillSettleTerm" type="String" length="50" />
+    <property name="IsPickFromBin" column="IsPickFromBin" type="Boolean"  />
+    <property name="IsShipByOrder" column="IsShipByOrder" type="Boolean"  />
+    <many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="ReleaseDate" column="ReleaseDate" type="DateTime" />
+    <many-to-one name="ReleaseUser" column="ReleaseUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="StartDate" column="StartDate" type="DateTime" />
+    <many-to-one name="StartUser" column="StartUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="CompleteDate" column="CompleteDate" type="DateTime" />
+    <many-to-one name="CompleteUser" column="CompleteUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="CloseDate" column="CloseDate" type="DateTime" />
+    <many-to-one name="CloseUser" column="CloseUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="CancelDate" column="CancelDate" type="DateTime" />
+    <many-to-one name="CancelUser" column="CancelUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="CancelReason" column="CancelReason" type="String" length="255" />
+    <property name="Memo" column="Memo" type="String" length="255" />
+    <many-to-one name="Currency" column="Currency" class="com.Sconit.Entity.MasterData.Currency, com.Sconit.Entity" cascade="none" />
+    <property name="DiscountFrom" column="DiscountFrom" type="Decimal" />
+    <property name="DiscountTo" column="DiscountTo" type="Decimal" />
+    <property name="IsNewItem" column="IsNewItem" type="Boolean"  />
+    <many-to-one name="BillFrom" column="BillFrom" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="BillTo" column="BillTo" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="PriceListFrom" column="PriceListFrom" class="com.Sconit.Entity.Procurement.PurchasePriceList, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="PriceListTo" column="PriceListTo" class="com.Sconit.Entity.Distribution.SalesPriceList, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="Routing" column="Routing" class="com.Sconit.Entity.MasterData.Routing, com.Sconit.Entity" cascade="none" />
+    <!--<many-to-one name="Flow" column="Flow" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />-->
+    <property name="Flow" column="Flow" type="String" length="50" />
+    <many-to-one name="LocationFrom" column="LocFrom" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="LocationTo" column="LocTo" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="Carrier" column="Carrier" class="com.Sconit.Entity.Transportation.Carrier, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="CarrierBillAddress" column="CarrierBillAddr" class="com.Sconit.Entity.MasterData.BillAddress, com.Sconit.Entity" cascade="none" />
+    <property name="IsShipScanHu" column="IsShipScan" type="Boolean"  />
+    <property name="IsReceiptScanHu" column="IsRecScan" type="Boolean"  />
+    <property name="AutoPrintHu" column="AutoPrintHu" type="Boolean"  />
+    <property name="IsOddCreateHu" column="IsOddCreateHu" type="Boolean"  />
+    <property name="CreateHuOption" column="CreateHuOpt" type="String" length="50" />
+    <property name="IsAutoCreatePickList" column="IsAutoCreatePL" type="Boolean"  />
+    <property name="IsPickListCreated" column="IsPLCreate" type="Boolean"  />
+    <property name="NeedInspection" column="NeedInspect" type="Boolean"  />
+    <many-to-one name="Shift" column="Shift" class="com.Sconit.Entity.MasterData.Shift, com.Sconit.Entity" cascade="none" />
+    <property name="IsGoodsReceiveFIFO" column="IsGrFifo" type="Boolean"  />
+    <property name="AntiResolveHu" column="AntiResolveHu" type="String" length="50" />
+    <property name="MaxOnlineQty" column="MaxOnlineQty" type="Int32"  />
+    <property name="AllowRepeatlyExceed" column="AllowRepeatlyExceed" type="Boolean"  />
+    <property name="IsAsnUniqueReceipt" column="IsAsnUniqueReceipt" type="Boolean"  />
+    <property name="IsSubcontract" column="IsSubcontract" type="Boolean"  />
+    <property name="IsAdditional" column="IsAdditional" type="Boolean"  />
+    <property name="IsMes" column="IsMes" type="Boolean"  />
+    <bag name="OrderDetails" table="OrderDet" inverse="true" lazy="true" order-by="Seq asc">
+      <key column="OrderNo" />
+      <one-to-many class="com.Sconit.Entity.MasterData.OrderDetail, com.Sconit.Entity" />
+    </bag>
+    <bag name="OrderOperations" table="OrderOp" inverse="true" lazy="true" order-by="Op asc">
+      <key column="OrderNo" />
+      <one-to-many class="com.Sconit.Entity.MasterData.OrderOperation, com.Sconit.Entity" />
+    </bag>
+    <bag name="OrderBindings" table="OrderBinding" inverse="true" lazy="true" order-by="Id asc">
+      <key column="OrderNo" />
+      <one-to-many class="com.Sconit.Entity.MasterData.OrderBinding, com.Sconit.Entity" />
+    </bag>
+  </class>
+</hibernate-mapping>

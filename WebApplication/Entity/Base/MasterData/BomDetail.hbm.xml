@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.BomDetail, com.Sconit.Entity" table="BomDet" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="Bom" column="Bom" class="com.Sconit.Entity.MasterData.Bom, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="Operation" column="Op" type="Int32"  />	
+		<property name="Reference" column="Ref" type="String" length="50" />	
+		<property name="StructureType" column="StruType" type="String" length="50" />	
+		<property name="StartDate" column="StartDate" type="DateTime"  />	
+		<property name="EndDate" column="EndDate" type="DateTime" />	
+		<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
+		<property name="RateQty" column="RateQty" type="Decimal"  />	
+		<property name="ScrapPercentage" column="ScrapPct" type="Decimal"  />
+		<property name="NeedPrint" column="NeedPrint" type="Boolean"  />
+		<property name="Priority" column="Priority" type="Int32"  />	
+		<many-to-one name="Location" column="Loc" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />
+		<property name="IsShipScanHu" column="IsShipScan" type="Boolean" />	
+		<property name="HuLotSize" column="HuLotSize" type="Int32" />
+    <property name="BackFlushMethod" column="BackFlushMethod" type="String" length="50" />
+  </class>
+</hibernate-mapping>

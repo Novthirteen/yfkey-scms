@@ -1,0 +1,28 @@
+<%@ CodeTemplate Language="C#" TargetLanguage="C#" Description="Generate the entity class." %>
+<%@ Property Name="AssemblyName" Type="String" Default="com.Sconit" Category="EntityClass" Description="The assembly that contains the entity class." %>
+<%@ Property Name="EntityClassName" Type="String" Category="EntityClass" Description="The entity class name." %>
+<%@ Property Name="ModuleGroupName" Type="String" Category="ModuleGroup" Description="The module group which contains the entity, for example, Security." %>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using Castle.Facilities.NHibernateIntegration;
+
+//TODO: Add other using statmens here.
+
+namespace <%=this.AssemblyName%>.Persistence.<%=this.ModuleGroupName%>.NH
+{
+    public class NH<%=EntityClassName%>Dao : NH<%=EntityClassName%>BaseDao, I<%=EntityClassName%>Dao
+    {
+        public NH<%=EntityClassName%>Dao(ISessionManager sessionManager)
+            : base(sessionManager)
+        {
+        }
+
+        #region Customized Methods
+
+        //TODO: Add other methods here.
+
+        #endregion Customized Methods
+    }
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.Dss.DssObjectMapping, com.Sconit.Entity" table="DssObjectMapping" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<property name="Entity" column="Entity" type="String" length="50" />	
+		<property name="Code" column="Code" type="String" length="50" />
+        <many-to-one name="ExternalSystem" column="ExtSys" class="com.Sconit.Entity.Dss.DssSystem, com.Sconit.Entity" cascade="none" />
+        <property name="ExternalEntity" column="ExtEntity" type="String" length="50" />
+        <property name="ExternalCode" column="ExtCode" type="String" length="50" />	
+  	</class>
+</hibernate-mapping>

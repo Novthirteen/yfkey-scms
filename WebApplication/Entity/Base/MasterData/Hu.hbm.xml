@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.MasterData.Hu, com.Sconit.Entity" table="HuDet" lazy="false">
+    <id name="HuId" column="HuId" type="String" unsaved-value="null" >
+      <generator class="assigned" />
+    </id>
+    <property name="LotNo" column="LotNo" type="String" length="50" />
+    <many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+    <property name="QualityLevel" column="QualityLevel" type="String" length="50" />
+    <many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
+    <property name="UnitCount" column="UC" type="Decimal" />
+    <property name="UnitQty" column="UnitQty" type="Decimal"  />
+    <property name="Qty" column="Qty" type="Decimal"  />
+    <property name="OrderNo" column="OrderNo" type="String" length="50" />
+    <property name="ReceiptNo" column="RecNo" type="String" length="50" />
+    <property name="ManufactureDate" column="ManufactureDate" type="DateTime"  />
+    <many-to-one name="ManufactureParty" column="ManufactureParty" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+    <property name="Remark" column="Remark" type="String" length="255" />
+    <!--<many-to-one name="ParentHuId" column="ParentHuId" class="com.Sconit.Entity.MasterData.Hu, com.Sconit.Entity" cascade="none" />-->
+    <property name="ParentHuId" column="ParentHuId" type="String" length="50" />
+    <property name="PrintCount" column="PrintCount" type="Int32"  />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="ExpiredDate" column="ExpireDate" type="DateTime"  />
+    <property name="Version" column="Version" type="String" length="50" />
+    <property name="LotSize" column="LotSize" type="Decimal" />
+    <property name="AntiResolveHu" column="AntiResolveHu" type="String" length="50" />
+    <property name="CustomerItemCode" column="CustomerItemCode" type="String" length="50" />
+    <!--<many-to-one name="Location" column="Location" class="com.Sconit.Entity.MasterData.Location, com.Sconit.Entity" cascade="none" />-->
+    <property name="Location" column="Location" type="String" length="50" />
+    <property name="Status" column="Status" type="String" length="50" />
+    <!--<many-to-one name="StorageBin" column="Bin" class="com.Sconit.Entity.MasterData.StorageBin, com.Sconit.Entity" cascade="none" />-->
+    <property name="StorageBin" column="Bin" type="String" length="50" />
+    <property name="TransferFlag" column="TFlag" type="Boolean"  />
+    <property name="IsMes" column="IsMes" type="Boolean"  />
+  </class>
+</hibernate-mapping>

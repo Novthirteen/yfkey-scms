@@ -1,0 +1,60 @@
+/*颜色定义
+#55616A
+
+#DAD6C5
+#00A2D2
+*/
+
+body
+{
+	background-color:#FFFFFF;
+}
+
+a 
+{
+	color:Blue
+}
+
+/*定义GridView表格颜色*/
+.lefttop{
+	background: #969696 url(tr_grey_bg.png) repeat-x;
+	color: #FFFFFF;
+}
+.GVHeader{
+	background-color: #969696;
+	color: #FFFFFF;
+}
+.GVHeader a,.lefttop a{
+	color: #FFFFFF;
+}
+.GVRow {
+	color: #000000;
+	background-color: #FFFFFF;
+}
+.GVAlternatingRow{
+    background-color: #EAEAEA;
+}
+.GVSelectedRow{background-color: #F5F7F7;}
+.obhd {
+	  background:#F0F7E3;
+	  font-family:arial;
+	  font-size:12px;
+	  font-weight:bold;
+	  color:#006633;
+	  border:1px solid #DEEBC6;
+	  padding:5px;
+	  width:350px;
+}
+
+.obbd {
+	  background:#FFFFFF;
+	  font-family:arial;
+	  font-size:12px;
+	  color:#006633;
+	  border-left:1px solid #DEEBC6;
+	  border-right:1px solid #DEEBC6;
+	  border-bottom:1px solid #DEEBC6;
+	  padding:5px;
+	  width:350px;
+	  filter:alpha(opacity=90);
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.MasterData.Favorites, com.Sconit.Entity" table="ACC_UserFav" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+		<many-to-one name="User" column="USR_Code" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+		<property name="Type" column="Type" type="String" length="50" />	
+		<property name="PageName" column="PageName" type="String" length="100" />	
+		<property name="PageUrl" column="PageUrl" type="String" length="250" />
+        <property name="PageImage" column="PageImg" type="String" length="50" />
+    </class>
+</hibernate-mapping>

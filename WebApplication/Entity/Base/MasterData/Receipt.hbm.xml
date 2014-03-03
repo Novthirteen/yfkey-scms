@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.MasterData.Receipt, com.Sconit.Entity" table="ReceiptMstr" lazy="false">
+    <id name="ReceiptNo" column="RecNo" type="String" unsaved-value="null" >
+      <generator class="assigned" />
+    </id>
+    <property name="OrderType" column="OrderType" type="String" length="50" />
+    <many-to-one name="PartyFrom" column="PartyFrom" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="PartyTo" column="PartyTo" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="ShipFrom" column="ShipFrom" class="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" cascade="none" />
+    <many-to-one name="ShipTo" column="ShipTo" class="com.Sconit.Entity.MasterData.ShipAddress, com.Sconit.Entity" cascade="none" />
+    <property name="DockDescription" column="DockDesc" type="String" length="50" />
+    <property name="ExternalReceiptNo" column="ExtRecNo" type="String" length="50" />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
+    <property name="ReceiptTemplate" column="RecTemplate" type="String" length="100" />
+    <property name="HuTemplate" column="HuTemplate" type="String" length="100" />
+    <property name="ReferenceIpNo" column="RefIpNo" type="String" length="255" />
+    <bag name="InProcessLocations" table="ReceiptIp" inverse="true" lazy="true">
+      <key column="RecNo"/>
+      <many-to-many column="IpNo" class="com.Sconit.Entity.Distribution.InProcessLocation, com.Sconit.Entity"/>
+    </bag>
+    <bag name="ReceiptDetails" table="ReceiptDet" inverse="true" lazy="true" order-by="OrderLocTransId asc">
+      <key column="RecNo" />
+      <one-to-many class="com.Sconit.Entity.MasterData.ReceiptDetail, com.Sconit.Entity" />
+    </bag>
+    <property name="IsPrinted" column="IsPrinted" type="Boolean"  />
+    <property name="NeedPrint" column="NeedPrint" type="Boolean"  />
+  </class>
+</hibernate-mapping>

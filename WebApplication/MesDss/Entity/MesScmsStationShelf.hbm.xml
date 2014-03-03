@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Mes.Dss.Entity.MesScmsStationShelf, com.Mes.Dss" table="MES_SCMS_STATION_SHELF" lazy="false">
+		<id name="ShelfNo" column="SHELF_NO" type="String" unsaved-value="null" length="64">
+      		<generator class="assigned" />
+        </id>
+        <property name="Flag" column="INTER_FLAG" type="Int32"  />
+        <property name="Qty" column="QTY" type="Int32"  />
+        <property name="LineName" column="LINE_NAME" type="String" length="64" />
+        <property name="StationName" column="STATION_NAME" type="String" length="64" />
+    </class>
+</hibernate-mapping>

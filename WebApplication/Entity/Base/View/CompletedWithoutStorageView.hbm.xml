@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.View.CompletedWithoutStorageView, com.Sconit.Entity" table="CompletedWithoutStorageView" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="assigned" />
+        </id>
+		<many-to-one name="PartyFrom" column="PartyFrom" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
+		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
+		<property name="LotNo" column="LotNo" type="String" length="50" />	
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />	
+		<property name="HuId" column="HuId" type="String" length="50" />	
+		<property name="Qty" column="Qty" type="Decimal"  />	
+		<property name="Description" column="Desc1" type="String" length="255" />	
+  	</class>
+</hibernate-mapping>

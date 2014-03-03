@@ -1,0 +1,80 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+//TODO: Add other using statements here
+
+namespace com.Sconit.Entity.MasterData
+{
+    [Serializable]
+    public abstract class NumberControlBase : EntityBase
+    {
+        #region O/R Mapping Properties
+		
+		private string _code;
+		public string Code
+		{
+			get
+			{
+				return _code;
+			}
+			set
+			{
+				_code = value;
+			}
+		}
+		private Int32? _intValue;
+		public Int32? IntValue
+		{
+			get
+			{
+				return _intValue;
+			}
+			set
+			{
+				_intValue = value;
+			}
+		}
+		private string _stringValue;
+		public string StringValue
+		{
+			get
+			{
+				return _stringValue;
+			}
+			set
+			{
+				_stringValue = value;
+			}
+		}
+        
+        #endregion
+
+		public override int GetHashCode()
+        {
+			if (Code != null)
+            {
+                return Code.GetHashCode();
+            }
+            else
+            {
+                return base.GetHashCode();
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            NumberControlBase another = obj as NumberControlBase;
+
+            if (another == null)
+            {
+                return false;
+            }
+            else
+            {
+            	return (this.Code == another.Code);
+            }
+        } 
+    }
+	
+}
