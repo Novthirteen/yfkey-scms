@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectView>ProjectFiles</ProjectView>
+    <PublishUrlHistory>D:\TEMP\Sconit_CS\|http://demo.sconit.com/Sconit_CS/|http://localhost/Sconit_CS/</PublishUrlHistory>
+    <InstallUrlHistory>http://192.168.210.147/Sconit/Sconit_CS/|http://192.168.210.229/Sconit/Sconit_CS/|http://192.168.210.229/Sconit_CS/|http://scms.yfkey.com/Sconit_CS/|http://127.0.0.1/Sconit_CS/</InstallUrlHistory>
+    <SupportUrlHistory>http://www.sconit.com</SupportUrlHistory>
+    <UpdateUrlHistory>
+    </UpdateUrlHistory>
+    <BootstrapperUrlHistory>
+    </BootstrapperUrlHistory>
+    <ErrorReportUrlHistory>http://www.sconit.com/help</ErrorReportUrlHistory>
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>true</VerifyUploadedFiles>
+  </PropertyGroup>
+</Project>
