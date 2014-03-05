@@ -22,7 +22,7 @@ namespace com.Sconit.Service.MasterData.Impl
 
         #region Method Created By CodeSmith
 
-        [Transaction(TransactionMode.Requires, IsolationMode.ReadUncommitted)]
+        [Transaction(TransactionMode.Requires)]
         public virtual void CreateNamedQuery(NamedQuery entity)
         {
             entityDao.CreateNamedQuery(entity);

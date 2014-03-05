@@ -387,7 +387,7 @@ namespace com.Sconit.Service.Transportation.Impl
                 }
 
                 TransportPriceListDetail priceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportPriceList[0]
-                    , order.StartDate.Value, currencyMgr.LoadCurrency(currency), order.PricingMethod, order.TransportationRoute.ShipFrom, order.TransportationRoute.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, order.VehicleType);
+                    , order.CreateDate, currencyMgr.LoadCurrency(currency), order.PricingMethod, order.TransportationRoute.ShipFrom, order.TransportationRoute.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, order.VehicleType);
                 if (priceListDetail == null)
                 {
                     throw new BusinessErrorException("Transportation.PriceListDetail.Empty", order.PricingMethod);
@@ -475,7 +475,7 @@ namespace com.Sconit.Service.Transportation.Impl
 
             actBill.OrderNo = order.OrderNo;
             actBill.BillAddress = order.CarrierBillAddress;
-            actBill.EffectiveDate = DateTime.Parse(order.StartDate.Value.ToString("yyyy-MM-dd"));
+            actBill.EffectiveDate = DateTime.Parse(order.CreateDate.ToString("yyyy-MM-dd"));
             actBill.Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE;
             actBill.TransType = BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION;
             actBill.CreateDate = DateTime.Now;
