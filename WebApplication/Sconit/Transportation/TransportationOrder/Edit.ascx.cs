@@ -451,7 +451,8 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
     }
     protected void createTBill()
     {
-        if ((TheTransportationOrderMgr.LoadTransportationOrder(OrderNo)).Status == "In-Process")
+        TransportationOrder to = TheTransportationOrderMgr.LoadTransportationOrder(OrderNo);
+        if (to.Status == "In-Process")
         {
         TransportationActBill tb = new TransportationActBill();
         tb.BillAddress=TheBillAddressMgr.LoadBillAddress(((Controls_TextBox)(this.FV_Order.FindControl("tbCarrierBillAddress"))).Text);
@@ -472,7 +473,7 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
          string vchtype = ((DropDownList)(this.FV_Order.FindControl("ddlType"))).SelectedValue;
         int shipto=(TheTransportationOrderMgr.LoadTransportationOrder(this.OrderNo)).TransportationRoute.ShipTo.Id;
         int shipfrom=(TheTransportationOrderMgr.LoadTransportationOrder(this.OrderNo)).TransportationRoute.ShipFrom.Id;
-        DataSet ds = SqlHelper.ExecuteDataset(connstring, CommandType.Text, "select id from TPriceListDet where Tpricelist='" + carrier + "' and startdate<'" + DateTime.Now.ToString() + "' and enddate >'" + DateTime.Now.ToString() + "' and currency='RMB' and pricingmethod='" + tb.PricingMethod + "' and vehicletype='" + vchtype + "' and shipto='" + shipto + "' and shipfrom='" + shipfrom + "' ");
+        DataSet ds = SqlHelper.ExecuteDataset(connstring, CommandType.Text, "select id from TPriceListDet where Tpricelist='" + carrier + "' and startdate<'" + to.CreateDate.ToShortDateString() + "' and enddate >'" + to.CreateDate.ToShortDateString() + "' and currency='RMB' and pricingmethod='" + tb.PricingMethod + "' and vehicletype='" + vchtype + "' and shipto='" + shipto + "' and shipfrom='" + shipfrom + "' ");
         if (ds.Tables[0].Rows.Count == 0)
         {
             throw new BusinessErrorException("没有找到该类型的价格单");
