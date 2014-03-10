@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using com.Sconit.Entity.MasterData;
 using com.Sconit.Entity.MRP;
+using NPOI.SS.UserModel;
 
 namespace com.Sconit.Service.MasterData
 {
@@ -23,5 +24,7 @@ namespace com.Sconit.Service.MasterData
         OrderHead ReadBatchTransferFromXls(Stream inputStream, User user, string flowCode);
 
         IList<CustomerSchedule> ReadCustomerScheduleFromXls(Stream inputStream, User user, DateTime? startDate, DateTime? endDate, string flowCode, string refScheduleNo, bool isItemRef);
+
+        bool CheckValidDataRow(Row row, int startColIndex, int endColIndex);
     }
 }
