@@ -1226,7 +1226,7 @@ namespace com.Sconit.Service.MasterData.Impl
             return colIndex;
         }
 
-        private bool CheckValidDataRow(Row row, int startColIndex, int endColIndex)
+        public bool CheckValidDataRow(Row row, int startColIndex, int endColIndex)
         {
             for (int i = startColIndex; i < endColIndex; i++)
             {
