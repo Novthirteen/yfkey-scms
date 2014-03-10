@@ -4,6 +4,7 @@
 <%@ Register Src="New.ascx" TagName="New" TagPrefix="uc2" %>
 <%@ Register Src="QuickNew.ascx" TagName="QuickNew" TagPrefix="uc2" %>
 <%@ Register Src="EditMain.ascx" TagName="Edit" TagPrefix="uc2" %>
+<%@ Register Src="Import.ascx" TagName="Import" TagPrefix="uc2" %>
 <%@ Register Src="~/Order/GoodsReceipt/ViewReceipt/ViewMain.ascx" TagName="ViewReceipt" TagPrefix="uc2" %>
 
 <uc2:Search ID="ucSearch" runat="server" Visible="true" />
@@ -12,3 +13,4 @@
 <uc2:QuickNew ID="ucQuickNew" runat="server" Visible="false" />
 <uc2:Edit ID="ucEdit" runat="server" Visible="false" />
 <uc2:ViewReceipt ID="ucViewReceipt" runat="server" Visible="false" />
+<uc2:Import ID="ucImport" runat="server" Visible="false" />

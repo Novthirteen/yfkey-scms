@@ -83,7 +83,7 @@ public partial class Order_OrderHead_Main : MainModuleBase
 
     public Order_OrderHead_Main()
     {
-        
+
     }
 
     protected void Page_Load(object sender, EventArgs e)
@@ -95,7 +95,8 @@ public partial class Order_OrderHead_Main : MainModuleBase
         this.ucNew.CreateEvent += new EventHandler(this.CreateBack_Render);
         this.ucNew.QuickCreateEvent += new EventHandler(this.QuickCreateBack_Render);
         this.ucQuickNew.QuickCreateEvent += new EventHandler(this.QuickCreateBack_Render);
-
+        this.ucSearch.ImportEvent += new EventHandler(this.Import_Render);
+        this.ucImport.BackEvent += new System.EventHandler(this.ImportBack_Render);
         if (this.Action != BusinessConstants.PAGE_NEW_ACTION)
         {
             this.ucNew.BackEvent += new System.EventHandler(this.NewBack_Render);
@@ -166,7 +167,7 @@ public partial class Order_OrderHead_Main : MainModuleBase
             this.ucQuickNew.IsQuick = this.IsQuick;
             this.ucQuickNew.ModuleType = this.ModuleType;
             this.ucQuickNew.ModuleSubType = this.ModuleSubType;
-   
+
             if (this.Action == BusinessConstants.PAGE_LIST_ACTION)
             {
                 ucSearch.QuickSearch(this.ActionParameter);
@@ -206,19 +207,19 @@ public partial class Order_OrderHead_Main : MainModuleBase
     {
         this.ucSearch.Visible = false;
         this.ucList.Visible = false;
-         this.ucEdit.Visible = false;
-         if (this.IsQuick)
-         {
-             this.ucQuickNew.Visible = true;
-             this.ucNew.Visible = false;
-             this.ucQuickNew.PageCleanup();
-         }
-         else
-         {
-             this.ucQuickNew.Visible = false;
-             this.ucNew.Visible = true;
-             this.ucNew.PageCleanup();
-         }       
+        this.ucEdit.Visible = false;
+        if (this.IsQuick)
+        {
+            this.ucQuickNew.Visible = true;
+            this.ucNew.Visible = false;
+            this.ucQuickNew.PageCleanup();
+        }
+        else
+        {
+            this.ucQuickNew.Visible = false;
+            this.ucNew.Visible = true;
+            this.ucNew.PageCleanup();
+        }
     }
 
     //The event handler when user click button "Back" button of ucNew
@@ -268,5 +269,22 @@ public partial class Order_OrderHead_Main : MainModuleBase
         this.ucSearch.Visible = true;
         this.ucList.Visible = true;
         this.ucList.UpdateView();
+    }
+
+
+    void Import_Render(object sender, EventArgs e)
+    {
+        this.ucSearch.Visible = false;
+        this.ucList.Visible = false;
+        this.ucEdit.Visible = false;
+        this.ucQuickNew.Visible = false;
+        this.ucNew.Visible = false;
+        this.ucImport.Visible = true;
+    }
+
+    void ImportBack_Render(object sender, EventArgs e)
+    {
+        this.ucSearch.Visible = true;
+        this.ucImport.Visible = false;
     }
 }

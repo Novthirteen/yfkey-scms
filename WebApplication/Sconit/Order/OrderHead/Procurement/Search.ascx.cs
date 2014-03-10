@@ -25,6 +25,8 @@ public partial class Order_OrderHead_Search : SearchModuleBase
     public event EventHandler SearchEvent;
     public event EventHandler NewEvent;
     public event EventHandler ExportEvent;
+    public event EventHandler ImportEvent;
+
 
     #region
     private IDictionary<string, string> parameter = new Dictionary<string, string>();
@@ -145,7 +147,7 @@ public partial class Order_OrderHead_Search : SearchModuleBase
 
     protected void btnSearch_Click(object sender, EventArgs e)
     {
-       
+
         Button btn = (Button)sender;
         if (btn == this.btnExport)
         {
@@ -359,6 +361,14 @@ public partial class Order_OrderHead_Search : SearchModuleBase
             this.astvMyTree.RootNode.ChildNodes[3].CheckedState = ASTreeViewCheckboxState.Checked;
             this.astvMyTree.InitialDropdownText = BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE + "," + BusinessConstants.CODE_MASTER_STATUS_VALUE_INPROCESS + "," + BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT;
             this.astvMyTree.DropdownText = BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE + "," + BusinessConstants.CODE_MASTER_STATUS_VALUE_INPROCESS + "," + BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT;
+        }
+    }
+
+    protected void btnImport_Click(object sender, EventArgs e)
+    {
+        if (ImportEvent != null)
+        {
+            ImportEvent(sender, e);
         }
     }
 }

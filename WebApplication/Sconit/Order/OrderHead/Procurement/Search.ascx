@@ -136,6 +136,8 @@
                     CssClass="button2" />
                 <cc1:Button ID="btnNew" runat="server" Text="${Common.Button.New}" OnClick="btnNew_Click"
                     CssClass="button2" FunctionId="EditOrder" />
+                <cc1:Button ID="btnImport" runat="server" Text="${Common.Button.Import}" OnClick="btnImport_Click"
+                    CssClass="button2" FunctionId="EditOrder" />
                 <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" CssClass="button2"
                     OnClick="btnSearch_Click" />
             </td>
