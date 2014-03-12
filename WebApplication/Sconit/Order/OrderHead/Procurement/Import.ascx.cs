@@ -87,8 +87,17 @@ public partial class Order_OrderHead_Procurement_Import : ModuleBase
                 #region 读取窗口时间
                 try
                 {
-                    windowTime = row.GetCell(colWindowTime).DateCellValue;
-                    orderHead.WindowTime = windowTime;
+                    string readwindowTime = row.GetCell(colWindowTime).StringCellValue;
+                    if (DateTime.TryParse(readwindowTime, out windowTime))
+                    {
+                        orderHead.WindowTime = windowTime;
+                    }
+                    else
+                    {
+                        errorMessage += string.Format("第{0}行:窗口时间填写有误。<br/>", rowCount);
+                        continue;
+                    }
+                    
                 }
                 catch
                 {
@@ -121,7 +130,7 @@ public partial class Order_OrderHead_Procurement_Import : ModuleBase
                 #region 读取数量
                 try
                 {
-                    qty = Convert.ToDecimal(row.GetCell(colQty).StringCellValue);
+                    qty = Convert.ToDecimal(row.GetCell(colQty).NumericCellValue);
                 }
                 catch
                 {
@@ -178,7 +187,9 @@ public partial class Order_OrderHead_Procurement_Import : ModuleBase
                 //OrderHead newOrderHead = new OrderHead();
                 foreach (var d in order.list)
                 {
-                    detList.Add(d.OrderDetails.First());
+                    OrderDetail det = d.OrderDetails.First();
+                    det.OrderHead = newOrderHead;
+                    detList.Add(det);
                 }
                 newOrderHead.OrderDetails = detList;
                 CreateOrder(newOrderHead);
