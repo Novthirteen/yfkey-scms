@@ -195,7 +195,19 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
                 tbEndDate.Text = ((DateTime)transportPriceListDetail.EndDate).ToString("yyyy-MM-dd");
             }
 
-            
+            TextBox tbStartQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartQty"));
+            if (transportPriceListDetail.StartQty != null)
+            {
+                tbStartQty.Text = transportPriceListDetail.StartQty.Value.ToString("0.########");
+            }
+
+            TextBox tbEndQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndQty"));
+            if (transportPriceListDetail.EndQty != null)
+            {
+                tbEndQty.Text = transportPriceListDetail.EndQty.Value.ToString("0.########");
+            }
+
+
         }
     }
 
@@ -263,6 +275,24 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
             tbMinVolume.Enabled = true;
         }
         tbMinVolume.Text = "0";
+
+        TextBox tbStartQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartQty"));
+        TextBox tbEndQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndQty"));
+
+        if (ddlPricingMethod.SelectedValue == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
+        {
+            tbStartQty.Enabled = true;
+            tbEndQty.Enabled = true;
+        }
+        else
+        {
+            tbStartQty.Enabled = false;
+            tbEndQty.Enabled = false;
+        }
+
+        tbStartQty.Text = "0";
+        tbEndQty.Text = "0";
+
         ddlVehicleType.DataSource = GetVehicleTypeGroup(ddlPricingMethod.SelectedValue);
         ddlVehicleType.DataBind();
     }
@@ -286,7 +316,7 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_20FOOT));
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_40FOOT));
         }
-        else if (pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3)
+        else if (pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3 || pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
         {
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_SCATTERED));
         }

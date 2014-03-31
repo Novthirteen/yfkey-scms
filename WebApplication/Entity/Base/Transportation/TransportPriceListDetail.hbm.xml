@@ -24,6 +24,10 @@
 		<property name="ServiceCharge" column="ServiceCharge" type="Decimal"  />	
 		<property name="RoundUpOption" column="RoundUpOpt" type="String" length="50"  />	
 		<property name="Type" column="Type" type="String" length="50" />	
-		<property name="Remark" column="Remark" type="String" length="50" />	
+		<property name="Remark" column="Remark" type="String" length="50" />
+    <property name="StartQty" column="StartQty" type="Decimal"  />
+    <property name="EndQty" column="EndQty" type="Decimal"  />
+    <property name="MinPrice" column="MinPrice" type="Decimal"  />
+    <property name="MaxPrice" column="MaxPrice" type="Decimal"  />
   </class>
 </hibernate-mapping>

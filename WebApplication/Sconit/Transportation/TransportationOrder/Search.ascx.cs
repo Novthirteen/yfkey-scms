@@ -56,9 +56,14 @@ public partial class Transportation_TransportationOrder_Search : SearchModuleBas
             DetachedCriteria selectCountCriteria = DetachedCriteria.For(typeof(TransportationOrder))
                 .SetProjection(Projections.Count("OrderNo"));
 
-            selectCriteria.CreateAlias("TransportationRoute", "r",NHibernate.SqlCommand.JoinType.LeftOuterJoin);
+            selectCriteria.CreateAlias("TransportationRoute", "r", NHibernate.SqlCommand.JoinType.LeftOuterJoin);
             selectCriteria.CreateAlias("r.ShipFrom", "f", NHibernate.SqlCommand.JoinType.LeftOuterJoin);
             selectCriteria.CreateAlias("r.ShipTo", "t", NHibernate.SqlCommand.JoinType.LeftOuterJoin);
+
+
+            selectCountCriteria.CreateAlias("TransportationRoute", "r", NHibernate.SqlCommand.JoinType.LeftOuterJoin);
+            selectCountCriteria.CreateAlias("r.ShipFrom", "f", NHibernate.SqlCommand.JoinType.LeftOuterJoin);
+            selectCountCriteria.CreateAlias("r.ShipTo", "t", NHibernate.SqlCommand.JoinType.LeftOuterJoin);
 
 
             if (orderNo != string.Empty)

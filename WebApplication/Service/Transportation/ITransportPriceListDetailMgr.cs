@@ -17,6 +17,8 @@ namespace com.Sconit.Service.Transportation
 
         TransportPriceListDetail GetLastestTransportPriceListDetail(TransportPriceList priceList, Item item, DateTime effectiveDate, Currency currency, Uom uom, string pricingMethod, TransportationAddress shipFrom, TransportationAddress shipTo, string priceListType, string billingMethod,string vehicleType);
 
+        TransportPriceListDetail GetLastestLadderStereTransportPriceListDetail(TransportPriceList priceList, Item item, DateTime effectiveDate, Currency currency, Uom uom, string pricingMethod, TransportationAddress shipFrom, TransportationAddress shipTo, string priceListType, string billingMethod, string vehicleType,decimal qty);
+
         IList<TransportPriceListDetail> CheckOperation(string transportPriceListCode, string startDate, string endDate, string item, string billingMethod);
         #endregion Customized Methods
     }

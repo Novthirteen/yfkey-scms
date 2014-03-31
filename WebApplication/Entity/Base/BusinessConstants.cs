@@ -170,6 +170,7 @@ namespace com.Sconit.Entity
         public static readonly string TRANSPORTATION_PRICING_METHOD_M3 = "M3";
         public static readonly string TRANSPORTATION_PRICING_METHOD_KG = "KG";
         public static readonly string TRANSPORTATION_PRICING_METHOD_SHIPT = "SHIPT";
+        public static readonly string TRANSPORTATION_PRICING_METHOD_LADDERSTERE = "LadderStere";
 
         public static readonly string TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION = "Transportation";
         public static readonly string TRANSPORTATION_PRICELIST_DETAIL_TYPE_OPERATION = "Operation";
