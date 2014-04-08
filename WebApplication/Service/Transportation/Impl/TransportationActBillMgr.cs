@@ -465,7 +465,8 @@ namespace com.Sconit.Service.Transportation.Impl
                         #endregion
                         actBill.UnitPrice = priceListDetail.UnitPrice;
                         actBill.BillQty = totalVolume;
-                        actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
+                        decimal minPrice = priceListDetail.MinPrice.HasValue ? priceListDetail.MinPrice.Value : 0;
+                        actBill.BillAmount = minPrice + actBill.UnitPrice * actBill.BillQty;
                     }
                     #endregion
                 }

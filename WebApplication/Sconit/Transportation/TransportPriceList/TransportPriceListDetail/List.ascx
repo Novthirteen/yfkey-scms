@@ -41,6 +41,8 @@
                     DataFormatString="{0:0.########}" />
                <asp:BoundField DataField="EndQty" HeaderText="${Transportation.TransportPriceListDetail.EndQty}" SortExpression="EndQty"
                     DataFormatString="{0:0.########}" />
+                  <asp:BoundField DataField="MinPrice" HeaderText="${Transportation.TransportPriceListDetail.MinPrice}" SortExpression="MinPrice"
+                    DataFormatString="{0:0.########}" />
                 <asp:CheckBoxField DataField="IsProvisionalEstimate" HeaderText="${Transportation.TransportPriceListDetail.IsProvisionalEstimate}"
                     SortExpression="IsProvisionalEstimate" />
                 <asp:BoundField DataField="StartDate" HeaderText="${Common.Business.StartDate}" SortExpression="StartDate"
