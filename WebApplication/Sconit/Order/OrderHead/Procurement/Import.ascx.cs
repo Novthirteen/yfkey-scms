@@ -142,7 +142,7 @@ public partial class Order_OrderHead_Procurement_Import : ModuleBase
                 orderHead.IsAutoRelease = true;
                 foreach (OrderDetail det in orderHead.OrderDetails)
                 {
-                    det.ReceivedQty = qty;
+                    det.RequiredQty = qty;
                     det.OrderedQty = qty;
                 }
                 orderHeadList.Add(orderHead);

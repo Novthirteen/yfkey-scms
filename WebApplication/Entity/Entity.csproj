@@ -97,6 +97,11 @@
     <Compile Include="Base\Dss\DssObjectMappingBase.cs" />
     <Compile Include="Base\Dss\DssOutboundControlBase.cs" />
     <Compile Include="Base\Dss\DssSystemBase.cs" />
+    <Compile Include="Base\EDI\EDIDailyPlanBase.cs" />
+    <Compile Include="Base\EDI\EDIFordPlanBase.cs" />
+    <Compile Include="Base\EDI\TEMP_FORD_EDI_862Base.cs" />
+    <Compile Include="Base\EDI\TEMP_FORD_EDI_856Base.cs" />
+    <Compile Include="Base\EDI\TEMP_FORD_EDI_830Base.cs" />
     <Compile Include="Base\EntityBase.cs" />
     <Compile Include="Base\Exception\BusinessErrorException.cs" />
     <Compile Include="Base\Exception\BusinessWarningException.cs" />
@@ -267,6 +272,11 @@
     <Compile Include="Dss\DssObjectMapping.cs" />
     <Compile Include="Dss\DssOutboundControl.cs" />
     <Compile Include="Dss\DssSystem.cs" />
+    <Compile Include="EDI\EDIDailyPlan.cs" />
+    <Compile Include="EDI\EDIFordPlan.cs" />
+    <Compile Include="EDI\TEMP_FORD_EDI_862.cs" />
+    <Compile Include="EDI\TEMP_FORD_EDI_856.cs" />
+    <Compile Include="EDI\TEMP_FORD_EDI_830.cs" />
     <Compile Include="MasterData\ActingBill.cs" />
     <Compile Include="MasterData\Address.cs" />
     <Compile Include="MasterData\Bill.cs" />
@@ -659,6 +669,21 @@
     <EmbeddedResource Include="Base\View\UnWHQueryView.hbm.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\EDI\TEMP_FORD_EDI_830.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\EDI\TEMP_FORD_EDI_856.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\EDI\TEMP_FORD_EDI_862.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\EDI\EDIFordPlan.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\EDI\EDIDailyPlan.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

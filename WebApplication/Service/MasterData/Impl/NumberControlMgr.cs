@@ -33,6 +33,12 @@ namespace com.Sconit.Service.MasterData.Impl
         }
 
         #region Customized Methods
+        [Transaction(TransactionMode.Requires)]
+        public int GenerateNumberNextSequence(string code)
+        {
+            string numberSuffix = GetNextSequence(code);
+            return Convert.ToInt32(numberSuffix);
+        }
 
         [Transaction(TransactionMode.Requires)]
         public string GenerateNumber(string code)

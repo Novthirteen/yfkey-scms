@@ -28,6 +28,8 @@ using com.Sconit.Service.Report;
 using com.Sconit.Service.Transportation;
 using com.Sconit.Service.MRP;
 using com.Sconit.Service.Mes;
+using com.Sconit.Service;
+using com.Sconit.Service.EDI;
 
 /// <summary>
 /// Summary description for ControlBase
@@ -312,6 +314,9 @@ namespace com.Sconit.Web
         protected IShelfItemMgr TheShelfItemMgr { get { return GetService<IShelfItemMgr>("ShelfItemMgr.service"); } }
         protected IProductLineUserMgr TheProductLineUserMgr { get { return GetService<IProductLineUserMgr>("ProductLineUserMgr.service"); } }
         protected IByMaterialMgr TheByMaterialMgr { get { return GetService<IByMaterialMgr>("ByMaterialMgr.service"); } }
+
+        protected IGenericMgr TheGenericMgr { get { return GetService<IGenericMgr>("IGenericMgr.service"); } }
+        protected IEDIMgr TheEDIMgr { get { return GetService<IEDIMgr>("IEDIMgr.service"); } }
 
         #region MRP
         protected ICustomerScheduleDetailMgr TheCustomerScheduleDetailMgr { get { return ServiceLocator.GetService<ICustomerScheduleDetailMgr>("CustomerScheduleDetailMgr.service"); } }

@@ -13,6 +13,7 @@ using com.Sconit.Service.Production;
 using com.Sconit.Utility;
 using com.Sconit.Service.Criteria;
 using com.Sconit.Service.View;
+using com.Sconit.Service.EDI;
 
 /// <summary>
 /// Summary description for BaseWS
@@ -130,6 +131,7 @@ public class BaseWS : System.Web.Services.WebService
     //protected IStorageAreaMgr TheStorageAreaMgr { get { return GetService<IStorageAreaMgr>("StorageAreaMgr.service"); } }
     //protected IReportMgr TheReportMgr { get { return GetService<IReportMgr>("ReportMgr.service"); } }
     //protected IScanBarcodeMgr TheScanBarcodeMgr { get { return GetService<IScanBarcodeMgr>("ScanBarcodeMgr.service"); } }
+    protected IEDIMgr TheEDIMgr { get { return GetService<IEDIMgr>("IEDIMgr.service"); } }
     #endregion
 
     #region 私有
