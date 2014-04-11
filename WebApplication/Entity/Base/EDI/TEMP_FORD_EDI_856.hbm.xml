@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.EDI.TEMP_FORD_EDI_856, com.Sconit.Entity" table="TEMP_FORD_EDI_856" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <property name="BatchNo" column="BatchNo" type="Int32" />
+    <property name="Message_Type_Code" column="Message_Type_Code" type="String" length="255"/>
+    <property name="Message_Type" column="Message_Type" type="String" length="255"/>
+    <property name="ReleaseVersion" column="ReleaseVersion" type="String" length="255"/>
+    <property name="Sender_ID" column="Sender_ID" type="String" length="255"/>
+    <property name="Receiver_ID" column="Receiver_ID" type="String" length="255"/>
+    <property name="Interchange_Control_Num" column="Interchange_Control_Num" type="String" length="255"/>
+    <property name="ASN_Creation_DateTime" column="ASN_Creation_DateTime" type="String" length="255"/>
+    <property name="Ship_To_GSDB_Code" column="Ship_To_GSDB_Code" type="String" length="255"/>
+    <property name="Ship_From_GSDB_Code" column="Ship_From_GSDB_Code" type="String" length="255"/>
+    <property name="Intermediate_Consignee_Code" column="Intermediate_Consignee_Code" type="String" length="255"/>
+    <property name="Message_Purpose_Code" column="Message_Purpose_Code" type="String" length="255"/>
+    <property name="Shipment_ID" column="Shipment_ID" type="String" length="255"/>
+    <property name="Shipped_DateTime" column="Shipped_DateTime" type="String" length="255"/>
+    <property name="Gross_Weight" column="Gross_Weight" type="String" length="255"/>
+    <property name="Net_Weight" column="Net_Weight" type="String" length="255"/>
+    <property name="UOM" column="UOM" type="String" length="255"/>
+    <property name="Packaging_Type_Code" column="Packaging_Type_Code" type="String" length="255"/>
+    <property name="Lading_Qty" column="Lading_Qty" type="String" length="255"/>
+    <property name="Carrier_SCAC_Code" column="Carrier_SCAC_Code" type="String" length="255"/>
+    <property name="Transportation_Method_Code" column="Transportation_Method_Code" type="String" length="255"/>
+    <property name="Equipment_Desc_Code" column="Equipment_Desc_Code" type="String" length="255"/>
+    <property name="Equipment_Num" column="Equipment_Num" type="String" length="255"/>
+    <property name="LadingNum" column="LadingNum" type="String" length="255"/>
+    <property name="Part_Num" column="Part_Num" type="String" length="255"/>
+    <property name="Purchase_Order_Num" column="Purchase_Order_Num" type="String" length="255"/>
+    <property name="Shipped_Qty" column="Shipped_Qty" type="String" length="255"/>
+    <property name="Cum_Shipped_Qty" column="Cum_Shipped_Qty" type="String" length="255"/>
+    <property name="Cum_Shipped_UOM" column="Cum_Shipped_UOM" type="String" length="255"/>
+    <property name="Number_of_Loads" column="Number_of_Loads" type="String" length="255"/>
+    <property name="Qty_Per_Load" column="Qty_Per_Load" type="String" length="255"/>
+    <property name="Packaging_Code" column="Packaging_Code" type="String" length="255"/>
+    <property name="Airport_Code" column="Airport_Code" type="String" length="255"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" />
+    <property name="CreateUserName" column="CreateUserName" type="String" length="255"/>
+    <property name="IsHandle" column="IsHandle" type="Boolean"/>
+    <property name="ReadFileName" column="ReadFileName" type="String" length="255"/>
+  </class>
+</hibernate-mapping>

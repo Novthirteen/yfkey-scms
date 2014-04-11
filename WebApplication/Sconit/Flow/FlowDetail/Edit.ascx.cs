@@ -157,6 +157,9 @@ public partial class MasterData_FlowDetail_Edit : EditModuleBase
             tbLocFrom.DataBind();
             tbLocFrom.Text = flowDetail.LocationFrom == null ? string.Empty : flowDetail.LocationFrom.Code;
 
+            this.FV_FlowDetail.FindControl("fdFordEDIOption").Visible = true;
+            ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbPackagingCode")).Value = flowDetail.PackagingCode;
+            ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbTransModeCode")).Value = flowDetail.TransModeCode;
 
         }
         else if (this.ModuleType == BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION)
@@ -323,6 +326,9 @@ public partial class MasterData_FlowDetail_Edit : EditModuleBase
                 flowDetail.OddShipOption = ddlOddShipOption.SelectedValue;
 
             }
+            flowDetail.PackagingCode = ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbPackagingCode")).Value;
+            flowDetail.TransModeCode = ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbTransModeCode")).Value;
+
         }
         else if (this.ModuleType == BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION)
         {

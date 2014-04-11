@@ -49,6 +49,9 @@ namespace com.Sconit.Entity
         public static readonly string CODE_PREFIX_TRANSPORTATION_ORDER = "SHP";
         public static readonly string CODE_PREFIX_TRANSPORTATIONBILL = "TBL";
         public static readonly string CODE_PREFIX_TRANSPORTATIONBILL_RED = "TRED";
+        public static readonly string CODE_PREFIX_IMPORT_TEMPEDI830 = "TEMPEDI830";
+        public static readonly string CODE_PREFIX_IMPORT_TEMPEDI856 = "TEMPEDI856";
+        public static readonly string CODE_PREFIX_IMPORT_TEMPEDI862 = "TEMPEDI862";
 
         public static readonly string ENTITY_PREFERENCE_CODE_DEFAULT_LANGUAGE = "Language";
         public static readonly string ENTITY_PREFERENCE_CODE_ORDER_LENGTH = "OrderLength";
@@ -186,6 +189,15 @@ namespace com.Sconit.Entity
         public static readonly string TRACK_EVENT_CREATE = "Create";
         public static readonly string TRACK_EVENT_UPDATE= "Update";
         public static readonly string TRACK_EVENT_DELETE = "Delete";
+
+
+        public static readonly string ENTITY_PREFERENCE_CODE_BATPATH = "BatPath"; //运行Bat文件目录
+        public static readonly string ENTITY_PREFERENCE_CODE_SOURCEFILEPATH = "SourceFilePath"; //导入文件目录
+        public static readonly string ENTITY_PREFERENCE_CODE_BAKFILEPATH = "BakFilePath";       //成功读取文件目录
+        public static readonly string ENTITY_PREFERENCE_CODE_ERRORFILEPATH = "ErrorFilePath";    //读取文件失败目录
+        public static readonly string ENTITY_PREFERENCE_CODE_ARCHIVEFOLDER = "ArchiveFolder";         //存档目录
+        public static readonly string ENTITY_PREFERENCE_CODE_TEMPFOLDER = "TempFolder";         //      临时目录
+        public static readonly string ENTITY_PREFERENCE_CODE_OUTFOLDER = "OutFolder";     //输出文件目录
 
         #region Template File Relative Path
 

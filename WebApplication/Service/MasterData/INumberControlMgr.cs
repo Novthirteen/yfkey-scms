@@ -8,6 +8,7 @@ namespace com.Sconit.Service.MasterData
     public interface INumberControlMgr : INumberControlBaseMgr
     {
         #region Customized Methods
+        int GenerateNumberNextSequence(string code);
 
         string GenerateNumber(string code);
 

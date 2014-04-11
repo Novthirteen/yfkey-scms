@@ -391,6 +391,105 @@
                     </tr>
                 </table>
             </fieldset>
+            <%--供货--%>
+            <fieldset id="fdFordEDIOption" runat="server" visible="false">
+                <legend>Ford EDI发货配置选项</legend>
+                <table class="mtable">
+                    <tr>
+                        <td class="td01">
+                            Gross Weight
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbGrossWeight" runat="server" Text='<%# Bind("GrossWeight") %>' />
+                        </td>
+                        <td class="td01">
+                        Net Weight
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbNetWeight" runat="server" Text='<%# Bind("NetWeight") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td01">
+                            净重毛重单位
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbWeightUom" runat="server" Text='<%# Bind("WeightUom") %>' />
+                        </td>
+                        <td class="td01">
+                        Carrier Code
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbCarrierCode" runat="server" Text='<%# Bind("CarrierCode") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td01">
+                            Trans Mode Code
+                        </td>
+                        <td class="td02">
+                            <%--<asp:TextBox ID="tbTransModeCode" runat="server" Text='<%# Bind("TransModeCode") %>' />--%>
+                            <select id="tbTransModeCode" runat="server" >
+                                <option  value=""></option>
+                                <option  value="M">Motor(汽运)</option>
+                                <option  value="O">海运</option>
+                                <option   value="A">空运</option>
+                            </select>
+                        </td>
+                        <td class="td01">
+                        Conveyance Number
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbConveyanceNumber" runat="server" Text='<%# Bind("ConveyanceNumber") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td01">
+                            Receiving Plant
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbReceivingPlant" runat="server" Text='<%# Bind("ReceivingPlant") %>' />
+                        </td>
+                        <td class="td01">
+                        Ship From
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbShipFrom" runat="server" Text='<%# Bind("ShipFrom") %>' />
+                        </td>
+                    </tr>
+                     <tr>
+                        <td class="td01">
+                            Packaging Code
+                        </td>
+                        <td class="td02">
+                            <%--<asp:TextBox ID="tbPackagingCode" runat="server" Text='<%# Bind("PackagingCode") %>' />--%>
+                             <select id="tbPackagingCode" runat="server" >
+                                <option  value=""></option>
+                                <option  value="CD">CD</option>
+                                <option   value="COP">COP</option>
+                            </select>
+                        </td>
+                        <td class="td01">
+                        Lading Quantity
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbLadingQuantity" runat="server" Text='<%# Bind("LadingQuantity") %>' />
+                        </td>
+                    </tr>
+                     <tr>
+                        <td class="td01">
+                            Units Per Container
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbUnitsPerContainer" runat="server" Text='<%# Bind("UnitsPerContainer") %>' />
+                        </td>
+                        <td class="td01">
+                        </td>
+                        <td class="td02">
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
             <div class="tablefooter">
                 <asp:Button ID="btnInsert" runat="server" CommandName="Insert" Text="${Common.Button.Save}"
                     CssClass="button2" ValidationGroup="vgSaveGroup" />
