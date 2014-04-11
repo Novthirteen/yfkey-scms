@@ -275,7 +275,11 @@ namespace com.Sconit.Entity.Transportation
 				_remark = value;
 			}
 		}
-        
+
+        public Decimal? MaxPrice { get; set; }
+        public Decimal? MinPrice { get; set; }
+        public Decimal? StartQty { get; set; }
+        public Decimal? EndQty { get; set; }
         #endregion
 
 		public override int GetHashCode()

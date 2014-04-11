@@ -19,9 +19,11 @@
                         <td class="td02">
                             <asp:Literal ID="lbCurrentTransportPriceList" runat="server" />
                         </td>
-                        <td class="td01">
+                          <td class="td01">
+                            <asp:Literal ID="lblIsProvisionalEstimate" runat="server" Text="${Transportation.TransportPriceListDetail.IsProvisionalEstimate}:" />
                         </td>
                         <td class="td02">
+                            <asp:CheckBox ID="cbIsProvisionalEstimate" runat="server" Checked='<%#Bind("IsProvisionalEstimate") %>' />
                         </td>
                     </tr>
                     <tr>
@@ -81,6 +83,20 @@
                             <asp:DropDownList ID="ddlVehicleType" runat="server" DataTextField="Description" DataValueField="Value" />
                         </td>
                     </tr>
+                     <tr>
+                        <td class="td01">
+                            <asp:Literal ID="lblStartQty" runat="server" Text="${Transportation.TransportPriceListDetail.StartQty}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbStartQty" runat="server" Text='<%#Bind("StartQty","{0:0.########}") %>' />
+                        </td>
+                        <td class="td01">
+                            <asp:Literal ID="lblEndQty" runat="server" Text="${Transportation.TransportPriceListDetail.EndQty}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbEndQty" runat="server" Text='<%#Bind("EndQty","{0:0.########}") %>' />
+                        </td>
+                    </tr>
                     <tr>
                         <td class="td01">
                             <asp:Literal ID="lblUnitPrice" runat="server" Text="${Transportation.TransportPriceListDetail.UnitPrice}:" />
@@ -109,6 +125,7 @@
                         </td>
                     </tr>
                     <tr>
+                     
                         <td class="td01">
                             <asp:Literal ID="lblMinVolume" runat="server" Text="${Transportation.TransportPriceListDetail.MinVolume}:" />
                         </td>
@@ -123,12 +140,7 @@
                                 Display="Dynamic" ErrorMessage="${Transportation.TransportPriceListDetail.MinVolume.Format}"
                                 MaximumValue="999999999" MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
-                        <td class="td01">
-                            <asp:Literal ID="lblIsProvisionalEstimate" runat="server" Text="${Transportation.TransportPriceListDetail.IsProvisionalEstimate}:" />
-                        </td>
-                        <td class="td02">
-                            <asp:CheckBox ID="cbIsProvisionalEstimate" runat="server" Checked='<%#Bind("IsProvisionalEstimate") %>' />
-                        </td>
+                      
                     </tr>
                     <tr>
                         <td class="td01">
