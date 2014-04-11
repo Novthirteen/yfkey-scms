@@ -41,17 +41,19 @@ public partial class EDI_FordPlan_DetailList : ListModuleBase
 
         if (eDIFordPlanList != null && eDIFordPlanList.Count > 0)
         {
+            IList<FlowDetail> flowdets = TheGenericMgr.FindAllWithCustomQuery<FlowDetail>(string.Format(" select d from FlowDetail as d where  d.ReferenceItemCode in('{0}') ", string.Join("','", eDIFordPlanList.Select(w => w.RefItem).Distinct().ToArray())));
+            
             control_num = eDIFordPlanList.First().Control_Num;
             var groups = (from tak in eDIFordPlanList
                           group tak by new
                           {
                               tak.Control_Num,
-                              tak.Item
+                              tak.RefItem
                           }
                               into result
                               select new
                               {
-                                  Item = result.Key.Item,
+                                  RefItem = result.Key.RefItem,
                                   Control_Num = result.Key.Control_Num,
                                   List = result.ToList()
                               }).ToList();
@@ -70,6 +72,12 @@ public partial class EDI_FordPlan_DetailList : ListModuleBase
                     planQtyArr.Add(dicArr);
                 }
                 newPlan.PlanQtyArr = planQtyArr;
+                var flowDet = flowdets.Where(f => f.ReferenceItemCode == newPlan.RefItem);
+                if (flowDet != null || flowDet.Count()> 0)
+                {
+                    newPlan.Item = flowDet.First().Item.Code;
+                    newPlan.ItemDesc = flowDet.First().Item.Description;
+                }
                 allList.Add(newPlan);
             }
             totalItem = allList.Count;

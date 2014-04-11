@@ -70,21 +70,25 @@ namespace com.Sconit.Service.EDI.Impl
 
             try
             {
-                string[] files = null;
+                List<string> fileList = new List<string>();
                 if (Directory.Exists(sourceFilePath))
                 {
-                    files = Directory.GetFiles(sourceFilePath);
+
+                    string [] paths = Directory.GetDirectories(sourceFilePath);
+                    for (int i = 0; i < paths.Length; i++)
+                    {
+                        fileList.AddRange(Directory.GetFiles(paths[i]));
+                    }
                 }
                 else
                 {
                     throw new Exception("文件地址不存在");
                 }
-
-                if (files != null && files.Length > 0)
+                if (fileList != null && fileList.Count > 0)
                 {
                     #region 导入/备份
                     List<string> errorlogs = new List<string>();
-                    var fileNames = files.OrderBy(f => f);
+                    var fileNames = fileList.OrderBy(f => f);
                     foreach (string filePath in fileNames)
                     {
                         string fileName = Path.GetFileName(filePath);
@@ -95,16 +99,16 @@ namespace com.Sconit.Service.EDI.Impl
                             {
                                 Directory.CreateDirectory(bakFilePath);
                             }
-                            string bakFile = DateTime.Now.ToString("yyyyMMddHHmmss") + "." + fileName;
+                            //string bakFile = DateTime.Now.ToString("yyyyMMddHHmmss") + "." + fileName;
 
-                            this.ImportEDIFile(filePath, bakFile);
-                            File.Move(filePath, Path.Combine(bakFilePath, bakFile));
+                            this.ImportEDIFile(filePath, fileName);
+                            File.Move(filePath, Path.Combine(bakFilePath, fileName));
                         }
                         catch (Exception ex)
                         {
                             this.ProcessPath(ref errorFilePath);
-                            string errFile = DateTime.Now.ToString("yyyyMMddHHmmss") + "." + fileName;
-                            File.Move(filePath, Path.Combine(errorFilePath, errFile));
+                            //string errFile = DateTime.Now.ToString("yyyyMMddHHmmss") + "." + fileName;
+                            File.Move(filePath, Path.Combine(errorFilePath, fileName));
                             //SendErrorEmail("导入读取EDI文件时出错", ex);
                         }
                     }
@@ -132,10 +136,16 @@ namespace com.Sconit.Service.EDI.Impl
                 IList<TEMP_FORD_EDI_830> weeklyPlans = this.genericMgr.FindAllWithCustomQuery<TEMP_FORD_EDI_830>(weeklySql);
                 if (weeklyPlans != null && weeklyPlans.Count > 0)
                 {
-                    IList<ItemReference> itemReferences = this.genericMgr.FindAllWithCustomQuery<ItemReference>(string.Format(" select t from ItemReference as t where t.ReferenceCode in('{0}')", string.Join("','", weeklyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
+                    //IList<FlowDetail> flowdets = this.genericMgr.FindAllWithCustomQuery<FlowDetail>(string.Format(" select d from FlowDetail as d where  d.ReferenceItemCode in('{0}') ",string.Join("','", weeklyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
+                    //IList<ItemReference> itemReferences = this.genericMgr.FindAllWithCustomQuery<ItemReference>(string.Format(" select t from ItemReference as t where t.ReferenceCode in('{0}')", string.Join("','", weeklyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
                     foreach (var weekly in weeklyPlans)
                     {
-                        ItemReference itemReference = itemReferences.Where(i => i.ReferenceCode == weekly.Part_Num).First();
+                        //var flowDet = flowdets.Where(f => f.ReferenceItemCode == weekly.Part_Num);
+                        //if (flowDet == null || flowDet.Count() == 0)
+                        //{
+                        //    throw new Exception("福特物料号找不到对应的明细。");
+                        //}
+                        //ItemReference itemReference = itemReferences.Where(i => i.ReferenceCode == weekly.Part_Num).First();
                         EDIFordPlan eDIFordPlan = new EDIFordPlan();
                         eDIFordPlan.TempId = weekly.Id;
                         eDIFordPlan.BatchNo = weekly.BatchNo;
@@ -143,9 +153,9 @@ namespace com.Sconit.Service.EDI.Impl
                         eDIFordPlan.SupplierCode = weekly.Ship_From_GSDB_Code;
                         eDIFordPlan.CustomerCode = weekly.Ship_To_GSDB_Code;
                         eDIFordPlan.ReleaseIssueDate =  DateTime.Parse(weekly.Message_Release_Date.Substring(0, 4) + "-" + weekly.Message_Release_Date.Substring(4, 2) + "-" + weekly.Message_Release_Date.Substring(6, 2));
-                        eDIFordPlan.Item = itemReference.Item.Code;
-                        eDIFordPlan.ItemDesc = itemReference.Item.Desc1;
-                        eDIFordPlan.RefItem = itemReference.ReferenceCode;
+                        eDIFordPlan.Item = string.Empty;
+                        eDIFordPlan.ItemDesc = string.Empty;
+                        eDIFordPlan.RefItem = weekly.Part_Num;
                         eDIFordPlan.Uom = weekly.UOM;
                         eDIFordPlan.LastShippedQuantity =Convert.ToDecimal(weekly.Last_Shipped_Qty);
                         eDIFordPlan.LastShippedCumulative = Convert.ToDecimal(weekly.Cum_Shipped_Qty);
@@ -173,10 +183,17 @@ namespace com.Sconit.Service.EDI.Impl
                 IList<TEMP_FORD_EDI_862> dailyPlans = this.genericMgr.FindAllWithCustomQuery<TEMP_FORD_EDI_862>(dailySql);
                 if (dailyPlans != null && dailyPlans.Count > 0)
                 {
-                    IList<ItemReference> itemReferences = this.genericMgr.FindAllWithCustomQuery<ItemReference>(string.Format(" select t from ItemReference as t where t.ReferenceCode in('{0}')", string.Join("','", dailyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
+                    //IList<FlowDetail> flowdets = this.genericMgr.FindAllWithCustomQuery<FlowDetail>(string.Format(" select d from FlowDetail as d where exists( select 1 from Flow as m where m.Code=d.Flow and m.Description like '%福特%' and m.IsActive=1) and d.ReferenceItemCode in('{0}') ", string.Join("','", dailyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
+                    //IList<FlowDetail> flowdets = this.genericMgr.FindAllWithCustomQuery<FlowDetail>(string.Format(" select d from FlowDetail as d where d.ReferenceItemCode in('{0}') ", string.Join("','", dailyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
+                    //IList<ItemReference> itemReferences = this.genericMgr.FindAllWithCustomQuery<ItemReference>(string.Format(" select t from ItemReference as t where t.ReferenceCode in('{0}')", string.Join("','", dailyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
                     foreach (var daily in dailyPlans)
                     {
-                        ItemReference itemReference = itemReferences.Where(i => i.ReferenceCode == daily.Part_Num).First();
+                        //ItemReference itemReference = itemReferences.Where(i => i.ReferenceCode == daily.Part_Num).First();
+                        //var flowDet = flowdets.Where(f => f.ReferenceItemCode == daily.Part_Num);
+                        //if (flowDet == null || flowDet.Count() == 0)
+                        //{
+                        //    throw new Exception("福特物料号找不到对应的明细。");
+                        //}
                         EDIFordPlan eDIFordPlan = new EDIFordPlan();
                         eDIFordPlan.TempId = daily.Id;
                         eDIFordPlan.BatchNo = daily.BatchNo;
@@ -184,9 +201,12 @@ namespace com.Sconit.Service.EDI.Impl
                         eDIFordPlan.SupplierCode = daily.Ship_From_GSDB_Code;
                         eDIFordPlan.CustomerCode = daily.Ship_To_GSDB_Code;
                         eDIFordPlan.ReleaseIssueDate = DateTime.Parse(daily.Message_Release_Date.Substring(0, 4) + "-" + daily.Message_Release_Date.Substring(4, 2) + "-" + daily.Message_Release_Date.Substring(6, 2));
-                        eDIFordPlan.Item = itemReference.Item.Code;
-                        eDIFordPlan.ItemDesc = itemReference.Item.Desc1;
-                        eDIFordPlan.RefItem = itemReference.ReferenceCode;
+                        //eDIFordPlan.Item = flowDet.First().Item.Code;
+                        //eDIFordPlan.ItemDesc = flowDet.First().Item.Desc1;
+                        //eDIFordPlan.RefItem = flowDet.First().ReferenceItemCode;
+                        eDIFordPlan.Item = string.Empty;
+                        eDIFordPlan.ItemDesc = string.Empty;
+                        eDIFordPlan.RefItem = daily.Part_Num;
                         eDIFordPlan.Uom = daily.UOM;
                         eDIFordPlan.LastShippedQuantity = Convert.ToDecimal(daily.Last_Shipped_Qty);
                         eDIFordPlan.LastShippedCumulative = Convert.ToDecimal(daily.Cum_Shipped_Qty);
@@ -261,7 +281,7 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.Message_Type_Code = "856";
                     temp_FORD_EDI_856.Message_Type = "FORDCSVFLAT";
                     temp_FORD_EDI_856.ReleaseVersion = "1";
-                    temp_FORD_EDI_856.Receiver_ID = "ZZ:BVT8A";
+                    temp_FORD_EDI_856.Receiver_ID = "ZZ:F159E";
                     temp_FORD_EDI_856.Sender_ID = "ZZ:EP4TA";
                     temp_FORD_EDI_856.BatchNo = batch;
 
@@ -270,8 +290,8 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.Ship_To_GSDB_Code = ediFordPlan.CustomerCode;
                     temp_FORD_EDI_856.Ship_From_GSDB_Code = ediFordPlan.SupplierCode;
                     temp_FORD_EDI_856.Intermediate_Consignee_Code = ediFordPlan.IntermediateConsignee;
-                    temp_FORD_EDI_856.Message_Purpose_Code = "12";
-                    temp_FORD_EDI_856.Shipment_ID = ipMaster.IpNo;
+                    temp_FORD_EDI_856.Message_Purpose_Code = ediFordPlan.Purpose;
+                    temp_FORD_EDI_856.Shipment_ID = ipMaster.IpNo.Substring(3);
                     temp_FORD_EDI_856.Shipped_DateTime = ipMaster.CreateDate.ToString("yyyyMMdd") + "-" + ipMaster.CreateDate.ToString("HHmm");
                     temp_FORD_EDI_856.Gross_Weight = ediFordPlan.GrossWeight.ToString();
                     temp_FORD_EDI_856.Net_Weight = ediFordPlan.NetWeight.ToString();
@@ -288,8 +308,8 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.Shipped_Qty = ediFordPlan.ShipQty.ToString();
                     temp_FORD_EDI_856.Cum_Shipped_Qty = (ediFordPlan.LastShippedCumulative + ediFordPlan.CurrenCumQty).ToString();
                     temp_FORD_EDI_856.Cum_Shipped_UOM = ediFordPlan.Uom;
-                    temp_FORD_EDI_856.Number_of_Loads = ediFordPlan.InPackQty.HasValue ? ediFordPlan.InPackQty.ToString() : string.Empty;  
-                    temp_FORD_EDI_856.Qty_Per_Load =ediFordPlan.PerLoadQty.HasValue?ediFordPlan.PerLoadQty.Value.ToString():string.Empty;
+                    temp_FORD_EDI_856.Number_of_Loads = ediFordPlan.InPackQty.HasValue ? ediFordPlan.InPackQty.ToString() : string.Empty;  // 包装个数
+                    temp_FORD_EDI_856.Qty_Per_Load = ediFordPlan.PerLoadQty.HasValue ? ediFordPlan.PerLoadQty.Value.ToString() : string.Empty;  // 单箱件数
                     temp_FORD_EDI_856.Packaging_Code = ediFordPlan.InPackType;
                     temp_FORD_EDI_856.Airport_Code = ediFordPlan.AirportCode;
                     temp_FORD_EDI_856.CreateDate = System.DateTime.Now;
@@ -297,6 +317,8 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.IsHandle = false;
                     temp_FORD_EDI_856.ReadFileName = string.Empty;
                     this.genericMgr.Create(temp_FORD_EDI_856);
+                    ediFordPlan.Item = string.Empty;
+                    ediFordPlan.ItemDesc = string.Empty;
                     this.genericMgr.Update(ediFordPlan);
                 }
                 #endregion
@@ -420,7 +442,7 @@ namespace com.Sconit.Service.EDI.Impl
                         writeLine.Add(l.Ship_To_GSDB_Code);
                         writeLine.Add(l.Ship_From_GSDB_Code);
                         writeLine.Add(l.Intermediate_Consignee_Code);
-                        writeLine.Add(l.Message_Purpose_Code);
+                        writeLine.Add(" " + l.Message_Purpose_Code);
                         writeLine.Add(l.Shipment_ID);
                         writeLine.Add(l.Shipped_DateTime);
                         writeLine.Add(l.Gross_Weight);
@@ -487,8 +509,6 @@ namespace com.Sconit.Service.EDI.Impl
         }
 
 
-
-
         private void ImportEDIFile(string fileName, string bakFile)
         {
             string[] datStrs = System.IO.File.ReadAllLines(fileName);
@@ -535,7 +555,6 @@ namespace com.Sconit.Service.EDI.Impl
             }
 
         }
-
 
         private void ProcessPath(ref string path)
         {

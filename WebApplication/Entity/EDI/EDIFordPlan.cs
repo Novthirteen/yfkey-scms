@@ -99,6 +99,9 @@ namespace com.Sconit.Entity.EDI
         public string AirportCode { get; set; }
 
 
+        public string Purpose { get; set; }
+
+
 
 
         #endregion
