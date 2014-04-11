@@ -69,6 +69,7 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
         ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndDate"))).Text = string.Empty;
         ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartQty"))).Text = "0";
         ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndQty"))).Text = "0";
+        ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbMinPrice"))).Text = "0";
     }
 
     private void InitPricingMethod()
@@ -115,6 +116,17 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
                 catch (Exception)
                 {
                     ShowWarningMessage("Transportation.TransportPriceListDetail.UnitPrice.Error");
+                    args.IsValid = false;
+                }
+                break;
+            case "cvMinPrice":
+                try
+                {
+                    Convert.ToDecimal(args.Value);
+                }
+                catch (Exception)
+                {
+                    ShowWarningMessage("Transportation.TransportPriceListDetail.MinPrice.Error");
                     args.IsValid = false;
                 }
                 break;
@@ -228,20 +240,24 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
 
         TextBox tbStartQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartQty"));
         TextBox tbEndQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndQty"));
+        TextBox tbMinPrice = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbMinPrice"));
 
         if (ddlPricingMethod.SelectedValue == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
         {
             tbStartQty.Enabled = true;
             tbEndQty.Enabled = true;
+            tbMinPrice.Enabled = true;
         }
         else
         {
             tbStartQty.Enabled = false;
             tbEndQty.Enabled = false;
+            tbMinPrice.Enabled = false;
         }
 
         tbStartQty.Text = "0";
         tbEndQty.Text = "0";
+        tbMinPrice.Text = "0";
 
         ddlVehicleType.DataSource = GetVehicleTypeGroup(ddlPricingMethod.SelectedValue);
         ddlVehicleType.DataBind();

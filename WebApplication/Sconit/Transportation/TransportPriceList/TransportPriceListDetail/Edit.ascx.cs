@@ -107,6 +107,17 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
                     args.IsValid = false;
                 }
                 break;
+            case "cvMinPrice":
+                try
+                {
+                    Convert.ToDecimal(args.Value);
+                }
+                catch (Exception)
+                {
+                    ShowWarningMessage("Transportation.TransportPriceListDetail.MinPrice.Error");
+                    args.IsValid = false;
+                }
+                break;
             case "cvEndDate":
                 try
                 {
@@ -207,6 +218,11 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
                 tbEndQty.Text = transportPriceListDetail.EndQty.Value.ToString("0.########");
             }
 
+            TextBox tbMinPrice = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbMinPrice"));
+            if (transportPriceListDetail.MinPrice != null)
+            {
+                tbMinPrice.Text = transportPriceListDetail.MinPrice.Value.ToString("0.########");
+            }
 
         }
     }
@@ -278,16 +294,19 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
 
         TextBox tbStartQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartQty"));
         TextBox tbEndQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndQty"));
+        TextBox tbMinPrice = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbMinPrice"));
 
         if (ddlPricingMethod.SelectedValue == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
         {
             tbStartQty.Enabled = true;
             tbEndQty.Enabled = true;
+            tbMinPrice.Enabled = true;
         }
         else
         {
             tbStartQty.Enabled = false;
             tbEndQty.Enabled = false;
+            tbMinPrice.Enabled = false;
         }
 
         tbStartQty.Text = "0";

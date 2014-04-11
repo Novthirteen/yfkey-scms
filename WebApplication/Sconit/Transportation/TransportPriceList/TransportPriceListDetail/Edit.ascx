@@ -140,7 +140,17 @@
                                 Display="Dynamic" ErrorMessage="${Transportation.TransportPriceListDetail.MinVolume.Format}"
                                 MaximumValue="999999999" MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
-                      
+                        <td class="td01">
+                            <asp:Literal ID="ltlMinPrice" runat="server" Text="${Transportation.TransportPriceListDetail.MinPrice}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbMinPrice" runat="server" Text='<%#Bind("MinPrice","{0:0.########}") %>'/>
+                            <asp:CustomValidator ID="cvMinPrice" runat="server" ControlToValidate="tbMinPrice"
+                                ErrorMessage="*" Display="Dynamic" ValidationGroup="vgSave" OnServerValidate="CV_ServerValidate" />
+                            <asp:RangeValidator ID="rfMinPrice" ControlToValidate="tbMinPrice" runat="server"
+                                Display="Dynamic" ErrorMessage="${Transportation.TransportPriceListDetail.UnitPrice.Format}"
+                                MaximumValue="999999999" MinimumValue="0.00000001" Type="Double" ValidationGroup="vgSave" />
+                        </td>
                     </tr>
                     <tr>
                         <td class="td01">
