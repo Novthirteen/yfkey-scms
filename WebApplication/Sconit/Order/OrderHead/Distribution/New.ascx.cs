@@ -21,6 +21,7 @@ using com.Sconit.Control;
 
 public partial class Order_OrderHead_New : NewModuleBase
 {
+    public event EventHandler ImportEvent;
     public event EventHandler CreateEvent;
     public event EventHandler BackEvent;
     public event EventHandler QuickCreateEvent;
@@ -134,6 +135,7 @@ public partial class Order_OrderHead_New : NewModuleBase
                 this.cbReleaseOrder.Visible = false;
             }
         }
+        this.btnImport.Visible = IsQuick;
     }
 
     protected void tbFlow_TextChanged(Object sender, EventArgs e)
@@ -503,4 +505,16 @@ public partial class Order_OrderHead_New : NewModuleBase
             InitDetailParamater(orderHead);
         }
     }
+
+    protected void btnImport_Click(object sender, EventArgs e)
+    {
+        ViewState["ModuleSubType"] = this.ModuleSubType;
+        ViewState["ModuleType"] = this.ModuleType;
+        if (ImportEvent != null)
+        {
+            ImportEvent(sender, e);
+        }
+    }
+
+
 }

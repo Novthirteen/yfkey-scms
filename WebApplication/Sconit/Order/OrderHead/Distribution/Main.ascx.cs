@@ -69,6 +69,8 @@ public partial class Order_OrderHead_Main : MainModuleBase
         this.ucList.EditEvent += new System.EventHandler(this.ListEdit_Render);
         this.ucNew.CreateEvent += new System.EventHandler(this.CreateBack_Render);
         this.ucNew.QuickCreateEvent += new System.EventHandler(this.QuickCreateBack_Render);
+        this.ucQuickImport.BackEvent += new System.EventHandler(this.QuickImportBack_Render);
+        this.ucNew.ImportEvent += new System.EventHandler(this.QuickImport_Render);
         if (this.Action != BusinessConstants.PAGE_NEW_ACTION)
         {
             this.ucNew.BackEvent += new System.EventHandler(this.NewBack_Render);
@@ -117,6 +119,8 @@ public partial class Order_OrderHead_Main : MainModuleBase
             this.ucEdit.NewItem = this.NewItem;
             this.ucSearch.NewItem = this.NewItem;
             this.ucImport.ModuleType = this.ModuleType;
+            this.ucQuickImport.ModuleSubType = this.ModuleSubType;
+            this.ucQuickImport.ModuleType = this.ModuleType;
 
             if (this.Action == BusinessConstants.PAGE_LIST_ACTION)
             {
@@ -213,5 +217,18 @@ public partial class Order_OrderHead_Main : MainModuleBase
     {
         this.ucImport.Visible = false;
         this.ucSearch.Visible = true;
+    }
+
+    void QuickImport_Render(object sender, EventArgs e)
+    {
+        this.ucNew.Visible = false;
+        this.ucQuickImport.Visible = true;
+    }
+
+    void QuickImportBack_Render(object sender, EventArgs e)
+    {
+        this.ucQuickImport.Visible = false;
+        this.ucNew.Visible = true;
+        this.ucNew.PageCleanup();
     }
 }

@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Import.ascx.cs" Inherits="Order_OrderHead_Procurement_Import" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="QuickImport.ascx.cs" Inherits="Order_OrderHead_Distribution_QuickImport" %>
 
  <fieldset runat="server" id="fs01" visible="true">
         <legend>文件上传</legend>
@@ -15,7 +15,7 @@
             </td>
             <td class="td02">
                 <asp:HyperLink ID="hlTemplate" runat="server" Text="${Common.Business.ClickToDownload}"
-                    NavigateUrl="~/Reports/Templates/ExcelTemplates/PullOrderBatchUpload.xls"></asp:HyperLink>
+                    NavigateUrl="~/Reports/Templates/ExcelTemplates/QuickNewImport.xls"></asp:HyperLink>
             </td>
         </tr>
          <tr>

@@ -42,6 +42,7 @@ public partial class EDI_FordPlan_List : ListModuleBase
         CurrenPage = 1;
         totalItem = 0;
         allList = new List<EDIFordPlan>();
+        returnList = new List<EDIFordPlan>();
         IList<EDIFordPlan> eDIFordPlanList = TheGenericMgr.FindAllWithCustomQuery<EDIFordPlan>(searchSql);
         //IList<EDIFordPlan> getList = new List<EDIFordPlan>(); ;
 
