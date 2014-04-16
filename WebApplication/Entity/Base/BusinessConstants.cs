@@ -198,6 +198,7 @@ namespace com.Sconit.Entity
         public static readonly string ENTITY_PREFERENCE_CODE_ARCHIVEFOLDER = "ArchiveFolder";         //存档目录
         public static readonly string ENTITY_PREFERENCE_CODE_TEMPFOLDER = "TempFolder";         //      临时目录
         public static readonly string ENTITY_PREFERENCE_CODE_OUTFOLDER = "OutFolder";     //输出文件目录
+        public static readonly string ENTITY_PREFERENCE_CODE_ISTESTSYSTEM = "IsTestSystem";     //测试系统标识
 
         #region Template File Relative Path
 

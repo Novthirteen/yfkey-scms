@@ -63,6 +63,7 @@ namespace com.Sconit.Service.EDI.Impl
             string sourceFilePath = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_SOURCEFILEPATH).Value;
             string bakFilePath = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_BAKFILEPATH).Value;
             string errorFilePath = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_ERRORFILEPATH).Value;
+            bool isTestSystem = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_ISTESTSYSTEM).Value == "1";
             //string sourceFilePath = "D:\\source";
             //string bakFilePath = "D:\\bak";
             //string errorFilePath = "D:\\error";
@@ -77,7 +78,20 @@ namespace com.Sconit.Service.EDI.Impl
                     string [] paths = Directory.GetDirectories(sourceFilePath);
                     for (int i = 0; i < paths.Length; i++)
                     {
-                        fileList.AddRange(Directory.GetFiles(paths[i]));
+                        if (isTestSystem)
+                        {
+                            if ((paths[i]).Contains("F159E") && ((paths[i]).Contains("830") || (paths[i]).Contains("862")))
+                            {
+                                fileList.AddRange(Directory.GetFiles(paths[i]));
+                            }
+                        }
+                        else
+                        {
+                            if ((paths[i]).Contains("F159B") && ((paths[i]).Contains("830") || (paths[i]).Contains("862")))
+                            {
+                                fileList.AddRange(Directory.GetFiles(paths[i]));
+                            }
+                        }
                     }
                 }
                 else
@@ -244,7 +258,9 @@ namespace com.Sconit.Service.EDI.Impl
                 {
                     throw new Exception("订单明细不能为空。");
                 }
-                currentFlow.FlowDetails =( from det in currentFlow.FlowDetails
+                bool isTestSystem = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_ISTESTSYSTEM).Value == "1";
+
+                currentFlow.FlowDetails = (from det in currentFlow.FlowDetails
                                           where shipEDIFordPlanList.Select(s => s.Item).Contains(det.Item.Code) 
                                           select det).ToList();
                 #region 新建订单
@@ -281,7 +297,7 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.Message_Type_Code = "856";
                     temp_FORD_EDI_856.Message_Type = "FORDCSVFLAT";
                     temp_FORD_EDI_856.ReleaseVersion = "1";
-                    temp_FORD_EDI_856.Receiver_ID = "ZZ:F159E";
+                    temp_FORD_EDI_856.Receiver_ID = isTestSystem ? "ZZ:F159E" : "ZZ:F159B";
                     temp_FORD_EDI_856.Sender_ID = "ZZ:EP4TA";
                     temp_FORD_EDI_856.BatchNo = batch;
 
@@ -337,8 +353,18 @@ namespace com.Sconit.Service.EDI.Impl
             string archiveFolder = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_ARCHIVEFOLDER).Value;
             string tempFolder = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_TEMPFOLDER).Value;
             string outFolder = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_OUTFOLDER).Value;
+            bool isTestSystem = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_ISTESTSYSTEM).Value == "1";
+            
             #region 初始化本地目录
             outFolder = outFolder.Replace("\\", "/");
+            if (isTestSystem)
+            {
+                outFolder += "/EP4TA-FORD-F159E";
+            }
+            else
+            {
+                outFolder += "/EP4TA-FORD-F159B";
+            }
             if (!outFolder.EndsWith("/"))
             {
                 outFolder += "/";
@@ -442,7 +468,7 @@ namespace com.Sconit.Service.EDI.Impl
                         writeLine.Add(l.Ship_To_GSDB_Code);
                         writeLine.Add(l.Ship_From_GSDB_Code);
                         writeLine.Add(l.Intermediate_Consignee_Code);
-                        writeLine.Add(" " + l.Message_Purpose_Code);
+                        writeLine.Add(l.Message_Purpose_Code);
                         writeLine.Add(l.Shipment_ID);
                         writeLine.Add(l.Shipped_DateTime);
                         writeLine.Add(l.Gross_Weight);
