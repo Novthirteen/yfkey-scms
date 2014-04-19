@@ -20,7 +20,8 @@
 		<many-to-one name="CreateUser" column="CreateUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
 		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
 		<many-to-one name="LastModifyUser" column="LastModifyUser" class="com.Sconit.Entity.MasterData.User, com.Sconit.Entity" cascade="none" />
-		<bag name="BillDetails" table="BillDet" inverse="true" lazy="true">
+        <property name="IsExport" column="IsExport" type="Boolean"  />
+        <bag name="BillDetails" table="BillDet" inverse="true" lazy="true">
 			<key column="BillNo" />
 			<one-to-many class="com.Sconit.Entity.MasterData.BillDetail, com.Sconit.Entity" />
 		</bag>

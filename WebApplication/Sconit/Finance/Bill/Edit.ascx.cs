@@ -362,7 +362,14 @@ public partial class Finance_Bill_Edit : EditModuleBase
             this.btnSubmit.Visible = false;
             this.btnDelete.Visible = false;
             this.btnClose.Visible = true;
-            this.btnCancel.Visible = true;
+            if (bill.IsExport)
+            {
+                this.btnCancel.Visible = false;
+            }
+            else
+            {
+                this.btnCancel.Visible = true;
+            }
             this.btnVoid.Visible = false;
             this.btnAddDetail.Visible = false;
             this.btnDeleteDetail.Visible = false;

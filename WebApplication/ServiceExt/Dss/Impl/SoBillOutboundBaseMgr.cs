@@ -18,6 +18,7 @@ namespace com.Sconit.Service.Dss.Impl
     public abstract class SoBillOutboundBaseMgr : AbstractOutboundMgr
     {
         private ICriteriaMgr criteriaMgr;
+        private IBillMgr billMgr;
         private ICommonOutboundMgr commonOutboundMgr;
 
         public SoBillOutboundBaseMgr(INumberControlMgr numberControlMgr,
@@ -26,11 +27,13 @@ namespace com.Sconit.Service.Dss.Impl
             IDssOutboundControlMgr dssOutboundControlMgr,
             IDssObjectMappingMgr dssObjectMappingMgr,
             ICommonOutboundMgr commonOutboundMgr,
-            ILocationMgr locationMgr)
+            ILocationMgr locationMgr,
+            IBillMgr billMgr)
             : base(numberControlMgr, dssExportHistoryMgr, criteriaMgr, dssOutboundControlMgr, dssObjectMappingMgr, locationMgr)
         {
             this.criteriaMgr = criteriaMgr;
             this.commonOutboundMgr = commonOutboundMgr;
+            this.billMgr = billMgr;
         }
 
         [Transaction(TransactionMode.Unspecified)]
@@ -40,10 +43,19 @@ namespace com.Sconit.Service.Dss.Impl
                 .CreateAlias("Bill", "b")
                 .Add(Expression.Gt("Id", dssOutboundControl.Mark))
                 .Add(Expression.Eq("b.TransactionType", BusinessConstants.BILL_TRANS_TYPE_SO));
-                //.Add(Expression.In("b.Status", new string[] { BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE, BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT }));
+            //.Add(Expression.In("b.Status", new string[] { BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE, BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT }));
 
             IList<BillDetail> result = criteriaMgr.FindAll<BillDetail>(criteria);
-            return this.ConvertList(result, dssOutboundControl);
+            IList<DssExportHistory> resultList = this.ConvertList(result, dssOutboundControl);
+
+            IList<Bill> billList = result.Select(r => r.Bill).Distinct().ToList();
+            foreach (Bill bill in billList)
+            {
+                bill.IsExport = true;
+                this.billMgr.UpdateBill(bill);
+            }
+
+            return resultList;
         }
 
         [Transaction(TransactionMode.Unspecified)]
@@ -115,8 +127,8 @@ namespace com.Sconit.Service.Dss.Impl
             }
             else
             {
-                  orderLocationTransaction =
-    commonOutboundMgr.GetOrderLocationTransactionInfo(dssExportHistory.OrderNo, dssExportHistory.Item, BusinessConstants.IO_TYPE_OUT);
+                orderLocationTransaction =
+  commonOutboundMgr.GetOrderLocationTransactionInfo(dssExportHistory.OrderNo, dssExportHistory.Item, BusinessConstants.IO_TYPE_OUT);
 
                 dssExportHistory.PartyFrom = dssExportHistory.PartyFrom;
             }
