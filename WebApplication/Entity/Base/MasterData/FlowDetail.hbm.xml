@@ -49,8 +49,8 @@
     <many-to-one name="Routing" column="Routing" class="com.Sconit.Entity.MasterData.Routing, com.Sconit.Entity" cascade="none"  lazy="proxy"/>
     <many-to-one name="ReturnRouting" column="ReturnRouting" class="com.Sconit.Entity.MasterData.Routing, com.Sconit.Entity" cascade="none" lazy="proxy" />
     
-    <property name="ReceivingPlant" column="ReceivingPlant" type="String" length="50" />
-    <property name="ShipFrom" column="ShipFrom" type="String" length="50" />
+    <!--<property name="ReceivingPlant" column="ReceivingPlant" type="String" length="50" />
+    <property name="ShipFrom" column="ShipFrom" type="String" length="50" />-->
     <property name="TransModeCode" column="TransModeCode" type="String" length="50" />
     <property name="ConveyanceNumber" column="ConveyanceNumber" type="String" length="50" />
     <property name="CarrierCode" column="CarrierCode" type="String" length="50" />

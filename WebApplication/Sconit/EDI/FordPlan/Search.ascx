@@ -48,6 +48,8 @@
             <td class="td02">
                 <div class="buttons">
                     <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" OnClick="btnSearch_Click" />
+                    <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" style="display:none" OnClick="btnExport_Click" />
+                    <input type="hidden" id="btControl_Num" runat="server" Style="display: none"  />
                 </div>
             </td>
         </tr>

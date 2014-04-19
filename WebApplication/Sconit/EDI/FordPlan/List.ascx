@@ -1,5 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="List.ascx.cs" Inherits="EDI_FordPlan_List" %>
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="cc1" %>
+<%@ Register Src="~/Controls/TextBox.ascx" TagName="textbox" TagPrefix="uc3" %>
 <style type="text/css">
     .Listtable
     {
@@ -8,7 +9,7 @@
         margin: 0;
         border-collapse: collapse;
         border-spacing: 0;
-        width:100%;
+        width: 100%;
     }
     .Listthead
     {
@@ -40,8 +41,8 @@
 <script type="text/javascript">
     $(function () {
         //        $("#listTable td").css("padding", "0");
-//        $("#listTable td").css("padding-left", "3");
-//        $("#listTable td").css("padding-right", "3");
+        //        $("#listTable td").css("padding-left", "3");
+        //        $("#listTable td").css("padding-right", "3");
         $("#listThead td").css("border", "1px solid #D7D7D2");
         $("#listThead td").css("color", "#FFFFFF");
         $("#listThead td").css("font-weight", "bold");
@@ -49,23 +50,67 @@
         $("#listTbody td").css("border-right", "1px solid #B8B8AD");
         //        $("#btPrev").attr("disabled",<%=isMinPage %>);
         //        $("#btNext).attr("disabled",<%=isMaxPage %>);
+        $(" input:checkbox").attr("checked", false);
     });
 
     function doDetClick(e) {
-   $("#ctl01_ucList_btHidden").val(e);
-   document.getElementById('ctl01_ucList_btShowDetail').click();
-      
+        $("#ctl01_ucList_btHidden").val(e);
+        document.getElementById('ctl01_ucList_btShowDetail').click();
+
+    }
+
+    function GVCheckClick() {
+        if ($(".Listthead input:checkbox").attr("checked") == true) {
+            $("#listTbody input:checkbox").attr("checked", true);
+            $("#ctl01_ucSearch_btnExport").show();
+        }
+        else {
+            $("#listTbody input:checkbox").attr("checked", false);
+            $("#ctl01_ucSearch_btnExport").hide();
+        }
+        getCheckedControl_Num();
+    }
+
+    function doCheckClick() {
+        var $checkRecords = $("#listTbody input:checkbox");
+        $(".Listthead input:checkbox").attr("checked", $checkRecords.length == $("#listTbody input[type=checkbox][checked]").length);
+        if ($("#listTbody input[type=checkbox][checked]").length > 0) {
+            $("#ctl01_ucSearch_btnExport").show();
+        } else {
+            $("#ctl01_ucSearch_btnExport").hide();
+        }
+        getCheckedControl_Num();
+    }
+
+    function getCheckedControl_Num() {
+        var $checkRecords = $("#listTbody input:checkbox");
+        var control_Num = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                control_Num += $($checkRecords[i]).parent().next().text()+",";
+            }
+        }
+        $("#ctl01_ucSearch_btControl_Num").val(control_Num);
     }
 </script>
 <fieldset>
     <div class="GridView">
-        <asp:Button ID="btShowDetail" Text="" runat="server"  OnClick="btnShowDetail_Click" style="display:none" />
-        <input  type="hidden" id="btHidden" runat="server"   />
+        <asp:Button ID="btShowDetail" Text="" runat="server"   OnClick="btnShowDetail_Click"   Style="display: none" />
+        <input type="hidden" id="btHidden" runat="server" />
         <% if (returnList != null && returnList.Count > 0)
            { %>
         <table class="Listtable" id="listTable">
             <thead class="Listthead" id="listThead">
                 <tr class="Listtr">
+                    <td>
+                        <asp:TemplateField>
+                            <headertemplate>
+                        <div onclick="GVCheckClick()">
+                            <asp:CheckBox ID="CheckAll" runat="server" />
+                        </div>
+                    </headertemplate>
+                        </asp:TemplateField>
+                    </td>
                     <td>
                         <%="${EDI.EDIFordPlanBase.Control_Num}"%>
                     </td>
@@ -93,7 +138,14 @@
                 %>
                 <tr class="<%=i%2==0?"Listtr":"Listtr02" %>">
                     <td>
-                        <a href="#" onclick="doDetClick(<%=fordPlan.Control_Num%>)"><%=fordPlan.Control_Num%></a>
+                      <%--  <itemtemplate>
+                        <asp:CheckBox ID="CheckBoxGroup" name="CheckBoxGroup" runat="server" />
+                    </itemtemplate>--%>
+                    <input type="checkbox" id="CheckBoxGroup" name="CheckBoxGroup" value="<%=fordPlan.Control_Num%>" runat="server" onclick="doCheckClick()" />
+                    </td>
+                    <td>
+                        <a href="#" onclick="doDetClick(<%=fordPlan.Control_Num%>)">
+                            <%=fordPlan.Control_Num%></a>
                     </td>
                     <td>
                         <%=fordPlan.ReleaseIssueDate.ToShortDateString()%>
@@ -107,14 +159,13 @@
                     <td>
                         <%=fordPlan.CreateDate %>
                     </td>
-                   <td>
+                    <td>
                         <%--<asp:Button ID="Button1" runat="server" Text="查看明细"  OnClick="btnShowDetail_Click(<%#fordPlan.Control_Num %>)" />--%>
                         <%--<asp:LinkButton ID="lbtnView" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "OrderNo") %>'
                             Text="${Common.Button.View}" OnClick="btnShowDetail_Click">--%>
                     </td>
                 </tr>
                 <%} %>
-               
             </tbody>
             <tfoot>
                 <tr style="height: 30px; text-align: left; border: 1px solid #CFCFC9">

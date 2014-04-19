@@ -58,11 +58,9 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
 
             #region 列定义
             int colFlow = 1;//发货路线
-            int colWindowTime = 2;//窗口时间
-            int colExtOrderNo = 3;//外部订单号
-            int colRefOrderNo = 4;// 参考订单号
-            int colItem = 5;// 物料号
-            int colQty = 6;//订单数
+            int colExtOrderNo = 2;//外部订单号
+            int colItem = 3;// 物料号
+            int colQty = 4;//订单数
             #endregion
             int rowCount = 10;
             //IList<Exception> exceptionList = new List<Exception>();
@@ -78,9 +76,7 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
                     break;//边界
                 }
                 string flowCode = string.Empty;
-                DateTime windowTime = DateTime.Now;
                 string extOrderNo = string.Empty;
-                string refOrderNo = string.Empty;
                 string itemCode = string.Empty;
                 decimal qty = 0;
                 OrderHead orderHead = new OrderHead();
@@ -101,29 +97,29 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
                 #endregion
 
                 #region 读取窗口时间
-                try
-                {
-                    string readwindowTime = row.GetCell(colWindowTime).StringCellValue;
-                    if (DateTime.TryParse(readwindowTime, out windowTime))
-                    {
-                        orderHead.WindowTime = windowTime;
-                    }
-                    else
-                    {
-                        errorMessage += string.Format("第{0}行:窗口时间填写有误。<br/>", rowCount);
-                        continue;
-                    }
-                }
-                catch
-                {
-                    errorMessage += string.Format("第{0}行:窗口时间填写有误。<br/>", rowCount);
-                    continue;
-                }
+                //try
+                //{
+                //    string readwindowTime = row.GetCell(colWindowTime).StringCellValue;
+                //    if (DateTime.TryParse(readwindowTime, out windowTime))
+                //    {
+                //        orderHead.WindowTime = windowTime;
+                //    }
+                //    else
+                //    {
+                //        errorMessage += string.Format("第{0}行:窗口时间填写有误。<br/>", rowCount);
+                //        continue;
+                //    }
+                //}
+                //catch
+                //{
+                //    errorMessage += string.Format("第{0}行:窗口时间填写有误。<br/>", rowCount);
+                //    continue;
+                //}
                 #endregion
 
                 extOrderNo = row.GetCell(colExtOrderNo) != null ? row.GetCell(colExtOrderNo).StringCellValue : string.Empty;
 
-                refOrderNo = row.GetCell(colRefOrderNo) != null ? row.GetCell(colRefOrderNo).StringCellValue : string.Empty;
+                //refOrderNo = row.GetCell(colRefOrderNo) != null ? row.GetCell(colRefOrderNo).StringCellValue : string.Empty;
 
                 #region 读取物料代码
                 itemCode = row.GetCell(colItem) != null ? row.GetCell(colItem).StringCellValue : string.Empty;
@@ -162,12 +158,12 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
                 #region 填充数据
                 orderHead = TheOrderMgr.TransferFlow2Order(currentFlow);
                 orderHead.SubType = this.ModuleSubType;
-                orderHead.WindowTime = windowTime;
+                orderHead.WindowTime = System.DateTime.Now;
                 orderHead.Priority = "Normal";
                 orderHead.Type = this.ModuleType;
                 orderHead.StartTime = System.DateTime.Now;
                 orderHead.ExternalOrderNo = extOrderNo;
-                orderHead.ReferenceOrderNo = refOrderNo;
+                //orderHead.ReferenceOrderNo = refOrderNo;
                 orderHead.IsAutoRelease = true;
                 orderHead.IsAutoStart = true;
                 orderHead.IsAutoShip = true;

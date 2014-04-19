@@ -482,8 +482,8 @@ namespace com.Sconit.Entity.MasterData
         public Int32 MRPWeight { get; set; }
 
         #region    Ford EDI Option
-        public string ReceivingPlant { get; set; }
-        public string ShipFrom { get; set; }
+        //public string ReceivingPlant { get; set; }
+        //public string ShipFrom { get; set; }
         public string TransModeCode { get; set; }
         public string ConveyanceNumber { get; set; }
         public string CarrierCode { get; set; }

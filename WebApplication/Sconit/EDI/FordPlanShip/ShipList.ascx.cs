@@ -94,8 +94,8 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                         var f = fdet.First();
                         r.Item = f.Item.Code;
                         r.ItemDesc = f.Item.Description;
-                        r.CustomerCode = f.ReceivingPlant;
-                        r.SupplierCode = f.ShipFrom;
+                        //r.CustomerCode = f.ReceivingPlant;
+                        //r.SupplierCode = f.ShipFrom;
                         r.TransportationMethod = f.TransModeCode;
                         r.EquipmentNum = f.ConveyanceNumber;
                         r.CarrierCode = f.CarrierCode;

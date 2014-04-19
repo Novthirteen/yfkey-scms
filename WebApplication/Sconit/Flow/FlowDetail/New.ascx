@@ -443,7 +443,7 @@
                             <asp:TextBox ID="tbConveyanceNumber" runat="server" Text='<%# Bind("ConveyanceNumber") %>' />
                         </td>
                     </tr>
-                    <tr>
+                   <%-- <tr>
                         <td class="td01">
                             Receiving Plant
                         </td>
@@ -456,7 +456,7 @@
                         <td class="td02">
                             <asp:TextBox ID="tbShipFrom" runat="server" Text='<%# Bind("ShipFrom") %>' />
                         </td>
-                    </tr>
+                    </tr>--%>
                      <tr>
                         <td class="td01">
                             Packaging Code

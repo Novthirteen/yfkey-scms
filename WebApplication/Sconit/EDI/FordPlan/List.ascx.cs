@@ -18,6 +18,11 @@ using NHibernate.Expression;
 using com.Sconit.Entity;
 using System.Collections.Generic;
 using com.Sconit.Entity.EDI;
+using Microsoft.Office.Interop;
+
+//using Microsoft.Office.Core;
+//using Microsoft.Excel.x.0.Object.Library
+//using Microsoft.Office.x.0.Object.Library 
 
 public partial class EDI_FordPlan_List : ListModuleBase
 {
@@ -94,6 +99,8 @@ public partial class EDI_FordPlan_List : ListModuleBase
     protected void btnLast_Click(object sender, EventArgs e)
     {
         this.GetView2("last");
+        //flowDetail.PackagingCode = ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbPackagingCode")).Value;
+//this.CheckBoxGroup
     }
     protected void btnShowDetail_Click(object sender, EventArgs e)
     {
@@ -136,7 +143,7 @@ public partial class EDI_FordPlan_List : ListModuleBase
         }
         else if (clickType == "last")
         {
-            CurrenPage = allList.Count % 10 == 0 ? allList.Count / 10 : allList.Count / 10+1;
+            CurrenPage = allList.Count % 10 == 0 ? allList.Count / 10 : allList.Count / 10 + 1;
         }
         totalItem = allList.Count;
         currentItem01 = (CurrenPage - 1) * 10 + 1;
@@ -155,7 +162,8 @@ public partial class EDI_FordPlan_List : ListModuleBase
 
     protected void GV_List_RowDataBound(object sender, GridViewRowEventArgs e)
     {
-       
+
     }
+
 
 }
