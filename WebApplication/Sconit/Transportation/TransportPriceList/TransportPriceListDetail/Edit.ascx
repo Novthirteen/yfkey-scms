@@ -149,7 +149,7 @@
                                 ErrorMessage="*" Display="Dynamic" ValidationGroup="vgSave" OnServerValidate="CV_ServerValidate" />
                             <asp:RangeValidator ID="rfMinPrice" ControlToValidate="tbMinPrice" runat="server"
                                 Display="Dynamic" ErrorMessage="${Transportation.TransportPriceListDetail.UnitPrice.Format}"
-                                MaximumValue="999999999" MinimumValue="0.00000001" Type="Double" ValidationGroup="vgSave" />
+                                MaximumValue="999999999" MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
                     </tr>
                     <tr>
