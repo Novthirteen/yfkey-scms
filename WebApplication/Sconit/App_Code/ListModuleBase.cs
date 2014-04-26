@@ -77,6 +77,8 @@ namespace com.Sconit.Web
             }
         }
 
+        public void GetView(string searchSql) { }
+
 
         #region Excel导出方法
 

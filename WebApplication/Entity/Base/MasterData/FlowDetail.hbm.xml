@@ -48,5 +48,17 @@
     <property name="MRPWeight" column="MRPWeight" type="Int32"  />
     <many-to-one name="Routing" column="Routing" class="com.Sconit.Entity.MasterData.Routing, com.Sconit.Entity" cascade="none"  lazy="proxy"/>
     <many-to-one name="ReturnRouting" column="ReturnRouting" class="com.Sconit.Entity.MasterData.Routing, com.Sconit.Entity" cascade="none" lazy="proxy" />
+    
+    <!--<property name="ReceivingPlant" column="ReceivingPlant" type="String" length="50" />
+    <property name="ShipFrom" column="ShipFrom" type="String" length="50" />-->
+    <property name="TransModeCode" column="TransModeCode" type="String" length="50" />
+    <property name="ConveyanceNumber" column="ConveyanceNumber" type="String" length="50" />
+    <property name="CarrierCode" column="CarrierCode" type="String" length="50" />
+    <property name="GrossWeight" column="GrossWeight" type="String" length="50" />
+    <property name="NetWeight" column="NetWeight" type="String" length="50" />
+    <property name="WeightUom" column="WeightUom" type="String" length="50" />
+    <property name="PackagingCode" column="PackagingCode" type="String" length="50" />
+    <property name="LadingQuantity" column="LadingQuantity" type="String" length="50" />
+    <property name="UnitsPerContainer" column="UnitsPerContainer" type="String" length="50" />
   </class>
 </hibernate-mapping>

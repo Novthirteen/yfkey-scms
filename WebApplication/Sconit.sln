@@ -4,7 +4,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		build.xml = build.xml
 		common.xml = common.xml
-		Service\Service.csproj = Service\Service.csproj
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sql", "Sql", "{DF041382-619B-4D5D-9D49-87D95637D84C}"
@@ -33,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Control", "Control\Control.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeSmith", "CodeSmith\CodeSmith.csproj", "{742A0B91-4323-4F25-ACE2-5573BFB9066F}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Sconit", "Sconit", "{14524E2B-F6C4-4474-8543-4E9DE6FE8A0D}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Sconit", "Sconit\", "{14524E2B-F6C4-4474-8543-4E9DE6FE8A0D}"
 	ProjectSection(WebsiteProperties) = preProject
 		SccProjectName = ""
 		SccAuxPath = ""

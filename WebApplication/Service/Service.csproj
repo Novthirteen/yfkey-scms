@@ -80,7 +80,7 @@
       <HintPath>..\DllLib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <HintPath>D:\ViStudio\Visual Studio Tools for Office\PIA\Office14\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <HintPath>..\..\..\..\Program Files\vs2010\Visual Studio Tools for Office\PIA\Office12\Microsoft.Office.Interop.Excel.dll</HintPath>
     </Reference>
     <Reference Include="NHibernate, Version=1.2.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -114,6 +114,8 @@
     <Compile Include="Base\Batch\Impl\BatchRunLogBaseMgr.cs" />
     <Compile Include="Base\Batch\Impl\BatchTriggerBaseMgr.cs" />
     <Compile Include="Base\Batch\Impl\BatchTriggerParameterBaseMgr.cs" />
+    <Compile Include="Base\EDI\IEDIMgr.cs" />
+    <Compile Include="Base\EDI\Impl\EDIMgr.cs" />
     <Compile Include="Base\Criteria\ICriteriaMgr.cs" />
     <Compile Include="Base\Criteria\Impl\CriteriaMgr.cs" />
     <Compile Include="Base\Distribution\ICustomerRollingPlanBaseMgr.cs" />
@@ -128,8 +130,10 @@
     <Compile Include="Base\Distribution\Impl\InProcessLocationTrackBaseMgr.cs" />
     <Compile Include="Base\Distribution\Impl\SalesPriceListBaseMgr.cs" />
     <Compile Include="Base\Distribution\ISalesPriceListBaseMgr.cs" />
+    <Compile Include="Base\GenericMgrImpl.cs" />
     <Compile Include="Base\Hql\IHqlMgr.cs" />
     <Compile Include="Base\Hql\Impl\HqlMgr.cs" />
+    <Compile Include="Base\IGenericMgr.cs" />
     <Compile Include="Base\ISession.cs" />
     <Compile Include="Base\MasterData\IActingBillBaseMgr.cs" />
     <Compile Include="Base\MasterData\IAddressBaseMgr.cs" />
@@ -402,6 +406,9 @@
     <Compile Include="Batch\JobDataMap.cs" />
     <Compile Include="Batch\JobRunContext.cs" />
     <Compile Include="Batch\Job\BillCreateJob.cs" />
+    <Compile Include="Batch\Job\LoadEDIJob.cs" />
+    <Compile Include="Batch\Job\ReadEDIFordPlanASNJob.cs" />
+    <Compile Include="Batch\Job\RunBatJob.cs" />
     <Compile Include="Batch\Job\CycleCountProcessJob.cs" />
     <Compile Include="Batch\Job\LeanEngineJob.cs" />
     <Compile Include="Batch\Job\OrderCloseJob.cs" />

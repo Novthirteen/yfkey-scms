@@ -10,6 +10,7 @@ using com.Sconit.Service.Criteria;
 using com.Sconit.Entity.Transportation;
 using com.Sconit.Service.MasterData;
 using com.Sconit.Entity;
+using System.Linq;
 
 namespace com.Sconit.Service.Transportation.Impl
 {
@@ -98,6 +99,63 @@ namespace com.Sconit.Service.Transportation.Impl
             {
                 return null;
             }
+        }
+
+        public TransportPriceListDetail GetLastestLadderStereTransportPriceListDetail(TransportPriceList priceList, Item item, DateTime effectiveDate, Currency currency, Uom uom, string pricingMethod, TransportationAddress shipFrom, TransportationAddress shipTo, string priceListType, string billingMethod, string vehicleType,decimal qty)
+        {
+            TransportPriceListDetail priceListDetail = null;
+            DetachedCriteria detachedCriteria = DetachedCriteria.For<TransportPriceListDetail>();
+            detachedCriteria.Add(Expression.Eq("TransportPriceList.Code", priceList.Code));
+            if (item != null)
+            {
+                detachedCriteria.Add(Expression.Eq("Item.Code", item.Code));
+            }
+            detachedCriteria.Add(Expression.Eq("Currency.Code", currency.Code));
+            if (uom != null)
+            {
+                detachedCriteria.Add(Expression.Eq("Uom.Code", uom.Code));
+            }
+            detachedCriteria.Add(Expression.Le("StartDate", effectiveDate));
+            detachedCriteria.Add(Expression.Or(Expression.Ge("EndDate", effectiveDate.Date), Expression.IsNull("EndDate")));
+
+            if (pricingMethod != null && pricingMethod != string.Empty)
+            {
+                detachedCriteria.Add(Expression.Eq("PricingMethod", pricingMethod));
+            }
+            if (shipFrom != null)
+            {
+                detachedCriteria.Add(Expression.Eq("ShipFrom.Id", shipFrom.Id));
+            }
+            if (shipTo != null)
+            {
+                detachedCriteria.Add(Expression.Eq("ShipTo.Id", shipTo.Id));
+            }
+
+            if (billingMethod != null && billingMethod != string.Empty)
+            {
+                detachedCriteria.Add(Expression.Eq("BillingMethod", billingMethod));
+            }
+
+            if (vehicleType != null && vehicleType != string.Empty)
+            {
+                detachedCriteria.Add(Expression.Eq("VehicleType", vehicleType));
+            }
+            detachedCriteria.Add(Expression.Eq("Type", priceListType));
+            detachedCriteria.Add(Expression.IsNotNull("StartQty"));
+           // detachedCriteria.Add(Expression.IsNotNull("EndQty"));
+
+            detachedCriteria.AddOrder(Order.Desc("StartDate")); //按StartDate降序，取最新的价格
+            IList<TransportPriceListDetail> priceListDetailList = criteriaMgr.FindAll<TransportPriceListDetail>(detachedCriteria);
+            if (priceListDetailList != null && priceListDetailList.Count > 0)
+            {
+                priceListDetail = priceListDetailList.Where(p => p.StartQty.Value < qty && (p.EndQty == null || p.EndQty.Value >= qty)).FirstOrDefault();
+
+                if (priceListDetail == null)
+                {
+                    priceListDetail = priceListDetailList.OrderBy(p => p.StartQty.Value).FirstOrDefault();
+                }
+            }
+           return priceListDetail;
         }
 
         public IList<TransportPriceListDetail> CheckOperation(string transportPriceListCode, string startDate, string endDate, string item, string billingMethod)

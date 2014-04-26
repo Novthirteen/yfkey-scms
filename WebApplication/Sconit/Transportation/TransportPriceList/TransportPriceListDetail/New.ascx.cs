@@ -67,7 +67,9 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
         ((CheckBox)(this.FV_TransportPriceListDetail.FindControl("cbIsIncludeTax"))).Checked = false;
         ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartDate"))).Text = DateTime.Now.Date.ToString("yyyy-MM-dd");
         ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndDate"))).Text = string.Empty;
-
+        ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartQty"))).Text = "0";
+        ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndQty"))).Text = "0";
+        ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbMinPrice"))).Text = "0";
     }
 
     private void InitPricingMethod()
@@ -114,6 +116,17 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
                 catch (Exception)
                 {
                     ShowWarningMessage("Transportation.TransportPriceListDetail.UnitPrice.Error");
+                    args.IsValid = false;
+                }
+                break;
+            case "cvMinPrice":
+                try
+                {
+                    Convert.ToDecimal(args.Value);
+                }
+                catch (Exception)
+                {
+                    ShowWarningMessage("Transportation.TransportPriceListDetail.MinPrice.Error");
                     args.IsValid = false;
                 }
                 break;
@@ -222,7 +235,29 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
         {
             tbMinVolume.Enabled = true;
         }
+
         tbMinVolume.Text = "0";
+
+        TextBox tbStartQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartQty"));
+        TextBox tbEndQty = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndQty"));
+        TextBox tbMinPrice = (TextBox)(this.FV_TransportPriceListDetail.FindControl("tbMinPrice"));
+
+        if (ddlPricingMethod.SelectedValue == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
+        {
+            tbStartQty.Enabled = true;
+            tbEndQty.Enabled = true;
+            tbMinPrice.Enabled = true;
+        }
+        else
+        {
+            tbStartQty.Enabled = false;
+            tbEndQty.Enabled = false;
+            tbMinPrice.Enabled = false;
+        }
+
+        tbStartQty.Text = "0";
+        tbEndQty.Text = "0";
+        tbMinPrice.Text = "0";
 
         ddlVehicleType.DataSource = GetVehicleTypeGroup(ddlPricingMethod.SelectedValue);
         ddlVehicleType.DataBind();
@@ -247,11 +282,11 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_20FOOT));
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_40FOOT));
         }
-        else if (pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3)
+        else if (pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3 || pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
         {
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_SCATTERED));
         }
-        else
+        else 
         {
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_2T));
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_5T));

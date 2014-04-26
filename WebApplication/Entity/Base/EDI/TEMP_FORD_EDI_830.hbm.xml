@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+ 	<class name="com.Sconit.Entity.EDI.TEMP_FORD_EDI_830, com.Sconit.Entity" table="TEMP_FORD_EDI_830" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      		<generator class="identity" />
+        </id>
+    <property name="BatchNo" column="BatchNo" type="Int32" />
+    <property name="Message_Type_Code" column="Message_Type_Code" type="String" length="255"/>
+    <property name="Message_Type" column="Message_Type" type="String" length="255"/>
+    <property name="Sender_ID_Title" column="Sender_ID_Title" type="String" length="255"/>
+    <property name="Sender_ID" column="Sender_ID" type="String" length="255"/>
+    <property name="Receiver_ID_Title" column="Receiver_ID_Title" type="String" length="255"/>
+    <property name="Receiver_ID" column="Receiver_ID" type="String" length="255"/>
+    <property name="Interchange_Control_Num" column="Interchange_Control_Num" type="String" length="255"/>
+    <property name="Message_Release_Num" column="Message_Release_Num" type="String" length="255"/>
+    <property name="Message_Release_Date" column="Message_Release_Date" type="String" length="255"/>
+    <property name="Message_Purpose" column="Message_Purpose" type="String" length="255"/>
+    <property name="Schedule_Type" column="Schedule_Type" type="String" length="255"/>
+    <property name="Horizon_Start_Date" column="Horizon_Start_Date" type="String" length="255"/>
+    <property name="Horizon_End_Date" column="Horizon_End_Date" type="String" length="255"/>
+    <property name="Comment_Note" column="Comment_Note" type="String" length="255"/>
+    <property name="Ship_To_GSDB_Code" column="Ship_To_GSDB_Code" type="String" length="255"/>
+    <property name="Ship_From_GSDB_Code" column="Ship_From_GSDB_Code" type="String" length="255"/>
+    <property name="Intermediate_Consignee" column="Intermediate_Consignee" type="String" length="255"/>
+    <property name="Part_Num" column="Part_Num" type="String" length="255"/>
+    <property name="Purchase_Order_Num" column="Purchase_Order_Num" type="String" length="255"/>
+    <property name="Part_Release_Status" column="Part_Release_Status" type="String" length="255"/>
+    <property name="Dock_Code" column="Dock_Code" type="String" length="255"/>
+    <property name="Line_Feed" column="Line_Feed" type="String" length="255"/>
+    <property name="Reserve_Line_Feed" column="Reserve_Line_Feed" type="String" length="255"/>
+    <property name="Contact_Name" column="Contact_Name" type="String" length="255"/>
+    <property name="Contact_Telephone" column="Contact_Telephone" type="String" length="255"/>
+    <property name="Fab_Auth_Qty" column="Fab_Auth_Qty" type="String" length="255"/>
+    <property name="Fab_Auth_Start_Date" column="Fab_Auth_Start_Date" type="String" length="255"/>
+    <property name="Fab_Auth_End_Date" column="Fab_Auth_End_Date" type="String" length="255"/>
+    <property name="Mat_Auth_Qty" column="Mat_Auth_Qty" type="String" length="255"/>
+    <property name="Mat_Auth_Start_Date" column="Mat_Auth_Start_Date" type="String" length="255"/>
+    <property name="Mat_Auth_End_Date" column="Mat_Auth_End_Date" type="String" length="255"/>
+    <property name="Last_Received_ASN_Num" column="Last_Received_ASN_Num" type="String" length="255"/>
+    <property name="Last_Shipped_Qty" column="Last_Shipped_Qty" type="String" length="255"/>
+    <property name="Last_Shipped_Date" column="Last_Shipped_Date" type="String" length="255"/>
+    <property name="Cum_Shipped_Qty" column="Cum_Shipped_Qty" type="String" length="255"/>
+    <property name="Cum_Start_Date" column="Cum_Start_Date" type="String" length="255"/>
+    <property name="Cum_End_Date" column="Cum_End_Date" type="String" length="255"/>
+    <property name="Forecast_Cum_Qty" column="Forecast_Cum_Qty" type="String" length="255"/>
+    <property name="Forecast_Net_Qty" column="Forecast_Net_Qty" type="String" length="255"/>
+    <property name="UOM" column="UOM" type="String" length="255"/>
+    <property name="Forecast_Status" column="Forecast_Status" type="String" length="255"/>
+    <property name="Forecast_Date" column="Forecast_Date" type="String" length="255"/>
+    <property name="Flexible_Forcast_Start_Date" column="Flexible_Forcast_Start_Date" type="String" length="255"/>
+    <property name="Flexible_Forcast_End_Date" column="Flexible_Forcast_End_Date" type="String" length="255"/>
+    <property name="Forecast_Date_Qual_r" column="Forecast_Date_Qual_r" type="String" length="255"/>
+    <property name="CreateDate" column="CreateDate" type="DateTime" />
+    <property name="CreateUserName" column="CreateUserName" type="String" length="255"/>
+    <property name="IsHandle" column="IsHandle" type="Boolean"/>
+    <property name="ReadFileName" column="ReadFileName" type="String" length="255"/>
+  </class>
+</hibernate-mapping>

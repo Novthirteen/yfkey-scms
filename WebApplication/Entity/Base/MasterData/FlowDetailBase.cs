@@ -480,9 +480,24 @@ namespace com.Sconit.Entity.MasterData
             }
         }
         public Int32 MRPWeight { get; set; }
+
+        #region    Ford EDI Option
+        //public string ReceivingPlant { get; set; }
+        //public string ShipFrom { get; set; }
+        public string TransModeCode { get; set; }
+        public string ConveyanceNumber { get; set; }
+        public string CarrierCode { get; set; }
+        public string GrossWeight { get; set; }
+        public string NetWeight { get; set; }
+        public string WeightUom { get; set; }
+        public string PackagingCode { get; set; }
+        public string LadingQuantity { get; set; }
+        public string UnitsPerContainer { get; set; }
+
+        #endregion
         #endregion
 
-		public override int GetHashCode()
+        public override int GetHashCode()
         {
 			if (Id != 0)
             {

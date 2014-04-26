@@ -1098,4 +1098,10 @@
   <data name="CheckASN" xml:space="preserve">
     <value>单据确认</value>
   </data>
+  <data name="FordPlan" xml:space="preserve">
+    <value>福特EDI计划</value>
+  </data>
+  <data name="FordPlanShip" xml:space="preserve">
+    <value>福特EDI发货</value>
+  </data>
 </root>

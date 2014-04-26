@@ -153,6 +153,8 @@ public partial class MasterData_FlowDetail_New : ModuleBase
             {
                 flowDetail.LocationFrom = TheLocationMgr.LoadLocation(tbLocFrom.Text.Trim());
             }
+            flowDetail.PackagingCode = ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbPackagingCode")).Value;
+            flowDetail.TransModeCode = ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbTransModeCode")).Value;
         }
         else if (this.ModuleType == BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION)
         {
@@ -401,6 +403,20 @@ public partial class MasterData_FlowDetail_New : ModuleBase
 
         ((TextBox)(this.FV_FlowDetail.FindControl("tbMRPWeight"))).Text = "1";
 
+        #region   EDI Option
+        ((TextBox)(this.FV_FlowDetail.FindControl("tbGrossWeight"))).Text = string.Empty;
+        ((TextBox)(this.FV_FlowDetail.FindControl("tbNetWeight"))).Text = string.Empty;
+        ((TextBox)(this.FV_FlowDetail.FindControl("tbWeightUom"))).Text = string.Empty;
+        ((TextBox)(this.FV_FlowDetail.FindControl("tbCarrierCode"))).Text = string.Empty;
+        ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbTransModeCode")).Value = string.Empty;
+        ((TextBox)(this.FV_FlowDetail.FindControl("tbConveyanceNumber"))).Text = string.Empty;
+        //((TextBox)(this.FV_FlowDetail.FindControl("tbReceivingPlant"))).Text = string.Empty;
+        //((TextBox)(this.FV_FlowDetail.FindControl("tbShipFrom"))).Text = string.Empty;
+        ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbPackagingCode")).Value = string.Empty;
+        ((TextBox)(this.FV_FlowDetail.FindControl("tbLadingQuantity"))).Text = string.Empty;
+        ((TextBox)(this.FV_FlowDetail.FindControl("tbUnitsPerContainer"))).Text = string.Empty;
+        #endregion
+
         Literal lblBillSettleTerm = (Literal)this.FV_FlowDetail.FindControl("lblBillSettleTerm");
         DropDownList ddlBillSettleTerm = (DropDownList)this.FV_FlowDetail.FindControl("ddlBillSettleTerm");
         if (ddlBillSettleTerm.Visible)
@@ -466,6 +482,7 @@ public partial class MasterData_FlowDetail_New : ModuleBase
             tbLocFrom.ServiceParameter = "string:" + flow.PartyFrom.Code;
             tbLocFrom.DataBind();
             tbLocFrom.Text = string.Empty;
+            this.FV_FlowDetail.FindControl("fdFordEDIOption").Visible = true;
         }
         else if (this.ModuleType == BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION)
         {

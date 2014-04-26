@@ -110,6 +110,8 @@
             <td class="td02">
                 <cc1:Button ID="btnConfirm" runat="server" Text="${Common.Button.Create}" OnClick="btnConfirm_Click"
                     CssClass="button2" ValidationGroup="vgCreate" FunctionId="EditOrder" />
+                <cc1:Button ID="btnImport" runat="server" Text="${Common.Button.Import}" OnClick="btnImport_Click"
+                    CssClass="button2" FunctionId="EditOrder" />
                 <asp:Button ID="btnBack" runat="server" Text="${Common.Button.Back}" OnClick="btnBack_Click"
                     CssClass="button2" />
             </td>

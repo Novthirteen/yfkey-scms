@@ -777,7 +777,7 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_20FOOT));
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_40FOOT));
         }
-        else if (pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3)
+        else if (pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3 ||pricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
         {
             vehicleTypeGroup.Add(GetVehicleType(BusinessConstants.TRANSPORTATION_VEHICLE_TYPE_SCATTERED));
         }

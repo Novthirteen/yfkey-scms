@@ -19,9 +19,11 @@
                         <td class="td02">
                             <asp:Literal ID="lbCurrentTransportPriceList" runat="server" />
                         </td>
-                        <td class="td01">
+                          <td class="td01">
+                            <asp:Literal ID="lblIsProvisionalEstimate" runat="server" Text="${Transportation.TransportPriceListDetail.IsProvisionalEstimate}:" />
                         </td>
                         <td class="td02">
+                            <asp:CheckBox ID="cbIsProvisionalEstimate" runat="server" Checked='<%#Bind("IsProvisionalEstimate") %>' />
                         </td>
                     </tr>
                     <tr>
@@ -88,6 +90,28 @@
                     </tr>
                     <tr>
                         <td class="td01">
+                            <asp:Literal ID="lblStartQty" runat="server" Text="${Transportation.TransportPriceListDetail.StartQty}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbStartQty" runat="server" Text='<%#Bind("StartQty","{0:0.########}") %>' Enabled="false" />
+                            <asp:RegularExpressionValidator ID="revStartQty" ControlToValidate="tbStartQty" runat="server"
+                                ValidationGroup="vgSave" ErrorMessage="${Common.Validator.Valid.Number}" ValidationExpression="^[0-9]+(.[0-9]{1,8})?$"
+                                Display="Dynamic" />
+                        </td>
+                        <td class="td01">
+                            <asp:Literal ID="lblEndQty" runat="server" Text="${Transportation.TransportPriceListDetail.EndQty}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbEndQty" runat="server" Text='<%#Bind("EndQty","{0:0.########}") %>'  Enabled="false"/>
+                            <asp:RegularExpressionValidator ID="revEndQty" ControlToValidate="tbEndQty" runat="server"
+                                ValidationGroup="vgSave" ErrorMessage="${Common.Validator.Valid.Number}" ValidationExpression="^[0-9]+(.[0-9]{1,8})?$"
+                                Display="Dynamic" />
+                            <asp:CustomValidator ID="cvStep" runat="server" ControlToValidate="tbEndQty"
+                                ErrorMessage="*" Display="Dynamic" ValidationGroup="vgSave" OnServerValidate="CV_ServerValidate" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td01">
                             <asp:Literal ID="lblUnitPrice" runat="server" Text="${Transportation.TransportPriceListDetail.UnitPrice}:" />
                         </td>
                         <td class="td02">
@@ -129,10 +153,15 @@
                                 MaximumValue="999999999" MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
                         <td class="td01">
-                            <asp:Literal ID="lblIsProvisionalEstimate" runat="server" Text="${Transportation.TransportPriceListDetail.IsProvisionalEstimate}:" />
+                            <asp:Literal ID="lblMinPrice" runat="server" Text="${Transportation.TransportPriceListDetail.MinPrice}:" />
                         </td>
                         <td class="td02">
-                            <asp:CheckBox ID="cbIsProvisionalEstimate" runat="server" Checked='<%#Bind("IsProvisionalEstimate") %>' />
+                            <asp:TextBox ID="tbMinPrice" runat="server" Text='<%#Bind("MinPrice","{0:0.########}") %>'  />
+                            <asp:CustomValidator ID="cvMinPrice" runat="server" ControlToValidate="tbMinPrice"
+                                ErrorMessage="*" Display="Dynamic" ValidationGroup="vgSave" OnServerValidate="CV_ServerValidate" />
+                            <asp:RangeValidator ID="rvMinPrice" ControlToValidate="tbMinPrice" runat="server"
+                                Display="Dynamic" ErrorMessage="${Transportation.TransportPriceListDetail.UnitPrice.Format}"
+                                MaximumValue="999999999" MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
                     </tr>
                     <tr>

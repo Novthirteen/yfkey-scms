@@ -379,29 +379,31 @@ namespace com.Sconit.Service.Transportation.Impl
                 IList<TransportPriceList> transportPriceList = transportPriceListMgr.GetTransportPriceList(order.Carrier.Code);
                 if (transportPriceList == null || transportPriceList.Count == 0)
                 {
-                    throw new BusinessErrorException("Transportation.PriceList.Empty",order.Carrier.Code);
+                    throw new BusinessErrorException("Transportation.PriceList.Empty", order.Carrier.Code);
                 }
                 if (transportPriceList.Count > 1)
                 {
                     throw new BusinessErrorException("Transportation.PriceList.MoreThanOne", order.Carrier.Code);
                 }
 
-                TransportPriceListDetail priceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportPriceList[0]
-                    , order.CreateDate, currencyMgr.LoadCurrency(currency), order.PricingMethod, order.TransportationRoute.ShipFrom, order.TransportationRoute.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, order.VehicleType);
-                if (priceListDetail == null)
+                TransportPriceListDetail priceListDetail = null;
+                if (order.PricingMethod != BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
                 {
-                    throw new BusinessErrorException("Transportation.PriceListDetail.Empty", order.PricingMethod);
+                    priceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportPriceList[0]
+                       , order.CreateDate, currencyMgr.LoadCurrency(currency), order.PricingMethod, order.TransportationRoute.ShipFrom, order.TransportationRoute.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, order.VehicleType);
+
                 }
+
                 #region 包车
                 if (order.PricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_SHIPT)
                 {
                     actBill.BillQty = 1;
-
+                    actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
                 }
                 #endregion
 
-                #region 体积
-                else if (order.PricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3)
+                #region 体积和阶梯
+                else if (order.PricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3 || order.PricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
                 {
                     decimal totalVolume = 0;
                     foreach (TransportationOrderDetail orderDetail in order.OrderDetails)
@@ -434,14 +436,39 @@ namespace com.Sconit.Service.Transportation.Impl
                     }
                     #endregion
 
-                    #region 最小起运量
-                    if (totalVolume < priceListDetail.MinVolume)
+                    if (order.PricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_M3)
                     {
-                        totalVolume = priceListDetail.MinVolume;
+                        #region 最小起运量
+                        if (totalVolume < priceListDetail.MinVolume)
+                        {
+                            totalVolume = priceListDetail.MinVolume;
+                        }
+                        #endregion
+
+                        actBill.BillQty = totalVolume;
+                        actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
+                    }
+                    #region 阶梯
+                    else if (order.PricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
+                    {
+                        priceListDetail = this.transportPriceListDetailMgr.GetLastestLadderStereTransportPriceListDetail(transportPriceList[0], null, order.CreateDate, currencyMgr.LoadCurrency(currency), null, order.PricingMethod, order.TransportationRoute.ShipFrom, order.TransportationRoute.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, null, order.VehicleType, totalVolume);
+                        if (priceListDetail == null)
+                        {
+                            throw new BusinessErrorException("Transportation.PriceListDetail.Empty", order.PricingMethod);
+                        }
+
+                        #region 最小起运量
+                        if (totalVolume < priceListDetail.MinVolume)
+                        {
+                            totalVolume = priceListDetail.MinVolume;
+                        }
+                        #endregion
+                        actBill.UnitPrice = priceListDetail.UnitPrice;
+                        actBill.BillQty = totalVolume;
+                        decimal minPrice = priceListDetail.MinPrice.HasValue ? priceListDetail.MinPrice.Value : 0;
+                        actBill.BillAmount = minPrice + actBill.UnitPrice * actBill.BillQty;
                     }
                     #endregion
-
-                    actBill.BillQty = totalVolume;
                 }
                 #endregion
 
@@ -451,13 +478,16 @@ namespace com.Sconit.Service.Transportation.Impl
 
                 }
                 #endregion
+
+
+
                 else
                 {
                     throw new BusinessErrorException("Transportation.PricingMethod.Empty");
                 }
 
                 actBill.UnitPrice = priceListDetail.UnitPrice;
-                actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
+                // actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
                 actBill.Currency = priceListDetail.Currency;
                 actBill.IsIncludeTax = priceListDetail.IsIncludeTax;
                 actBill.Currency = priceListDetail.Currency;
