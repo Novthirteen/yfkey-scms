@@ -189,17 +189,13 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
             var groups = (from tak in orderHeadList
                           group tak by new
                           {
-                              tak.WindowTime,
                               tak.Flow,
-                              tak.ReferenceOrderNo,
                               tak.ExternalOrderNo,
                           }
                               into result
                               select new
                               {
-                                  WindowTime = result.Key.WindowTime,
                                   Flow = result.Key.Flow,
-                                  ReferenceOrderNo = result.Key.ReferenceOrderNo,
                                   ExternalOrderNo = result.Key.ExternalOrderNo,
                                   list = result.ToList()
                               }
