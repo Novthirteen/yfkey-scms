@@ -1,6 +1,4 @@
 
-update acc_user set usr_pwd='1BBD886460827015E5D605ED44252251' where usr_code='su'
----
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TEMP_FORD_EDI_830]') AND type in (N'U'))
 DROP TABLE [dbo].[TEMP_FORD_EDI_830]
 GO
@@ -260,22 +258,22 @@ CurrenCumQty decimal not null,
 
 ------------------------------
 ------------------------------ 配置项
-insert into EntityOpt values('SourceFilePath','D:\\CovisintHttpsClient_v3.2_EP4TA\\fromcovisint','读取EDI文件目录',1)
-go
-insert into EntityOpt values('BakFilePath','D:\\CovisintHttpsClient_v3.2_EP4TA\\backup','读取EDI文件成功备份目录',1)
-go
-insert into EntityOpt values('ErrorFilePath','D:\\error','读取EDI文件失败备份目录',1)
-go
-insert into EntityOpt values('BatPath','D:\\CovisintHttpsClient_v3.2_EP4TA\\run.bat','运行Bat文件目录',1)
-go
-insert into EntityOpt values('TempFolder','D:\\TempFolder','ASN临时目录',1)
-go
-insert into EntityOpt values('ArchiveFolder','D:\\ArchiveFolder','ASN存档目录',1)
-go
-insert into EntityOpt values('OutFolder','D:\\CovisintHttpsClient_v3.2_EP4TA\\tocovisint','输出文件目录',1)
-go
-insert into EntityOpt values('IsTestSystem','1','测试系统标识',1)
-go
+--insert into EntityOpt values('SourceFilePath','D:\\CovisintHttpsClient_v3.2_EP4TA\\fromcovisint','读取EDI文件目录',1)
+--go
+--insert into EntityOpt values('BakFilePath','D:\\CovisintHttpsClient_v3.2_EP4TA\\backup','读取EDI文件成功备份目录',1)
+--go
+--insert into EntityOpt values('ErrorFilePath','D:\\error','读取EDI文件失败备份目录',1)
+--go
+--insert into EntityOpt values('BatPath','D:\\CovisintHttpsClient_v3.2_EP4TA\\run.bat','运行Bat文件目录',1)
+--go
+--insert into EntityOpt values('TempFolder','D:\\TempFolder','ASN临时目录',1)
+--go
+--insert into EntityOpt values('ArchiveFolder','D:\\ArchiveFolder','ASN存档目录',1)
+--go
+--insert into EntityOpt values('OutFolder','D:\\CovisintHttpsClient_v3.2_EP4TA\\tocovisint','输出文件目录',1)
+--go
+--insert into EntityOpt values('IsTestSystem','1','测试系统标识',1)
+--go
 
 
 ------------------
@@ -297,11 +295,6 @@ insert into BatchTrigger values('LoadEDITrigger','Trigger of Load Ford EDI File'
 
 
 ------------------路线明细上的默认值
-alter table FlowDet add EDIUom varchar(50) null--发货单位
-go
-alter table FlowDet add ReceivingPlant varchar(50) null--收货方
-go
-alter table FlowDet add ShipFrom varchar(50) null--发货方
 go
 alter table FlowDet add TransModeCode varchar(50) null--运输方式
 go
@@ -319,41 +312,11 @@ alter table FlowDet add PackagingCode varchar(50) null--包装类型
 go
 alter table FlowDet add LadingQuantity varchar(50) null--包装类型数量
 go
---alter table FlowDet add InPackagingCode varchar(50) null--内包装类型
---go
 alter table FlowDet add UnitsPerContainer varchar(50) null--单箱件数
 go
 ----------------------
 -------------------
-update  flowdet set ReceivingPlant='BVT8A',ShipFrom='EP4TA',TransModeCode='M',ConveyanceNumber='987654',CarrierCode='VEND',GrossWeight='130',NetWeight='120',WeightUom='KG',PackagingCode='CD',LadingQuantity='1',UnitsPerContainer='2',refitemcode='DG93 9034 JH' where id=39005
-go
-update  flowdet set ReceivingPlant='BVT8A',ShipFrom='EP4TA',TransModeCode='M',ConveyanceNumber='987654',CarrierCode='VEND',GrossWeight='130',NetWeight='120',WeightUom='KG',PackagingCode='CD',LadingQuantity='1',UnitsPerContainer='2',refitemcode='DC9C 2586 AC' where id=39006
-go
-update  flowdet set ReceivingPlant='BVT8A',ShipFrom='EP4TA',TransModeCode='M',ConveyanceNumber='987654',CarrierCode='VEND',GrossWeight='130',NetWeight='120',WeightUom='KG',PackagingCode='CD',LadingQuantity='1',UnitsPerContainer='2',refitemcode='DG93 9D333 EC' where id=39008
-go
-update  flowdet set ReceivingPlant='BVT8A',ShipFrom='EP4TA',TransModeCode='M',ConveyanceNumber='987654',CarrierCode='VEND',GrossWeight='130',NetWeight='120',WeightUom='KG',PackagingCode='CD',LadingQuantity='1',UnitsPerContainer='2',refitemcode='8M59 A045B34 AA' where id=39009
-go
-update  flowdet set ReceivingPlant='BVT8A',ShipFrom='EP4TA',TransModeCode='M',ConveyanceNumber='987654',CarrierCode='VEND',GrossWeight='130',NetWeight='120',WeightUom='KG',PackagingCode='CD',LadingQuantity='1',UnitsPerContainer='2',refitemcode='8M59 A045B55 DG32N4' where id=39010
-go
-update  flowdet set ReceivingPlant='BVT8A',ShipFrom='EP4TA',TransModeCode='M',ConveyanceNumber='987654',CarrierCode='VEND',GrossWeight='130',NetWeight='120',WeightUom='KG',PackagingCode='CD',LadingQuantity='1',UnitsPerContainer='2',refitemcode='8M59 A045M18 CA1E3H' where id=39011
-go
-update  flowdet set ReceivingPlant='BVT8A',ShipFrom='EP4TA',TransModeCode='M',ConveyanceNumber='987654',CarrierCode='VEND',GrossWeight='130',NetWeight='120',WeightUom='KG',PackagingCode='CD',LadingQuantity='1',UnitsPerContainer='2',refitemcode='8M59 A045M18 DA1E8R' where id=39013
-go
-update  flowdet set ReceivingPlant='BVT8A',ShipFrom='EP4TA',TransModeCode='M',ConveyanceNumber='987654',CarrierCode='VEND',GrossWeight='130',NetWeight='120',WeightUom='KG',PackagingCode='CD',LadingQuantity='1',UnitsPerContainer='2',refitemcode='8M59 A048197 AA32N4' where id=39014
 
-
---select * from itemref where id in(394,393,387,386,314,391,318)
---update itemref set refcode='DG93 9034 JH' where id=394
---update itemref set refcode='DC9C 2586 AC' where id=393
---update itemref set refcode='DG93 9D333 EC' where id=395
---update itemref set refcode='8M59 A045B34 AA' where id=387
---update itemref set refcode='8M59 A045B55 DG32N4' where id=386
---update itemref set refcode='8M59 A045M18 CA1E3H' where id=314
---update itemref set refcode='8M59 A045M18 DA1E8R' where id=391
---update itemref set refcode='8M59 A048197 AA32N4' where id=318
-
-
---select * from flowdet where refitemcode is not null and refitemcode='8M59 A045B55 DG32N4'
 
 
 
