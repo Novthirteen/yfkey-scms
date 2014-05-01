@@ -1104,4 +1104,7 @@
   <data name="FordPlanShip" xml:space="preserve">
     <value>福特EDI发货</value>
   </data>
+  <data name="FordNoPlanShip" xml:space="preserve">
+    <value>福特无计划发货</value>
+  </data>
 </root>

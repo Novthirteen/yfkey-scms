@@ -22,6 +22,20 @@ public partial class EDI_FordPlanShip_Main : MainModuleBase
         this.ucSearch.SearchEvent += new System.EventHandler(this.Search_Render);
         this.ucList.SearchShipEvent += new System.EventHandler(this.SearchDetail_Render);
         this.ucShipList.BackEvent += new System.EventHandler(this.DetailBackEvent_Render);
+        if (this.Action == BusinessConstants.PAGE_NEW_ACTION)
+        {
+            this.ucSearch.Visible = false;
+            this.ucList.Visible = false;
+            this.ucShipList.Visible = false;
+            this.ucNoPlanShip.Visible = true;
+        }
+        else
+        {
+            this.ucSearch.Visible = true;
+            this.ucList.Visible = false;
+            this.ucShipList.Visible = false;
+            this.ucNoPlanShip.Visible = false;
+        }
     }
 
 

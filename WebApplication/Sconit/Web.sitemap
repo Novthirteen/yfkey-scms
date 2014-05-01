@@ -39,6 +39,7 @@
           <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.DemandSchedule" title="$Resources:Language, DemandSchedule" description="DemandSchedule"/>
           <siteMapNode url="~/Main.aspx?mid=EDI.FordPlan" title="$Resources:Language, FordPlan" description="FordPlan"/>
           <siteMapNode url="~/Main.aspx?mid=EDI.FordPlanShip" title="$Resources:Language, FordPlanShip" description="FordPlanShip"/>
+          <siteMapNode url="~/Main.aspx?mid=EDI.FordPlanShip__act--NewAction" title="$Resources:Language, FordNoPlanShip" description="FordNoPlanShip"/>
       </siteMapNode>
       <siteMapNode url="" title="$Resources:Language,Information" description="Information">
         <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.ProductionScheduleReport" title="$Resources:Language, ProductionScheduleReport" description="ProductionScheduleReport"/>

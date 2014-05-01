@@ -298,7 +298,7 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.Message_Type = "FORDCSVFLAT";
                     temp_FORD_EDI_856.ReleaseVersion = "1";
                     temp_FORD_EDI_856.Receiver_ID = isTestSystem ? "ZZ:F159E" : "ZZ:F159B";
-                    temp_FORD_EDI_856.Sender_ID = "ZZ:EP4TA";
+                    temp_FORD_EDI_856.Sender_ID = "ZZ:" + ediFordPlan.SupplierCode;
                     temp_FORD_EDI_856.BatchNo = batch;
 
                     temp_FORD_EDI_856.Interchange_Control_Num = ediFordPlan.Control_Num;
@@ -333,9 +333,12 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.IsHandle = false;
                     temp_FORD_EDI_856.ReadFileName = string.Empty;
                     this.genericMgr.Create(temp_FORD_EDI_856);
-                    ediFordPlan.Item = string.Empty;
-                    ediFordPlan.ItemDesc = string.Empty;
-                    this.genericMgr.Update(ediFordPlan);
+                    if (ediFordPlan.Id > 0)
+                    {
+                        ediFordPlan.Item = string.Empty;
+                        ediFordPlan.ItemDesc = string.Empty;
+                        this.genericMgr.Update(ediFordPlan);
+                    }
                 }
                 #endregion
 
