@@ -180,14 +180,16 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
                 #endregion
 
                 #region  采购订单号
-                if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbPurchaseOrder")).Text.Trim()))
-                {
-                    throw new BusinessErrorException(string.Format("物料号{0}采购订单号填写有误。", eDIFordPlan.Item));
-                }
-                else
-                {
-                    eDIFordPlan.PurchaseOrder = ((TextBox)gvr.FindControl("tbPurchaseOrder")).Text.Trim();
-                }
+                //if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbPurchaseOrder")).Text.Trim()))
+                //{
+                //    throw new BusinessErrorException(string.Format("物料号{0}采购订单号填写有误。", eDIFordPlan.Item));
+                //}
+                //else
+                //{
+                //    eDIFordPlan.PurchaseOrder = ((TextBox)gvr.FindControl("tbPurchaseOrder")).Text.Trim();
+                //}
+                //售后备件发货 采购订单号 默认填写
+                eDIFordPlan.PurchaseOrder = "111111";
                 #endregion
 
                 #region   中间商

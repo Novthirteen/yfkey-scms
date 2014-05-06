@@ -79,11 +79,11 @@
                         <asp:TextBox ID="tbSupplierCode" runat="server" Text='<%# Bind("SupplierCode") %>'  Width="50"/>
                     </ItemTemplate>
                 </asp:TemplateField>
-                 <asp:TemplateField HeaderText="采购订单号">
+                <%-- <asp:TemplateField HeaderText="采购订单号">
                     <ItemTemplate>
                         <asp:TextBox ID="tbPurchaseOrder" runat="server" Text='<%# Bind("PurchaseOrder") %>'  Width="50"/>
                     </ItemTemplate>
-                </asp:TemplateField>
+                </asp:TemplateField>--%>
                  <asp:TemplateField HeaderText="中间商">
                     <ItemTemplate>
                         <asp:TextBox ID="tbIntermediateConsignee" runat="server" Text='<%# Bind("IntermediateConsignee") %>'  Width="50"/>
