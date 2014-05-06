@@ -200,7 +200,7 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
                                   list = result.ToList()
                               }
                            ).ToList();
-            string orderNos = "导入成功，生成收货单号：";
+            string orderNos = "导入成功，生成送货单号：";
             foreach (var order in groups)
             {
                 OrderHead newOrderHead = order.list.First();
@@ -284,7 +284,9 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
             orderHead = receipt.ReceiptDetails[0].OrderLocationTransaction.OrderDetail.OrderHead;
         }
         //ShowSuccessMessage("Receipt.Receive.Successfully", receipt.ReceiptNo);
-        return receipt.ReceiptNo;
+        //return receipt.ReceiptNo;
+        
+        return receipt.InProcessLocations.First().IpNo;
 
     }
 
