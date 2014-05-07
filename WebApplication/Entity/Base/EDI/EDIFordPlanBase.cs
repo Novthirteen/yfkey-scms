@@ -21,7 +21,7 @@ namespace com.Sconit.Entity.EDI
         public string Uom { get; set; }
         public decimal LastShippedQuantity { get; set; }
         public decimal LastShippedCumulative { get; set; }
-        public DateTime LastShippedDate { get; set; }
+        public DateTime? LastShippedDate { get; set; }
         public string DockCode { get; set; }
         public string LineFeed { get; set; }
         public string StorageLocation { get; set; }

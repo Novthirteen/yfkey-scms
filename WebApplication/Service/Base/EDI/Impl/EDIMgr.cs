@@ -222,9 +222,9 @@ namespace com.Sconit.Service.EDI.Impl
                         eDIFordPlan.ItemDesc = string.Empty;
                         eDIFordPlan.RefItem = daily.Part_Num;
                         eDIFordPlan.Uom = daily.UOM;
-                        eDIFordPlan.LastShippedQuantity = Convert.ToDecimal(daily.Last_Shipped_Qty);
-                        eDIFordPlan.LastShippedCumulative = Convert.ToDecimal(daily.Cum_Shipped_Qty);
-                        eDIFordPlan.LastShippedDate = DateTime.Parse(daily.Last_Shipped_Date.Substring(0, 4) + "-" + daily.Last_Shipped_Date.Substring(4, 2) + "-" + daily.Last_Shipped_Date.Substring(6, 2));
+                        eDIFordPlan.LastShippedQuantity =string.IsNullOrEmpty(daily.Last_Shipped_Qty)?null:(decimal?)( Convert.ToDecimal(daily.Last_Shipped_Qty));
+                        eDIFordPlan.LastShippedCumulative = string.IsNullOrEmpty(daily.Cum_Shipped_Qty) ? null :(decimal?)( Convert.ToDecimal(daily.Cum_Shipped_Qty));
+                        eDIFordPlan.LastShippedDate = string.IsNullOrEmpty(daily.Last_Shipped_Date) ? null : (DateTime?)(DateTime.Parse(daily.Last_Shipped_Date.Substring(0, 4) + "-" + daily.Last_Shipped_Date.Substring(4, 2) + "-" + daily.Last_Shipped_Date.Substring(6, 2)));
                         eDIFordPlan.DockCode = daily.Dock_Code;
                         eDIFordPlan.LineFeed = daily.Line_Feed;
                         eDIFordPlan.StorageLocation = daily.Reserve_Line_Feed;
