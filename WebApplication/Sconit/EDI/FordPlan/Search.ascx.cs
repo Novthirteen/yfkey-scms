@@ -181,11 +181,14 @@ public partial class EDI_FordPlan_Search : SearchModuleBase
                     Row rowDetail = sheet1.CreateRow(j);
                     Row rowDetail2 = sheet1.CreateRow(j + 1);
                     EDIFordPlan newPlan = d.List.First();
-                    var flowDet = flowdets.Where(f => f.ReferenceItemCode == newPlan.RefItem);
-                    if (flowDet != null && flowDet.Count() > 0)
+                    if (flowdets != null && flowdets.Count > 0)
                     {
-                        newPlan.Item = flowDet.First().Item.Code;
-                        newPlan.ItemDesc = flowDet.First().Item.Description;
+                        var flowDet = flowdets.Where(f => f.ReferenceItemCode == newPlan.RefItem);
+                        if (flowDet != null && flowDet.Count() > 0)
+                        {
+                            newPlan.Item = flowDet.First().Item.Code;
+                            newPlan.ItemDesc = flowDet.First().Item.Description;
+                        }
                     }
                     rowDetail.CreateCell(0).SetCellValue(newPlan.Control_Num);
                     rowDetail.CreateCell(1).SetCellValue(newPlan.ReleaseIssueDate.ToShortDateString());
