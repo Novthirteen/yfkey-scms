@@ -41,5 +41,6 @@
     <property name="CreateUserName" column="CreateUserName" type="String" length="255"/>
     <property name="IsHandle" column="IsHandle" type="Boolean"/>
     <property name="ReadFileName" column="ReadFileName" type="String" length="255"/>
+    <property name="AsnNo" column="AsnNo" type="String" length="50"/>
   </class>
 </hibernate-mapping>

@@ -101,6 +101,11 @@ namespace com.Sconit.Entity.EDI
 
         public string Purpose { get; set; }
 
+        /// <summary>
+        /// 装箱单号
+        /// </summary>
+        public string ShipmentID { get; set; }
+
 
 
 

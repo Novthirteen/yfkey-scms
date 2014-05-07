@@ -45,6 +45,7 @@ namespace com.Sconit.Entity.EDI
         public string CreateUserName { get; set; }
         public bool IsHandle { get; set; }
         public string ReadFileName { get; set; }
+        public string AsnNo { get; set; }
       
 
 

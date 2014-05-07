@@ -221,10 +221,21 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                     eDIFordPlan.ItemDesc = itemDesc;
                 }
 
+                #region   本次发货量
+                try
+                {
+                    eDIFordPlan.ShipQty = decimal.Parse(((TextBox)gvr.FindControl("tbShipQty")).Text.Trim());
+                }
+                catch (Exception e)
+                {
+                    throw new BusinessErrorException(string.Format("版本号{0}物料号{1}本次发货量填写有误。", eDIFordPlan.Control_Num, eDIFordPlan.Item));
+                }
+                #endregion
+
                 #region   发货总毛重
                 try
                 {
-                    eDIFordPlan.GrossWeight = decimal.Parse(((TextBox)gvr.FindControl("tbGrossWeight")).Text.Trim());
+                    eDIFordPlan.GrossWeight = decimal.Parse(((TextBox)gvr.FindControl("tbGrossWeight")).Text.Trim()) * eDIFordPlan.ShipQty;
                 }
                 catch (Exception e)
                 {
@@ -235,7 +246,7 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                 #region   发货总净重
                 try
                 {
-                    eDIFordPlan.NetWeight = decimal.Parse(((TextBox)gvr.FindControl("tbNetWeight")).Text.Trim());
+                    eDIFordPlan.NetWeight = decimal.Parse(((TextBox)gvr.FindControl("tbNetWeight")).Text.Trim()) * eDIFordPlan.ShipQty;
                 }
                 catch (Exception e)
                 {
@@ -250,6 +261,28 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                 }
                 else {
                     eDIFordPlan.WeightUom = ((TextBox)gvr.FindControl("tbWeightUom")).Text.Trim();
+                }
+                #endregion
+
+                #region   装箱单号
+                if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbShipmentID")).Text.Trim()))
+                {
+                    throw new BusinessErrorException(string.Format("版本号{0}物料号{1}装箱单号填写有误。", eDIFordPlan.Control_Num, eDIFordPlan.Item));
+                }
+                else
+                {
+                    eDIFordPlan.ShipmentID = ((TextBox)gvr.FindControl("tbShipmentID")).Text.Trim();
+                }
+                #endregion
+
+                #region   提单号
+                if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbLadingNum")).Text.Trim()))
+                {
+                    throw new BusinessErrorException(string.Format("版本号{0}物料号{1}提单号填写有误。", eDIFordPlan.Control_Num, eDIFordPlan.Item));
+                }
+                else
+                {
+                    eDIFordPlan.LadingNum = ((TextBox)gvr.FindControl("tbLadingNum")).Text.Trim();
                 }
                 #endregion
 
@@ -325,27 +358,9 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                 }
                 #endregion
 
-                #region   提单号
-                if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbLadingNum")).Text.Trim()))
-                {
-                    throw new BusinessErrorException(string.Format("版本号{0}物料号{1}提单号填写有误。", eDIFordPlan.Control_Num, eDIFordPlan.Item));
-                }
-                else
-                {
-                    eDIFordPlan.LadingNum = ((TextBox)gvr.FindControl("tbLadingNum")).Text.Trim();
-                }
-                #endregion
+                
 
-                #region   本次发货量
-                try
-                {
-                    eDIFordPlan.ShipQty = decimal.Parse(((TextBox)gvr.FindControl("tbShipQty")).Text.Trim());
-                }
-                catch (Exception e)
-                {
-                    throw new BusinessErrorException(string.Format("版本号{0}物料号{1}本次发货量填写有误。", eDIFordPlan.Control_Num, eDIFordPlan.Item));
-                }
-                #endregion
+                
 
                 #region   累计发货量
                 //try

@@ -81,12 +81,12 @@
                  
                 <asp:TemplateField HeaderText="${EDI.EDIFordPlanBase.ItemDesc}">
                     <ItemTemplate>
-                        <asp:Label ID="lblItemDesc" runat="server" Text='<%# Bind("ItemDesc")  %>' Width="100" />
+                        <asp:Label ID="lblItemDesc" runat="server" Text='<%# Bind("ItemDesc")  %>' Width="150" />
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Part Number">
                     <ItemTemplate>
-                        <asp:Label ID="lblRefItem" runat="server" Text='<%# Bind("RefItem") %>'  Width="100"/>
+                        <asp:Label ID="lblRefItem" runat="server" Text='<%# Bind("RefItem") %>'  Width="150"/>
                     </ItemTemplate>
                 </asp:TemplateField>
                   <asp:TemplateField HeaderText="计划数">
@@ -111,6 +111,11 @@
                 <asp:TemplateField HeaderText="${EDI.EDIFordPlanBase.Uom}">
                     <ItemTemplate>
                         <asp:TextBox ID="tbInUom" runat="server" Text='<%# Bind("Uom") %>' Width="50"></asp:TextBox>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="装箱单号">
+                    <ItemTemplate>
+                        <asp:TextBox ID="tbShipmentID" runat="server" Text='<%# Bind("ShipmentID") %>' Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Bill of Lading Reference">
