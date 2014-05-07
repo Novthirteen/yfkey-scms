@@ -73,7 +73,7 @@ public partial class EDI_FordPlan_DetailList : ListModuleBase
                 }
                 newPlan.PlanQtyArr = planQtyArr;
                 var flowDet = flowdets.Where(f => f.ReferenceItemCode == newPlan.RefItem);
-                if (flowDet != null || flowDet.Count()> 0)
+                if (flowDet != null && flowDet.Count()> 0)
                 {
                     newPlan.Item = flowDet.First().Item.Code;
                     newPlan.ItemDesc = flowDet.First().Item.Description;

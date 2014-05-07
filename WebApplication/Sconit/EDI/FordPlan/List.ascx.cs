@@ -18,7 +18,6 @@ using NHibernate.Expression;
 using com.Sconit.Entity;
 using System.Collections.Generic;
 using com.Sconit.Entity.EDI;
-using Microsoft.Office.Interop;
 
 //using Microsoft.Office.Core;
 //using Microsoft.Excel.x.0.Object.Library

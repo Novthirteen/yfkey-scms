@@ -31,10 +31,17 @@ public partial class EDI_FordPlanShip_Main : MainModuleBase
         }
         else
         {
-            this.ucSearch.Visible = true;
-            this.ucList.Visible = false;
-            this.ucShipList.Visible = false;
-            this.ucNoPlanShip.Visible = false;
+            if (IsPostBack)
+            {
+                
+            }
+            else
+            {
+                this.ucSearch.Visible = true;
+                this.ucList.Visible = false;
+                this.ucShipList.Visible = false;
+                this.ucNoPlanShip.Visible = false;
+            }
         }
     }
 

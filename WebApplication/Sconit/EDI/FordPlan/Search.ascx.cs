@@ -10,7 +10,6 @@ using com.Sconit.Entity;
 using Geekees.Common.Controls;
 using com.Sconit.Entity.EDI;
 using NHibernate.Expression;
-using Microsoft.Office.Interop.Excel;
 using com.Sconit.Entity.MasterData;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -181,9 +180,9 @@ public partial class EDI_FordPlan_Search : SearchModuleBase
                 {
                     Row rowDetail = sheet1.CreateRow(j);
                     Row rowDetail2 = sheet1.CreateRow(j + 1);
-                    EDIFordPlan newPlan = g.List.First();
+                    EDIFordPlan newPlan = d.List.First();
                     var flowDet = flowdets.Where(f => f.ReferenceItemCode == newPlan.RefItem);
-                    if (flowDet != null || flowDet.Count() > 0)
+                    if (flowDet != null && flowDet.Count() > 0)
                     {
                         newPlan.Item = flowDet.First().Item.Code;
                         newPlan.ItemDesc = flowDet.First().Item.Description;

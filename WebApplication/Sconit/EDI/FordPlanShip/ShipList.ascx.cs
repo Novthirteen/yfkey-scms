@@ -24,6 +24,7 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
 {
 
     public event EventHandler BackEvent;
+    public event EventHandler FlowEvent;
 
     public static string control_num = string.Empty;
 
@@ -146,6 +147,10 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
     protected void tbFlow_TextChanged(Object sender, EventArgs e)
     {
         this.GetView(SearchSql);
+        //if (this.FlowEvent != null)
+        //{
+        //    this.FlowEvent(this, e);
+        //}
     }
 
     protected void btnShip_Click(object sender, EventArgs e)
