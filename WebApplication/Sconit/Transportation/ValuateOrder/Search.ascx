@@ -35,7 +35,17 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3" />
+            <td class="td01">
+            文件位置：
+            </td>
+            <td class="td02">
+            <asp:FileUpload ID="fileUpload" runat="server" />
+                    <asp:Button runat="server" ID="btnUpload" OnClick="btnUpload_Click" Text="上传" CssClass="button2" />
+                    <asp:HyperLink ID="hlTemplate" runat="server" Text="模板下载"
+                    NavigateUrl="~/Reports/Templates/YFKExcelTemplates/ImportValuateOrder.xls"></asp:HyperLink>
+            </td>
+            <td class="td01">
+            </td>
             <td class="ttd02">
                 <div class="buttons">
                     <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" OnClick="btnSearch_Click"
