@@ -114,6 +114,10 @@
     <Compile Include="Base\Batch\Impl\BatchRunLogBaseMgr.cs" />
     <Compile Include="Base\Batch\Impl\BatchTriggerBaseMgr.cs" />
     <Compile Include="Base\Batch\Impl\BatchTriggerParameterBaseMgr.cs" />
+    <Compile Include="Base\Criteria\IArchCriteriaMgr.cs" />
+    <Compile Include="Base\Criteria\Impl\ArchCriteriaMgr.cs" />
+    <Compile Include="Base\IArchSession.cs" />
+    <Compile Include="Base\ArchSessionBase.cs" />
     <Compile Include="Base\EDI\IEDIMgr.cs" />
     <Compile Include="Base\EDI\Impl\EDIMgr.cs" />
     <Compile Include="Base\Criteria\ICriteriaMgr.cs" />

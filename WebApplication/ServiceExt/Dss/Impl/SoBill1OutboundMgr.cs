@@ -27,8 +27,10 @@ namespace com.Sconit.Service.Dss.Impl
             IDssObjectMappingMgr dssObjectMappingMgr,
             ICommonOutboundMgr commonOutboundMgr,
             ILocationMgr locationMgr,
-            IBillMgr billMgr)
-            : base(numberControlMgr, dssExportHistoryMgr, criteriaMgr, dssOutboundControlMgr, dssObjectMappingMgr, commonOutboundMgr, locationMgr, billMgr)
+            IBillMgr billMgr,
+            IArchCriteriaMgr archCriteriaMgr
+            )
+            : base(numberControlMgr, dssExportHistoryMgr, criteriaMgr, dssOutboundControlMgr, dssObjectMappingMgr, commonOutboundMgr, locationMgr, billMgr, archCriteriaMgr)
         {
         }
 

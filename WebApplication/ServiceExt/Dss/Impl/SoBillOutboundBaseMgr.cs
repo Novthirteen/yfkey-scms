@@ -18,6 +18,7 @@ namespace com.Sconit.Service.Dss.Impl
     public abstract class SoBillOutboundBaseMgr : AbstractOutboundMgr
     {
         private ICriteriaMgr criteriaMgr;
+        private IArchCriteriaMgr archCriteriaMgr;
         private IBillMgr billMgr;
         private ICommonOutboundMgr commonOutboundMgr;
 
@@ -28,12 +29,15 @@ namespace com.Sconit.Service.Dss.Impl
             IDssObjectMappingMgr dssObjectMappingMgr,
             ICommonOutboundMgr commonOutboundMgr,
             ILocationMgr locationMgr,
-            IBillMgr billMgr)
+            IBillMgr billMgr,
+            IArchCriteriaMgr archCriteriaMgr
+            )
             : base(numberControlMgr, dssExportHistoryMgr, criteriaMgr, dssOutboundControlMgr, dssObjectMappingMgr, locationMgr)
         {
             this.criteriaMgr = criteriaMgr;
             this.commonOutboundMgr = commonOutboundMgr;
             this.billMgr = billMgr;
+            this.archCriteriaMgr = archCriteriaMgr;
         }
 
         [Transaction(TransactionMode.Unspecified)]
@@ -127,10 +131,23 @@ namespace com.Sconit.Service.Dss.Impl
             }
             else
             {
-                orderLocationTransaction =
-  commonOutboundMgr.GetOrderLocationTransactionInfo(dssExportHistory.OrderNo, dssExportHistory.Item, BusinessConstants.IO_TYPE_OUT);
+                //归档库查找
+                DetachedCriteria criteria = DetachedCriteria.For(typeof(OrderLocationTransaction));
+                criteria.CreateAlias("OrderDetail", "od");
+                criteria.Add(Expression.Eq("od.OrderHead.OrderNo", dssExportHistory.OrderNo));
+                criteria.Add(Expression.Eq("Item.Code", dssExportHistory.Item));
+                criteria.Add(Expression.Eq("IOType", BusinessConstants.IO_TYPE_OUT));
 
-                dssExportHistory.PartyFrom = dssExportHistory.PartyFrom;
+                IList<OrderLocationTransaction> result = archCriteriaMgr.FindAll<OrderLocationTransaction>(criteria);
+                if (result != null && result.Count > 0)
+                {
+                   orderLocationTransaction= result[0];
+                   dssExportHistory.PartyFrom = orderLocationTransaction.OrderDetail.OrderHead.PartyFrom.Code;//发出区域
+                }
+                else
+                {
+                   
+                }
             }
         }
         #endregion

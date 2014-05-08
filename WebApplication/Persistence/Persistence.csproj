@@ -92,6 +92,10 @@
     <Compile Include="Base\Batch\NH\NHBatchRunLogBaseDao.cs" />
     <Compile Include="Base\Batch\NH\NHBatchTriggerBaseDao.cs" />
     <Compile Include="Base\Batch\NH\NHBatchTriggerParameterBaseDao.cs" />
+    <Compile Include="Base\Criteria\IArchCriteriaDao.cs" />
+    <Compile Include="Base\Criteria\NH\ArchNHCriteriaDao.cs" />
+    <Compile Include="Base\IArchNHDao.cs" />
+    <Compile Include="Base\ArchNHDaoBase.cs" />
     <Compile Include="Base\Criteria\ICriteriaDao.cs" />
     <Compile Include="Base\Criteria\NH\NHCriteriaDao.cs" />
     <Compile Include="Base\Distribution\ICustomerRollingPlanBaseDao.cs" />
