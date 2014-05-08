@@ -48,8 +48,12 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
 
     public void GetView(string searchSql)
     {
-        SearchSql = searchSql;
-        IList<EDIFordPlan> fordPlanList = TheGenericMgr.FindAllWithCustomQuery<EDIFordPlan>(searchSql);
+        IList<EDIFordPlan> fordPlanList = new List<EDIFordPlan>();
+        if (!string.IsNullOrEmpty(searchSql))
+        {
+            SearchSql = searchSql;
+            fordPlanList=TheGenericMgr.FindAllWithCustomQuery<EDIFordPlan>(searchSql);
+        }
         List<EDIFordPlan> returnList = new List<EDIFordPlan>();
         if (fordPlanList != null && fordPlanList.Count > 0)
         {

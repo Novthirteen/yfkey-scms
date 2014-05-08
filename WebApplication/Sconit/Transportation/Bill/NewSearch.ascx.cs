@@ -147,12 +147,20 @@ public partial class Transportation_Bill_NewSearch : SearchModuleBase
         }
         if (tactbillList.Count > 0)
         {
-            IList<TransportationBill> transportationBillList = TheTransportationBillMgr.CreateTransportationBill(tactbillList, this.CurrentUser);
-            if (transportationBillList != null && transportationBillList.Count > 0)
+            try
             {
-                ExportResult(transportationBillList);
-                btnBack_Click(sender, e);
+                IList<TransportationBill> transportationBillList = TheTransportationBillMgr.CreateTransportationBill(tactbillList, this.CurrentUser);
+                if (transportationBillList != null && transportationBillList.Count > 0)
+                {
+                    ExportResult(transportationBillList);
+                    btnBack_Click(sender, e);
+                }
             }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex.Message);
+            }
+           
 
         }
         else
