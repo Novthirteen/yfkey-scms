@@ -294,5 +294,8 @@ namespace com.Sconit.Service.MasterData
 
         void DoReceiveWO(string huId, OrderDetail orderDetail, decimal qty);
 
+        //快速发货导入
+        string QuickImportDistributionOrder(IList<OrderHead> orderHeadList, string userCode, string moduleSubType);
+
     }
 }

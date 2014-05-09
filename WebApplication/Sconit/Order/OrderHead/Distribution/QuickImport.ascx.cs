@@ -186,37 +186,39 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
             {
                 throw new Exception("导入的有效数据为0.");
             }
-            var groups = (from tak in orderHeadList
-                          group tak by new
-                          {
-                              tak.Flow,
-                              tak.ExternalOrderNo,
-                          }
-                              into result
-                              select new
-                              {
-                                  Flow = result.Key.Flow,
-                                  ExternalOrderNo = result.Key.ExternalOrderNo,
-                                  list = result.ToList()
-                              }
-                           ).ToList();
-            string orderNos = "导入成功，生成送货单号：";
-            foreach (var order in groups)
-            {
-                OrderHead newOrderHead = order.list.First();
-                IList<OrderDetail> detList = new List<OrderDetail>();
-                //OrderHead newOrderHead = new OrderHead();
-                foreach (var d in order.list)
-                {
-                    OrderDetail det = d.OrderDetails.First();
-                    det.OrderHead = newOrderHead;
-                    detList.Add(det);
-                }
-                newOrderHead.OrderDetails = detList;
+            string successMessage = TheOrderMgr.QuickImportDistributionOrder(orderHeadList,this.CurrentUser.Code,this.ModuleSubType);
+            ShowSuccessMessage(successMessage);
+            //var groups = (from tak in orderHeadList
+            //              group tak by new
+            //              {
+            //                  tak.Flow,
+            //                  tak.ExternalOrderNo,
+            //              }
+            //                  into result
+            //                  select new
+            //                  {
+            //                      Flow = result.Key.Flow,
+            //                      ExternalOrderNo = result.Key.ExternalOrderNo,
+            //                      list = result.ToList()
+            //                  }
+            //               ).ToList();
+            //string orderNos = "导入成功，生成送货单号：";
+            //foreach (var order in groups)
+            //{
+            //    OrderHead newOrderHead = order.list.First();
+            //    IList<OrderDetail> detList = new List<OrderDetail>();
+            //    //OrderHead newOrderHead = new OrderHead();
+            //    foreach (var d in order.list)
+            //    {
+            //        OrderDetail det = d.OrderDetails.First();
+            //        det.OrderHead = newOrderHead;
+            //        detList.Add(det);
+            //    }
+            //    newOrderHead.OrderDetails = detList;
 
-                orderNos += CreateOrder(newOrderHead);
-            }
-            ShowSuccessMessage(orderNos);
+            //    orderNos += CreateOrder(newOrderHead);
+            //}
+            //ShowSuccessMessage(orderNos);
         }
         catch (Exception ex)
         {

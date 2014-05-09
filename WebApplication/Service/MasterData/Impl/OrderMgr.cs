@@ -3738,6 +3738,44 @@ namespace com.Sconit.Service.MasterData.Impl
             this.ReceiveOrder(receipt, this.userMgr.GetMonitorUser());
             #endregion
         }
+
+
+        #region  快速发货导入
+        [Transaction(TransactionMode.Requires)]
+        public string QuickImportDistributionOrder(IList<OrderHead> orderHeadList, string userCode, string moduleSubType)
+        {
+            var groups = (from tak in orderHeadList
+                          group tak by new
+                          {
+                              tak.Flow,
+                              tak.ExternalOrderNo,
+                          }
+                              into result
+                              select new
+                              {
+                                  Flow = result.Key.Flow,
+                                  ExternalOrderNo = result.Key.ExternalOrderNo,
+                                  list = result.ToList()
+                              }
+                          ).ToList();
+            string orderNos = "导入成功，生成送货单号：";
+            foreach (var order in groups)
+            {
+                OrderHead newOrderHead = order.list.First();
+                IList<OrderDetail> detList = new List<OrderDetail>();
+                foreach (var d in order.list)
+                {
+                    OrderDetail det = d.OrderDetails.First();
+                    det.OrderHead = newOrderHead;
+                    detList.Add(det);
+                }
+                newOrderHead.OrderDetails = detList;
+
+                orderNos += CreateOrder(newOrderHead, userCode, moduleSubType);
+            }
+            return orderNos;
+        }
+        #endregion
         #endregion
 
         #region private方法
@@ -4348,6 +4386,67 @@ namespace com.Sconit.Service.MasterData.Impl
             return hu;
         }
 
+        //快速发货导入 新增订单
+        private string CreateOrder(OrderHead orderHead, string userCode, string moduleSubType)
+        {
+            IList<OrderDetail> resultOrderDetailList = new List<OrderDetail>();
+            foreach (OrderDetail orderDetail in orderHead.OrderDetails)
+            {
+                if (orderDetail.OrderedQty != 0)
+                {
+                    if (orderDetail.Item.Type == BusinessConstants.CODE_MASTER_ITEM_TYPE_VALUE_K)
+                    {
+                        IList<Item> newItemList = new List<Item>(); //填充套件子件
+                        decimal? convertRate = null;
+                        IList<ItemKit> itemKitList = null;
+
+                        var maxSequence = orderHead.OrderDetails.Max(o => o.Sequence);
+                        itemKitList = itemKitMgr.GetChildItemKit(orderDetail.Item);
+                        for (int i = 0; i < itemKitList.Count; i++)
+                        {
+                            Item item = itemKitList[i].ChildItem;
+                            if (!convertRate.HasValue)
+                            {
+                                if (itemKitList[i].ParentItem.Uom.Code != orderDetail.Item.Uom.Code)
+                                {
+                                    convertRate = uomConversionMgr.ConvertUomQty(orderDetail.Item, orderDetail.Item.Uom, 1, itemKitList[i].ParentItem.Uom);
+                                }
+                                else
+                                {
+                                    convertRate = 1;
+                                }
+                            }
+                            OrderDetail newOrderDetail = new OrderDetail();
+
+                            newOrderDetail.OrderHead = orderDetail.OrderHead;
+                            newOrderDetail.Sequence = maxSequence + (i + 1);
+                            newOrderDetail.IsBlankDetail = false;
+                            newOrderDetail.Item = item;
+                            newOrderDetail.Uom = item.Uom;
+                            newOrderDetail.UnitCount = orderDetail.Item.UnitCount * itemKitList[i].Qty * convertRate.Value;
+                            newOrderDetail.OrderedQty = orderDetail.OrderedQty * itemKitList[i].Qty * convertRate.Value;
+                            newOrderDetail.PackageType = orderDetail.PackageType;
+
+                            resultOrderDetailList.Add(newOrderDetail);
+                        }
+                    }
+                    else
+                    {
+                        resultOrderDetailList.Add(orderDetail);
+                    }
+                }
+            }
+            orderHead.OrderDetails = resultOrderDetailList;
+
+            Receipt receipt = this.QuickReceiveOrder(orderHead.Flow, orderHead.OrderDetails, userCode, moduleSubType, orderHead.WindowTime, orderHead.StartTime, false, orderHead.ReferenceOrderNo, orderHead.ExternalOrderNo);
+            if (receipt.ReceiptDetails != null && receipt.ReceiptDetails.Count > 0)
+            {
+                orderHead = receipt.ReceiptDetails[0].OrderLocationTransaction.OrderDetail.OrderHead;
+            }
+
+            return receipt.InProcessLocations.First().IpNo;
+
+        }
         #endregion
     }
 }
