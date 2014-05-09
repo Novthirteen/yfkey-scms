@@ -42,6 +42,8 @@
                     Width="59px" CssClass="button2" />
                  <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" CssClass="button2"
                     OnClick="btnSearch_Click" />
+                <cc1:Button ID="btnImportKPOrder" runat="server" OnClick="btnImportKPOrder_Click" Text="导入开票数据"
+                        FunctionId="ImportKPOrder" />
             </td>
         </tr>
     </table>

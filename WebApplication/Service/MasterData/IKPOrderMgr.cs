@@ -11,6 +11,8 @@ namespace com.Sconit.Service.MasterData
 
         KPOrder LoadKPOrder(Decimal orderId, bool includeDetail);
 
+        void ImportKPOrder();
+
         #endregion Customized Methods
     }
 }

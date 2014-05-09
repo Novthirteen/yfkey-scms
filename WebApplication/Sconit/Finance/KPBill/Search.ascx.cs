@@ -10,6 +10,8 @@ using com.Sconit.Entity;
 using com.Sconit.Entity.MasterData;
 using com.Sconit.Service.MasterData;
 using com.Sconit.Utility;
+using com.Sconit.Entity.Exception;
+using System.Data.SqlClient;
 
 public partial class Finance_Bill_Search : SearchModuleBase
 {
@@ -116,6 +118,19 @@ public partial class Finance_Bill_Search : SearchModuleBase
 
 
         return new object[] { selectCriteria, selectCountCriteria, isExport, false };
+    }
+
+    protected void btnImportKPOrder_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            TheKPOrderMgr.ImportKPOrder();
+            ShowSuccessMessage("操作成功");
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage(ex.Message);
+        }
     }
 
 }

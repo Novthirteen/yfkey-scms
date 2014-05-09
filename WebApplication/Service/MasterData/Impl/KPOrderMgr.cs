@@ -5,6 +5,7 @@ using System.Text;
 using Castle.Services.Transaction;
 using com.Sconit.Persistence.MasterData;
 using com.Sconit.Entity.MasterData;
+using com.Sconit.Persistence;
 
 //TODO: Add other using statements here.
 
@@ -13,9 +14,12 @@ namespace com.Sconit.Service.MasterData.Impl
     [Transactional]
     public class KPOrderMgr : KPOrderBaseMgr, IKPOrderMgr
     {
-        public KPOrderMgr(IKPOrderDao entityDao)
+        private ISqlHelperDao sqlHelperDao;
+
+        public KPOrderMgr(IKPOrderDao entityDao,ISqlHelperDao sqlHelperDao)
             : base(entityDao)
         {
+            this.sqlHelperDao = sqlHelperDao;
         }
 
         #region Customized Methods
@@ -31,6 +35,11 @@ namespace com.Sconit.Service.MasterData.Impl
             }
 
             return kpOrder;
+        }
+
+        public void ImportKPOrder()
+        {
+            sqlHelperDao.ExecuteStoredProcedure("USP_Busi_ImportKPOrder", null);
         }
         #endregion Customized Methods
     }

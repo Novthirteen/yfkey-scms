@@ -1,0 +1,1 @@
+insert into ACC_Permission values('ImportKPOrder','导入开票数据','BillOperation')
