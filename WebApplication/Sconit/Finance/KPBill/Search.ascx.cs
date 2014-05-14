@@ -122,15 +122,32 @@ public partial class Finance_Bill_Search : SearchModuleBase
 
     protected void btnImportKPOrder_Click(object sender, EventArgs e)
     {
+        fs01.Visible = true;
+    }
+
+    protected void Button9_Click(object sender, EventArgs e)
+    {
         try
         {
-            TheKPOrderMgr.ImportKPOrder();
+            if (string.IsNullOrEmpty(this.tbImportStartDate.Text))
+            {
+                throw new Exception("请填写开票日期。");
+            }
+            DateTime startTime = DateTime.Parse(this.tbImportStartDate.Text);
+
+            TheKPOrderMgr.ImportKPOrder(startTime);
             ShowSuccessMessage("操作成功");
+            fs01.Visible = false;
         }
         catch (Exception ex)
         {
             ShowErrorMessage(ex.Message);
         }
+    }
+
+    protected void btnBack_Click(object sender, EventArgs e)
+    {
+        fs01.Visible = false;
     }
 
 }

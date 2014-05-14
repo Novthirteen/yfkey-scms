@@ -6,6 +6,8 @@ using Castle.Services.Transaction;
 using com.Sconit.Persistence.MasterData;
 using com.Sconit.Entity.MasterData;
 using com.Sconit.Persistence;
+using System.Data.SqlClient;
+using System.Data;
 
 //TODO: Add other using statements here.
 
@@ -37,9 +39,12 @@ namespace com.Sconit.Service.MasterData.Impl
             return kpOrder;
         }
 
-        public void ImportKPOrder()
+        public void ImportKPOrder(DateTime startTime)
         {
-            sqlHelperDao.ExecuteStoredProcedure("USP_Busi_ImportKPOrder", null);
+             SqlParameter []  sqlParameter=new SqlParameter[1];
+             sqlParameter[0] = new SqlParameter("@CodePrefix", SqlDbType.DateTime, 50);
+             sqlParameter[0].Value = startTime;
+             sqlHelperDao.ExecuteStoredProcedure("USP_Busi_ImportKPOrder", sqlParameter);
         }
         #endregion Customized Methods
     }
