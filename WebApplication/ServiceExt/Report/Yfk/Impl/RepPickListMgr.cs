@@ -86,7 +86,7 @@ namespace com.Sconit.Service.Report.Yfk.Impl
                         this.SetRowCell(pageIndex, rowIndex, 5, pickListDetail.Qty.ToString("0.########"));
 
                         //库位(loc)
-                        this.SetRowCell(pageIndex, rowIndex, 6, pickListDetail.StorageBin != null ? pickListDetail.StorageBin.Code : pickListDetail.Location.Code);
+                        this.SetRowCell(pageIndex, rowIndex, 6, pickListDetail.PrintLocationCode);
                         //批号（LOT）
                         this.SetRowCell(pageIndex, rowIndex, 7, pickListDetail.LotNo != null ? pickListDetail.LotNo : String.Empty);
 

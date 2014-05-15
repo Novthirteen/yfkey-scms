@@ -91,7 +91,7 @@
                 </asp:TemplateField>
                   <asp:TemplateField HeaderText="计划数">
                     <ItemTemplate>
-                        <asp:Label ID="lblForecastQty" runat="server" Text='<%# Bind("ForecastQty","{0:0.########}") %>' Width="30" />
+                        <asp:Label ID="lblForecastQty" runat="server" Text='<%# Bind("ForecastQtyFormat","{0:0.########}") %>' Width="30" />
                         <%--<asp:TextBox ID="tbShipQty" runat="server" Text='<%# Bind("ForecastQty","{0:0.########}") %>'  Width="50"></asp:TextBox>--%>
                     </ItemTemplate>
                 </asp:TemplateField>

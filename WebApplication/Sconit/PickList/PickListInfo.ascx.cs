@@ -45,6 +45,7 @@ public partial class Distribution_PickList_PickListInfo : ModuleBase
         string pickListNo = this.tbPickListNo.Text;
         IList<object> list = new List<object>();
         PickList pickList = ThePickListMgr.LoadPickList(pickListNo, true);
+        pickList.PickListDetails = pickList.PickListDetails.OrderBy(pd => pd.PrintLocationCode).ToList();
         list.Add(pickList);
         string printUrl = TheReportMgr.WriteToFile("PickList.xls", list);
         Page.ClientScript.RegisterStartupScript(GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + printUrl + "'); </script>");

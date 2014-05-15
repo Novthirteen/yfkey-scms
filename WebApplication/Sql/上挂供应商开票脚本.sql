@@ -2,7 +2,7 @@
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
-GO
+GO 
 alter procedure [dbo].[USP_Busi_ImportKPOrder]  
 	 @StartDate datetime 
 

@@ -68,7 +68,7 @@ public partial class EDI_FordPlan_DetailList : ListModuleBase
                 foreach (var f in g.List)
                 {
                     //forecastDateList.Add(f.ForecastDate);
-                    decimal[] dicArr = new decimal[] { f.ForecastQty, f.ForecastCumQty };
+                    decimal[] dicArr = new decimal[] { f.ForecastQty>0?f.ForecastQty:0, f.ForecastCumQty>0?f.ForecastCumQty:0 };
                     planQtyArr.Add(dicArr);
                 }
                 newPlan.PlanQtyArr = planQtyArr;

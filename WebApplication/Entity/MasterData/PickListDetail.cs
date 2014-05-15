@@ -10,6 +10,8 @@ namespace com.Sconit.Entity.MasterData
     {
         #region Non O/R Mapping Properties
 
+        public string PrintLocationCode { get { return this.StorageBin != null ? this.StorageBin.Code : this.Location.Code; } }
+
         public void AddPickListResult(PickListResult pickListResult)
         {
             if (this.PickListResults == null)

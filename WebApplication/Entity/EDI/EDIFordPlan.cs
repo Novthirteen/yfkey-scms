@@ -107,7 +107,7 @@ namespace com.Sconit.Entity.EDI
         public string ShipmentID { get; set; }
 
 
-
+        public decimal ForecastQtyFormat { get { return this.ForecastQty > 0 ? this.ForecastQty : 0; } }
 
         #endregion
     }
