@@ -12,6 +12,7 @@ using com.Sconit.Entity.MasterData;
 using com.Sconit.Utility;
 using com.Sconit.Entity.Dss;
 using com.Sconit.Entity.Exception;
+using com.Sconit.Persistence;
 
 namespace com.Sconit.Service.Dss.Impl
 {
@@ -28,9 +29,9 @@ namespace com.Sconit.Service.Dss.Impl
             ICommonOutboundMgr commonOutboundMgr,
             ILocationMgr locationMgr,
             IBillMgr billMgr,
-            IArchCriteriaMgr archCriteriaMgr
+            ISqlHelperDao sqlHelperDao
             )
-            : base(numberControlMgr, dssExportHistoryMgr, criteriaMgr, dssOutboundControlMgr, dssObjectMappingMgr, commonOutboundMgr, locationMgr, billMgr, archCriteriaMgr)
+            : base(numberControlMgr, dssExportHistoryMgr, criteriaMgr, dssOutboundControlMgr, dssObjectMappingMgr, commonOutboundMgr, locationMgr, billMgr, sqlHelperDao)
         {
         }
 
