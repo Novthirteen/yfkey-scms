@@ -211,6 +211,10 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
                 try
                 {
                     eDIFordPlan.CurrenCumQty = decimal.Parse(((TextBox)gvr.FindControl("tbCurrenCumQty")).Text.Trim());
+                    if (eDIFordPlan.CurrenCumQty == 0)
+                    {
+                        throw new Exception();
+                    }
                 }
                 catch (Exception e)
                 {

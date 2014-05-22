@@ -24,7 +24,7 @@ namespace com.Sconit.Persistence
     public class ArchNHDaoBase : IArchNHDao
     {
         private readonly ISessionManager sessionManager;
-        private string sessionFactoryAlias = null;
+        private string sessionFactoryAlias = "arch";
 
         public ArchNHDaoBase(ISessionManager sessionManager)
 		{

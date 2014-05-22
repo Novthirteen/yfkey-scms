@@ -6,6 +6,8 @@ using com.Sconit.Entity.MasterData;
 using Castle.Services.Transaction;
 using com.Sconit.Utility;
 using com.Sconit.Service.MasterData;
+using NHibernate.Expression;
+using com.Sconit.Service.Criteria;
 
 namespace com.Sconit.Service.Report.Yfk.Impl
 {
@@ -14,12 +16,13 @@ namespace com.Sconit.Service.Report.Yfk.Impl
     {
         private IBillMgr billMgr;
         private IReceiptMgr receiptMgr;
-
-        public RepBillMarketMgr(String reportTemplateFolder, IBillMgr billMgr, IReceiptMgr receiptMgr)
+        private ICriteriaMgr criteriaMgr;
+        public RepBillMarketMgr(String reportTemplateFolder, IBillMgr billMgr, IReceiptMgr receiptMgr,ICriteriaMgr criteriaMgr)
         {
             this.reportTemplateFolder = reportTemplateFolder;
             this.billMgr = billMgr;
             this.receiptMgr = receiptMgr;
+            this.criteriaMgr = criteriaMgr;
 
             //明细部分的行数
             this.pageDetailRowCount = 32;
@@ -42,18 +45,26 @@ namespace com.Sconit.Service.Report.Yfk.Impl
         {
             try
             {
-
                 if (list == null || list.Count < 2) return false;
 
                 Bill bill = (Bill)(list[0]);
                 IList<BillDetail> billDetails = (IList<BillDetail>)(list[1]);
 
-
+                
                 if (bill == null
                     || billDetails == null || billDetails.Count == 0)
                 {
                     return false;
                 }
+
+                DetachedCriteria criteria = DetachedCriteria.For(typeof(ItemReference));
+                criteria.CreateAlias("Item", "i");
+                criteria.Add(Expression.InG("i.Code", billDetails.Select(b => b.ActingBill.Item.Code).Distinct().ToList()));
+                IList<ItemReference> itemRefList= criteriaMgr.FindAll<ItemReference>(criteria);
+
+                       //string [] ss=;
+                //string sql = string.Format(" select i from ItemReference as i  where Item in ('{0}') ", string.Join("','",billDetails.Select(b=>b.ActingBill.Item.Code).ToArray() ));
+                //IList<ItemReference> itemRefList = this.genericMgr.FindAllWithCustomQuery<ItemReference>(sql);
 
                 this.CopyPage(billDetails.Count);
 
@@ -78,7 +89,22 @@ namespace com.Sconit.Service.Report.Yfk.Impl
                     //零件号
                     this.SetRowCell(pageIndex, rowIndex, 3, billDetail.ActingBill.Item.Code);
                     //客户零件号
-                    this.SetRowCell(pageIndex, rowIndex, 4, string.Empty);//todo
+                    if (itemRefList != null && itemRefList.Count > 0)
+                    {
+                        var itemRef = itemRefList.Where(ir => ir.Item.Code == billDetail.ActingBill.Item.Code);
+                        if (itemRef != null && itemRef.Count() > 0)
+                        {
+                            this.SetRowCell(pageIndex, rowIndex, 4, itemRef.FirstOrDefault().ReferenceCode);//todo
+                        }
+                        else
+                        {
+                            this.SetRowCell(pageIndex, rowIndex, 4, string.Empty);//todo
+                        }
+                    }
+                    else
+                    {
+                        this.SetRowCell(pageIndex, rowIndex, 4, string.Empty);//todo
+                    }
                     //序号	
                     this.SetRowCell(pageIndex, rowIndex, 5, string.Empty);
                     //出库数量	

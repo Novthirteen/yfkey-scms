@@ -12,15 +12,18 @@ using com.Sconit.Entity.MasterData;
 using com.Sconit.Utility;
 using com.Sconit.Entity.Dss;
 using com.Sconit.Entity.Exception;
+using com.Sconit.Persistence;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace com.Sconit.Service.Dss.Impl
 {
     public abstract class SoBillOutboundBaseMgr : AbstractOutboundMgr
     {
         private ICriteriaMgr criteriaMgr;
-        private IArchCriteriaMgr archCriteriaMgr;
         private IBillMgr billMgr;
         private ICommonOutboundMgr commonOutboundMgr;
+        private ISqlHelperDao sqlHelperDao;
 
         public SoBillOutboundBaseMgr(INumberControlMgr numberControlMgr,
             IDssExportHistoryMgr dssExportHistoryMgr,
@@ -30,14 +33,14 @@ namespace com.Sconit.Service.Dss.Impl
             ICommonOutboundMgr commonOutboundMgr,
             ILocationMgr locationMgr,
             IBillMgr billMgr,
-            IArchCriteriaMgr archCriteriaMgr
+            ISqlHelperDao sqlHelperDao
             )
             : base(numberControlMgr, dssExportHistoryMgr, criteriaMgr, dssOutboundControlMgr, dssObjectMappingMgr, locationMgr)
         {
             this.criteriaMgr = criteriaMgr;
             this.commonOutboundMgr = commonOutboundMgr;
             this.billMgr = billMgr;
-            this.archCriteriaMgr = archCriteriaMgr;
+            this.sqlHelperDao = sqlHelperDao;
         }
 
         [Transaction(TransactionMode.Unspecified)]
@@ -131,22 +134,42 @@ namespace com.Sconit.Service.Dss.Impl
             }
             else
             {
-                //归档库查找
-                DetachedCriteria criteria = DetachedCriteria.For(typeof(OrderLocationTransaction));
-                criteria.CreateAlias("OrderDetail", "od");
-                criteria.Add(Expression.Eq("od.OrderHead.OrderNo", dssExportHistory.OrderNo));
-                criteria.Add(Expression.Eq("Item.Code", dssExportHistory.Item));
-                criteria.Add(Expression.Eq("IOType", BusinessConstants.IO_TYPE_OUT));
+                ////归档库查找
+                //DetachedCriteria criteria = DetachedCriteria.For(typeof(OrderLocationTransaction));
+                //criteria.CreateAlias("OrderDetail", "od");
+                //criteria.Add(Expression.Eq("od.OrderHead.OrderNo", dssExportHistory.OrderNo));
+                //criteria.Add(Expression.Eq("Item.Code", dssExportHistory.Item));
+                //criteria.Add(Expression.Eq("IOType", BusinessConstants.IO_TYPE_OUT));
 
-                IList<OrderLocationTransaction> result = archCriteriaMgr.FindAll<OrderLocationTransaction>(criteria);
-                if (result != null && result.Count > 0)
-                {
-                   orderLocationTransaction= result[0];
-                   dssExportHistory.PartyFrom = orderLocationTransaction.OrderDetail.OrderHead.PartyFrom.Code;//发出区域
-                }
-                else
-                {
+                //IList<OrderLocationTransaction> result = archCriteriaMgr.FindAll<OrderLocationTransaction>(criteria);
+                //if (result != null && result.Count > 0)
+                //{
+                //   orderLocationTransaction= result[0];
+                //   dssExportHistory.PartyFrom = orderLocationTransaction.OrderDetail.OrderHead.PartyFrom.Code;//发出区域
+                //}
+                //else
+                //{
                    
+                //}
+                try
+                {
+                    SqlParameter[] sqlParameter = new SqlParameter[3];
+                    sqlParameter[0] = new SqlParameter("@Item", SqlDbType.VarChar, 50);
+                    sqlParameter[0].Value = dssExportHistory.Item;
+
+                    sqlParameter[1] = new SqlParameter("@OrderNo", SqlDbType.VarChar, 50);
+                    sqlParameter[1].Value = dssExportHistory.OrderNo;
+
+                    sqlParameter[2] = new SqlParameter("@PartyFrom", SqlDbType.VarChar, 50);
+                    sqlParameter[2].Direction = ParameterDirection.InputOutput;
+
+                    sqlHelperDao.ExecuteStoredProcedure("GetPartyFrom", sqlParameter);
+
+                    dssExportHistory.PartyFrom = sqlParameter[2].Value.ToString();
+                }
+                catch (Exception)
+                {
+                    dssExportHistory.PartyFrom = string.Empty;
                 }
             }
         }
