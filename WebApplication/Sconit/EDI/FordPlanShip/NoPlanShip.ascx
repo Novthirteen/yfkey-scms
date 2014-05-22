@@ -96,7 +96,7 @@
                             Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
-                 <asp:TemplateField HeaderText="累积发货数">
+                 <asp:TemplateField HeaderText="发货累计数">
                     <ItemTemplate>
                         <asp:TextBox ID="tbCurrenCumQty" runat="server" Text='<%# Bind("CurrenCumQty","{0:0.########}") %>'
                             Width="50"></asp:TextBox>
