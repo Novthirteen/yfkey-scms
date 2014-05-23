@@ -369,10 +369,15 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
                 try
                 {
                     eDIFordPlan.PerLoadQty = decimal.Parse(((TextBox)gvr.FindControl("tbPerLoadQty")).Text.Trim());
+                    if (eDIFordPlan.PerLoadQty == 0)
+                    {
+                        throw new BusinessErrorException(string.Format("版本号{0}物料号{1}每个包装件数必须大于0。", eDIFordPlan.Control_Num, eDIFordPlan.Item));
+                    }
                 }
                 catch (Exception e)
                 {
-                    eDIFordPlan.PerLoadQty = null;
+                    //eDIFordPlan.PerLoadQty = null;
+                    throw new BusinessErrorException(string.Format("版本号{0}物料号{1}每个包装件数必须大于0。", eDIFordPlan.Control_Num, eDIFordPlan.Item));
                 }
                 #endregion
 
