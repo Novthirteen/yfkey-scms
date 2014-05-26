@@ -217,13 +217,6 @@
                             Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="${Common.GridView.Action}">
-                    <ItemTemplate>
-                        <asp:LinkButton ID="lbtnDelete" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "Id") %>'
-                            Text="克隆" OnClick="btnAddRow_Click" OnClientClick="return confirm('克隆')" Width="50" >
-                        </asp:LinkButton>
-                    </ItemTemplate>
-                </asp:TemplateField>
             </Columns>
         </asp:GridView>
     </div>

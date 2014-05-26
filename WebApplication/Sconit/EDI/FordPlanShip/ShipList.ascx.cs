@@ -30,8 +30,6 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
 
     public static string SearchSql = string.Empty;
 
-    public static List<EDIFordPlan> returnList = new List<EDIFordPlan>();
-
     protected void Page_Load(object sender, EventArgs e)
     {
         //this.tbFlow.Text = "C0000008_W";
@@ -50,14 +48,13 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
 
     public void GetView(string searchSql)
     {
-        returnList = new List<EDIFordPlan>();
         IList<EDIFordPlan> fordPlanList = new List<EDIFordPlan>();
         if (!string.IsNullOrEmpty(searchSql))
         {
             SearchSql = searchSql;
             fordPlanList=TheGenericMgr.FindAllWithCustomQuery<EDIFordPlan>(searchSql);
         }
-        //List<EDIFordPlan> returnList = new List<EDIFordPlan>();
+        List<EDIFordPlan> returnList = new List<EDIFordPlan>();
         if (fordPlanList != null && fordPlanList.Count > 0)
         {
             
@@ -153,68 +150,11 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
 
     protected void tbFlow_TextChanged(Object sender, EventArgs e)
     {
-        string flowCode = this.tbFlow.Text.Trim();
-        Flow currentFlow = null;
-        if (!string.IsNullOrEmpty(flowCode))
-        {
-            currentFlow = TheFlowMgr.LoadFlow(flowCode, this.CurrentUser.Code, true);
-            if (currentFlow != null)
-            {
-                foreach (var r in returnList)
-                {
-                    var fdet = currentFlow.FlowDetails.Where(d => d.ReferenceItemCode == r.RefItem);
-                    if (fdet != null && fdet.Count() > 0)
-                    {
-                        var f = fdet.First();
-                        r.Item = f.Item.Code;
-                        r.ItemDesc = f.Item.Description;
-                        //r.CustomerCode = f.ReceivingPlant;
-                        //r.SupplierCode = f.ShipFrom;
-                        r.TransportationMethod = f.TransModeCode;
-                        r.EquipmentNum = f.ConveyanceNumber;
-                        r.CarrierCode = f.CarrierCode;
-                        try
-                        {
-                            r.GrossWeight = Convert.ToDecimal(f.GrossWeight);
-                        }
-                        catch (Exception)
-                        {
-                            r.GrossWeight = 0;
-                        }
-                        try
-                        {
-                            r.NetWeight = Convert.ToDecimal(f.NetWeight);
-                        }
-                        catch (Exception)
-                        {
-                            r.NetWeight = 0;
-                        }
-                        r.WeightUom = f.WeightUom;
-                        r.OutPackType = f.PackagingCode;
-                        r.InPackType = f.PackagingCode;
-                        try
-                        {
-                            r.OutPackQty = Convert.ToDecimal(f.LadingQuantity);
-                        }
-                        catch (Exception)
-                        {
-                            r.OutPackQty = 0;
-                        }
-                        try
-                        {
-                            r.PerLoadQty = Convert.ToDecimal(f.UnitsPerContainer);
-                        }
-                        catch (Exception)
-                        {
-                            r.PerLoadQty = 0;
-                        }
-                    }
-                }
-            }
-        }
-        this.GV_List.DataSource = returnList;
-        this.GV_List.DataBind();
-
+        this.GetView(SearchSql);
+        //if (this.FlowEvent != null)
+        //{
+        //    this.FlowEvent(this, e);
+        //}
     }
 
     protected void btnShip_Click(object sender, EventArgs e)
@@ -456,10 +396,6 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                 try
                 {
                     eDIFordPlan.PerLoadQty = decimal.Parse(((TextBox)gvr.FindControl("tbPerLoadQty")).Text.Trim());
-                    if (eDIFordPlan.PerLoadQty == 0)
-                    {
-                        throw new BusinessErrorException(string.Format("版本号{0}物料号{1}每个包装件数必须大于0。", eDIFordPlan.Control_Num, eDIFordPlan.Item));
-                    }
                 }
                 catch (Exception e)
                 {
@@ -503,22 +439,24 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
         return eDIFordPlanList;
     }
 
+    //private List<string> CollectShipIdList()
+    //{
+    //    List<string> orderNoList = new List<string>();
+    //    foreach (GridViewRow gvr in GV_List.Rows)
+    //    {
+    //        CheckBox cbCheckBoxGroup = (CheckBox)gvr.FindControl("CheckBoxGroup");
+    //        if (cbCheckBoxGroup.Checked)
+    //        {
+    //            string orderNo = ((Literal)gvr.FindControl("ltlOrderNo")).Text;
+    //            orderNoList.Add(orderNo);
+    //        }
+    //    }
+    //    return orderNoList;
+    //}
 
     protected void GV_List_RowDataBound(object sender, GridViewRowEventArgs e)
     {
        
     }
-
-    protected void btnAddRow_Click(object sender, EventArgs e)
-    {
-        int id = int.Parse(((LinkButton)sender).CommandArgument);
-         returnList.Add(returnList.FirstOrDefault(f=>f.Id==id));
-         returnList = returnList.OrderBy(o => o.Id).ToList();
-        this.GV_List.DataSource = returnList;
-        this.GV_List.DataBind();
-        
-    }
-
-
 
 }
