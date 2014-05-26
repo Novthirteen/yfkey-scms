@@ -200,8 +200,14 @@ public partial class EDI_FordPlan_Search : SearchModuleBase
                     foreach (var f in d.List.OrderBy(o => o.ForecastDate))
                     {
                         cell++;
-                        rowDetail.CreateCell(5 + cell).SetCellValue(f.ForecastQty>0?f.ForecastQty.ToString():"0");
-                        rowDetail2.CreateCell(5 + cell).SetCellValue(f.ForecastCumQty > 0 ? f.ForecastCumQty.ToString() : "0");
+                        //rowDetail.CreateCell(5 + cell).
+                        var createCell = rowDetail.CreateCell(5 + cell);
+                        createCell.SetCellType(CellType.NUMERIC);
+                        createCell.SetCellValue(Convert.ToDouble(f.ForecastQty > 0 ? f.ForecastQty : 0));
+
+                        var createCell2 = rowDetail2.CreateCell(5 + cell);
+                        createCell2.SetCellType(CellType.NUMERIC);
+                        createCell2.SetCellValue(Convert.ToDouble(f.ForecastCumQty > 0 ? f.ForecastCumQty : 0));
                     }
                     j += 2;
                 }
