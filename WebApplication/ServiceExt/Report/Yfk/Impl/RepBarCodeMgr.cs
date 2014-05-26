@@ -51,7 +51,7 @@ namespace com.Sconit.Service.Report.Yfk.Impl
             this.SetMergedRegion(pageIndex, 4, 0, 4, 1);
             this.SetMergedRegion(pageIndex, 5, 0, 5, 1);
             this.SetMergedRegion(pageIndex, 6, 0, 6, 1);
-            this.SetMergedRegion(pageIndex, 7, 0, 7, 4);
+            this.SetMergedRegion(pageIndex, 7, 0, 7, 2);
             this.SetMergedRegion(pageIndex, 8, 0, 8, 1);
             this.SetMergedRegion(pageIndex, 9, 0, 9, 3);
 
@@ -190,6 +190,9 @@ namespace com.Sconit.Service.Report.Yfk.Impl
 
                             //print name 内容
                             this.SetRowCell(pageIndex, 10, 3, userName);
+
+
+                        
 
                             this.sheet.SetRowBreak(this.GetRowIndexAbsolute(pageIndex, ROW_COUNT - 1));
                             pageIndex++;
