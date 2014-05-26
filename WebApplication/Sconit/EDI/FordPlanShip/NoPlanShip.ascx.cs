@@ -25,6 +25,8 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
 
     public event EventHandler BackEvent;
 
+    public static List<EDIFordPlan> returnList = new List<EDIFordPlan>();
+
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -33,7 +35,7 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
 
     public override void UpdateView()
     {
-        List<EDIFordPlan> returnList = new List<EDIFordPlan>();
+        returnList = new List<EDIFordPlan>();
         string flowCode = this.tbFlow.Text.Trim();
         Flow currentFlow = null;
         if (!string.IsNullOrEmpty(flowCode))
@@ -96,7 +98,7 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
             }
 
         }
-        this.GV_List.DataSource = returnList;
+        this.GV_List.DataSource = returnList.OrderBy(o => o.Item).ToList(); 
         this.GV_List.DataBind();
     }
 
@@ -418,6 +420,16 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
     protected void GV_List_RowDataBound(object sender, GridViewRowEventArgs e)
     {
        
+    }
+
+    protected void btnAddRow_Click(object sender, EventArgs e)
+    {
+        string itemCode = (((LinkButton)sender).CommandArgument).ToString();
+        returnList.Add(returnList.FirstOrDefault(f => f.Item == itemCode));
+        returnList = returnList.OrderBy(o => o.Item).ToList();
+        this.GV_List.DataSource = returnList;
+        this.GV_List.DataBind();
+
     }
 
 }

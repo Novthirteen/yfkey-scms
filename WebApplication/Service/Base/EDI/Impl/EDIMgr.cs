@@ -277,9 +277,9 @@ namespace com.Sconit.Service.EDI.Impl
 
                 foreach (var orderDet in orderHead.OrderDetails)
                 {
-                    EDIFordPlan ediFordPlan = shipEDIFordPlanList.Where(s => s.Item == orderDet.Item.Code).First();
-                    orderDet.RequiredQty = ediFordPlan.ShipQty.Value;
-                    orderDet.OrderedQty = ediFordPlan.ShipQty.Value;
+                    var ediFordPlans = shipEDIFordPlanList.Where(s => s.Item == orderDet.Item.Code);
+                    orderDet.RequiredQty = ediFordPlans.Sum(s=>s.ShipQty.Value);
+                    orderDet.OrderedQty = ediFordPlans.Sum(s => s.ShipQty.Value);
                 }
                 orderMgr.CreateOrder(orderHead, currentUserCode);
 
@@ -289,9 +289,9 @@ namespace com.Sconit.Service.EDI.Impl
                 InProcessLocation ipMaster = this.genericMgr.FindAllWithCustomQuery<InProcessLocationDetail>(" select i from InProcessLocationDetail as i where i.OrderLocationTransaction=? "
                     , orderHead.OrderDetails.First().OrderLocationTransactions.First().Id).First().InProcessLocation;
                 int batch = numberControlMgr.GenerateNumberNextSequence(BusinessConstants.CODE_PREFIX_IMPORT_TEMPEDI856);
-                foreach (var orderDet in orderHead.OrderDetails)
+                foreach (var ediFordPlan in shipEDIFordPlanList)
                 {
-                    EDIFordPlan ediFordPlan = shipEDIFordPlanList.Where(s => s.Item == orderDet.Item.Code).First();
+                    //EDIFordPlan ediFordPlan = shipEDIFordPlanList.Where(s => s.Item == orderDet.Item.Code).First();
                     TEMP_FORD_EDI_856 temp_FORD_EDI_856 = new TEMP_FORD_EDI_856();
                     temp_FORD_EDI_856.Message_Type_Code = "856";
                     temp_FORD_EDI_856.Message_Type = "FORDCSVFLAT";
@@ -333,14 +333,37 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.IsHandle = false;
                     temp_FORD_EDI_856.ReadFileName = string.Empty;
                     this.genericMgr.Create(temp_FORD_EDI_856);
-                    if (ediFordPlan.Id > 0)
+                    //if (ediFordPlan.Id > 0)
+                    //{
+                    //    ediFordPlan.CurrenCumQty += ediFordPlan.ShipQty.Value;
+                    //    ediFordPlan.Item = string.Empty;
+                    //    ediFordPlan.ItemDesc = string.Empty;
+                    //    this.genericMgr.Update(ediFordPlan);
+                    //}
+                }
+
+                #region    更新计划表已发货数
+                if (shipEDIFordPlanList.First().Id > 0)
+                {
+                    var upGroups = (from tak in shipEDIFordPlanList
+                                    group tak by tak.Id
+                                        into result
+                                        select new
+                                        {
+                                            Id = result.Key,
+                                            List = result.ToList()
+                                        }).ToList();
+
+                    foreach (var up in upGroups)
                     {
-                        ediFordPlan.CurrenCumQty += ediFordPlan.ShipQty.Value;
+                        var ediFordPlan = up.List.First();
+                        ediFordPlan.CurrenCumQty = up.List.Sum(s => s.ShipQty.Value);
                         ediFordPlan.Item = string.Empty;
                         ediFordPlan.ItemDesc = string.Empty;
                         this.genericMgr.Update(ediFordPlan);
                     }
                 }
+                #endregion
                 #endregion
 
             }
