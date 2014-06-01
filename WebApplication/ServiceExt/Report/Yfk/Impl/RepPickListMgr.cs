@@ -51,7 +51,10 @@ namespace com.Sconit.Service.Report.Yfk.Impl
                     {
                         return false;
                     }
-                    //pickListDetails = pickListDetails.OrderBy(pd => pd.PrintLocationCode).ToList();
+                    if (pickListDetails.FirstOrDefault().Item.Type.Equals("P"))
+                    {
+                        pickListDetails = pickListDetails.OrderBy(pd => pd.PrintLocationCode).ToList();
+                    }
                     this.barCodeFontName = this.GetBarcodeFontName(0, 7);
                     //this.SetRowCellBarCode(0, 0, 7);
                     this.CopyPage(pickListDetails.Count);
