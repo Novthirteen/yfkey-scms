@@ -51,7 +51,8 @@ namespace com.Sconit.Service.Report.Yfk.Impl
                     {
                         return false;
                     }
-                    if (pickListDetails.FirstOrDefault().Item.Type.Equals("P"))
+                    //if (pickListDetails.FirstOrDefault().Item.Type.Equals("P"))
+                    if (pickList.PartyFrom.Code.IndexOf('-') == pickList.PartyFrom.Code.LastIndexOf('-') && (pickList.PartyFrom.Code.Contains("-RM") || pickList.PartyFrom.Code.Contains("RM-")))
                     {
                         pickListDetails = pickListDetails.OrderBy(pd => pd.PrintLocationCode).ToList();
                     }
