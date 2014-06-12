@@ -418,7 +418,7 @@ namespace com.Sconit.Service.EDI.Impl
                               });
                 foreach (var g in groups)
                 {
-                    string fileName = "ASN" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + (r.Next(100)) + ".csv";
+                    string fileName = "ASN" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + (g.BatchNo) + ".csv";
                     List<List<string>> writeList = new List<List<string>>();
                     int i=0;
                     foreach (var l in g.List)
