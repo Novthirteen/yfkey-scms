@@ -391,7 +391,6 @@ namespace com.Sconit.Service.Transportation.Impl
                 {
                     priceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportPriceList[0]
                        , order.CreateDate, currencyMgr.LoadCurrency(currency), order.PricingMethod, order.TransportationRoute.ShipFrom, order.TransportationRoute.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, order.VehicleType);
-                    actBill.UnitPrice = priceListDetail.UnitPrice;
 
                 }
 
@@ -487,7 +486,7 @@ namespace com.Sconit.Service.Transportation.Impl
                     throw new BusinessErrorException("Transportation.PricingMethod.Empty");
                 }
 
-                //actBill.UnitPrice = priceListDetail.UnitPrice;
+                actBill.UnitPrice = priceListDetail.UnitPrice;
                 // actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
                 actBill.Currency = priceListDetail.Currency;
                 actBill.IsIncludeTax = priceListDetail.IsIncludeTax;
