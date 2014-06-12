@@ -156,7 +156,10 @@ public partial class Distribution_PickList_PickListInfo : ModuleBase
                 this.lblStatus.Visible = true;
                 if (pickList.PickListDetails != null && pickList.PickListDetails.Count > 0)
                 {
-
+                    if (!pickList.PartyFrom.Code.Contains("YFK-BJ") && (pickList.PartyFrom.Code.Contains("-RM") || pickList.PartyFrom.Code.Contains("RM-")))
+                    {
+                        pickList.PickListDetails = pickList.PickListDetails.OrderBy(pd => pd.PrintLocationCode).ToList();
+                    }
                     if (pickList.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT)
                     {
                         this.ucResultList.Visible = false;
