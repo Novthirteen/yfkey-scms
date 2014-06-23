@@ -24,6 +24,8 @@ alter table Region add Plant varchar(50)
 go
 alter table Location add IsFG bit
 go
+alter table Item add MaxStock int
+go
 
 /****** Object:  Table [dbo].[MRP_ShipPlanOpenOrder]    Script Date: 2014/6/25 15:32:53 ******/
 DROP TABLE [dbo].[MRP_ShipPlanOpenOrder]

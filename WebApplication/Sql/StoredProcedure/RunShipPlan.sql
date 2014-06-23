@@ -407,8 +407,8 @@ BEGIN
 		set @ShipPlanId = @@Identity
 		
 		--新增发运计划期初库存
-		insert into MRP_ShipPlanInitLocationDet(ShipPlanId, Location, Item, InitStock, SafeStock, InTransitQty, CreateDate, CreateUser)
-		select @ShipPlanId, LocTo, Item, LocQty, SafeStock, InTransitQty, @DateTimeNow, @RunUser from #tempShipFlowDet
+		insert into MRP_ShipPlanInitLocationDet(ShipPlanId, Location, Item, InitStock, SafeStock, MaxStock, InTransitQty, CreateDate, CreateUser)
+		select @ShipPlanId, LocTo, Item, LocQty, SafeStock, MaxStock, InTransitQty, @DateTimeNow, @RunUser from #tempShipFlowDet
 
 		--发货数按包装圆整
 		update #tempShipPlanDet set ShipQty = ceiling(ShipQty / UC) * UC where ShipQty > 0 and UC > 0
@@ -427,8 +427,8 @@ BEGIN
 		select @ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, @DateTimeNow, @RunUser from #tempShipPlanDetTrace
 
 		--新增Open Order追溯表
-		insert into MRP_ShipPlanOpenOrder(ShipPlanId, UUID, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
-		select @ShipPlanId, UUID, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, @DateTimeNow, @RunUser from #tempOpenOrder
+		insert into MRP_ShipPlanOpenOrder(ShipPlanId, UUID, Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
+		select @ShipPlanId, UUID, Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, @DateTimeNow, @RunUser from #tempOpenOrder
 		-----------------------------↑生成发运计划-----------------------------
 
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Flow, Item, Qty, Uom, LocFrom, LocTo, StartTime, WindowTime, Msg, CreateDate, CreateUser) 
