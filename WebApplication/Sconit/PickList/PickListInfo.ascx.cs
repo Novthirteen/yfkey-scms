@@ -156,7 +156,7 @@ public partial class Distribution_PickList_PickListInfo : ModuleBase
                 this.lblStatus.Visible = true;
                 if (pickList.PickListDetails != null && pickList.PickListDetails.Count > 0)
                 {
-                    if (!pickList.PartyFrom.Code.Contains("YFK-BJ") && (pickList.PartyFrom.Code.Contains("-RM") || pickList.PartyFrom.Code.Contains("RM-")))
+                    if (pickList.PartyFrom.Code == "YFK-RW" || pickList.PartyFrom.Code == "YFK-RM-HD")
                     {
                         pickList.PickListDetails = pickList.PickListDetails.OrderBy(pd => pd.PrintLocationCode).ToList();
                     }
