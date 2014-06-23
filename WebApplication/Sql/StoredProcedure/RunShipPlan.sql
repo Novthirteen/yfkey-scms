@@ -205,7 +205,7 @@ BEGIN
 		insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, 
 		LocQty, InTransitQty, SafeStock, ActiveQty)
 		select det.Flow, ISNULL(mstr.MRPLeadTime, 0) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, det.UC, mstr.LocFrom, mstr.LocTo, 
-		ISNULL(loc.Qty, 0), ISNULL(loc.InTransitQty, 0), ISNULL(det.SafeStock, 0), (ISNULL(loc.Qty, 0) + ISNULL(loc.InTransitQty, 0) - ISNULL(det.SafeStock, 0))
+		ISNULL(loc.Qty, 0), ISNULL(loc.InTransitQty, 0), ISNULL(det.SafeStock, 0), (ISNULL(loc.Qty, 0) - ISNULL(det.SafeStock, 0))
 		from FlowDet as det
 		inner join FlowMstr as mstr on det.Flow = mstr.Code
 		inner join Item as i on det.Item = i.Code
@@ -248,6 +248,9 @@ BEGIN
 		req.Uom, req.BaseUom, req.UnitQty, flow.UC, flow.LocFrom, flow.LocTo, DATEADD(day, -flow.LeadTime, StartTime), StartTime  --客户日程的开始时间就是发运计划的窗口时间
 		from #tempEffCustScheduleDet as req inner join #tempShipFlowDet as flow on req.ShipFlow = flow.Flow and req.Item = flow.Item
 
+		--删除开始时间小于今天的计划
+		delete from #tempShipPlanDet where StartTime < @DateNow
+
 		--转没有发运路线的，销售路线直接就是发运路线
 		insert into #tempShipPlanDet(UUID, DistributionFlow, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
 		select NEWID(), Flow, Flow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UnitQty, UC, Location, null, StartTime, WindowTime
@@ -255,7 +258,7 @@ BEGIN
 
 		--记录需求中间表
 		insert into #tempShipPlanDetTrace(UUID, DistributionFlow, Item, ReqDate, ReqQty) 
-		select UUID, DistributionFlow, Item, StartTime, ShipQty from #tempShipPlanDet
+		select UUID, DistributionFlow, Item, WindowTime, ShipQty from #tempShipPlanDet
 
 		--合并相同发运路线+物料的需求
 		--合并毛需求至一行（最小UUID)
@@ -274,6 +277,15 @@ BEGIN
 		(select MIN(UUID) as MinUUID, Flow, Item, StartTime from #tempShipPlanDet group by Flow, Item, StartTime having count(1) > 1) as t
 		on p.Flow = t.Flow and p.Item = t.Item and p.StartTime = t.StartTime
 		where p.UUID <> MinUUID
+
+		--低于安全库存的转为当天的发运计划
+		update p set ShipQty = ShipQty - d.ActiveQty
+		from #tempShipPlanDet as p inner join #tempShipFlowDet as d on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
+		where d.ActiveQty < 0
+		insert into #tempShipPlanDet(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
+		select d.Flow, d.Item, d.ItemDesc, d.RefItemCode, -d.ActiveQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
+		from #tempShipFlowDet as d left join #tempShipPlanDet as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
+		where d.ActiveQty < 0 and p.Flow is null
 
 		--根据开始时间依次扣减库存（含在途库存，不考虑在途库存的到货时间）
 		set @RowId = null
@@ -302,41 +314,31 @@ BEGIN
 			set @RowId = @RowId + 1
 		end
 
+		----删除小于今天并且发运数为0的计划
+		--delete from #tempShipPlanDetTrace where UUID in (select UUID from #tempShipPlanDet where StartTime < @DateNow and ShipQty <= 0)
+		--delete from #tempShipPlanDet where StartTime < @DateNow and ShipQty <= 0
 
-		--低于安全库存的转为当天的发运计划
-		update p set ShipQty = ShipQty - d.ActiveQty
-		from #tempShipPlanDet as p inner join #tempShipFlowDet as d on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
-		where d.ActiveQty < 0
-		insert into #tempShipPlanDet(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
-		select d.Flow, d.Item, d.ItemDesc, d.RefItemCode, -d.ActiveQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
-		from #tempShipFlowDet as d left join #tempShipPlanDet as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
-		where d.ActiveQty < 0 and p.Flow is null
-
-		--删除小于今天并且发运数为0的计划
-		delete from #tempShipPlanDetTrace where UUID in (select UUID from #tempShipPlanDet where StartTime < @DateNow and ShipQty <= 0)
-		delete from #tempShipPlanDet where StartTime < @DateNow and ShipQty <= 0
-
-		--日期小于今天的量全部转为今天
-		--有今天的数据
-		update at set UUID = bt.UUID
-		from #tempShipPlanDet as a 
-		inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
-		inner join #tempShipPlanDetTrace as at on a.UUID = at.UUID
-		inner join #tempShipPlanDetTrace as bt on b.UUID = bt.UUID
-		where b.StartTime = @DateNow and a.StartTime < @DateNow
-		update b set ShipQty = b.ShipQty + a.ShipQty
-		from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
-		where b.StartTime = @DateNow and a.StartTime < @DateNow
-		update a set ShipQty = 0
-		from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
-		where b.StartTime = @DateNow and a.StartTime < @DateNow
-		--没有今天的数据
-		update a set StartTime = @DateNow, WindowTime = DATEADD(day, d.LeadTime, @DateNow) 
-		from #tempShipPlanDet as a left join #tempShipPlanDet as b on a.Flow = b.Flow and a.ITem = b.Item and b.StartTime = @DateNow
-		inner join #tempShipFlowDet as d on a.Flow = d.Flow and a.Item = d.Item
-		where a.StartTime < @DateNow and b.Flow is null
-		--删除开始日期小于今天的发运计划
-		delete from #tempShipPlanDet where StartTime < @DateNow
+		----日期小于今天的量全部转为今天
+		----有今天的数据
+		--update at set UUID = bt.UUID
+		--from #tempShipPlanDet as a 
+		--inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
+		--inner join #tempShipPlanDetTrace as at on a.UUID = at.UUID
+		--inner join #tempShipPlanDetTrace as bt on b.UUID = bt.UUID
+		--where b.StartTime = @DateNow and a.StartTime < @DateNow
+		--update b set ShipQty = b.ShipQty + a.ShipQty
+		--from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
+		--where b.StartTime = @DateNow and a.StartTime < @DateNow
+		--update a set ShipQty = 0
+		--from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
+		--where b.StartTime = @DateNow and a.StartTime < @DateNow
+		----没有今天的数据
+		--update a set StartTime = @DateNow, WindowTime = DATEADD(day, d.LeadTime, @DateNow) 
+		--from #tempShipPlanDet as a left join #tempShipPlanDet as b on a.Flow = b.Flow and a.ITem = b.Item and b.StartTime = @DateNow
+		--inner join #tempShipFlowDet as d on a.Flow = d.Flow and a.Item = d.Item
+		--where a.StartTime < @DateNow and b.Flow is null
+		----删除开始日期小于今天的发运计划
+		--delete from #tempShipPlanDet where StartTime < @DateNow
 
 		--汇总发运需求
 		update d set ReqQty = ISNULL(dt.ReqQty, 0) from #tempShipPlanDet as d 

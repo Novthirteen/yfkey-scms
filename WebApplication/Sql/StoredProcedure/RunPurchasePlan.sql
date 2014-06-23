@@ -37,8 +37,8 @@ BEGIN
 	declare @RefPlanNo varchar(50)
 	declare @ProdItem varchar(50)
 	declare @Item varchar(50)
-	declare @Qty decimal(18, 8)
-	declare @LastQty decimal(18, 8)
+	declare @ActiveQty decimal(18, 8)
+	declare @LastActiveQty decimal(18, 8)
 	declare @ReleaseNo varchar(50)
 	declare @PurchasePlanId int
 
@@ -328,6 +328,22 @@ BEGIN
 
 
 
+		-----------------------------↓获取可用库存-----------------------------
+		insert into #tempLocatoinDet(Item, SafeStock, Qty, InTransitQty, InSpectQty, ActiveQty)
+		select Item, i.SafeStock, Qty, InTransitQty, InSpectQty, SUM(Qty + InspectQty) - MAX(ISNULL(i.SafeStock, 0))
+		from 
+		(
+		select loc.Item, SUM(loc.Qty) as Qty, SUM(loc.InTransitQty) as InTransitQty, SUM(loc.InspectQty) as InspectQty
+		from MRP_LocationDetSnapShot as loc
+		inner join (select distinct Item from #tempMaterialPlanDet) as p on loc.Item = p.Item
+		where loc.Plant = @Plant
+		group by loc.Item
+		) as a inner join Item as i on a.Item = i.Code 
+		group by Item
+		-----------------------------↑获取可用库存-----------------------------
+
+
+
 		-----------------------------↓合并采购需求-----------------------------
 		--毛需求插入合并表
 		insert into  #tempMergeMaterialPlanDet(UUID, Item, ItemDesc, BaseReqQty, BasePurchaseQty, BaseUom, StartTime, WindowTime)
@@ -349,22 +365,19 @@ BEGIN
 		on p.Item = t.Item and p.WindowTime = t.WindowTime
 		where p.UUID <> MinUUID
 		-----------------------------↑合并采购需求-----------------------------
-		
-		
 
-		-----------------------------↓获取可用库存-----------------------------
-		insert into #tempLocatoinDet(Item, SafeStock, Qty, InTransitQty, InSpectQty, ActiveQty)
-		select Item, i.SafeStock, Qty, InTransitQty, InSpectQty, SUM(Qty + InTransitQty + InspectQty) - MAX(ISNULL(i.SafeStock, 0))
-		from 
-		(
-		select loc.Item, SUM(loc.Qty) as Qty, SUM(loc.InTransitQty) as InTransitQty, SUM(loc.InspectQty) as InspectQty
-		from MRP_LocationDetSnapShot as loc
-		inner join (select distinct Item from #tempMaterialPlanDet) as p on loc.Item = p.Item
-		where loc.Plant = @Plant
-		group by loc.Item
-		) as a inner join Item as i on a.Item = i.Code 
-		group by Item
-		-----------------------------↑获取可用库存-----------------------------
+
+
+		-----------------------------↓低于安全库存的转为当天的物料需求计划-----------------------------
+		update p set BasePurchaseQty = BasePurchaseQty - d.ActiveQty
+		from #tempMergeMaterialPlanDet as p inner join #tempLocatoinDet as d on p.Item = d.Item and p.WindowTime = @DateNow
+		where d.ActiveQty < 0
+		insert into #tempMergeMaterialPlanDet(UUID, Item, ItemDesc, BaseReqQty, BasePurchaseQty, BaseUom, StartTime, WindowTime)
+		select NEWID(), d.Item, i.Desc1, 0, -d.ActiveQty, i.Uom, DATEADD(day, -ISNULL(i.LeadTime, 0), @DateNow), @DateNow 
+		from #tempLocatoinDet as d left join #tempMergeMaterialPlanDet as p on p.Item = d.Item and p.WindowTime = @DateNow
+		inner join Item as i on d.Item = i.Code
+		where d.ActiveQty < 0 and p.Item is null
+		-----------------------------↑低于安全库存的转为当天的物料需求计划-----------------------------
 
 
 		
@@ -375,54 +388,40 @@ BEGIN
 		while (@RowId <= @MaxRowId)
 		begin
 			set @Item = null
-			set @Qty = null
-			set @LastQty = 0
+			set @ActiveQty = null
+			set @LastActiveQty = 0
 
-			select @Qty = ActiveQty, @Item = Item from #tempLocatoinDet where RowId = @RowId
-			if (@Qty > 0)
+			select @ActiveQty = ActiveQty, @Item = Item from #tempLocatoinDet where RowId = @RowId
+			if (@ActiveQty > 0)
 			begin
-				update det set BasePurchaseQty = CASE WHEN @Qty >= BasePurchaseQty THEN 0 WHEN @Qty < BasePurchaseQty and @Qty > 0 THEN BasePurchaseQty - @Qty ELSE BasePurchaseQty END,
-				@Qty = @Qty - @LastQty, @LastQty = BasePurchaseQty
+				update det set BasePurchaseQty = CASE WHEN @ActiveQty >= BasePurchaseQty THEN 0 WHEN @ActiveQty < BasePurchaseQty and @ActiveQty > 0 THEN BasePurchaseQty - @ActiveQty ELSE BasePurchaseQty END,
+				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = BasePurchaseQty
 				from #tempMergeMaterialPlanDet as det with(INDEX(IX_WindowTime))
 				where det.Item = @Item
 			end
 			
 			set @RowId = @RowId + 1
-		end
+		end		
 
-		--低于安全库存的转为当天的物料需求计划
-		update p set BasePurchaseQty = BasePurchaseQty - d.ActiveQty
-		from #tempMergeMaterialPlanDet as p inner join #tempLocatoinDet as d on p.Item = d.Item and p.StartTime = @DateNow
-		where d.ActiveQty < 0
-		insert into #tempMergeMaterialPlanDet(UUID, Item, ItemDesc, BaseReqQty, BasePurchaseQty, BaseUom, StartTime, WindowTime)
-		select NEWID(), d.Item, i.Desc1, 0, -d.ActiveQty, i.Uom, @DateNow, DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow) 
-		from #tempLocatoinDet as d left join #tempMergeMaterialPlanDet as p on p.Item = d.Item and p.StartTime = @DateNow
-		inner join Item as i on d.Item = i.Code
-		where d.ActiveQty < 0 and p.Item is null
-
-		--删除小于今天并且物料需求为0的计划
-		delete from #tempMaterialPlanDetTrace where UUID in (select UUID from #tempMergeMaterialPlanDet where StartTime < @DateNow and BasePurchaseQty <= 0)
-		delete from #tempMergeMaterialPlanDet where StartTime < @DateNow and BasePurchaseQty <= 0
-
-		--日期小于今天的量全部转为今天
-		--有今天的数据
-		update at set UUID = bt.UUID
-		from #tempMergeMaterialPlanDet as a
-		inner join #tempMergeMaterialPlanDet as b on a.Item = b.Item
-		inner join #tempMaterialPlanDetTrace as at on a.UUID = at.UUID
-		inner join #tempMaterialPlanDetTrace as bt on b.UUID = bt.UUID
-		where b.StartTime = @DateNow and a.StartTime < @DateNow
-		update b set BasePurchaseQty = b.BasePurchaseQty + a.BasePurchaseQty, BaseReqQty = b.BaseReqQty + a.BaseReqQty
-		from #tempMergeMaterialPlanDet as a inner join #tempMergeMaterialPlanDet as b on a.Item = b.Item
-		where b.StartTime = @DateNow and a.StartTime < @DateNow
-		update a set BasePurchaseQty = 0
-		from #tempMergeMaterialPlanDet as a inner join #tempMergeMaterialPlanDet as b on a.Item = b.Item
-		where b.StartTime = @DateNow and a.StartTime < @DateNow
-		--没有今天的数据
-		update a set StartTime = @DateNow, WindowTime = DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow) 
-		from #tempMergeMaterialPlanDet as a left join #tempMergeMaterialPlanDet as b on a.ITem = b.Item and b.StartTime = @DateNow
-		inner join Item as i on a.Item = i.Code
-		where a.StartTime < @DateNow and b.Item is null
+		----日期小于今天的量全部转为今天
+		----有今天的数据
+		--update at set UUID = bt.UUID
+		--from #tempMergeMaterialPlanDet as a
+		--inner join #tempMergeMaterialPlanDet as b on a.Item = b.Item
+		--inner join #tempMaterialPlanDetTrace as at on a.UUID = at.UUID
+		--inner join #tempMaterialPlanDetTrace as bt on b.UUID = bt.UUID
+		--where b.StartTime = @DateNow and a.StartTime < @DateNow
+		--update b set BasePurchaseQty = b.BasePurchaseQty + a.BasePurchaseQty, BaseReqQty = b.BaseReqQty + a.BaseReqQty
+		--from #tempMergeMaterialPlanDet as a inner join #tempMergeMaterialPlanDet as b on a.Item = b.Item
+		--where b.StartTime = @DateNow and a.StartTime < @DateNow
+		--update a set BasePurchaseQty = 0
+		--from #tempMergeMaterialPlanDet as a inner join #tempMergeMaterialPlanDet as b on a.Item = b.Item
+		--where b.StartTime = @DateNow and a.StartTime < @DateNow
+		----没有今天的数据
+		--update a set StartTime = @DateNow, WindowTime = DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow) 
+		--from #tempMergeMaterialPlanDet as a left join #tempMergeMaterialPlanDet as b on a.ITem = b.Item and b.StartTime = @DateNow
+		--inner join Item as i on a.Item = i.Code
+		--where a.StartTime < @DateNow and b.Item is null
 		-----------------------------↑计算净需求-----------------------------
 
 
@@ -435,7 +434,6 @@ BEGIN
 		inner join FlowMstr as m on d.Flow = m.Code
 		inner join Region as r on m.PartyFrom = r.Code
 		where r.Plant = @Plant
-		
 
 		--记录日志没有找到采购路线
 		insert into #tempMsg(Lvl, Item, Qty, Uom, PlanDate, Msg) 
