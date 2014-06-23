@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using com.Sconit.Entity;
+using System.Globalization;
 
 namespace com.Sconit.Utility
 {
@@ -204,6 +205,38 @@ namespace com.Sconit.Utility
             int weekIndex = days / 7 + 1;
 
             return weekIndex;
+        }
+
+        private static string GetWeekOfYear(DateTime dateTime, int weekIndex)
+        {
+            if (weekIndex > 52)
+            {
+                weekIndex = weekIndex - 52;
+                return dateTime.AddYears(1).ToString("yyyy") + "-" + (weekIndex).ToString("D2");
+            }
+            else
+            {
+                return dateTime.ToString("yyyy") + "-" + weekIndex.ToString("D2");
+            }
+        }
+
+        /// <summary>
+        /// return 2012-25
+        /// </summary>
+        public static string GetWeekOfYear(DateTime curDay)
+        {
+            int weekIndex = GetWeekIndex(curDay);
+            return GetWeekOfYear(curDay, weekIndex);
+        }
+
+        public static DateTime GetWeekIndexDateFrom(string weekOfYear)
+        {
+            string[] wk = weekOfYear.Split('-');
+            DateTime dateTime = new DateTime(int.Parse(wk[0]), 1, 1);
+            dateTime = GetStartTime(BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK, dateTime);
+            CultureInfo ci = new System.Globalization.CultureInfo("zh-CN");
+            dateTime = ci.Calendar.AddWeeks(dateTime, int.Parse(wk[1]) - 1);
+            return dateTime;
         }
 
     }

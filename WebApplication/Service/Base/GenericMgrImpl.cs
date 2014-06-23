@@ -12,6 +12,7 @@ namespace com.Sconit.Service
     using com.Sconit.Persistence;
     using NHibernate.Type;
     using System.Data.SqlClient;
+    using System.Data;
 
     #endregion
 
@@ -19,17 +20,19 @@ namespace com.Sconit.Service
     /// 
     /// </summary>
     [Transactional]
-    public class GenericMgrImpl :  IGenericMgr
+    public class GenericMgrImpl :  IGenericMgr                                    
     {
-        public GenericMgrImpl(INHDao dao)
+        public GenericMgrImpl(INHDao dao, ISqlHelperDao sqlHelperDao)
         {
             this.dao = dao;
+            this.sqlHelperDao = sqlHelperDao;
         }
         /// <summary>
         /// NHibernate数据获取对象
         /// </summary>
         private INHDao dao { get; set; }
         public ISqlDao sqlDao { get; set; }
+        private ISqlHelperDao sqlHelperDao { get; set; }
 
         /// <summary>
         /// 
@@ -135,6 +138,12 @@ namespace com.Sconit.Service
             dao.Delete(hqlString, values, types);
         }
 
+        [Transaction(TransactionMode.Requires)]
+        public T FindById<T>(object id)
+        {
+            return dao.FindById<T>(id);
+        }
+
         public IList<T> FindAllWithCustomQuery<T>(string queryString) 
         {
             return dao.FindAllWithCustomQuery<T>(queryString);
@@ -159,5 +168,31 @@ namespace com.Sconit.Service
         {
             return dao.FindAllWithCustomQuery<T>(queryString, values, types);
         }
+
+        public DataSet GetDatasetBySql(string commandText)
+        {
+            return sqlHelperDao.GetDatasetBySql(commandText, null);
+        }
+
+        public DataSet GetDatasetBySql(string commandText, SqlParameter[] commandParameters)
+        {
+            return sqlHelperDao.GetDatasetBySql(commandText, commandParameters);
+        }
+
+        public int ExecuteSql(string commandText, SqlParameter[] commandParameters)
+        {
+            return sqlHelperDao.ExecuteSql(commandText, commandParameters);
+        }
+
+        public int ExecuteSql(string commandText)
+        {
+            return sqlHelperDao.ExecuteSql(commandText, null);
+        }
+
+        public DataSet GetDatasetByStoredProcedure(string commandText, SqlParameter[] commandParameters)
+        {
+            return sqlHelperDao.GetDatasetByStoredProcedure(commandText, commandParameters);
+        }
+
     }
 }

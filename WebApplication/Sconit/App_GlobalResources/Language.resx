@@ -1107,4 +1107,22 @@
   <data name="FordNoPlanShip" xml:space="preserve">
     <value>福特无计划发货</value>
   </data>
+  <data name="CustomerPlan" xml:space="preserve">
+    <value>客户计划</value>
+  </data>
+  <data name="Scheduling" xml:space="preserve">
+    <value>排产</value>
+  </data>
+  <data name="ShiftPlan" xml:space="preserve">
+    <value>班产计划</value>
+  </data>
+  <data name="ProductPlan" xml:space="preserve">
+    <value>生产需求</value>
+  </data>
+  <data name="ProcurementPlan" xml:space="preserve">
+    <value>采购需求</value>
+  </data>
+  <data name="TransferPlan" xml:space="preserve">
+    <value>领料计划</value>
+  </data>
 </root>

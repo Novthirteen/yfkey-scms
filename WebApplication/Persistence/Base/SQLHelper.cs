@@ -179,7 +179,7 @@ namespace Microsoft.ApplicationBlocks.Data
 			{
 				mustCloseConnection = false;
 			}
-
+            command.CommandTimeout = 3600;
             // Associate the connection with the command
             command.Connection = connection;
 

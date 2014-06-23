@@ -204,14 +204,23 @@
     <Compile Include="Base\Mes\ProductLineUserBase.cs" />
     <Compile Include="Base\Mes\ShelfBase.cs" />
     <Compile Include="Base\Mes\ShelfItemBase.cs" />
+    <Compile Include="Base\MRP\ProductionPlan.cs" />
+    <Compile Include="Base\MRP\ProductionPlanLog.cs" />
+    <Compile Include="Base\MRP\ProcurementPlan.cs" />
+    <Compile Include="Base\MRP\ProcurementPlanLog.cs" />
+    <Compile Include="Base\MRP\CustomerPlan.cs" />
+    <Compile Include="Base\MRP\CustomerPlanLog.cs" />
     <Compile Include="Base\MRP\CustomerScheduleBase.cs" />
     <Compile Include="Base\MRP\CustomerScheduleDetailBase.cs" />
     <Compile Include="Base\MRP\ExpectTransitInventoryBase.cs" />
     <Compile Include="Base\MRP\ExpectTransitInventoryViewBase.cs" />
+    <Compile Include="Base\MRP\FlatBomBase.cs" />
     <Compile Include="Base\MRP\MrpReceivePlanBase.cs" />
     <Compile Include="Base\MRP\MrpRunLogBase.cs" />
     <Compile Include="Base\MRP\MrpShipPlanBase.cs" />
     <Compile Include="Base\MRP\MrpShipPlanViewBase.cs" />
+    <Compile Include="Base\MRP\ShiftPlan.cs" />
+    <Compile Include="Base\MRP\ShiftPlanLog.cs" />
     <Compile Include="Base\Procurement\AutoOrderTrackBase.cs" />
     <Compile Include="Base\Procurement\ItemFlowPlanBase.cs" />
     <Compile Include="Base\Procurement\ItemFlowPlanDetailBase.cs" />
@@ -384,14 +393,20 @@
     <Compile Include="Mes\ProductLineUser.cs" />
     <Compile Include="Mes\Shelf.cs" />
     <Compile Include="Mes\ShelfItem.cs" />
+    <Compile Include="MRP\CustomerPlan.cs" />
     <Compile Include="MRP\CustomerSchedule.cs" />
     <Compile Include="MRP\CustomerScheduleDetail.cs" />
     <Compile Include="MRP\ExpectTransitInventory.cs" />
     <Compile Include="MRP\ExpectTransitInventoryView.cs" />
+    <Compile Include="MRP\FirmPlan.cs" />
+    <Compile Include="MRP\FlatBom.cs" />
+    <Compile Include="MRP\ForcastPlan.cs" />
     <Compile Include="MRP\MrpReceivePlan.cs" />
     <Compile Include="MRP\MrpRunLog.cs" />
     <Compile Include="MRP\MrpShipPlan.cs" />
     <Compile Include="MRP\MrpShipPlanView.cs" />
+    <Compile Include="MRP\PlanInv.cs" />
+    <Compile Include="MRP\ShiftPlan.cs" />
     <Compile Include="Procurement\AutoOrderTrack.cs" />
     <Compile Include="Procurement\ItemFlowPlan.cs" />
     <Compile Include="Procurement\ItemFlowPlanDetail.cs" />
@@ -684,6 +699,31 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Base\EDI\EDIDailyPlan.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\CustomerPlan.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\CustomerPlanLog.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ShiftPlan.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\ShiftPlanLog.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\FlatBom.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ProcurementPlan.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ProcurementPlanLog.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ProductionPlan.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ProductionPlanLog.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

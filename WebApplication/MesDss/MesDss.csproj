@@ -102,40 +102,108 @@
     <Compile Include="Entity\ScmsPart.cs" />
     <Compile Include="Entity\ScmsTableIndex.cs" />
     <Compile Include="Entity\ScmsWorkOrder.cs" />
-    <Compile Include="Persistence\IScmsWorkOrderDaoNewKQ.cs" />
-    <Compile Include="Persistence\IScmsWorkOrderDaoNew.cs" />
-    <Compile Include="Persistence\IMesScmsCompletedIssueDao.cs" />
-    <Compile Include="Persistence\IMesScmsBomDao.cs" />
-    <Compile Include="Persistence\IMesScmsCompletedBoxDao.cs" />
-    <Compile Include="Persistence\IMesScmsCompletedOrderDao.cs" />
-    <Compile Include="Persistence\IMesScmsRepairMaterialDao.cs" />
-    <Compile Include="Persistence\IMesScmsShelfPartDao.cs" />
-    <Compile Include="Persistence\IMesScmsStationBoxDao.cs" />
-    <Compile Include="Persistence\IMesScmsStationShelfDao.cs" />
-    <Compile Include="Persistence\IMesScmsTableIndexDao.cs" />
-    <Compile Include="Persistence\INHDao.cs" />
-    <Compile Include="Persistence\IScmsBomDao.cs" />
-    <Compile Include="Persistence\IScmsMaterialBarcodeDao.cs" />
-    <Compile Include="Persistence\IScmsPartDao.cs" />
-    <Compile Include="Persistence\IScmsTableIndexDao.cs" />
-    <Compile Include="Persistence\IScmsWorkOrderDao.cs" />
-    <Compile Include="Persistence\NHDaoBase.cs" />
-    <Compile Include="Persistence\NH\NHScmsWorkOrderDaoNewKQ.cs" />
-    <Compile Include="Persistence\NH\NHScmsWorkOrderDaoNew.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsCompletedIssueDao.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsBomDao.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsCompletedBoxDao.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsCompletedOrderDao.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsRepairMaterialDao.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsShelfPartDao.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsStationBoxDao.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsStationShelfDao.cs" />
-    <Compile Include="Persistence\NH\NHMesScmsTableIndexDao.cs" />
-    <Compile Include="Persistence\NH\NHScmsBomDao.cs" />
-    <Compile Include="Persistence\NH\NHScmsMaterialBarcodeDao.cs" />
-    <Compile Include="Persistence\NH\NHScmsPartDao.cs" />
-    <Compile Include="Persistence\NH\NHScmsTableIndexDao.cs" />
-    <Compile Include="Persistence\NH\NHScmsWorkOrderDao.cs" />
+    <Compile Include="Persistence\IMesScmsBomDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IMesScmsCompletedBoxDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IMesScmsCompletedIssueDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IMesScmsCompletedOrderDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IMesScmsRepairMaterialDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IMesScmsShelfPartDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IMesScmsStationBoxDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IMesScmsStationShelfDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IMesScmsTableIndexDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\INHDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IScmsBomDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IScmsMaterialBarcodeDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IScmsPartDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IScmsTableIndexDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IScmsWorkOrderDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IScmsWorkOrderDaoNew.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\IScmsWorkOrderDaoNewKQ.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NHDaoBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsBomDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsCompletedBoxDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsCompletedIssueDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsCompletedOrderDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsRepairMaterialDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsShelfPartDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsStationBoxDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsStationShelfDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHMesScmsTableIndexDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHScmsBomDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHScmsMaterialBarcodeDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHScmsPartDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHScmsTableIndexDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHScmsWorkOrderDao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHScmsWorkOrderDaoNew.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Persistence\NH\NHScmsWorkOrderDaoNewKQ.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\IScmsWorkOrderNewKQMgr.cs" />
     <Compile Include="Service\Impl\ScmsWorkOrderNewKQMgr.cs" />

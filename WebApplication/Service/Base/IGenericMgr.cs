@@ -3,6 +3,7 @@ using System.Collections;
 using NHibernate.Type;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Data;
 
 namespace com.Sconit.Service
 {
@@ -38,6 +39,8 @@ namespace com.Sconit.Service
 
         void Delete(string hqlString, object[] values, IType[] types);
 
+        T FindById<T>(object id);
+
         IList<T> FindAllWithCustomQuery<T>(string queryString);
 
         IList<T> FindAllWithCustomQuery<T>(string queryString, object value);
@@ -47,5 +50,16 @@ namespace com.Sconit.Service
         IList<T> FindAllWithCustomQuery<T>(string queryString, object[] values);
 
         IList<T> FindAllWithCustomQuery<T>(string queryString, object[] values, IType[] types);
+
+        DataSet GetDatasetBySql(string commandText, SqlParameter[] commandParameters);
+        DataSet GetDatasetBySql(string commandText);
+
+        int ExecuteSql(string commandText, SqlParameter[] commandParameters);
+
+        int ExecuteSql(string commandText);
+
+        DataSet GetDatasetByStoredProcedure(string commandText, SqlParameter[] commandParameters);
+
+
     }
 }

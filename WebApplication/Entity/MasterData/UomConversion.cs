@@ -12,5 +12,9 @@ namespace com.Sconit.Entity.MasterData
         //TODO: Add Non O/R Mapping Properties here. 
 
         #endregion
+
+        public decimal? Qty { get; set; }
+
+        public bool IsAsc { get; set; }
     }
 }

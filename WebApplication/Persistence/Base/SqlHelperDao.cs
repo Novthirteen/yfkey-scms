@@ -106,7 +106,7 @@ namespace com.Sconit.Persistence
             {
                 connection = new SqlConnection(ConnectionString);
                 connection.Open();
-
+                //connection.ConnectionTimeout = 3600;
                 //start a transaction
                 transaction = connection.BeginTransaction();
                 executeDataSet  = SqlHelper.ExecuteDataset(transaction, commandType, commandText, commandParameters);

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.MRP.CustomerPlan, com.Sconit.Entity" table="MRP_CustomerPlan" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="DateIndex" column="DateIndex" type="String" length="10" />
+    <property name="DateIndexTo" column="DateIndexTo" type="String" length="10"  />
+    <property name="Flow" column="Flow" type="String" length="50" />
+    <property name="Item" column="Item" type="String" length="50" />
+    <property name="DateType" column="DateType"  />
+    <property name="Qty" column="Qty" type="Double"  />
+    <property name="PlanVersion" column="PlanVersion" type="Int32"  />
+    <property name="UnitQty" column="UnitQty" type="Decimal"  />
+    <property name="Uom" column="Uom" type="String" length="5" />
+    <property name="ItemDescription" column="ItemDescription" type="String" length="510" />
+
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <property name="LastModifyUser" column="LastModifyUser" type="String" length="100" />
+
+  </class>
+</hibernate-mapping>

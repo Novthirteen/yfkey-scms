@@ -30,21 +30,4 @@ namespace com.Sconit.Service.MasterData
 
 
 
-
-#region Extend Interface
-
-
-
-
-
-
-namespace com.Sconit.Service.Ext.MasterData
-{
-    public partial interface IUomConversionMgrE : com.Sconit.Service.MasterData.IUomConversionMgr
-    {
-        
-    }
-}
-
-#endregion
 

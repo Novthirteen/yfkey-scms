@@ -51,4 +51,22 @@ namespace com.Sconit.Entity.MasterData
         }
         #endregion
     }
+
+    public class TempBomDetail
+    {
+        public Int32 Id { get; set; }
+        public string Bom { get; set; }
+        public string Item { get; set; }
+        public string Operation { get; set; }
+        public string Reference { get; set; }
+        public string StructureType { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string Uom { get; set; }
+        public Decimal RateQty { get; set; }
+        public Decimal ScrapPercentage { get; set; }
+        public Decimal CalculatedQty { get; set; }
+        public string OptionalItemGroup { get; set; }
+        
+    }
 }

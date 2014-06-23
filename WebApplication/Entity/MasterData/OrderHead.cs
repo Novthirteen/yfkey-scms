@@ -439,6 +439,8 @@ namespace com.Sconit.Entity.MasterData
             }
         }
 
+        //public IList<TempOrderDet> ExistsProdDetails { get; set; }
+
         //private string _subType;
         //public string SubType
         //{
@@ -454,4 +456,12 @@ namespace com.Sconit.Entity.MasterData
 
         #endregion
     }
+
+    //public class TempOrderDet
+    //{
+    //    public string OrderNo { get; set; }
+    //    public string ItemCode { get; set; }
+    //    public decimal OrderedQty { get; set; }
+    //    public decimal ReceivedQty { get; set; }
+    //}
 }

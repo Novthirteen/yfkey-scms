@@ -915,4 +915,22 @@
   <data name="FordNoPlanShip" xml:space="preserve">
     <value>FordNoPlanShip</value>
   </data>
+  <data name="CustomerPlan" xml:space="preserve">
+    <value>CustomerPlan</value>
+  </data>
+  <data name="Scheduling" xml:space="preserve">
+    <value>Scheduling</value>
+  </data>
+  <data name="ShiftPlan" xml:space="preserve">
+    <value>ShiftPlan</value>
+  </data>
+  <data name="ProductPlan" xml:space="preserve">
+    <value>ProductPlan</value>
+  </data>
+  <data name="ProcurementPlan" xml:space="preserve">
+    <value>ProcurementPlan</value>
+  </data>
+  <data name="TransferPlan" xml:space="preserve">
+    <value>TransferPlan</value>
+  </data>
 </root>

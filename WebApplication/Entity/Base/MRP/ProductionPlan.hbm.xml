@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="com.Sconit.Entity.MRP.ProductionPlan, com.Sconit.Entity" table="MRP_ProductionPlan" lazy="false">
+    <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+      <generator class="identity" />
+    </id>
+    <property name="PlanDate" column="PlanDate" type="DateTime" />
+    <property name="Flow" column="Flow" type="String" length="50" />
+    <property name="Item" column="Item" type="String" length="50" />
+    <property name="ItemDescription" column="ItemDescription" type="String" length="510" />
+    <property name="Uom" column="Uom" type="String" length="5" />
+    <property name="UnitQty" column="UnitQty" type="Decimal"  />
+    <property name="SafeStock" column="SafeStock" type="Decimal"  />
+    <property name="MaxStock" column="MaxStock" type="Decimal"  />
+    <property name="InvQty" column="InvQty" type="Decimal"  />
+    <property name="OutQty" column="OutQty" type="Decimal"  />
+    <property name="InProdQty" column="InProdQty" type="Decimal"  />
+    <property name="PlanVersion" column="PlanVersion" type="Int32"  />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <property name="LastModifyUser" column="LastModifyUser" type="String" length="100" />
+
+  </class>
+</hibernate-mapping>
