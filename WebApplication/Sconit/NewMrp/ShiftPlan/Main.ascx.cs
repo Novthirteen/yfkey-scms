@@ -316,7 +316,7 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         var shiptPlanListDic = shiftPlanList.GroupBy(p => new { p.ProdLine, p.Version })
    .ToDictionary(d => d.Key, d => d.ToList());
         List<ShiftPlanDet> shiftPlanDetLogs = new List<ShiftPlanDet>();
-        string hql = @" select det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId
+        string hql = @" select det.Id,det.PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId
                      where 1=1 and det.ProdLine='{0}' and m.Version={1} ";
         foreach (var dic in shiptPlanListDic)
         {
