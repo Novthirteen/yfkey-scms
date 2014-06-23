@@ -20,7 +20,7 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
     {
         //this.ucPreview.BtnCreateClick += new System.EventHandler(this.CalculateProdPlan_Render);
 
-       
+
     }
 
     protected void btnImport_Click(object sender, EventArgs e)
@@ -229,7 +229,7 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
 
     protected void btnSearch_Click(object sender, EventArgs e)
     {
-        string hql = @" select det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId where 1=1 ";
+        string hql = @" select det.Id,det.PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId where 1=1 ";
         DateTime startTime = DateTime.Today;
         if (this.tbStartDate.Text.Trim() != string.Empty)
         {
@@ -252,26 +252,26 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         {
             hql += string.Format(" and det.ProdLine in ('{0}') ", flowCodeValues);
         }
-        if (this.ltlPlanVersion.Text.Trim()!=string.Empty)
+        if (this.ltlPlanVersion.Text.Trim() != string.Empty)
         {
             hql += string.Format(" and m.Version ={0} ", this.ltlPlanVersion.Text.Trim());
         }
 
         var allResult = TheGenericMgr.GetDatasetBySql(hql).Tables[0];
-        var shiftPlans = new List<ShiftPlanDet>();
+        var pdPlanList = new List<ShiftPlanDet>();
         foreach (System.Data.DataRow row in allResult.Rows)
         {
             //det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,
             //det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version
-            shiftPlans.Add(new ShiftPlanDet
+            pdPlanList.Add(new ShiftPlanDet
             {
-                Id =int.Parse(row[0].ToString()),
+                Id = int.Parse(row[0].ToString()),
                 PlanId = int.Parse(row[1].ToString()),
                 RefPlanNo = row[2].ToString(),
                 ProdLine = row[3].ToString(),
                 Item = row[4].ToString(),
                 ItemDesc = row[5].ToString(),
-                RefItemCode =row[6].ToString(),
+                RefItemCode = row[6].ToString(),
                 Qty = Convert.ToDecimal(row[7]),
                 Uom = row[8].ToString(),
                 PlanDate = Convert.ToDateTime(row[9]),
@@ -282,7 +282,6 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
             });
         }
 
-        IList<ShiftPlanDet> pdPlanList = TheGenericMgr.FindAllWithCustomQuery<ShiftPlanDet>(hql);
         pdPlanList = pdPlanList == null || pdPlanList.Count == 0 ? new List<ShiftPlanDet>() : pdPlanList;
 
         if (string.IsNullOrEmpty(this.ltlPlanVersion.Text.Trim()) && pdPlanList.Count > 0)
@@ -313,24 +312,39 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         var groupByFlowItems = shiftPlanList.OrderBy(p => p.ProdLine).GroupBy(d => new { d.ProdLine, d.Item }).ToDictionary(d => d.Key, d => d.ToList());
         var planByDateIndexs = shiftPlanList.GroupBy(p => p.PlanDate).OrderBy(p => p.Key);
 
-
-
         #region
-        //        var shiptPlanListDic = shiptPlanList.GroupBy(p => new { p.ProdLine, p.Version })
-//           .ToDictionary(d => d.Key, d => d.ToList());
-//        List<ShiftPlanDet> shiftPlanDetLogs = new List<ShiftPlanDet>();
-//        string hql = @" select det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId
-//                     where 1=1 and det.ProdLine=? and m.Version=? ";
-//        foreach (var dic in shiptPlanListDic)
-//        {
-//            var customerPlans = dic.Value;
-//            var paramList = new List<object> { customerPlans.First().Type, customerPlans.First().Version - 1, customerPlans.First().Flow };
-//            var rr = this.TheGenericMgr.FindAllWithCustomQuery<CustomerScheduleDetail>(hql, paramList.ToArray());
-//            if (rr != null && rr.Count > 0)
-//            {
-//                customerPlanLogList.AddRange(rr);
-//            }
-        //        }
+        var shiptPlanListDic = shiftPlanList.GroupBy(p => new { p.ProdLine, p.Version })
+   .ToDictionary(d => d.Key, d => d.ToList());
+        List<ShiftPlanDet> shiftPlanDetLogs = new List<ShiftPlanDet>();
+        string hql = @" select det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId
+                     where 1=1 and det.ProdLine='{0}' and m.Version={1} ";
+        foreach (var dic in shiptPlanListDic)
+        {
+            var sPlan = dic.Value;
+            var allResult = TheGenericMgr.GetDatasetBySql(string.Format(hql, sPlan.First().ProdLine, sPlan.First().Version - 1)).Tables[0];
+            foreach (System.Data.DataRow row in allResult.Rows)
+            {
+                //det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,
+                //det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version
+                shiftPlanDetLogs.Add(new ShiftPlanDet
+                {
+                    Id = int.Parse(row[0].ToString()),
+                    PlanId = int.Parse(row[1].ToString()),
+                    RefPlanNo = row[2].ToString(),
+                    ProdLine = row[3].ToString(),
+                    Item = row[4].ToString(),
+                    ItemDesc = row[5].ToString(),
+                    RefItemCode = row[6].ToString(),
+                    Qty = Convert.ToDecimal(row[7]),
+                    Uom = row[8].ToString(),
+                    PlanDate = Convert.ToDateTime(row[9]),
+                    Shift = row[10].ToString(),
+                    CreateDate = Convert.ToDateTime(row[11]),
+                    Status = row[12].ToString(),
+                    Version = Convert.ToInt32(row[13].ToString()),
+                });
+            }
+        }
         #endregion
 
         StringBuilder str = new StringBuilder();
@@ -390,7 +404,8 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
             var firstPlan = planByFlowItem.Value.First();
             //var currentShiftPlans = shiftPlanList.Where(s => s.ProdLine == firstPlan.ProdLine);
             //var currentShiftPlan = currentShiftPlans != null && currentShiftPlans.Count() > 0 ? currentShiftPlans.First() : new ShiftPlanDet();
-            var prevShiftPlan = planByFlowItem.Value.Where(sl => sl.Version != firstPlan.Version).Count()>0? planByFlowItem.Value.Where(sl => sl.Version != firstPlan.Version).OrderByDescending(sl => sl.Version).First() : new ShiftPlanDet();
+            var logLists = shiftPlanDetLogs.Where(sl => sl.Version == firstPlan.Version - 1 && sl.ProdLine == firstPlan.ProdLine).Count() > 0 ? shiftPlanDetLogs.Where(sl => sl.Version == firstPlan.Version - 1 && sl.ProdLine == firstPlan.ProdLine) : new List<ShiftPlanDet>();
+            var prevShiftPlan = logLists.Count() > 0 ? logLists.First() : new ShiftPlanDet();
             //var planDic = planByFlowItem.Value.GroupBy(p => p.PlanDate).ToDictionary(d => d.Key, d =>d.ToList() });
             l++;
             if (l % 2 == 0)
@@ -437,113 +452,102 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
             }
             foreach (var planByDateIndex in planByDateIndexs)
             {
-                //var shiftplansByDate = planByFlowItem.Value.Where(s => s.PlanDate == planByDateIndex.Key  && s.Item == planByFlowItem.Key.Item);
-                //if (shiftplansByDate != null && shiftplansByDate.Count() > 0)
-                //{
-                //    var shiftplanLogByDates = shiftPlanLogList.Where(s => s.PlanDate == planByDateIndex.Key && s.Flow == planByFlowItem.Key.Flow && s.Item == planByFlowItem.Key.Item);
-                //    var shiftPlnaLogs = shiftplanLogByDates != null ? shiftplanLogByDates.Where(s => s.PlanVersion == shiftplanLogByDates.Max(m => m.PlanVersion)) : null;
+                var shiftplansByDate = planByFlowItem.Value.Where(s => s.PlanDate == planByDateIndex.Key && s.Item == planByFlowItem.Key.Item);
+                if (shiftplansByDate != null && shiftplansByDate.Count() > 0)
+                {
+                    var shiftplanLogByDates = logLists.Where(s => s.PlanDate == planByDateIndex.Key && s.ProdLine == planByFlowItem.Key.ProdLine && s.Item == planByFlowItem.Key.Item);
 
-                //    #region
-                //    var aShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "A");
-                //    var bShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "B");
-                //    var cShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "C");
-                //    if (aShift != null && aShift.Count() > 0)
-                //    {
-                //        var currentLog = shiftPlnaLogs != null ? shiftPlnaLogs.Where(s => s.Shift == aShift.First().Shift) : null;
-                //        if (currentLog != null && currentLog.Count() > 0)
-                //        {
-                //            if (currentLog.First().Qty != aShift.First().Qty)
-                //            {
-                //                str.Append(string.Format("<td style='background:orange' title='{0}'>", currentLog.First().Qty.ToString("0.##")));
-                //            }
-                //            else
-                //            {
-                //                str.Append("<td style='background:yellow'>");
-                //            }
-                //        }
-                //        else
-                //        {
-                //            str.Append("<td>");
-                //        }
-                //        str.Append(aShift.First().Qty.ToString("0.##") + " </td> ");
-                //        str.Append("<td>" + aShift.First().Memo + "</td>");
-                //    }
-                //    else
-                //    {
-                //        str.Append("<td></td>");
-                //        str.Append("<td></td>");
+                    #region
+                    var aShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "A");
+                    var bShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "B");
+                    var cShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "C");
+                    if (aShift != null && aShift.Count() > 0)
+                    {
+                        var currentLog = shiftplanLogByDates != null ? shiftplanLogByDates.Where(s => s.Shift == aShift.First().Shift) : null;
+                        if (currentLog != null && currentLog.Count() > 0)
+                        {
+                            if (currentLog.First().Qty != aShift.First().Qty)
+                            {
+                                str.Append(string.Format("<td style='background:orange' title='{0}'>", currentLog.First().Qty.ToString("0.##")));
+                            }
+                            else
+                            {
+                                str.Append("<td style='background:yellow'>");
+                            }
+                        }
+                        else
+                        {
+                            str.Append("<td>");
+                        }
+                        str.Append(aShift.First().Qty.ToString("0.##") + " </td> ");
+                    }
+                    else
+                    {
+                        str.Append("<td></td>");
 
-                //    }
-                //    if (bShift != null && bShift.Count() > 0)
-                //    {
-                //        var currentLog = shiftPlnaLogs != null ? shiftPlnaLogs.Where(s => s.Shift == bShift.First().Shift) : null;
-                //        if (currentLog != null && currentLog.Count() > 0)
-                //        {
-                //            if (currentLog.First().Qty != bShift.First().Qty)
-                //            {
-                //                str.Append(string.Format("<td style='background:orange' title='{0}'>", currentLog.First().Qty.ToString("0.##")));
-                //            }
-                //            else
-                //            {
-                //                str.Append("<td style='background:yellow'>");
-                //            }
-                //        }
-                //        else
-                //        {
-                //            str.Append("<td>");
-                //        }
-                //        str.Append(bShift.First().Qty.ToString("0.##") + " </td> ");
-                //        str.Append("<td>" + bShift.First().Memo + "</td>");
-                //    }
-                //    else
-                //    {
-                //        str.Append("<td></td>");
-                //        str.Append("<td></td>");
+                    }
+                    if (bShift != null && bShift.Count() > 0)
+                    {
+                        var currentLog = shiftplanLogByDates != null ? shiftplanLogByDates.Where(s => s.Shift == bShift.First().Shift) : null;
+                        if (currentLog != null && currentLog.Count() > 0)
+                        {
+                            if (currentLog.First().Qty != bShift.First().Qty)
+                            {
+                                str.Append(string.Format("<td style='background:orange' title='{0}'>", currentLog.First().Qty.ToString("0.##")));
+                            }
+                            else
+                            {
+                                str.Append("<td style='background:yellow'>");
+                            }
+                        }
+                        else
+                        {
+                            str.Append("<td>");
+                        }
+                        str.Append(bShift.First().Qty.ToString("0.##") + " </td> ");
+                    }
+                    else
+                    {
+                        str.Append("<td></td>");
 
-                //    }
-                //    if (cShift != null && cShift.Count() > 0)
-                //    {
-                //        var currentLog = shiftPlnaLogs != null ? shiftPlnaLogs.Where(s => s.Shift == cShift.First().Shift) : null;
-                //        if (currentLog != null && currentLog.Count() > 0)
-                //        {
-                //            if (currentLog.First().Qty != cShift.First().Qty)
-                //            {
-                //                str.Append(string.Format("<td style='background:orange' title='{0}'>", currentLog.First().Qty.ToString("0.##")));
-                //            }
-                //            else
-                //            {
-                //                str.Append("<td style='background:yellow'>");
-                //            }
-                //        }
-                //        else
-                //        {
-                //            str.Append("<td>");
-                //        }
-                //        str.Append(cShift.First().Qty.ToString("0.##") + " </td> ");
-                //        str.Append("<td>" + cShift.First().Memo + "</td>");
-                //    }
-                //    else
-                //    {
-                //        str.Append("<td></td>");
-                //        str.Append("<td></td>");
+                    }
+                    if (cShift != null && cShift.Count() > 0)
+                    {
+                        var currentLog = shiftplanLogByDates != null ? shiftplanLogByDates.Where(s => s.Shift == cShift.First().Shift) : null;
+                        if (currentLog != null && currentLog.Count() > 0)
+                        {
+                            if (currentLog.First().Qty != cShift.First().Qty)
+                            {
+                                str.Append(string.Format("<td style='background:orange' title='{0}'>", currentLog.First().Qty.ToString("0.##")));
+                            }
+                            else
+                            {
+                                str.Append("<td style='background:yellow'>");
+                            }
+                        }
+                        else
+                        {
+                            str.Append("<td>");
+                        }
+                        str.Append(cShift.First().Qty.ToString("0.##") + " </td> ");
+                    }
+                    else
+                    {
+                        str.Append("<td></td>");
 
-                //    }
-                //    #endregion
-                //}
-                //else
-                //{
-                //    str.Append("<td></td>");
-                //    str.Append("<td></td>");
-                //    str.Append("<td></td>");
-                //    str.Append("<td></td>");
-                //    str.Append("<td></td>");
-                //    str.Append("<td></td>");
+                    }
+                    #endregion
+                }
+                else
+                {
+                    str.Append("<td></td>");
+                    str.Append("<td></td>");
+                    str.Append("<td></td>");
+                    str.Append("<td></td>");
+                    str.Append("<td></td>");
+                    str.Append("<td></td>");
 
-                //}
-                //invQtyByDate = invQtyByDate + qtys[1] - outQty + Convert.ToDecimal((shiftplansByDate != null ? shiftplansByDate.Sum(s => s.Qty) : 0));
-                //str.Append("<td>");
-                //str.Append(invQtyByDate.ToString("0.##"));
-                //str.Append("</td>");
+                }
             }
             str.Append("</tr>");
         }
@@ -582,8 +586,6 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
                 </script>";
     }
 
-
-
     protected void GV_Order_RowDataBound(object sender, GridViewRowEventArgs e)
     {
         //var shiftCodes = this.TheGenericMgr.FindAll<EntityPreference>("from EntityPreference e where e.Code ='DefaultShift'")[0].Value.Split(',');
@@ -616,321 +618,6 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         //}
     }
 
-    #region    MRP运算
-    //protected void btnMrpCalculate_Click(object sender, EventArgs e)
-    //{
-    //    try
-    //    {
-    //        DateTime startTime = DateTime.Today;
-    //        if (startTime < DateTime.Today)
-    //        {
-    //            ShowWarningMessage("时间不能小于今天");
-    //            return;
-    //        }
-    //        string dateIndex = startTime.ToString("yyyy-MM-dd");
-    //        string dateIndexTo = startTime.AddDays(13).ToString("yyyy-MM-dd");
-    //        var sqlParams = new SqlParameter[5];
-    //        sqlParams[0] = new SqlParameter("@FlowType", "Procurement");
-    //        sqlParams[1] = new SqlParameter("@Operation", null);
-    //        sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
-    //        sqlParams[3] = new SqlParameter("@DateFrom", startTime);
-    //        sqlParams[4] = new SqlParameter("@IsShow0", false);
-    //        var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
-    //        var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
-    //        var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
-    //        if (firmPlanList == null || firmPlanList.Count == 0)
-    //        {
-    //            this.list.InnerHtml = "没有运算采购需求。";
-    //        }
-    //        var planInvDic = planInvList
-    //           .GroupBy(p => p.ItemCode).Select(p => new PlanInv
-    //           {
-    //               InvQty = p.Sum(q => q.InvQty),
-    //               ItemCode = p.Key,
-    //               SafeStock = p.First().SafeStock,
-    //               MaxStock = p.First().MaxStock,
-    //               RecQty = p.Sum(q => q.RecQty)
-    //           }).ToDictionary(d => d.ItemCode, d => d);
-    //        var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
-    //            .ToDictionary(d => d.Key, d => d);
-    //        string searchSql = string.Format("select Code,Desc1 from Item ");
-    //        var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-    //        foreach (System.Data.DataRow row in itemDescs.Rows)
-    //        {
-    //            var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
-    //            if (plans != null && plans.Count() > 0)
-    //            {
-    //                foreach (var plan in plans)
-    //                {
-    //                    plan.ItemDescription = row[1].ToString();
-    //                }
-    //            }
-    //        }
-    //        //int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
-    //        IList<ProcurementPlan> procurementPlanList = new List<ProcurementPlan>();
-    //        foreach (var flowItems in planByFlowItems)
-    //        {
-    //            var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
-    //            var finalQty = planInv.InvQty + planInv.RecQty;
-    //            foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
-    //            {
-    //                var orderQty = firmPlan.OutQty;
-    //                finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
-    //                if (finalQty < planInv.SafeStock)
-    //                {
-    //                    orderQty = planInv.SafeStock - finalQty;
-    //                    //outQty += planInv.SafeStock - finalQty;
-    //                    finalQty += planInv.SafeStock - finalQty;
-    //                }
-    //                else if (finalQty > planInv.SafeStock)
-    //                {
-    //                    orderQty = 0;
-    //                }
-
-    //                ProcurementPlan prPlan = new ProcurementPlan
-    //                {
-    //                    PlanDate = firmPlan.PlanDate.Date,
-    //                    Flow = firmPlan.FlowCode,
-    //                    Item = firmPlan.ItemCode,
-    //                    ItemDescription = firmPlan.ItemDescription,
-    //                    Uom = firmPlan.UomCode,
-    //                    //UnitQty = firmPlan.uni,
-    //                    Location = firmPlan.LocationTo,
-    //                    SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
-    //                    MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
-    //                    InvQty = Convert.ToDecimal(planInv.InvQty),
-    //                    InQty = Convert.ToDecimal(firmPlan.InQty),
-    //                    OutQty = Convert.ToDecimal(firmPlan.OutQty),
-    //                    OrderQty = Convert.ToDecimal(orderQty),
-    //                    FinalQty = Convert.ToDecimal(finalQty),
-    //                    Supplier = firmPlan.Supplier,
-    //                };
-    //                procurementPlanList.Add(prPlan);
-    //            }
-    //        }
-    //        TheMrpMgr.MrpCalculate(null, this.CurrentUser.Code, procurementPlanList);
-    //    }
-    //    catch (BusinessErrorException ex)
-    //    {
-    //        ShowErrorMessage(ex);
-    //    }
-    //}
-
-    //void MrpCalculate_Render(object sender, EventArgs e)
-    //{
-    //    IList<OrderHead> orderHeadList = (IList<OrderHead>)((object[])sender)[0];
-
-    //    DateTime startTime = DateTime.Today;
-    //    //if (this.tbStartDate.Text.Trim() != string.Empty)
-    //    //{
-    //    //    DateTime.TryParse(this.tbStartDate.Text.Trim(), out startTime);
-    //    //}
-    //    if (startTime < DateTime.Today)
-    //    {
-    //        ShowWarningMessage("时间不能小于今天");
-    //        return;
-    //    }
-    //    string dateIndex = startTime.ToString("yyyy-MM-dd");
-    //    string dateIndexTo = startTime.AddDays(13).ToString("yyyy-MM-dd");
-    //    var sqlParams = new SqlParameter[5];
-    //    sqlParams[0] = new SqlParameter("@FlowType", "Procurement");
-    //    sqlParams[1] = new SqlParameter("@Operation", null);
-    //    sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
-    //    sqlParams[3] = new SqlParameter("@DateFrom", startTime);
-    //    sqlParams[4] = new SqlParameter("@IsShow0", false);
-    //    var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
-    //    var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
-    //    var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
-    //    if (firmPlanList == null || firmPlanList.Count == 0)
-    //    {
-    //        this.list.InnerHtml = "没有运算采购需求。";
-    //    }
-    //    var planInvDic = planInvList
-    //       .GroupBy(p => p.ItemCode).Select(p => new PlanInv
-    //       {
-    //           InvQty = p.Sum(q => q.InvQty),
-    //           ItemCode = p.Key,
-    //           SafeStock = p.First().SafeStock,
-    //           MaxStock = p.First().MaxStock,
-    //           RecQty = p.Sum(q => q.RecQty)
-    //       }).ToDictionary(d => d.ItemCode, d => d);
-    //    var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
-    //        .ToDictionary(d=>d.Key,d=>d);
-    //    string searchSql = string.Format("select Code,Desc1 from Item ");
-    //    var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-    //    foreach (System.Data.DataRow row in itemDescs.Rows)
-    //    {
-    //        var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
-    //        if (plans != null && plans.Count() > 0)
-    //        {
-    //            foreach (var plan in plans)
-    //            {
-    //                plan.ItemDescription = row[1].ToString();
-    //            }
-    //        }
-    //    }
-    //    int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
-    //    IList<ProcurementPlan> procurementPlanList = new List<ProcurementPlan>();
-    //    foreach (var flowItems in planByFlowItems)
-    //    {
-    //        var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
-    //        var finalQty = planInv.InvQty + planInv.RecQty;
-    //        foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
-    //        {
-    //            var outQty = firmPlan.OutQty;
-    //            finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
-    //            if (finalQty < planInv.SafeStock)
-    //            {
-    //                outQty += planInv.SafeStock - finalQty;
-    //                finalQty += planInv.SafeStock - finalQty;
-    //            }
-               
-    //            ProcurementPlan prPlan = new ProcurementPlan
-    //            {
-    //                PlanDate = firmPlan.PlanDate.Date,
-    //                Flow = firmPlan.FlowCode,
-    //                Item = firmPlan.ItemCode,
-    //                ItemDescription = firmPlan.ItemDescription,
-    //                Uom = firmPlan.UomCode,
-    //                //UnitQty = firmPlan.uni,
-    //                Location = firmPlan.LocationTo,
-    //                SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
-    //                MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
-    //                InvQty = Convert.ToDecimal(planInv.InvQty),
-    //                InQty = Convert.ToDecimal(firmPlan.InQty),
-    //                OutQty = Convert.ToDecimal(outQty),
-    //                FinalQty = Convert.ToDecimal(finalQty),
-    //                Supplier = firmPlan.Supplier,
-    //            };
-    //            procurementPlanList.Add(prPlan);
-    //        }
-    //    }
-    //    TheMrpMgr.MrpCalculate(orderHeadList, this.CurrentUser.Code, procurementPlanList);
-    //}
-    #endregion
-
-    #region    重新生成生成生产需求
-
-    //private void CalculateProdPlan()
-    //void CalculateProdPlan_Render(object sender, EventArgs e)
-    //{
-    //    try
-    //    {
-    //        var sqlParams = new SqlParameter[5];
-    //        sqlParams[0] = new SqlParameter("@FlowType", "Production");
-    //        sqlParams[1] = new SqlParameter("@Operation", null);
-    //        sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
-    //        sqlParams[3] = new SqlParameter("@DateFrom", System.DateTime.Now.Date);
-    //        sqlParams[4] = new SqlParameter("@IsShow0", false);
-    //        var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
-    //        var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
-    //        var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
-    //        if (firmPlanList == null || firmPlanList.Count == 0)
-    //        {
-    //            this.list.InnerHtml = "没有生产需求。";
-    //        }
-    //        var planInvDic = planInvList
-    //      .GroupBy(p => p.ItemCode).Select(p => new PlanInv
-    //      {
-    //          InvQty = p.Sum(q => q.InvQty),
-    //          ItemCode = p.Key
-    //      }).ToDictionary(d => d.ItemCode, d => d);
-
-    //        var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
-    //            .ToDictionary(d => d.Key, d => d);
-    //        string searchSql = string.Format("select Code,Desc1 from Item ");
-    //        var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-    //        foreach (System.Data.DataRow row in itemDescs.Rows)
-    //        {
-    //            var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
-    //            if (plans != null && plans.Count() > 0)
-    //            {
-    //                foreach (var plan in plans)
-    //                {
-    //                    plan.ItemDescription = row[1].ToString();
-    //                }
-    //            }
-    //        }
-    //        int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProductionPlan");
-    //        IList<ProductionPlan> productionPlanList = new List<ProductionPlan>();
-    //        foreach (var flowItems in planByFlowItems)
-    //        {
-    //            var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
-    //            var finalQty = planInv.InvQty + planInv.RecQty;
-    //            foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
-    //            {
-    //                var outQty = firmPlan.OutQty;
-    //                //finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
-    //                //if (finalQty < planInv.SafeStock)
-    //                //{
-    //                //    outQty += planInv.SafeStock - finalQty;
-    //                //finalQty += planInv.SafeStock - finalQty;
-    //                //}
-
-    //                ProductionPlan prPlan = new ProductionPlan
-    //                {
-    //                    PlanDate = firmPlan.PlanDate.Date,
-    //                    Flow = firmPlan.FlowCode,
-    //                    Item = firmPlan.ItemCode,
-    //                    ItemDescription = firmPlan.ItemDescription,
-    //                    Uom = firmPlan.UomCode,
-    //                    //UnitQty = firmPlan.uni,
-    //                    SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
-    //                    MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
-    //                    InvQty = Convert.ToDecimal(planInv.InvQty),
-    //                    OutQty = Convert.ToDecimal(outQty),
-    //                    InProdQty = Convert.ToDecimal(firmPlan.InProdQty),
-    //                    PlanVersion = planVersion,
-    //                };
-    //                productionPlanList.Add(prPlan);
-    //            }
-    //        }
-
-    //        var dateTimeNow = DateTime.Now;
-    //        if (productionPlanList != null && productionPlanList.Count > 0)
-    //        {
-    //            //string sql = string.Format(" from ProductionPlan as c where  c.DateType = '{0}' and c.DateIndexTo in('{1}') and c.Flow in ('{2}')",
-    //            //   (int)dateType, string.Join("','", customerPlanList.Select(p => p.DateIndexTo).Distinct().ToArray()),
-    //            //   string.Join("','", customerPlanList.Select(p => p.Flow).Distinct().ToArray()));
-
-    //            //this.genericMgr.Delete(sql);
-    //            //int planVersion = this.iNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
-    //            this.TheGenericMgr.Delete(" from ProductionPlan as c ");
-    //            foreach (var prPlan in productionPlanList)
-    //            {
-    //                prPlan.LastModifyDate = dateTimeNow;
-    //                prPlan.LastModifyUser = this.CurrentUser.Code;
-    //                TheGenericMgr.Create(prPlan);
-
-    //                ProductionPlanLog pPlanLog = new ProductionPlanLog
-    //                {
-    //                    PlanId = prPlan.Id,
-    //                    PlanDate = prPlan.PlanDate.Date,
-    //                    Flow = prPlan.Flow,
-    //                    Item = prPlan.Item,
-    //                    ItemDescription = prPlan.ItemDescription,
-    //                    Uom = prPlan.Uom,
-    //                    UnitQty = prPlan.UnitQty,
-    //                    SafeStock = prPlan.SafeStock,
-    //                    MaxStock = prPlan.MaxStock,
-    //                    InvQty = prPlan.InvQty,
-    //                    OutQty = prPlan.OutQty,
-    //                    InProdQty = prPlan.InProdQty,
-    //                    LastModifyDate = dateTimeNow,
-    //                    LastModifyUser = prPlan.LastModifyUser,
-    //                    PlanVersion = prPlan.PlanVersion,
-    //                };
-    //                TheGenericMgr.Create(pPlanLog);
-    //            }
-    //        }
-    //    }
-    //    catch (BusinessErrorException ex)
-    //    {
-    //        ShowErrorMessage(ex);
-    //    }
-    //}
-
-    #endregion
 
 
 }
