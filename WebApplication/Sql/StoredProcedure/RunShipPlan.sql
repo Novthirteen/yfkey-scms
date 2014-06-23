@@ -344,7 +344,14 @@ BEGIN
 		update d set ReqQty = ISNULL(dt.ReqQty, 0) from #tempShipPlanDet as d 
 		left join (select UUID, SUM(ISNULL(ReqQty, 0)) as ReqQty from #tempShipPlanDetTrace group by UUID) as dt on d.UUID = dt.UUID
 		-----------------------------↑计算发运计划-----------------------------
+	end try
+	begin catch
+		set @Msg = N'运行发运计划异常：' + Error_Message()
+		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
+		RAISERROR(@Msg, 16, 1) 
+	end catch 
 
+	begin try
 		if @trancount = 0
 		begin
             begin tran
@@ -399,10 +406,9 @@ BEGIN
             rollback
         end 
        
-		set @Msg = N'运行发运计划异常' + Error_Message()
+		set @Msg = N'运行发运计划异常：' + Error_Message()
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
 		RAISERROR(@Msg, 16, 1) 
-
 	end catch 
 END 
 

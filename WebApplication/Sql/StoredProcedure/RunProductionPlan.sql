@@ -137,6 +137,9 @@ BEGIN
 		inner join Item as i on det.Item = i.Code
 		where mstr.ReleaseNo = @ShipPlanReleaseNo and r.Plant = @Plant
 		group by det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, det.StartTime, i.Bom, i.LeadTime
+
+		--删除开始日期小于今天的需求
+		delete from #tempCurrentLevlProductPlan where StartTime < @DateNow
 		-----------------------------↑获取顶层毛需求-----------------------------
 
 
@@ -151,7 +154,8 @@ BEGIN
 			select Item, SUM(Qty) - MAX(ISNULL(i.SafeStock, 0)) as ActiveQty
 			from 
 			(
-			select loc.Item, (loc.Qty + loc.InTransitQty + loc.InspectQty) as Qty  from MRP_LocationDetSnapShot as loc
+			select loc.Item, (loc.Qty + loc.InspectQty + loc.InTransitQty - loc.PurchaseInTransitQty) as Qty  
+			from MRP_LocationDetSnapShot as loc
 			inner join (select distinct Item from #tempCurrentLevlProductPlan) as p on loc.Item = p.Item
 			where loc.Plant = @Plant
 			) as a inner join Item as i on a.Item = i.Code 
@@ -246,6 +250,9 @@ BEGIN
 						inner join Item as i on bom.Item = i.Code
 						inner join BomMstr as bm on (i.Bom is not null and bm.Code = i.Bom) or (i.Bom is null and bm.Code = bom.Item)
 						where bm.IsActive = 1
+
+						--删除开始日期小于今天的需求
+						delete from #tempNextLevlProductPlan where StartTime < @DateNow
 					end
 
 					set @GroupSeq = @GroupSeq + 1 
@@ -285,7 +292,14 @@ BEGIN
 			end
 		end
 		-----------------------------↑循环分解Bom，添加下层生产计划-----------------------------
+	end try
+	begin catch
+		set @Msg = N'运行主生产计划异常：' + Error_Message()
+		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
+		RAISERROR(@Msg, 16, 1) 
+	end catch 
 
+	begin try
 		if @trancount = 0
 		begin
 			begin tran
@@ -324,7 +338,6 @@ BEGIN
 		set @Msg = N'运行主生产计划异常' + Error_Message()
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
 		RAISERROR(@Msg, 16, 1) 
-
 	end catch 
 END 
 

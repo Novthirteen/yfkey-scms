@@ -469,8 +469,14 @@ BEGIN
 		--数量转为采购单位
 		update #tempPurchasePlanDet set ReqQty = BaseReqQty * UnitQty, PurchaseQty = BasePurchaseQty * UnitQty
 		-----------------------------↑查找采购路线-----------------------------
-		
+	end try
+	begin catch
+		set @Msg = N'运行物料需求计划异常：' + Error_Message()
+		insert into MRP_RunPurchasePlanLog(BatchNo, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, 'Error', @Msg, @DateTimeNow, @RunUser)
+		RAISERROR(@Msg, 16, 1) 
+	end catch 
 
+	begin try	
 		if @trancount = 0
 		begin
 			begin tran
@@ -528,7 +534,7 @@ BEGIN
             rollback
         end 
        
-		set @Msg = N'运行物料需求计划异常' + Error_Message()
+		set @Msg = N'运行物料需求计划异常：' + Error_Message()
 		insert into MRP_RunPurchasePlanLog(BatchNo, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, 'Error', @Msg, @DateTimeNow, @RunUser)
 		RAISERROR(@Msg, 16, 1) 
 	end catch 
