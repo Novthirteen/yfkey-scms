@@ -21,12 +21,10 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
     protected void Page_Load(object sender, EventArgs e)
     {
         //this.tbFlow.ServiceParameter = "string:" + this.Cur
-        this.tbFlow.ServiceParameter = "string:" + this.CurrentUser.Code + ",bool:false,bool:false,bool:true,bool:false,bool:false,bool:false,string:" + BusinessConstants.PARTY_AUTHRIZE_OPTION_BOTH;
+        this.tbFlow.ServiceParameter = "string:" + this.CurrentUser.Code + ",bool:true,bool:false,bool:true,bool:false,bool:true,bool:true,string:" + BusinessConstants.PARTY_AUTHRIZE_OPTION_TO;
 
         if (!IsPostBack)
         {
-            //this.tbStartDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
-            //this.tbEndDate.Text = DateTime.Today.AddDays(14).ToString("yyyy-MM-dd");
             this.btQtyHidden.Value = string.Empty;
             this.btSeqHidden.Value = string.Empty;
             this.tbFlow.Text = string.Empty;
@@ -61,11 +59,10 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"select det.Flow,det.Item,i.Desc1,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0)
-from  MRP_ShipPlanDet as det 
- inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
- inner join Item as i on i.Code=det.Item 
- left join MRP_ShipPlanInitLocationDet as l on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1 ";
+        var searchSql = @"select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime
+ from MRP_PurchasePlanDet as det 
+inner join MRP_PurchasePlanMstr as m on m.Id=det.PurchasePlanId
+left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1 ";
         if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
         {
             searchSql += string.Format(" and det.Flow ='{0}' ", this.tbFlow.Text.Trim());
@@ -73,33 +70,9 @@ from  MRP_ShipPlanDet as det
         else
         {
             this.list.InnerHtml = "";
-            ShowErrorMessage("发运路线不能为空。");
+            ShowErrorMessage("采购路线不能为空。");
             return;
         }
-
-        //DateTime startTime = DateTime.Today;
-        //if (!string.IsNullOrEmpty(this.tbStartDate.Text.Trim()))
-        //{
-        //    DateTime.TryParse(this.tbStartDate.Text.Trim(), out startTime);
-        //    searchSql += string.Format(" and det.StartTime>='{0}' ", startTime.Date);
-        //}
-        //else
-        //{
-        //    this.list.InnerHtml = "";
-        //    ShowErrorMessage("开始日期不能为空。");
-        //    return;
-        //}
-        //if (!string.IsNullOrEmpty(this.tbEndDate.Text.Trim()))
-        //{
-        //    DateTime endTime = DateTime.Today;
-        //    DateTime.TryParse(this.tbEndDate.Text.Trim(), out endTime);
-        //    searchSql += string.Format(" and det.StartTime<='{0}' ", endTime.Date);
-        //}
-        //else
-        //{
-        //    DateTime endTime = startTime.AddDays(14);
-        //    searchSql += string.Format(" and det.StartTime<='{0}' ", endTime.Date);
-        //}
 
         if (!string.IsNullOrEmpty(this.tbItemCode.Text.Trim()))
         {
@@ -114,63 +87,61 @@ from  MRP_ShipPlanDet as det
         searchSql += " order by det.Item asc ";
 
         var flowCodes = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-        var shipPlanDetList = new List<ShipPlanDet>();
+        var purchasePlanDetList = new List<PurchasePlanDet>();
         foreach (System.Data.DataRow row in flowCodes.Rows)
         {
-            //det.Flow,det.Item,i.Desc1,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,det.ShipQty,
-            //det.OrgShipQty,m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,det.ReqQty,l.InitStock,l.SafeStock, l.InTransitQty
-            shipPlanDetList.Add(new ShipPlanDet
+            //det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),
+            //isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0)
+            purchasePlanDetList.Add(new PurchasePlanDet
             {
-                Flow = row[0].ToString(),
-                Item = row[1].ToString(),
-                ItemDesc = row[2].ToString(),
-                RefItemCode = row[3].ToString(),
-                LocFrom = row[4].ToString(),
-                LocTo = row[5].ToString(),
-                WindowTime = Convert.ToDateTime(row[6]),
-                Version = Convert.ToInt32(row[7]),
-                ShipQty = Convert.ToDecimal(row[8]),
-                OrgShipQty = Convert.ToDecimal(row[9]),
+                Id = Convert.ToInt32(row[0].ToString()),
+                UUID = row[1].ToString(),
+                Flow = row[2].ToString(),
+                Item = row[3].ToString(),
+                ItemDesc = row[4].ToString(),
+                RefItemCode = row[5].ToString(),
+                ReqQty = Convert.ToDecimal(row[6]),
+                PurchaseQty = Convert.ToInt32(row[7]),
+                WindowTime = Convert.ToDateTime(row[8]),
+                Version = Convert.ToInt32(row[9]),
                 ReleaseNo = Convert.ToInt32(row[10]),
                 Status = row[11].ToString(),
-                Id = Convert.ToInt32(row[14].ToString()),
-                ReqQty = Convert.ToDecimal(row[15]),
-                InitStock = Convert.ToDecimal(row[16]),
-                SafeStock = Convert.ToDecimal(row[17]),
-                InTransitQty = Convert.ToDecimal(row[18]),
-                UUID = row[19].ToString(),
-                StartTime = Convert.ToDateTime(row[20]),
-                OrderQty= Convert.ToDecimal(row[21]),
-                MaxStock = Convert.ToDecimal(row[22]),
+                InitStock = Convert.ToDecimal(row[12]),
+                SafeStock = Convert.ToDecimal(row[13]),
+                InTransitQty = Convert.ToDecimal(row[14]),
+                InspectQty = Convert.ToDecimal(row[15]),
+                OrderQty = Convert.ToDecimal(row[16]),
+                MaxStock = Convert.ToDecimal(row[17]),
+                StartTime = Convert.ToDateTime(row[18]),
             });
         }
-        ListTable(shipPlanDetList);
+        ListTable(purchasePlanDetList);
     }
 
-    private void ListTable(IList<ShipPlanDet> shipPlanDetList)
+    private void ListTable(IList<PurchasePlanDet> pPlanDetList)
     {
-        if (shipPlanDetList == null || shipPlanDetList.Count == 0)
+        if (pPlanDetList == null || pPlanDetList.Count == 0)
         {
             this.list.InnerHtml = "没有查到符合条件的记录";
             return;
         }
 
         #region   trace
-        IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
-        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        IList<PurchasePlanDetTrace> traceList = new List<PurchasePlanDetTrace>();
+        traceList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.UUID in ('{0}') ", string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
 
         if (traceList!=null && traceList.Count > 0)
         {
-            foreach (var sd in shipPlanDetList)
+            foreach (var sd in pPlanDetList)
             {
                 var currentLogs = traceList.Where(d => d.UUID == sd.UUID).ToList();
                 var showText = string.Empty;
                 if (currentLogs != null && currentLogs.Count > 0)
                 {
-                    showText = "<table><thead><tr><th>销售路线</th><th>物料</th><th>需求日期</th><th>需求数</th></tr></thead><tbody><tr>";
+                    showText = "<table><thead><tr><th>生产计划版本号</th><th>生产线</th><th>成品物料号</th><th>计划日期</th><th>计划数量</th></tr></thead><tbody><tr>";
                     foreach (var c in currentLogs)
                     {
-                        showText += "<td>" + c.DistributionFlow + "</td><td>" + c.Item + "</td><td>" + c.ReqDate + "</td><td>" + c.ReqQty.ToString("0.##") + "</td></tr><tr>";
+                        showText += "<td>" + c.RefPlanNo + "</td><td>" + c.ProdLine + "</td><td>" + c.ProdItem + "</td><td>" + c.PlanDate.ToShortDateString() + "</td><td>" + c.ProdQty.ToString("0.##") + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
@@ -180,20 +151,19 @@ from  MRP_ShipPlanDet as det
         #endregion
 
         #region  orderQty
-        IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
-        shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
-        if (shipPlanOpenOrderList!=null && shipPlanOpenOrderList.Count > 0)
+        IList<PurchasePlanOpenOrder> pPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        if (pPlanOpenOrderList != null && pPlanOpenOrderList.Count > 0)
         {
-            foreach (var sd in shipPlanDetList)
+            foreach (var sd in pPlanDetList)
             {
-                var currentOrders = shipPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentOrders = pPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
                 var showText = string.Empty;
                 if (currentOrders != null && currentOrders.Count > 0)
                 {
-                    showText = "<table><thead><tr><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                    showText = "<table><thead><tr><th>采购路线</th><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
                     foreach (var c in currentOrders)
                     {
-                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                        showText += "<td>" + c.Flow + "</td><td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
@@ -202,15 +172,15 @@ from  MRP_ShipPlanDet as det
         }
         #endregion
 
-        var planByDateIndexs = shipPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
-        var planByFlowItems = shipPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item, p.LocFrom, p.LocTo });
+        var planByDateIndexs = pPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
+        var planByFlowItems = pPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item});
 
         StringBuilder str = new StringBuilder();
         //str.Append(CopyString());
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th><th rowspan='2'>报验</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -222,7 +192,7 @@ from  MRP_ShipPlanDet as det
         str.Append("</tr><tr class='GVHeader'>");
         foreach (var planByDateIndex in planByDateIndexs)
         {
-            str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th>");
+            str.Append("<th >需求数</th><th >订单数</th><th >采购数</th><th >期末</th>");
         }
         str.Append("</tr></thead>");
         str.Append("<tbody>");
@@ -253,7 +223,7 @@ from  MRP_ShipPlanDet as det
         foreach (var planByFlowItem in planByFlowItems)
         {
             var firstPlan = planByFlowItem.First();
-            var planDic = planByFlowItem.GroupBy(d => d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q => q.ShipQty));
+            var planDic = planByFlowItem.GroupBy(d => d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q => q.PurchaseQty));
             l++;
             if (l % 2 == 0)
             {
@@ -291,7 +261,7 @@ from  MRP_ShipPlanDet as det
             }
             else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
             {
-                str.Append("<td style='background:green' color='white'>");
+                str.Append("<td style='background:green'>");
             }
             else if (InitStockQty > firstPlan.MaxStock)
             {
@@ -302,33 +272,35 @@ from  MRP_ShipPlanDet as det
             str.Append("<td>");
             str.Append((firstPlan.InTransitQty).ToString("0.##"));
             str.Append("</td>");
-
+            str.Append("<td>");
+            str.Append((firstPlan.InspectQty).ToString("0.##"));
+            str.Append("</td>");
+            InitStockQty = InitStockQty + firstPlan.InspectQty + firstPlan.InTransitQty;
             foreach (var planByDateIndex in planByDateIndexs)
             {
-                //str.Append("<th >需求数</th><th >发货数</th><th >期末</th>");
-                //var qty = planDic.Keys.Contains(planByDateIndex.Key) ? planDic[planByDateIndex.Key] : 0;
+                // str.Append("<th >需求数</th><th >订单数</th><th >采购数</th><th >期末</th>")
                 var curenPlan = planByFlowItem.Where(p => p.StartTime == planByDateIndex.Key);
-                var shipPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new ShipPlanDet();
-                str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", shipPlanDet.Logs));
-                str.Append(shipPlanDet.ReqQty.ToString("0.##"));
+                var pPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet();
+                str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", pPlanDet.Logs));
+                str.Append(pPlanDet.ReqQty.ToString("0.##"));
                 str.Append("</td>");
-                str.Append(string.Format("<td tital='{0}'  onclick='doShowDetsClick(this)'>", shipPlanDet.OrderDets));
-                str.Append(shipPlanDet.OrderQty.ToString("0.##"));
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowDetsClick(this)'>", pPlanDet.OrderDets));
+                str.Append(pPlanDet.OrderQty.ToString("0.##"));
                 str.Append("</td>");
                 if (firstPlan.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)
                 {
                     seq++;
                     str.Append("<td width='30px'>");
-                    str.Append("<input  type='text' flow='" + firstPlan.Flow + "' item='" + firstPlan.Item + "'  name='UpQty' id='" + shipPlanDet.Id + "'value='" + shipPlanDet.ShipQty.ToString("0.##") + "' releaseNo='" + firstPlan.ReleaseNo + "'  dateFrom='" + planByDateIndex.Key + "' style='width:70px' onblur='doFocusClick(this)' seq='" + seq + "' />");
+                    str.Append("<input  type='text' flow='" + firstPlan.Flow + "' item='" + firstPlan.Item + "'  name='UpQty' id='" + pPlanDet.Id + "'value='" + pPlanDet.PurchaseQty.ToString("0.##") + "' releaseNo='" + firstPlan.ReleaseNo + "'  dateFrom='" + planByDateIndex.Key + "' style='width:70px' onblur='doFocusClick(this)' seq='" + seq + "' />");
                     str.Append("</td>");
                 }
                 else
                 {
                     str.Append("<td>");
-                    str.Append(shipPlanDet.ShipQty.ToString("0.##"));
+                    str.Append(pPlanDet.PurchaseQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty;
+                InitStockQty = InitStockQty + pPlanDet.PurchaseQty - pPlanDet.ReqQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
                     str.Append("<td style='background:red'>");
@@ -353,35 +325,9 @@ from  MRP_ShipPlanDet as det
     #endregion
 
 
-    protected void btnRunProdPlan_Click(object sender, EventArgs e)
-    {
-        try
-        {
-            TheMrpMgr.RunProductionPlan(this.CurrentUser);
-            ShowSuccessMessage("生成成功。");
-        }
-        catch (SqlException ex)
-        {
-            ShowErrorMessage(ex.Message);
-        }
-        catch (Exception ee)
-        {
-            ShowErrorMessage(ee.Message);
-        }
-    }
 
     protected void btnSave_Click(object sender, EventArgs e)
     {
-        //}
-        //foreach (Control c in this.list.Controls)
-        //{
-        //    if (c is TextBox)
-        //    {
-        //        TextBox currentBox = (TextBox)c;
-        //    }
-        //}
-
-        //str.Append("<input  type='text' flow='" + firstPlan.Flow + "' item='" + firstPlan.Item + "'  name='UpQty' id='" + shipPlanDet.Id + "'value='" + shipPlanDet.ShipQty.ToString("0.##") + "' style='width:70px' />");
         try
         {
 
@@ -478,7 +424,7 @@ from  MRP_ShipPlanDet as det
             {
                 ShowErrorMessage("没有要修改的计划。");
             }
-            TheMrpMgr.UpdateShipPlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser);
+            TheMrpMgr.UpdatePurchasePlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser);
             ShowSuccessMessage("修改成功。");
             this.btnSearch_Click(null, null);
         }

@@ -192,7 +192,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         str.Append("</tr><tr class='GVHeader'>");
         foreach (var planByDateIndex in planByDateIndexs)
         {
-            str.Append("<th >需求</th><th >订单数</th><th >生产数</th><th >期末</th>");
+            str.Append("<th >需求</th><th >订单数</th><th >计划数</th><th >期末</th>");
         }
         str.Append("</tr></thead>");
         str.Append("<tbody>");

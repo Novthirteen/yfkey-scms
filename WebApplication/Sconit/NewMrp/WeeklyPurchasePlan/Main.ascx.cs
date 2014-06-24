@@ -14,7 +14,7 @@ using com.Sconit.Entity;
 using com.Sconit.Web;
 using NHibernate.Expression;
 
-public partial class NewMrp_PurchasePlan_Main : MainModuleBase
+public partial class NewMrp_WeeklyPurchasePlan_Main : MainModuleBase
 {                                                                                              
 
     protected void Page_Load(object sender, EventArgs e)

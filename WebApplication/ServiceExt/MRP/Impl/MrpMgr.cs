@@ -676,9 +676,18 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
 
+        private static object RunPurchasePlanLock = new object();
         [Transaction(TransactionMode.Requires)]
         public void RunMrp(User user)
         {
+            lock (RunPurchasePlanLock)
+            {
+                SqlParameter[] sqlParameterArr = new SqlParameter[1];
+                sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
+                sqlParameterArr[0].Value = user.Code;
+                this.genericMgr.GetDatasetByStoredProcedure("RunPurchasePlan", sqlParameterArr);
+
+            }
         }
 
         public void RunMrp(DateTime effectiveDate, User user)
@@ -1222,6 +1231,54 @@ namespace com.Sconit.Service.MRP.Impl
                 else
                 {
                     this.genericMgr.ExecuteSql(string.Format(" update MRP_PurchasePlanDet set PurchaseQty={0},Version=Version+1 where id={1} ", qtyList[i], id));
+                }
+            }
+        }
+        #endregion
+
+        #region    修改周采购计划
+        [Transaction(TransactionMode.Requires)]
+        public void UpdateWeeklyPurchasePlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user)
+        {
+            var dateTimeNow = System.DateTime.Now;
+            for (int i = 0; i < idList.Count; i++)
+            {
+                int id = int.Parse(idList[i]);
+                if (id == 0)
+                {
+                    IList<WeeklyPurchasePlanMstr> pMaster = this.genericMgr.FindAllWithCustomQuery<WeeklyPurchasePlanMstr>(" select m from WeeklyPurchasePlanMstr as m where m.ReleaseNo=? ", new object[] { releaseNoList[i] });
+                    IList<WeeklyPurchasePlanDet> searchPlandets = this.genericMgr.FindAllWithCustomQuery<WeeklyPurchasePlanDet>(" select d from WeeklyPurchasePlanDet as d where d.Flow=? and d.Item=? and d.PurchasePlanId=? ", new object[] { flowList[i], itemList[i], pMaster.First().Id });
+                    if (searchPlandets != null && searchPlandets.Count > 0)
+                    {
+                        //Id, PurchasePlanId, UUID, Flow, Item, ItemDesc, RefItemCode, ReqQty, OrgPurchaseQty, 
+                        //PurchaseQty, Uom, BaseUom, UnitQty, UC, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version
+                        var first = searchPlandets.First();
+                        WeeklyPurchasePlanDet newPlan = new WeeklyPurchasePlanDet();
+                        newPlan.PurchasePlanId = first.PurchasePlanId;
+                        newPlan.Flow = first.Flow;
+                        newPlan.Item = first.Item;
+                        newPlan.ItemDesc = first.ItemDesc;
+                        newPlan.RefItemCode = first.RefItemCode;
+                        newPlan.PurchaseQty = Convert.ToDecimal(qtyList[i]);
+                        newPlan.Uom = first.Uom;
+                        newPlan.BaseUom = first.BaseUom;
+                        newPlan.UnitCount = first.UnitCount;
+                        newPlan.UnitQty = first.UnitQty;
+                        newPlan.OrgPurchaseQty = 0;
+                        newPlan.WindowTime = Convert.ToDateTime(dateFrom[i]);
+                        newPlan.StartTime = Convert.ToDateTime(dateFrom[i]);
+                        newPlan.CreateDate = dateTimeNow;
+                        newPlan.CreateUser = user.Code;
+                        newPlan.LastModifyDate = dateTimeNow;
+                        newPlan.LastModifyUser = user.Code;
+                        newPlan.Version = 1;
+                        newPlan.Id = 0;
+                        this.genericMgr.Create(newPlan);
+                    }
+                }
+                else
+                {
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_WeeklyPurchasePlanDet set PurchaseQty={0},Version=Version+1 where id={1} ", qtyList[i], id));
                 }
             }
         }

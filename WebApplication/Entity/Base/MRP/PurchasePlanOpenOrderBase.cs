@@ -7,33 +7,22 @@ using System.Collections.Generic;
 namespace com.Sconit.Entity.MRP
 {
     [Serializable]
-    public abstract class PurchasePlanDetBase : EntityBase
+    public abstract class PurchasePlanOpenOrderBase : EntityBase
     {
-        // <!--Id, PurchasePlanId, UUID, Flow, Item, ItemDesc, RefItemCode, ReqQty, OrgPurchaseQty, PurchaseQty, Uom, BaseUom, UnitQty,
-    //UC, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version-->
+        //Id, PurchasePlanId, UUID, Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser
         public Int32 Id { get; set; }
         public Int32 PurchasePlanId { get; set; }
         public string UUID { get; set; }
         public string Flow { get; set; }
+        public string OrderNo { get; set; }
         public string Item { get; set; }
-        public string ItemDesc { get; set; }
-        public string RefItemCode { get; set; }
-        public decimal ReqQty { get; set; }
-        public decimal OrgPurchaseQty { get; set; }
-        public decimal PurchaseQty { get; set; }
-        public string Uom { get; set; }
-        public string BaseUom { get; set; }
-        public decimal UnitQty { get; set; }
-        public decimal UnitCount { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime WindowTime { get; set; }
+        public decimal OrderQty { get; set; }
+        public decimal ShipQty { get; set; }
+        public decimal RecQty { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
-        public DateTime LastModifyDate { get; set; }
-        public string LastModifyUser { get; set; }
-        public Int32 Version { get; set; }
-        public decimal OrderQty { get; set; }
-        
         
 
 		public override int GetHashCode()
@@ -50,7 +39,7 @@ namespace com.Sconit.Entity.MRP
 
         public override bool Equals(object obj)
         {
-            PurchasePlanDetBase another = obj as PurchasePlanDetBase;
+            PurchasePlanOpenOrderBase another = obj as PurchasePlanOpenOrderBase;
 
             if (another == null)
             {
