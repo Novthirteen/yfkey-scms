@@ -26,7 +26,8 @@ alter table Location add IsFG bit
 go
 alter table Item add MaxStock int
 go
-
+alter table Item add IsMRP bit
+go
 /****** Object:  Table [dbo].[MRP_ShipPlanOpenOrder]    Script Date: 2014/6/25 15:32:53 ******/
 DROP TABLE [dbo].[MRP_ShipPlanOpenOrder]
 GO
