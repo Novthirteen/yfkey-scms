@@ -28,82 +28,91 @@ alter table Item add MaxStock int
 go
 alter table Item add IsMRP bit
 go
-/****** Object:  Table [dbo].[MRP_WeeklyShipPlan]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_WeeklyShipPlan]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_WeeklyShipPlan]
 GO
-/****** Object:  Table [dbo].[MRP_WeeklyProductionPlan]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_WeeklyPurchasePlanOpenOrder]    Script Date: 2014/6/24 17:47:05 ******/
+DROP TABLE [dbo].[MRP_WeeklyPurchasePlanOpenOrder]
+GO
+/****** Object:  Table [dbo].[MRP_WeeklyPurchasePlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
+DROP TABLE [dbo].[MRP_WeeklyPurchasePlanMstr]
+GO
+/****** Object:  Table [dbo].[MRP_WeeklyPurchasePlanDet]    Script Date: 2014/6/24 17:47:05 ******/
+DROP TABLE [dbo].[MRP_WeeklyPurchasePlanDet]
+GO
+/****** Object:  Table [dbo].[MRP_WeeklyProductionPlan]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_WeeklyProductionPlan]
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanOpenOrder]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanOpenOrder]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ShipPlanOpenOrder]
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanMstr]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ShipPlanMstr]
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanInitLocationDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanInitLocationDet]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ShipPlanInitLocationDet]
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanDetTrace]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanDetTrace]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ShipPlanDetTrace]
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanDet]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ShipPlanDet]
 GO
-/****** Object:  Table [dbo].[MRP_ShiftPlanMstr]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShiftPlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ShiftPlanMstr]
 GO
-/****** Object:  Table [dbo].[MRP_ShiftPlanDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShiftPlanDet]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ShiftPlanDet]
 GO
-/****** Object:  Table [dbo].[MRP_RunWeeklyMRPLog]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_RunWeeklyMRPLog]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_RunWeeklyMRPLog]
 GO
-/****** Object:  Table [dbo].[MRP_RunShipPlanLog]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_RunShipPlanLog]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_RunShipPlanLog]
 GO
-/****** Object:  Table [dbo].[MRP_RunPurchasePlanLog]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_RunPurchasePlanLog]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_RunPurchasePlanLog]
 GO
-/****** Object:  Table [dbo].[MRP_RunProductionPlanLog]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_RunProductionPlanLog]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_RunProductionPlanLog]
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanOpenOrder]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanOpenOrder]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_PurchasePlanOpenOrder]
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanMstr]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_PurchasePlanMstr]
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanInitLocationDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanInitLocationDet]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_PurchasePlanInitLocationDet]
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanDetTrace]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanDetTrace]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_PurchasePlanDetTrace]
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanDet]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_PurchasePlanDet]
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanOpenOrder]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanOpenOrder]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ProductionPlanOpenOrder]
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanMstr]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ProductionPlanMstr]
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanInitLocationDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanInitLocationDet]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ProductionPlanInitLocationDet]
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanDetTrace]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanDetTrace]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ProductionPlanDetTrace]
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanDet]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_ProductionPlanDet]
 GO
-/****** Object:  Table [dbo].[MRP_OpenOrderSnapShot]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_OpenOrderSnapShot]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_OpenOrderSnapShot]
 GO
-/****** Object:  Table [dbo].[MRP_LocationDetSnapShot]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_LocationDetSnapShot]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_LocationDetSnapShot]
 GO
-/****** Object:  Table [dbo].[MRP_LocationDetSnapShot]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_LocationDetSnapShot]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -129,7 +138,7 @@ CREATE TABLE [dbo].[MRP_LocationDetSnapShot](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_OpenOrderSnapShot]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_OpenOrderSnapShot]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -157,7 +166,7 @@ CREATE TABLE [dbo].[MRP_OpenOrderSnapShot](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanDet]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -171,6 +180,7 @@ CREATE TABLE [dbo].[MRP_ProductionPlanDet](
 	[Item] [varchar](50) NULL,
 	[ItemDesc] [varchar](50) NULL,
 	[RefItemCode] [varchar](50) NULL,
+	[ReqQty] [decimal](18, 8) NULL,
 	[OrgQty] [decimal](18, 8) NULL,
 	[Qty] [decimal](18, 8) NULL,
 	[OrderQty] [decimal](18, 8) NULL,
@@ -191,7 +201,7 @@ CREATE TABLE [dbo].[MRP_ProductionPlanDet](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanDetTrace]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanDetTrace]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -222,7 +232,7 @@ CREATE TABLE [dbo].[MRP_ProductionPlanDetTrace](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanInitLocationDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanInitLocationDet]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -249,7 +259,7 @@ CREATE TABLE [dbo].[MRP_ProductionPlanInitLocationDet](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanMstr]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -272,7 +282,7 @@ CREATE TABLE [dbo].[MRP_ProductionPlanMstr](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ProductionPlanOpenOrder]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ProductionPlanOpenOrder]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -301,7 +311,7 @@ CREATE TABLE [dbo].[MRP_ProductionPlanOpenOrder](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanDet]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -340,7 +350,7 @@ CREATE TABLE [dbo].[MRP_PurchasePlanDet](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanDetTrace]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanDetTrace]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -375,7 +385,7 @@ CREATE TABLE [dbo].[MRP_PurchasePlanDetTrace](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanInitLocationDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanInitLocationDet]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -402,7 +412,7 @@ CREATE TABLE [dbo].[MRP_PurchasePlanInitLocationDet](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanMstr]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -431,7 +441,7 @@ CREATE TABLE [dbo].[MRP_PurchasePlanMstr](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_PurchasePlanOpenOrder]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_PurchasePlanOpenOrder]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -461,7 +471,7 @@ CREATE TABLE [dbo].[MRP_PurchasePlanOpenOrder](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_RunProductionPlanLog]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_RunProductionPlanLog]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -487,7 +497,7 @@ CREATE TABLE [dbo].[MRP_RunProductionPlanLog](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_RunPurchasePlanLog]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_RunPurchasePlanLog]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -511,7 +521,7 @@ CREATE TABLE [dbo].[MRP_RunPurchasePlanLog](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_RunShipPlanLog]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_RunShipPlanLog]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -543,7 +553,7 @@ CREATE TABLE [dbo].[MRP_RunShipPlanLog](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_RunWeeklyMRPLog]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_RunWeeklyMRPLog]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -569,7 +579,7 @@ CREATE TABLE [dbo].[MRP_RunWeeklyMRPLog](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ShiftPlanDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShiftPlanDet]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -600,7 +610,7 @@ CREATE TABLE [dbo].[MRP_ShiftPlanDet](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ShiftPlanMstr]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShiftPlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -628,7 +638,7 @@ CREATE TABLE [dbo].[MRP_ShiftPlanMstr](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanDet]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -669,7 +679,7 @@ CREATE TABLE [dbo].[MRP_ShipPlanDet](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanDetTrace]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanDetTrace]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -695,7 +705,7 @@ CREATE TABLE [dbo].[MRP_ShipPlanDetTrace](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanInitLocationDet]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanInitLocationDet]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -722,7 +732,7 @@ CREATE TABLE [dbo].[MRP_ShipPlanInitLocationDet](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanMstr]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -751,7 +761,7 @@ CREATE TABLE [dbo].[MRP_ShipPlanMstr](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_ShipPlanOpenOrder]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_ShipPlanOpenOrder]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -781,7 +791,7 @@ CREATE TABLE [dbo].[MRP_ShipPlanOpenOrder](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_WeeklyProductionPlan]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_WeeklyProductionPlan]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -807,7 +817,105 @@ CREATE TABLE [dbo].[MRP_WeeklyProductionPlan](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[MRP_WeeklyShipPlan]    Script Date: 2014/6/25 15:57:16 ******/
+/****** Object:  Table [dbo].[MRP_WeeklyPurchasePlanDet]    Script Date: 2014/6/24 17:47:05 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[MRP_WeeklyPurchasePlanDet](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[PurchasePlanId] [int] NULL,
+	[UUID] [varchar](50) NULL,
+	[Flow] [varchar](50) NULL,
+	[Item] [varchar](50) NULL,
+	[ItemDesc] [varchar](100) NULL,
+	[RefItemCode] [varchar](50) NULL,
+	[ReqQty] [decimal](18, 8) NULL,
+	[OrgPurchaseQty] [decimal](18, 8) NULL,
+	[PurchaseQty] [decimal](18, 8) NULL,
+	[OrderQty] [decimal](18, 8) NULL,
+	[Uom] [varchar](5) NULL,
+	[BaseUom] [varchar](5) NULL,
+	[UnitQty] [decimal](18, 8) NULL,
+	[UC] [decimal](18, 8) NULL,
+	[StartTime] [datetime] NULL,
+	[WindowTime] [datetime] NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [varchar](50) NULL,
+	[LastModifyDate] [datetime] NULL,
+	[LastModifyUser] [varchar](50) NULL,
+	[Version] [int] NULL,
+ CONSTRAINT [PK_MRP_WeeklyPurchasePlanDet] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[MRP_WeeklyPurchasePlanMstr]    Script Date: 2014/6/24 17:47:05 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[MRP_WeeklyPurchasePlanMstr](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ReleaseNo] [int] NULL,
+	[BatchNo] [int] NULL,
+	[EffDate] [datetime] NULL,
+	[Status] [varchar](50) NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [varchar](50) NULL,
+	[LastModifyDate] [datetime] NULL,
+	[LastModifyUser] [varchar](50) NULL,
+	[ReleaseDate] [datetime] NULL,
+	[ReleaseUser] [varchar](50) NULL,
+	[Version] [int] NULL,
+ CONSTRAINT [PK_MRP_WeeklyPurchasePlanMstr] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[MRP_WeeklyPurchasePlanOpenOrder]    Script Date: 2014/6/24 17:47:05 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[MRP_WeeklyPurchasePlanOpenOrder](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[PurchasePlanId] [int] NULL,
+	[UUID] [varchar](50) NULL,
+	[Flow] [varchar](50) NULL,
+	[OrderNo] [varchar](50) NULL,
+	[Item] [varchar](50) NULL,
+	[StartTime] [datetime] NULL,
+	[WindowTime] [datetime] NULL,
+	[OrderQty] [decimal](18, 8) NULL,
+	[ShipQty] [decimal](18, 8) NULL,
+	[RecQty] [decimal](18, 8) NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [varchar](50) NULL,
+ CONSTRAINT [PK_MRP_WeeklyPurchasePlanOpenOrder] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[MRP_WeeklyShipPlan]    Script Date: 2014/6/24 17:47:05 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

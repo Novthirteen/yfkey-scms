@@ -107,6 +107,7 @@ BEGIN
 			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			ReqQty decimal(18, 8),
 			Qty decimal(18, 8),
 			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			OrderQty decimal(18, 8),
@@ -399,6 +400,10 @@ BEGIN
 		from #tempOpenOrder as ord inner join #tempProductPlanDet as pl on pl.Item = ord.Item and pl.StartTime = ord.EffDate
 		-----------------------------↑更新订单数-----------------------------
 
+		--汇总生产需求
+		update d set ReqQty = ISNULL(dt.ReqQty, 0) from #tempProductPlanDet as d
+		left join (select UUID, SUM(ISNULL(ReqQty, 0)) as ReqQty from #tempProductPlanDetTrace group by UUID) as dt on d.UUID = dt.UUID
+
 	end try
 	begin catch
 		set @Msg = N'运行主生产计划异常：' + Error_Message()
@@ -437,8 +442,8 @@ BEGIN
 		where pl.Qty > 0 and i.UC > 0
 
 		--新增主生产计划明细
-		insert into MRP_ProductionPlanDet(ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, OrgQty, Qty, OrderQty, Uom, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
-		select @ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, ISNULL(Qty, 0), ISNULL(Qty, 0), ISNULL(OrderQty, 0), Uom, StartTime, WindowTime, @DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
+		insert into MRP_ProductionPlanDet(ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, ReqQty, OrgQty, Qty, OrderQty, Uom, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
+		select @ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, ISNULL(ReqQty, 0), ISNULL(Qty, 0), ISNULL(Qty, 0), ISNULL(OrderQty, 0), Uom, StartTime, WindowTime, @DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
 		from #tempProductPlanDet
 
 		--新增主生产计划明细追溯
