@@ -149,9 +149,11 @@ BEGIN
 		--from CustScheduleDet as det inner join EDI_FordPlan as p on det.FordPlanId = p.Id
 
 		--更新客户日程开始时间
-		update CustScheduleDet set StartTime = DATEADD(day, -ISNULL(mstr.MRPLeadTime, 0), det.DateFrom)
-		from CustScheduleDet as det inner join FlowMstr as mstr on det.Flow = mstr.Code
-		where det.DateFrom >= @DateNow 
+		update CustScheduleDet set StartTime = DATEADD(day, -ISNULL(fMstr.MRPLeadTime, 0), det.DateFrom)
+		from CustScheduleDet as det 
+		inner join CustScheduleMstr as mstr on det.ScheduleId = mstr.Id
+		inner join FlowMstr as fMstr on det.Flow = fMstr.Code
+		where  mstr.[Type] = 'Daily' and mstr.[Status] = 'Submit' and det.DateFrom >= @DateNow 
 
 
 		-----------------------------↓获取客户日程-----------------------------
@@ -160,10 +162,11 @@ BEGIN
 		Uom, BaseUom, UC, Location, StartTime, WindowTime)
 		select det.Id, mstr.Id as MstrId, mstr.Flow, mstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty,
 		det.Uom, i.Uom as BaseUom, det.UC, det.Loc as Location, det.StartTime, det.DateFrom as WindowTime
-		from CustScheduleDet as det inner join CustScheduleMstr as mstr on det.ScheduleId = mstr.Id
+		from CustScheduleDet as det 
+		inner join CustScheduleMstr as mstr on det.ScheduleId = mstr.Id
 		inner join Item as i on det.Item = i.Code
 		where mstr.[Type] = 'Daily' and mstr.[Status] = 'Submit' and det.StartTime >= @DateNow 
-		and (det.Qty > det.ShipQty or (det.ShipQty is null and det.Qty > 0))
+		--and (det.Qty > det.ShipQty or (det.ShipQty is null and det.Qty > 0))
 
 		if not exists(select top 1 1 from #tempEffCustScheduleDet)
 		begin
@@ -286,7 +289,7 @@ BEGIN
 		--转有发运路线的（毛需求）
 		insert into #tempShipPlanDet(UUID, DistributionFlow, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
 		select NEWID(), req.Flow, flow.Flow, flow.Item, req.ItemDesc, req.ItemRef, req.Qty * req.UnitQty / flow.UnitQty, /*先把客户日程的单位转为基本单位，在转为发运计划的单位*/
-		req.Uom, req.BaseUom, req.UnitQty, flow.UC, flow.LocFrom, flow.LocTo, DATEADD(day, -flow.LeadTime, StartTime), StartTime  --客户日程的开始时间就是发运计划的窗口时间
+		req.Uom, req.BaseUom, req.UnitQty, flow.UC, flow.LocFrom, flow.LocTo, DATEADD(day, -ISNULL(flow.LeadTime, 0), StartTime), StartTime  --客户日程的开始时间就是发运计划的窗口时间
 		from #tempEffCustScheduleDet as req 
 		inner join #tempShipFlowDet as flow on req.ShipFlow = flow.Flow and req.Item = flow.Item
 

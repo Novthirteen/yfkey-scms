@@ -292,7 +292,7 @@ BEGIN
 		N'生产线[' + t.ProdLine + N']成品[ ' + t.Item + N']的Bom代码[ ' + t.Bom + N']不存在' 
 		from #tempEffShiftPlan as t
 		left join BomMstr as b on t.Bom = b.Code
-		where t.ProdLine = @ProdLine and b.Code is null
+		where b.Code is null
 		--删除班产计划
 		delete t from #tempEffShiftPlan as t
 		left join BomMstr as b on t.Bom = b.Code
