@@ -337,7 +337,6 @@
     <Compile Include="Base\MRP\ICustomerScheduleBaseDao.cs" />
     <Compile Include="Base\MRP\ICustomerScheduleDetailBaseDao.cs" />
     <Compile Include="Base\MRP\IExpectTransitInventoryBaseDao.cs" />
-    <Compile Include="Base\MRP\IFlatBomBaseDao.cs" />
     <Compile Include="Base\MRP\IMrpReceivePlanBaseDao.cs" />
     <Compile Include="Base\MRP\IMrpRunLogBaseDao.cs" />
     <Compile Include="Base\MRP\IMrpShipPlanBaseDao.cs" />
@@ -345,7 +344,6 @@
     <Compile Include="Base\MRP\NH\NHCustomerScheduleBaseDao.cs" />
     <Compile Include="Base\MRP\NH\NHCustomerScheduleDetailBaseDao.cs" />
     <Compile Include="Base\MRP\NH\NHExpectTransitInventoryBaseDao.cs" />
-    <Compile Include="Base\MRP\NH\NHFlatBomBaseDao.cs" />
     <Compile Include="Base\MRP\NH\NHMrpReceivePlanBaseDao.cs" />
     <Compile Include="Base\MRP\NH\NHMrpRunLogBaseDao.cs" />
     <Compile Include="Base\MRP\NH\NHMrpShipPlanBaseDao.cs" />
@@ -667,7 +665,6 @@
     <Compile Include="MRP\ICustomerScheduleDao.cs" />
     <Compile Include="MRP\ICustomerScheduleDetailDao.cs" />
     <Compile Include="MRP\IExpectTransitInventoryDao.cs" />
-    <Compile Include="MRP\IFlatBomDao.cs" />
     <Compile Include="MRP\IMrpReceivePlanDao.cs" />
     <Compile Include="MRP\IMrpRunLogDao.cs" />
     <Compile Include="MRP\IMrpShipPlanDao.cs" />
@@ -675,7 +672,6 @@
     <Compile Include="MRP\NH\NHCustomerScheduleDao.cs" />
     <Compile Include="MRP\NH\NHCustomerScheduleDetailDao.cs" />
     <Compile Include="MRP\NH\NHExpectTransitInventoryDao.cs" />
-    <Compile Include="MRP\NH\NHFlatBomDao.cs" />
     <Compile Include="MRP\NH\NHMrpReceivePlanDao.cs" />
     <Compile Include="MRP\NH\NHMrpRunLogDao.cs" />
     <Compile Include="MRP\NH\NHMrpShipPlanDao.cs" />

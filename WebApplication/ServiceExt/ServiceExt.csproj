@@ -98,11 +98,9 @@
     <Compile Include="Base\MRP\ICustomerScheduleBaseMgr.cs" />
     <Compile Include="Base\MRP\ICustomerScheduleDetailBaseMgr.cs" />
     <Compile Include="Base\MRP\IExpectTransitInventoryBaseMgr.cs" />
-    <Compile Include="Base\MRP\IFlatBomBaseMgr.cs" />
     <Compile Include="Base\MRP\Impl\CustomerScheduleBaseMgr.cs" />
     <Compile Include="Base\MRP\Impl\CustomerScheduleDetailBaseMgr.cs" />
     <Compile Include="Base\MRP\Impl\ExpectTransitInventoryBaseMgr.cs" />
-    <Compile Include="Base\MRP\Impl\FlatBomBaseMgr.cs" />
     <Compile Include="Base\MRP\Impl\MrpReceivePlanBaseMgr.cs" />
     <Compile Include="Base\MRP\Impl\MrpRunLogBaseMgr.cs" />
     <Compile Include="Base\MRP\Impl\MrpShipPlanBaseMgr.cs" />
@@ -132,7 +130,6 @@
     <Compile Include="Batch\Job\DssInboundJob.cs" />
     <Compile Include="Batch\Job\DssOutboundJob.cs" />
     <Compile Include="Batch\Job\MesJob.cs" />
-    <Compile Include="Batch\Job\MRPJob.cs" />
     <Compile Include="Batch\Job\TPriceList2TActBillJob.cs" />
     <Compile Include="Batch\Job\TransportationOrderCloseJob.cs" />
     <Compile Include="Batch\Job\TransportationOrderCompleteJob.cs" />
@@ -196,11 +193,9 @@
     <Compile Include="MRP\ICustomerScheduleDetailMgr.cs" />
     <Compile Include="MRP\ICustomerScheduleMgr.cs" />
     <Compile Include="MRP\IExpectTransitInventoryMgr.cs" />
-    <Compile Include="MRP\IFlatBomMgr.cs" />
     <Compile Include="MRP\Impl\CustomerScheduleDetailMgr.cs" />
     <Compile Include="MRP\Impl\CustomerScheduleMgr.cs" />
     <Compile Include="MRP\Impl\ExpectTransitInventoryMgr.cs" />
-    <Compile Include="MRP\Impl\FlatBomMgr.cs" />
     <Compile Include="MRP\Impl\MrpMgr.cs" />
     <Compile Include="MRP\Impl\MrpReceivePlanMgr.cs" />
     <Compile Include="MRP\Impl\MrpRunLogMgr.cs" />
@@ -212,7 +207,6 @@
     <Compile Include="MRP\IMrpShipPlanMgr.cs" />
     <Compile Include="MRP\IMrpShipPlanViewMgr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Report\Yfk\Impl\RepProcurementPlanMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepASNMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepBarCodeA4Mgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepBarCodeMgr.cs" />
@@ -224,7 +218,6 @@
     <Compile Include="Report\Yfk\Impl\RepInsideBarCodeA4Mgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepInsideBarCodeMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepInspectOrderMgr.cs" />
-    <Compile Include="Report\Yfk\Impl\RepShiftPlanMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepPickListMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepProductionMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepReceiptNoteMgr.cs" />
