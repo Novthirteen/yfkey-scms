@@ -111,6 +111,9 @@ namespace com.Sconit.Entity.MRP
         public string ReleaseUser { get; set; }
         public DateTime? ReleaseDate { get; set; }
         public IList<CustomerScheduleDetail> CustomerScheduleDetails { get; set; }
+
+        public string Type { get; set; }
+        public Int32 Version { get; set; }
         #endregion
 
         public override int GetHashCode()

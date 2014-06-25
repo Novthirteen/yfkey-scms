@@ -141,7 +141,7 @@ namespace com.Sconit.Service.EDI.Impl
             }
         }
 
-        [Transaction(TransactionMode.Requires)]
+        //[Transaction(TransactionMode.Requires)]
         public void TransformationPlan(User user)
         {
             try
@@ -156,6 +156,7 @@ namespace com.Sconit.Service.EDI.Impl
                     //IList<ItemReference> itemReferences = this.genericMgr.FindAllWithCustomQuery<ItemReference>(string.Format(" select t from ItemReference as t where t.ReferenceCode in('{0}')", string.Join("','", weeklyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
                     foreach (var weekly in weeklyPlans)
                     {
+                        #region
                         //var flowDet = flowdets.Where(f => f.ReferenceItemCode == weekly.Part_Num);
                         //if (flowDet == null || flowDet.Count() == 0)
                         //{
@@ -190,82 +191,108 @@ namespace com.Sconit.Service.EDI.Impl
                         this.genericMgr.Create(eDIFordPlan);
                         weekly.IsHandle = true    ;
                         this.genericMgr.Update(weekly);
+                        #endregion
                     }
 
-                    var groupWeeklys = weeklyPlans.GroupBy(w => w.Interchange_Control_Num).ToDictionary(d => d.Key, d => d.OrderBy(rd=>rd.Forecast_Date).ToList());
-                    string searchFlowCodeSql = string.Format("select Code from flowmstr where type='Distribution' and CustomerCodes like '%{0}%' and SupplierCodes like '%{1}%'", weeklyPlans.First().Ship_To_GSDB_Code, weeklyPlans.First().Ship_From_GSDB_Code);
-                     var flowCodes = this.genericMgr.GetDatasetBySql(searchFlowCodeSql).Tables[0];
-                     string flowCode = string.Empty;
-                     foreach (System.Data.DataRow row in flowCodes.Rows)
-                     {
-                         flowCode = row[0].ToString();
-                     }
-                     //if (string.IsNullOrEmpty(flowCode)) continue;
-                     Flow currentFlow = this.flowMgr.LoadFlow(flowCode);
-                     int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" +flowCode +"_" + com.Sconit.Entity.MasterData.CodeMaster.TimeUnit.Week.ToString());
+                    var groupWeeklys = weeklyPlans.GroupBy(w => w.Interchange_Control_Num).ToDictionary(d => d.Key, d => d.OrderBy(rd => rd.Forecast_Date).ToList());
+                   
                      foreach (var g in groupWeeklys)
                     {
-                        var firstWeek=g.Value.First();
-                        CustomerPlanMstr mstr = new CustomerPlanMstr
-                        { 
-                            PlanNo= g.Key,
+                        string searchFlowCodeSql = string.Format("select Code from flowmstr where type='Distribution' and CustomerCodes like '%{0}%' and SupplierCodes like '%{1}%'", g.Value.First().Ship_To_GSDB_Code, g.Value.First().Ship_From_GSDB_Code);
+                        var flowCodes = this.genericMgr.GetDatasetBySql(searchFlowCodeSql).Tables[0];
+                        string flowCode = string.Empty;
+                        foreach (System.Data.DataRow row in flowCodes.Rows)
+                        {
+                            flowCode = row[0].ToString();
+                        }
+                        //if (string.IsNullOrEmpty(flowCode)) continue;
+                        Flow currentFlow = this.flowMgr.LoadFlow(flowCode);
+                        if (currentFlow == null) continue;
+                        int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + flowCode + "_" + BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK);
+                        var firstWeek = g.Value.First();
+                        CustomerSchedule mstr = new CustomerSchedule
+                        {
+                            ReferenceScheduleNo = g.Key,
                             Flow = flowCode,
-                            Type=com.Sconit.Entity.MasterData.CodeMaster.TimeUnit.Week.ToString(),
-                            Status = com.Sconit.Entity.MasterData.CodeMaster.PlanStatus.Create.ToString(),
+                            Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT,
+                            Type=BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK,
                             CreateDate= datetimeNow,
-                            CreateUser = user.Name,
+                            CreateUser = user.Code,
                             LastModifyDate= datetimeNow,
-                            LastModifyUser = user.Name,
+                            LastModifyUser = user.Code,
                             Version = customerPlanVersion,
                         };
                         this.genericMgr.Create(mstr);
                         for (int i = 0; i < g.Value.Count-3; i++)
                         {
                             var r = g.Value[i];
-                            if (i == g.Value.Count - 4)
+                            var rn = g.Value[i + 1];
+                            if (rn.Forecast_Date_Qual_r=="M")
                             {
-                               var r1 = g.Value[i];
-                               var sDate = DateTime.Parse(r1.Forecast_Date.Substring(0, 4) + "-" + r1.Forecast_Date.Substring(4, 2) + "-" + r1.Forecast_Date.Substring(6, 2));
-                               var eDate = new DateTime(sDate.Date.Year, sDate.Date.Month+1, 1).AddDays(-1);
-                               DateTime dt1 = Convert.ToDateTime(sDate);
-                               DateTime dt2 = Convert.ToDateTime(eDate); 
-                               TimeSpan ts = dt1 - dt2; 
-                               int sub = ts.Days;
-                               int surplusWeekly = sub % 7 > 4 ? sub / 7 + 1 : sub / 7;
-                               for (int ii = 0; ii < surplusWeekly; ii++)
-                               {
-                                   
-                               }
+                                for (int ii = i; ii < g.Value.Count-i; ii++)
+                                {
+                                    var r1 = g.Value[ii];
+                                    var sDate = DateTime.Parse(r1.Forecast_Date.Substring(0, 4) + "-" + r1.Forecast_Date.Substring(4, 2) + "-" + r1.Forecast_Date.Substring(6, 2));
+                                    var eDate = new DateTime(sDate.Date.Year, sDate.Date.Month + 1, 1).AddDays(-1);
+                                    TimeSpan ts = sDate - eDate;
+                                    int sub = ts.Days;
+                                    int surplusWeekly = sub % 7 > 4 ? sub / 7 + 1 : sub / 7;
+                                    if (surplusWeekly == 0)
+                                    {
+                                         eDate = new DateTime(sDate.Date.Year, sDate.Date.Month + 2, 1).AddDays(-1);
+                                          ts = sDate - eDate;
+                                          sub = ts.Days;
+                                          surplusWeekly = sub % 7 > 4 ? sub / 7 + 1 : sub / 7;
+                                    }
+                                    var averageQty = Convert.ToDecimal(r.Forecast_Net_Qty) / surplusWeekly;
+                                    for (int j = 0; j < surplusWeekly; j++)
+                                    {
+                                        var cFlowDets = currentFlow.FlowDetails.Where(d => d.ReferenceItemCode == r1.Part_Num);
+                                        FlowDetail fdet = cFlowDets != null && cFlowDets.Count() > 0 ? cFlowDets.First() : new FlowDetail();
+                                        if (fdet.Item != null)
+                                        {
+                                            CustomerScheduleDetail cdet = new CustomerScheduleDetail();
+                                            cdet.CustomerSchedule = mstr;
+                                            cdet.Item = fdet.Item.Code;
+                                            cdet.ItemDescription = fdet.Item.Description;
+                                            cdet.ItemReference = r1.Part_Num;
+                                            cdet.Type = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK;
+                                            cdet.Version = mstr.Version;
+                                            cdet.DateFrom = sDate;
+                                            cdet.DateTo = sDate.AddDays(7);
+                                            cdet.Uom = fdet.Uom.Code;
+                                            cdet.UnitCount = fdet.UnitCount;
+                                            cdet.Qty = averageQty<0?0:averageQty;
+                                            cdet.Location = fdet.LocationFrom.Code;
+                                            cdet.StartTime = sDate;
+                                            this.genericMgr.Create(cdet);
+                                            sDate = sDate.AddDays(7);
+                                        }
+                                    }
+                                }
                                 continue;
                             }
-                            //var r1 = g.Value[i+2];
-                            //if (r1.Forecast_Date_Qual_r == "M")
-                            //{
-                            //}
-                            //}
-                            //foreach (var r in g.Value)
-                            //{
                             var currentFlowDets = currentFlow.FlowDetails.Where(d => d.ReferenceItemCode == r.Part_Num);
                             FlowDetail flowdet = currentFlowDets != null && currentFlowDets.Count() > 0 ? currentFlowDets.First() : new FlowDetail();
-                            CustomerPlanDet det = new CustomerPlanDet();
-                            det.PlanNo = mstr.PlanNo;
-                            det.Type = mstr.Type;
-                            det.Item = flowdet.Item.Code;
-                            det.ItemDesc = flowdet.Item.Description;
-                            det.ItemRef = r.Part_Num;
-                            det.Uom = r.UOM;
-                            det.UnitCount = flowdet.UnitCount;
-                            det.Qty = string.IsNullOrEmpty(r.Forecast_Net_Qty) ? 0 : Convert.ToDecimal(r.Forecast_Net_Qty); ;
-                            det.Location = flowdet.LocationFrom.Code;
-                            det.DateFrom = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2)); ;
-                            det.DateTo = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2)); ;
-                            //det.StartTime = g.Key;
-                            det.CreateDate = datetimeNow;
-                            det.CreateUser = user.Name;
-                            det.LastModifyDate = datetimeNow;
-                            det.LastModifyUser = user.Name;
-                            det.Version = customerPlanVersion;
-                            this.genericMgr.Create(det);
+                            if (flowdet.Item != null)
+                            {
+                                CustomerScheduleDetail det = new CustomerScheduleDetail();
+                                det.CustomerSchedule = mstr;
+                                det.Item = flowdet.Item != null ? flowdet.Item.Code : string.Empty;
+                                det.ItemDescription = flowdet.Item != null ? flowdet.Item.Description : string.Empty;
+                                det.ItemReference = r.Part_Num;
+                                //det.Bom = null;
+                                det.Type = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK;
+                                det.DateFrom = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2));
+                                det.DateTo = det.DateFrom.AddDays(7); 
+                                det.Uom = flowdet.Uom.Code;
+                                det.UnitCount = flowdet.UnitCount;
+                                det.Qty = string.IsNullOrEmpty(r.Forecast_Net_Qty) ? 0 : Convert.ToDecimal(r.Forecast_Net_Qty) < 0 ? 0 : Convert.ToDecimal(r.Forecast_Net_Qty);
+                                det.Location = currentFlow.LocationFrom != null ? currentFlow.LocationFrom.Code : string.Empty;
+                                det.StartTime = det.DateFrom;
+                                det.Version = mstr.Version;
+                                this.genericMgr.Create(det);
+                            }
                         }
                     }
                 }
@@ -281,6 +308,7 @@ namespace com.Sconit.Service.EDI.Impl
                     //IList<ItemReference> itemReferences = this.genericMgr.FindAllWithCustomQuery<ItemReference>(string.Format(" select t from ItemReference as t where t.ReferenceCode in('{0}')", string.Join("','", dailyPlans.Select(w => w.Part_Num).Distinct().ToArray())));
                     foreach (var daily in dailyPlans)
                     {
+                        #region
                         //ItemReference itemReference = itemReferences.Where(i => i.ReferenceCode == daily.Part_Num).First();
                         //var flowDet = flowdets.Where(f => f.ReferenceItemCode == daily.Part_Num);
                         //if (flowDet == null || flowDet.Count() == 0)
@@ -318,11 +346,15 @@ namespace com.Sconit.Service.EDI.Impl
                         this.genericMgr.Create(eDIFordPlan);
                         daily.IsHandle = true;
                         this.genericMgr.Update(daily);
+                        #endregion
                     }
 
 
                     var groupDailyPlan = dailyPlans.GroupBy(w => w.Interchange_Control_Num).ToDictionary(d => d.Key, d => d.ToList());
-                    string searchFlowCodeSql = string.Format("select Code from flowmstr where type='Distribution' and CustomerCodes like '%{0}%' and SupplierCodes like '%{1}%'", dailyPlans.First().Ship_To_GSDB_Code, dailyPlans.First().Ship_From_GSDB_Code);
+                   
+                    foreach (var g in groupDailyPlan)
+                    {
+                     string searchFlowCodeSql = string.Format("select Code from flowmstr where type='Distribution' and CustomerCodes like '%{0}%' and SupplierCodes like '%{1}%'", g.Value.First().Ship_To_GSDB_Code, g.Value.First().Ship_From_GSDB_Code);
                     var flowCodes = this.genericMgr.GetDatasetBySql(searchFlowCodeSql).Tables[0];
                     string flowCode = string.Empty;
                     foreach (System.Data.DataRow row in flowCodes.Rows)
@@ -331,46 +363,45 @@ namespace com.Sconit.Service.EDI.Impl
                     }
                     //if (string.IsNullOrEmpty(flowCode)) continue;
                     Flow currentFlow = this.flowMgr.LoadFlow(flowCode);
-                    int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + flowCode + "_" + com.Sconit.Entity.MasterData.CodeMaster.TimeUnit.Day.ToString());
-                    foreach (var g in groupDailyPlan)
-                    {
+                    if (currentFlow == null) continue;
+                    int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + flowCode + "_" + BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY);
                         var firstWeek = g.Value.First();
-                        CustomerPlanMstr mstr = new CustomerPlanMstr
+                        CustomerSchedule mstr = new CustomerSchedule
                         {
-                            PlanNo = g.Key,
+                            ReferenceScheduleNo = g.Key,
                             Flow = flowCode,
-                            Type = com.Sconit.Entity.MasterData.CodeMaster.TimeUnit.Day.ToString(),
-                            Status = com.Sconit.Entity.MasterData.CodeMaster.PlanStatus.Create.ToString(),
+                            Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT,
+                            Type = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY,
                             CreateDate = datetimeNow,
-                            CreateUser = user.Name,
+                            CreateUser = user.Code,
                             LastModifyDate = datetimeNow,
-                            LastModifyUser = user.Name,
-                            Version = customerPlanVersion,
+                            LastModifyUser = user.Code,
+                            Version=customerPlanVersion,
                         };
                         this.genericMgr.Create(mstr);
                         foreach (var r in g.Value)
                         {
                             var currentFlowDets = currentFlow.FlowDetails.Where(d => d.ReferenceItemCode == r.Part_Num);
                             FlowDetail flowdet = currentFlowDets != null && currentFlowDets.Count() > 0 ? currentFlowDets.First() : new FlowDetail();
-                            CustomerPlanDet det = new CustomerPlanDet();
-                            det.PlanNo = mstr.PlanNo;
-                            det.Type = mstr.Type;
-                            det.Item = flowdet.Item.Code;
-                            det.ItemDesc = flowdet.Item.Description;
-                            det.ItemRef = r.Part_Num;
-                            det.Uom = r.UOM;
-                            det.UnitCount = flowdet.UnitCount;
-                            det.Qty = string.IsNullOrEmpty(r.Forecast_Net_Qty) ? 0 : Convert.ToDecimal(r.Forecast_Net_Qty); ;
-                            det.Location = flowdet.LocationFrom.Code;
-                            det.DateFrom = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2)); ;
-                            det.DateTo = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2)); ;
-                            //det.StartTime = g.Key;
-                            det.CreateDate = datetimeNow;
-                            det.CreateUser = user.Name;
-                            det.LastModifyDate = datetimeNow;
-                            det.LastModifyUser = user.Name;
-                            det.Version = customerPlanVersion;
-                            this.genericMgr.Create(det);
+                            if (flowdet.Item != null)
+                            {
+                                CustomerScheduleDetail det = new CustomerScheduleDetail();
+                                det.CustomerSchedule = mstr;
+                                det.Item = flowdet.Item != null ? flowdet.Item.Code : string.Empty;
+                                det.ItemDescription = flowdet.Item != null ? flowdet.Item.Description : string.Empty;
+                                det.ItemReference = r.Part_Num;
+                                //det.Bom = null;
+                                det.Type = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY;
+                                det.DateFrom = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2));
+                                det.DateTo = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2));
+                                det.Uom = flowdet.Uom.Code;
+                                det.UnitCount = flowdet.UnitCount;
+                                det.Qty = string.IsNullOrEmpty(r.Forecast_Net_Qty) ? 0 : Convert.ToDecimal(r.Forecast_Net_Qty) < 0 ? 0 : Convert.ToDecimal(r.Forecast_Net_Qty);
+                                det.Location = currentFlow.LocationFrom != null ? currentFlow.LocationFrom.Code : string.Empty;
+                                det.StartTime = det.DateFrom;
+                                det.Version = mstr.Version;
+                                this.genericMgr.Create(det);
+                            }
                         }
                     }
                 }
@@ -894,11 +925,6 @@ namespace com.Sconit.Service.EDI.Impl
                 temp_FORD_EDI_862.ReadFileName = fileName;
                 this.genericMgr.Create(temp_FORD_EDI_862);
             }
-        }
-
-        private void CreateWeeklyPlan()
-        { 
-        
         }
 
     }

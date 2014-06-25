@@ -146,6 +146,8 @@ namespace com.Sconit.Entity.MRP
         public string ItemDescription { get; set; }
         public string ItemReference { get; set; }
         public string Bom { get; set; }
+        public Int32 Version { get; set; }
+
         #endregion
 
 		public override int GetHashCode()

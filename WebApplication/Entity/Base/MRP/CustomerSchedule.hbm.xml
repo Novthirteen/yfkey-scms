@@ -12,8 +12,10 @@
 		<property name="ReleaseDate" column="ReleaseDate" type="DateTime"  />
 		<property name="ReleaseUser" column="ReleaseUser" type="String" length="50" />
 		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
-		<property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
-		<bag name="CustomerScheduleDetails" table="CustScheduleDet" inverse="true" lazy="true" order-by="Id asc">
+    <property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
+    <property name="Type" column="Type" type="String" length="50" />
+    <property name="Version" column="Version" type="Int32"  />
+    <bag name="CustomerScheduleDetails" table="CustScheduleDet" inverse="true" lazy="true" order-by="Id asc">
 			<key column="ScheduleId" />
 			<one-to-many class="com.Sconit.Entity.MRP.CustomerScheduleDetail, com.Sconit.Entity" />
 		</bag>

@@ -324,7 +324,7 @@ namespace com.Sconit.Web
         protected IMrpMgr TheMrpMgr { get { return GetService<IMrpMgr>("MrpMgr.service"); } }
         protected IMrpShipPlanMgr TheMrpShipPlanMgr { get { return ServiceLocator.GetService<IMrpShipPlanMgr>("MrpShipPlanMgr.service"); } }
         protected IMrpShipPlanViewMgr TheMrpShipPlanViewMgr { get { return ServiceLocator.GetService<IMrpShipPlanViewMgr>("MrpShipPlanViewMgr.service"); } }
-        protected IFlatBomMgr TheFlatBomMgr { get { return ServiceLocator.GetService<IFlatBomMgr>("FlatBomMgr.service"); } }
+        //protected IFlatBomMgr TheFlatBomMgr { get { return ServiceLocator.GetService<IFlatBomMgr>("FlatBomMgr.service"); } }
         
         #endregion
 

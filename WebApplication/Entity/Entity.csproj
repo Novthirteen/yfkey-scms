@@ -204,8 +204,6 @@
     <Compile Include="Base\Mes\ProductLineUserBase.cs" />
     <Compile Include="Base\Mes\ShelfBase.cs" />
     <Compile Include="Base\Mes\ShelfItemBase.cs" />
-    <Compile Include="Base\MRP\CustomerPlanDet.cs" />
-    <Compile Include="Base\MRP\CustomerPlanMstr.cs" />
     <Compile Include="Base\MRP\CustomerScheduleBase.cs" />
     <Compile Include="Base\MRP\CustomerScheduleDetailBase.cs" />
     <Compile Include="Base\MRP\ExpectTransitInventoryBase.cs" />
@@ -687,10 +685,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Base\EDI\EDIDailyPlan.hbm.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Base\MRP\CustomerPlanDet.hbm.xml" />
-    <Content Include="Base\MRP\CustomerPlanMstr.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

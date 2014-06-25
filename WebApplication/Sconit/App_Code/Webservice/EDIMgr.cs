@@ -37,14 +37,14 @@ public class EDIMgr : BaseWS
     [WebMethod]
     public void LoadEDI()
     {
-        this.TheEDIMgr.LoadEDI();
+        this.TheEDIMgr.LoadEDI(TheUserMgr.GetMonitorUser());
     
     }
 
     [WebMethod]
     public void TransformationPlan()
     {
-        this.TheEDIMgr.TransformationPlan();
+        this.TheEDIMgr.TransformationPlan(TheUserMgr.GetMonitorUser());
     
     }
 

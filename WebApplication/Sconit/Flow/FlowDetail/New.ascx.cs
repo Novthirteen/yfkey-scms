@@ -410,8 +410,8 @@ public partial class MasterData_FlowDetail_New : ModuleBase
         ((TextBox)(this.FV_FlowDetail.FindControl("tbCarrierCode"))).Text = string.Empty;
         ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbTransModeCode")).Value = string.Empty;
         ((TextBox)(this.FV_FlowDetail.FindControl("tbConveyanceNumber"))).Text = string.Empty;
-        ((TextBox)(this.FV_FlowDetail.FindControl("tbReceivingPlant"))).Text = string.Empty;
-        ((TextBox)(this.FV_FlowDetail.FindControl("tbShipFrom"))).Text = string.Empty;
+        //((TextBox)(this.FV_FlowDetail.FindControl("tbReceivingPlant"))).Text = string.Empty;
+        //((TextBox)(this.FV_FlowDetail.FindControl("tbShipFrom"))).Text = string.Empty;
         ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbPackagingCode")).Value = string.Empty;
         ((TextBox)(this.FV_FlowDetail.FindControl("tbLadingQuantity"))).Text = string.Empty;
         ((TextBox)(this.FV_FlowDetail.FindControl("tbUnitsPerContainer"))).Text = string.Empty;
