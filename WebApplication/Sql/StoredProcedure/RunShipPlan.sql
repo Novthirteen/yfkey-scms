@@ -92,6 +92,7 @@ BEGIN
 			LocQty decimal(18, 8),
 			InTransitQty decimal(18, 8),
 			SafeStock decimal(18, 8),
+			MaxStock decimal(18, 8),
 			ActiveQty decimal(18, 8)
 		)
 		
@@ -105,6 +106,7 @@ BEGIN
 			RefItemCode varchar(50),
 			ReqQty decimal(18, 8),
 			ShipQty decimal(18, 8),
+			OrderQty decimal(18, 8),
 			Uom varchar(5),
 			BaseUom varchar(5),
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
@@ -125,6 +127,21 @@ BEGIN
 			Item varchar(50),
 			ReqDate datetime,
 			ReqQty decimal(18, 8)
+		)
+
+		create table #tempOpenOrder
+		(
+			RowId int identity(1, 1)  primary key,
+			UUID varchar(50), 
+			Flow varchar(50),
+			OrderNo varchar(50),
+			Item varchar(50),
+			StartTime datetime,
+			WindowTime datetime,
+			EffDate datetime,
+			OrderQty decimal(18, 8),
+			ShipQty decimal(18, 8),
+			RecQty decimal(18, 8),
 		)
 
 		--更新福特计划的发货数
@@ -150,8 +167,7 @@ BEGIN
 
 		if not exists(select top 1 1 from #tempEffCustScheduleDet)
 		begin
-			insert into #tempMsg(Lvl, Msg) values('Info', N'没有找到有效的客户日程')
-			return			
+			RAISERROR(N'没有找到有效的客户日程。', 16, 1)
 		end
 
 		--取最新日程的所有明细，旧日程的明细要删除和最新日程重复的明细，依次循环得到有效日程
@@ -197,8 +213,10 @@ BEGIN
 		where det.UnitQty is null and c.Item is null
 
 		--删除没有维护单位换算的物料
-		insert into #tempMsg(Lvl, Flow, Item, Qty, Uom, LocFrom, StartTime, WindowTime, Msg) 
-		select 'Error', Flow, Item, Qty, Uom, Location, StartTime, WindowTime, N'销售路线的物料没有维护单位换算' from #tempEffCustScheduleDet where UnitQty is null
+		insert into #tempMsg(Lvl, Flow, Item, Qty, Uom, LocFrom, StartTime, WindowTime, Msg)
+		select 'Error', Flow, Item, Qty, Uom, Location, StartTime, WindowTime, 
+		N'销售路线[' + Flow + N']物料[ ' + Item + N']没有维护单位[ ' + Uom + N' ]和基本单位[' + BaseUom + N']的换算率' 
+		from #tempEffCustScheduleDet where UnitQty is null
 		delete from #tempEffCustScheduleDet where UnitQty is null
 		-----------------------------↑获取客户日程-----------------------------
 
@@ -207,9 +225,9 @@ BEGIN
 		-----------------------------↓获取发运路线-----------------------------
 		--获取发运路线和发运库位的库存（中间仓库存）
 		insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, 
-		LocQty, InTransitQty, SafeStock, ActiveQty)
+		LocQty, InTransitQty, SafeStock, MaxStock, ActiveQty)
 		select det.Flow, ISNULL(mstr.MRPLeadTime, 0) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, det.UC, mstr.LocFrom, mstr.LocTo, 
-		ISNULL(loc.Qty, 0), ISNULL(loc.InTransitQty, 0), ISNULL(det.SafeStock, 0), (ISNULL(loc.Qty, 0) - ISNULL(det.SafeStock, 0))
+		ISNULL(loc.Qty, 0), ISNULL(loc.InTransitQty, 0), ISNULL(det.SafeStock, 0), ISNULL(det.MaxStock, 0), (ISNULL(loc.Qty, 0) - ISNULL(det.SafeStock, 0))
 		from FlowDet as det
 		inner join FlowMstr as mstr on det.Flow = mstr.Code
 		inner join Item as i on det.Item = i.Code
@@ -233,24 +251,44 @@ BEGIN
 		
 		--删除没有维护单位换算的物料
 		insert into #tempMsg(Lvl, Flow, Item, Uom, LocFrom, LocTo, Msg) 
-		select 'Error', Flow, Item, Uom, LocFrom, LocTo, N'发运路线的物料没有维护单位换算' from #tempShipFlowDet where UnitQty is null
+		select 'Error', Flow, Item, Uom, LocFrom, LocTo, 
+		N'发运路线[' + Flow + N']物料[ ' + Item + N']没有维护单位[ ' + Uom + N']和基本单位[' + BaseUom + N']的换算率' 
+		from #tempShipFlowDet where UnitQty is null
 		delete from #tempShipFlowDet where UnitQty is null
 
 		--发运路线没有维护物料
 		insert into #tempMsg(Lvl, Flow, Item, Uom, LocFrom, LocTo, Msg) 
-		select 'Error', c.ShipFlow, c.Item, c.Uom, c.Location, null, N'物料在发运路线中不存在' 
+		select 'Error', c.ShipFlow, c.Item, c.Uom, c.Location, null, 
+		N'物料[ ' + c.Item + N']在发运路线[' + c.ShipFlow + N']中不存在' 
 		from #tempEffCustScheduleDet as c left join #tempShipFlowDet as f on c.ShipFlow = f.Flow and c.Item = f.Item
 		where f.RowId is null
 		-----------------------------↑获取发运路线-----------------------------
+
+
+
+		-----------------------------↓缓存Open Order-----------------------------
+		--插入发运路线的Open Order
+		insert into #tempOpenOrder(Flow, OrderNo, Item, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
+		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, ord.OrderQty, ord.ShipQty, ord.RecQty
+		from MRP_OpenOrderSnapShot as ord
+		inner join #tempShipFlowDet as fDet on ord.Flow = fDet.Flow and ord.Item = fDet.Item
+
+		--插入销售路线的Order Order
+		insert into #tempOpenOrder(Flow, OrderNo, Item, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
+		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, ord.OrderQty, ord.ShipQty, ord.RecQty
+		from MRP_OpenOrderSnapShot as ord 
+		inner join (select distinct Flow, Item from #tempEffCustScheduleDet where ShipFlow is null) as dFlow on ord.Flow = dFlow.Flow and ord.Item = dFlow.Item
+		-----------------------------↑缓存Open Order-----------------------------
 
 		
 
 		-----------------------------↓计算发运计划-----------------------------
 		--转有发运路线的（毛需求）
 		insert into #tempShipPlanDet(UUID, DistributionFlow, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
-		select NEWID(), req.Flow, flow.Flow, flow.Item, req.ItemDesc, req.ItemRef, req.Qty * req.UnitQty / flow.UnitQty, --先把客户日程的单位转为基本单位，在转为发运计划的单位
+		select NEWID(), req.Flow, flow.Flow, flow.Item, req.ItemDesc, req.ItemRef, req.Qty * req.UnitQty / flow.UnitQty, /*先把客户日程的单位转为基本单位，在转为发运计划的单位*/
 		req.Uom, req.BaseUom, req.UnitQty, flow.UC, flow.LocFrom, flow.LocTo, DATEADD(day, -flow.LeadTime, StartTime), StartTime  --客户日程的开始时间就是发运计划的窗口时间
-		from #tempEffCustScheduleDet as req inner join #tempShipFlowDet as flow on req.ShipFlow = flow.Flow and req.Item = flow.Item
+		from #tempEffCustScheduleDet as req 
+		inner join #tempShipFlowDet as flow on req.ShipFlow = flow.Flow and req.Item = flow.Item
 
 		--删除开始时间小于今天的计划
 		delete from #tempShipPlanDet where StartTime < @DateNow
@@ -276,7 +314,7 @@ BEGIN
 		(select MIN(UUID) as MinUUID, Flow, Item, StartTime from #tempShipPlanDet group by Flow, Item, StartTime having count(1) > 1) as t
 		on p.Flow = t.Flow and p.Item = t.Item and p.StartTime = t.StartTime
 		inner join #tempShipPlanDetTrace as dt on p.UUID = dt.UUID
-		--删除重复毛需求
+		--删除重复毛需求 q
 		delete p from #tempShipPlanDet as p inner join
 		(select MIN(UUID) as MinUUID, Flow, Item, StartTime from #tempShipPlanDet group by Flow, Item, StartTime having count(1) > 1) as t
 		on p.Flow = t.Flow and p.Item = t.Item and p.StartTime = t.StartTime
@@ -286,8 +324,8 @@ BEGIN
 		update p set ShipQty = ShipQty - d.ActiveQty
 		from #tempShipPlanDet as p inner join #tempShipFlowDet as d on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
 		where d.ActiveQty < 0
-		insert into #tempShipPlanDet(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
-		select d.Flow, d.Item, d.ItemDesc, d.RefItemCode, -d.ActiveQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
+		insert into #tempShipPlanDet(UUID, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
+		select NEWID(), d.Flow, d.Item, d.ItemDesc, d.RefItemCode, -d.ActiveQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
 		from #tempShipFlowDet as d left join #tempShipPlanDet as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
 		where d.ActiveQty < 0 and p.Flow is null
 
@@ -318,31 +356,20 @@ BEGIN
 			set @RowId = @RowId + 1
 		end
 
-		----删除小于今天并且发运数为0的计划
-		--delete from #tempShipPlanDetTrace where UUID in (select UUID from #tempShipPlanDet where StartTime < @DateNow and ShipQty <= 0)
-		--delete from #tempShipPlanDet where StartTime < @DateNow and ShipQty <= 0
+		--更新订单数
+		update pd set OrderQty = ord.OrderQty
+		from #tempShipPlanDet as pd
+		inner join (select Flow, Item, EffDate, SUM(ISNULL(OrderQty, 0) - ISNULL(ShipQty, 0)) as OrderQty from #tempOpenOrder group by Flow, Item, EffDate) as ord 
+		on pd.Flow = ord.Flow and pd.Item = ord.Item and pd.StartTime = ord.EffDate
+		insert into #tempShipPlanDet(UUID, Flow, Item, ItemDesc, RefItemCode, ShipQty, OrderQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
+		select NEWID(), d.Flow, d.Item, d.ItemDesc, d.RefItemCode, 0, ord.OrderQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, ord.EffDate, DATEADD(day, d.LeadTime, ord.EffDate) 
+		from (select Flow, Item, EffDate, SUM(ISNULL(OrderQty, 0) - ISNULL(ShipQty, 0)) as OrderQty from #tempOpenOrder group by Flow, Item, EffDate) as ord 
+		left join #tempShipPlanDet as p on p.Flow = ord.Flow and p.Item = ord.Item and p.StartTime = ord.EffDate
+		inner join #tempShipFlowDet as d on d.Flow = ord.Flow and d.Item = ord.Item
+		where p.Flow is null
 
-		----日期小于今天的量全部转为今天
-		----有今天的数据
-		--update at set UUID = bt.UUID
-		--from #tempShipPlanDet as a 
-		--inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
-		--inner join #tempShipPlanDetTrace as at on a.UUID = at.UUID
-		--inner join #tempShipPlanDetTrace as bt on b.UUID = bt.UUID
-		--where b.StartTime = @DateNow and a.StartTime < @DateNow
-		--update b set ShipQty = b.ShipQty + a.ShipQty
-		--from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
-		--where b.StartTime = @DateNow and a.StartTime < @DateNow
-		--update a set ShipQty = 0
-		--from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
-		--where b.StartTime = @DateNow and a.StartTime < @DateNow
-		----没有今天的数据
-		--update a set StartTime = @DateNow, WindowTime = DATEADD(day, d.LeadTime, @DateNow) 
-		--from #tempShipPlanDet as a left join #tempShipPlanDet as b on a.Flow = b.Flow and a.ITem = b.Item and b.StartTime = @DateNow
-		--inner join #tempShipFlowDet as d on a.Flow = d.Flow and a.Item = d.Item
-		--where a.StartTime < @DateNow and b.Flow is null
-		----删除开始日期小于今天的发运计划
-		--delete from #tempShipPlanDet where StartTime < @DateNow
+		update ord set UUID = pl.UUID
+		from #tempOpenOrder as ord inner join #tempShipPlanDet as pl on pl.Flow = ord.Flow and pl.Item = ord.Item and pl.StartTime = ord.EffDate
 
 		--汇总发运需求
 		update d set ReqQty = ISNULL(dt.ReqQty, 0) from #tempShipPlanDet as d 
@@ -351,7 +378,6 @@ BEGIN
 	end try
 	begin catch
 		set @Msg = N'运行发运计划异常：' + Error_Message()
-		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
 		RAISERROR(@Msg, 16, 1)
 		return
 	end catch 
@@ -364,8 +390,9 @@ BEGIN
 
 		-----------------------------↓生成发运计划-----------------------------
 		--删除未释放的发运计划
-		delete from MRP_ShipPlanDetTrace where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
+		delete from MRP_ShipPlanOpenOrder where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
 		delete from MRP_ShipPlanInitLocationDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
+		delete from MRP_ShipPlanDetTrace where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
 		delete from MRP_ShipPlanDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
 		delete from MRP_ShipPlanMstr where Status = 'Create'
 
@@ -388,16 +415,20 @@ BEGIN
 
 		--新增发运计划明细
 		insert into MRP_ShipPlanDet(ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
-		ReqQty, OrgShipQty, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
+		ReqQty, OrgShipQty, ShipQty, OrderQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
 		CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
 		select @ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
-		ReqQty, ShipQty, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
+		ISNULL(ReqQty, 0), ISNULL(ShipQty, 0), ISNULL(ShipQty, 0), ISNULL(OrderQty, 0), Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
 		@DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
 		from #tempShipPlanDet
 
 		--新增发运计划明细追溯表
 		insert into MRP_ShipPlanDetTrace(ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, CreateDate, CreateUser)
 		select @ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, @DateTimeNow, @RunUser from #tempShipPlanDetTrace
+
+		--新增Open Order追溯表
+		insert into MRP_ShipPlanOpenOrder(ShipPlanId, UUID, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
+		select @ShipPlanId, UUID, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, @DateTimeNow, @RunUser from #tempOpenOrder
 		-----------------------------↑生成发运计划-----------------------------
 
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Flow, Item, Qty, Uom, LocFrom, LocTo, StartTime, WindowTime, Msg, CreateDate, CreateUser) 
@@ -412,10 +443,9 @@ BEGIN
         if @trancount = 0
         begin
             rollback
-        end 
+        end
        
 		set @Msg = N'运行发运计划异常：' + Error_Message()
-		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
 		RAISERROR(@Msg, 16, 1) 
 	end catch 
 END 

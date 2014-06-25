@@ -28,7 +28,7 @@ BEGIN
         end
 		
 		if not exists(select top 1 1 from MRP_LocationDetSnapShot) or
-			exists(select top 1 1 from MRP_LocationDetSnapShot where EffDate < @DateNow)
+			exists(select top 1 1 from MRP_LocationDetSnapShot where EffDate <> @DateNow)
 		begin
 			truncate table MRP_LocationDetSnapShot
 			insert into MRP_LocationDetSnapShot(Item, Location, Plant, Qty, InTransitQty, PurchaseInTransitQty, InspectQty, EffDate)
