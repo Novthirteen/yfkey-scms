@@ -10,6 +10,9 @@ namespace com.Sconit.Service.MRP
 {
     public interface IMrpMgr
     {
+        void RunShipPlan(User user);
+        void RunShipPlan(DateTime effectiveDate, User user);
+
         void RunMrp(User user);
 
         void RunMrp(DateTime effectiveDate, User user);
