@@ -25,5 +25,11 @@ namespace com.Sconit.Entity.MasterData
             Quarter = 7,
             Year = 8
         }
+
+        public enum PlanStatus
+        {
+            Create = 0,
+            Release = 1,
+        }
     }
 }

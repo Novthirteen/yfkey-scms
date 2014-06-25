@@ -14,20 +14,23 @@ namespace com.Sconit.Service.Batch.Job
     public class LoadEDIJob : IJob
     {
         private IEDIMgr theEDIMgr;
+        private IUserMgr userMgr;
 
         #region 构造函数
         public LoadEDIJob(
-            IEDIMgr theEDIMgr)
+            IEDIMgr theEDIMgr, IUserMgr userMgr)
         {
             this.theEDIMgr = theEDIMgr;
+            this.userMgr = userMgr;
         }
         #endregion
 
         [Transaction(TransactionMode.Unspecified)]
         public void Execute(JobRunContext context)
         {
-            this.theEDIMgr.LoadEDI();
-            this.theEDIMgr.TransformationPlan();
+            User user= this.userMgr.GetMonitorUser();
+            this.theEDIMgr.LoadEDI(user);
+            this.theEDIMgr.TransformationPlan(user);
         }
     }
 }

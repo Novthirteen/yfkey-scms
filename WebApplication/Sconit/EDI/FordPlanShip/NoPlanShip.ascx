@@ -25,8 +25,39 @@
                     ServiceMethod="GetFlowList" ServicePath="FlowMgr.service" OnTextChanged="tbFlow_TextChanged"
                     AutoPostBack="true" MustMatch="true" Width="250" />
             </td>
+            <td class="td01">
+            </td>
             <td class="td02">
-                <div class="buttons">
+               
+            </td>
+        </tr>
+         <tr>
+            <td class="td01">
+                发货工厂
+            </td>
+            <td class="td02">
+                 <select id="SupplierCodeSelect" runat="server" >
+                                <option selected="selected" value=""></option>
+                            </select>
+            </td>
+            <td class="td01">
+                收货工厂
+            </td>
+            <td class="td02">
+                 <select id="CustomerCodeSelect" runat="server" >
+                                <option selected="selected" value=""></option>
+                </select>
+            </td>
+        </tr> 
+         <tr>
+            <td class="td01">
+            </td>
+            <td class="td02"">
+            </td>
+            <td class="td01">
+            </td>
+            <td class="td02">
+                 <div class="buttons">
                     <cc1:Button ID="btnShip" runat="server" OnClick="btnShip_Click" Text="${MasterData.Distribution.Button.Ship}"
                         FunctionId="ShipOrder" />
                 </div>
@@ -69,7 +100,7 @@
                         <asp:Label ID="lblRefItem" runat="server" Text='<%# Bind("RefItem") %>'  Width="150"/>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="Receiving Plant">
+               <%-- <asp:TemplateField HeaderText="Receiving Plant">
                     <ItemTemplate>
                         <asp:TextBox ID="tbCustomerCode" runat="server" Text='<%# Bind("CustomerCode") %>'  Width="50"/>
                     </ItemTemplate>
@@ -78,7 +109,7 @@
                     <ItemTemplate>
                         <asp:TextBox ID="tbSupplierCode" runat="server" Text='<%# Bind("SupplierCode") %>'  Width="50"/>
                     </ItemTemplate>
-                </asp:TemplateField>
+                </asp:TemplateField>--%>
                 <%-- <asp:TemplateField HeaderText="采购订单号">
                     <ItemTemplate>
                         <asp:TextBox ID="tbPurchaseOrder" runat="server" Text='<%# Bind("PurchaseOrder") %>'  Width="50"/>

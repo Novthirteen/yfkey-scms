@@ -16,9 +16,9 @@ namespace com.Sconit.Service.EDI
 
         void RunBat();
 
-        void LoadEDI();
+        void LoadEDI(User user);
 
-        void TransformationPlan();
+        void TransformationPlan(User user);
 
         void ShipEDIFordPlan(List<EDIFordPlan> shipEDIFordPlanList, string currentUserCode, Flow currentFlow);
 

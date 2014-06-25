@@ -41,18 +41,40 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
             currentFlow = TheFlowMgr.LoadFlow(flowCode, this.CurrentUser.Code, true);
             if (currentFlow != null && currentFlow.FlowDetails != null && currentFlow.FlowDetails.Count > 0)
             {
+                if (string.IsNullOrEmpty(currentFlow.SupplierCodes))
+                {
+                    foreach (var supplierCode in currentFlow.SupplierCodes.Split(','))
+                    {
+                        this.SupplierCodeSelect.Items.Add(new ListItem(supplierCode, supplierCode));
+                    }
+                }
+                else
+                {
+                    ShowErrorMessage("请维护发货路线的发货工厂。");
+                }
+                if (string.IsNullOrEmpty(currentFlow.CustomerCodes))
+                {
+                    foreach (var customerCode in currentFlow.CustomerCodes.Split(','))
+                    {
+                        this.CustomerCodeSelect.Items.Add(new ListItem(customerCode, customerCode));
+                    }
+                }
+                else
+                {
+                    ShowErrorMessage("请维护发货路线的收货工厂。");
+                }
                 foreach (var f in currentFlow.FlowDetails)
                 {
                     EDIFordPlan r = new EDIFordPlan();
                     r.Item = f.Item.Code;
                     r.ItemDesc = f.Item.Description;
                     r.RefItem = f.ReferenceItemCode;
-                    if (!string.IsNullOrEmpty(r.RefItem))
-                    {
-                        r.Uom = f.Uom.Code;
-                        r.CustomerCode = "BVT8A";
-                    }
+                    //if (!string.IsNullOrEmpty(r.RefItem))
+                    //{
+                        //r.CustomerCode = "BVT8A";
+                    //}
                     //r.SupplierCode = f.ShipFrom;
+                    r.Uom = f.Uom.Code;
                     r.TransportationMethod = f.TransModeCode;
                     r.EquipmentNum = f.ConveyanceNumber;
                     r.CarrierCode = f.CarrierCode;
@@ -146,6 +168,16 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
 
     private List<EDIFordPlan> GetShipEDIFordPlan()
     {
+        var customerCode = this.CustomerCodeSelect.Value;
+        var supplierCode = this.SupplierCodeSelect.Value;
+        if (string.IsNullOrEmpty(customerCode))
+        {
+            throw new BusinessErrorException("发货工厂不能为空。");
+        }
+        if (string.IsNullOrEmpty(supplierCode))
+        {
+            throw new BusinessErrorException("收货工厂不能为空。");
+        }
         List<EDIFordPlan> eDIFordPlanList = new List<EDIFordPlan>();
         foreach (GridViewRow gvr in GV_List.Rows)
         {
@@ -158,25 +190,27 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
                 eDIFordPlan.RefItem = ((HiddenField)gvr.FindControl("ftRefItem")).Value;
 
                 #region  收货工厂
-                if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbCustomerCode")).Text.Trim()))
-                {
-                    throw new BusinessErrorException(string.Format("物料号{0}收货工厂填写有误。", eDIFordPlan.Item));
-                }
-                else
-                {
-                    eDIFordPlan.CustomerCode = ((TextBox)gvr.FindControl("tbCustomerCode")).Text.Trim();
-                }
+                //if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbCustomerCode")).Text.Trim()))
+                //{
+                //    throw new BusinessErrorException(string.Format("物料号{0}收货工厂填写有误。", eDIFordPlan.Item));
+                //}
+                //else
+                //{
+                //    eDIFordPlan.CustomerCode = ((TextBox)gvr.FindControl("tbCustomerCode")).Text.Trim();
+                //}
+                eDIFordPlan.CustomerCode = customerCode; 
                 #endregion
 
                 #region  发货工厂
-                if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbSupplierCode")).Text.Trim()))
-                {
-                    throw new BusinessErrorException(string.Format("物料号{0}发货工厂填写有误。", eDIFordPlan.Item));
-                }
-                else
-                {
-                    eDIFordPlan.SupplierCode = ((TextBox)gvr.FindControl("tbSupplierCode")).Text.Trim();
-                }
+                //if (string.IsNullOrEmpty(((TextBox)gvr.FindControl("tbSupplierCode")).Text.Trim()))
+                //{
+                //    throw new BusinessErrorException(string.Format("物料号{0}发货工厂填写有误。", eDIFordPlan.Item));
+                //}
+                //else
+                //{
+                //    eDIFordPlan.SupplierCode = ((TextBox)gvr.FindControl("tbSupplierCode")).Text.Trim();
+                //}
+                eDIFordPlan.SupplierCode = supplierCode;
                 #endregion
 
                 #region  采购订单号

@@ -157,6 +157,31 @@
                 </table>
             </fieldset>
             <fieldset>
+                <legend>Ford EDI发货配置选项</legend>
+                <table class="mtable">
+                    <tr>
+                        <td class="td01">
+                            收货工厂GSDB号
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbCustomerCodes" runat="server" Text='<%# Bind("CustomerCodes") %>' />
+                        </td>
+                        <td class="td01">
+                         发货工厂GSDB号
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbSupplierCodes" runat="server" Text='<%# Bind("SupplierCodes") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" >
+                        每个工厂之间逗号（,）分开
+                        </td>
+                        
+                    </tr>
+                </table>
+            </fieldset>
+            <fieldset>
                 <legend>${MasterData.Flow.Default.Value}</legend>
                 <table class="mtable">
                     <tr>

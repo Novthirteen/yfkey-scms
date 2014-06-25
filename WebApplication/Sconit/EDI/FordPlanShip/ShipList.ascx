@@ -89,6 +89,18 @@
                         <asp:Label ID="lblRefItem" runat="server" Text='<%# Bind("RefItem") %>'  Width="150"/>
                     </ItemTemplate>
                 </asp:TemplateField>
+                <asp:TemplateField HeaderText="Receiving Plant">
+                    <ItemTemplate>
+                        <asp:Label ID="lblCustomerCode" runat="server" Text='<%# Bind("CustomerCode") %>'  Width="50"/>
+                        <%--<asp:TextBox ID="tbCustomerCode" runat="server" Text='<%# Bind("CustomerCode") %>'  Width="50"/>--%>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="Ship From">
+                    <ItemTemplate>
+                        <asp:Label ID="lblSupplierCode" runat="server" Text='<%# Bind("SupplierCode") %>'  Width="50"/>
+                        <%--<asp:TextBox ID="tbSupplierCode" runat="server" Text='<%# Bind("SupplierCode") %>'  Width="50"/>--%>
+                    </ItemTemplate>
+                </asp:TemplateField>
                   <asp:TemplateField HeaderText="计划数">
                     <ItemTemplate>
                         <asp:Label ID="lblForecastQty" runat="server" Text='<%# Bind("ForecastQtyFormat","{0:0.########}") %>' Width="30" />

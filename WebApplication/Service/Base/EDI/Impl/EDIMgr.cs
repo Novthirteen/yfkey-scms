@@ -14,6 +14,7 @@ using com.Sconit.Service.MasterData;
 using com.Sconit.Service.MasterData.Impl;
 using com.Sconit.Entity.MasterData;
 using com.Sconit.Entity.Distribution;
+using com.Sconit.Entity.MRP;
 
 //TODO: Add other using statements here.
 
@@ -58,7 +59,7 @@ namespace com.Sconit.Service.EDI.Impl
         }
 
         [Transaction(TransactionMode.Requires)]
-        public void LoadEDI()
+        public void LoadEDI(User user)
         {
             string sourceFilePath = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_SOURCEFILEPATH).Value;
             string bakFilePath = this.entityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_BAKFILEPATH).Value;
@@ -115,7 +116,7 @@ namespace com.Sconit.Service.EDI.Impl
                             }
                             //string bakFile = DateTime.Now.ToString("yyyyMMddHHmmss") + "." + fileName;
 
-                            this.ImportEDIFile(filePath, fileName);
+                            this.ImportEDIFile(filePath, fileName,user);
                             File.Move(filePath, Path.Combine(bakFilePath, fileName));
                         }
                         catch (Exception ex)
@@ -141,10 +142,11 @@ namespace com.Sconit.Service.EDI.Impl
         }
 
         [Transaction(TransactionMode.Requires)]
-        public void TransformationPlan()
+        public void TransformationPlan(User user)
         {
             try
             {
+                DateTime datetimeNow = System.DateTime.Now;
                 #region  存入周计划
                 string weeklySql = " select t from TEMP_FORD_EDI_830 as t where t.IsHandle=0 order by t.Id asc";
                 IList<TEMP_FORD_EDI_830> weeklyPlans = this.genericMgr.FindAllWithCustomQuery<TEMP_FORD_EDI_830>(weeklySql);
@@ -181,13 +183,90 @@ namespace com.Sconit.Service.EDI.Impl
                         eDIFordPlan.ForecastQty = string.IsNullOrEmpty(weekly.Forecast_Net_Qty) ? 0 : Convert.ToDecimal(weekly.Forecast_Net_Qty);
                         eDIFordPlan.ForecastCumQty = string.IsNullOrEmpty(weekly.Forecast_Cum_Qty) ? 0 : Convert.ToDecimal(weekly.Forecast_Cum_Qty);
                         eDIFordPlan.ForecastDate = string.IsNullOrEmpty(weekly.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(weekly.Forecast_Date.Substring(0, 4) + "-" + weekly.Forecast_Date.Substring(4, 2) + "-" + weekly.Forecast_Date.Substring(6, 2));
-                        eDIFordPlan.CreateDate = System.DateTime.Now;
-                        eDIFordPlan.CreateUserName = string.Empty;
+                        eDIFordPlan.CreateDate = datetimeNow;
+                        eDIFordPlan.CreateUserName = user.Name;
                         eDIFordPlan.Type = weekly.Forecast_Date_Qual_r;
                         eDIFordPlan.PurchaseOrder = weekly.Purchase_Order_Num;
                         this.genericMgr.Create(eDIFordPlan);
                         weekly.IsHandle = true    ;
                         this.genericMgr.Update(weekly);
+                    }
+
+                    var groupWeeklys = weeklyPlans.GroupBy(w => w.Interchange_Control_Num).ToDictionary(d => d.Key, d => d.OrderBy(rd=>rd.Forecast_Date).ToList());
+                    string searchFlowCodeSql = string.Format("select Code from flowmstr where type='Distribution' and CustomerCodes like '%{0}%' and SupplierCodes like '%{1}%'", weeklyPlans.First().Ship_To_GSDB_Code, weeklyPlans.First().Ship_From_GSDB_Code);
+                     var flowCodes = this.genericMgr.GetDatasetBySql(searchFlowCodeSql).Tables[0];
+                     string flowCode = string.Empty;
+                     foreach (System.Data.DataRow row in flowCodes.Rows)
+                     {
+                         flowCode = row[0].ToString();
+                     }
+                     //if (string.IsNullOrEmpty(flowCode)) continue;
+                     Flow currentFlow = this.flowMgr.LoadFlow(flowCode);
+                     int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" +flowCode +"_" + com.Sconit.Entity.MasterData.CodeMaster.TimeUnit.Week.ToString());
+                     foreach (var g in groupWeeklys)
+                    {
+                        var firstWeek=g.Value.First();
+                        CustomerPlanMstr mstr = new CustomerPlanMstr
+                        { 
+                            PlanNo= g.Key,
+                            Flow = flowCode,
+                            Type=com.Sconit.Entity.MasterData.CodeMaster.TimeUnit.Week.ToString(),
+                            Status = com.Sconit.Entity.MasterData.CodeMaster.PlanStatus.Create.ToString(),
+                            CreateDate= datetimeNow,
+                            CreateUser = user.Name,
+                            LastModifyDate= datetimeNow,
+                            LastModifyUser = user.Name,
+                            Version = customerPlanVersion,
+                        };
+                        this.genericMgr.Create(mstr);
+                        for (int i = 0; i < g.Value.Count-3; i++)
+                        {
+                            var r = g.Value[i];
+                            if (i == g.Value.Count - 4)
+                            {
+                               var r1 = g.Value[i];
+                               var sDate = DateTime.Parse(r1.Forecast_Date.Substring(0, 4) + "-" + r1.Forecast_Date.Substring(4, 2) + "-" + r1.Forecast_Date.Substring(6, 2));
+                               var eDate = new DateTime(sDate.Date.Year, sDate.Date.Month+1, 1).AddDays(-1);
+                               DateTime dt1 = Convert.ToDateTime(sDate);
+                               DateTime dt2 = Convert.ToDateTime(eDate); 
+                               TimeSpan ts = dt1 - dt2; 
+                               int sub = ts.Days;
+                               int surplusWeekly = sub % 7 > 4 ? sub / 7 + 1 : sub / 7;
+                               for (int ii = 0; ii < surplusWeekly; ii++)
+                               {
+                                   
+                               }
+                                continue;
+                            }
+                            //var r1 = g.Value[i+2];
+                            //if (r1.Forecast_Date_Qual_r == "M")
+                            //{
+                            //}
+                            //}
+                            //foreach (var r in g.Value)
+                            //{
+                            var currentFlowDets = currentFlow.FlowDetails.Where(d => d.ReferenceItemCode == r.Part_Num);
+                            FlowDetail flowdet = currentFlowDets != null && currentFlowDets.Count() > 0 ? currentFlowDets.First() : new FlowDetail();
+                            CustomerPlanDet det = new CustomerPlanDet();
+                            det.PlanNo = mstr.PlanNo;
+                            det.Type = mstr.Type;
+                            det.Item = flowdet.Item.Code;
+                            det.ItemDesc = flowdet.Item.Description;
+                            det.ItemRef = r.Part_Num;
+                            det.Uom = r.UOM;
+                            det.UnitCount = flowdet.UnitCount;
+                            det.Qty = string.IsNullOrEmpty(r.Forecast_Net_Qty) ? 0 : Convert.ToDecimal(r.Forecast_Net_Qty); ;
+                            det.Location = flowdet.LocationFrom.Code;
+                            det.DateFrom = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2)); ;
+                            det.DateTo = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2)); ;
+                            //det.StartTime = g.Key;
+                            det.CreateDate = datetimeNow;
+                            det.CreateUser = user.Name;
+                            det.LastModifyDate = datetimeNow;
+                            det.LastModifyUser = user.Name;
+                            det.Version = customerPlanVersion;
+                            this.genericMgr.Create(det);
+                        }
                     }
                 }
                 #endregion
@@ -232,13 +311,67 @@ namespace com.Sconit.Service.EDI.Impl
                         eDIFordPlan.ForecastQty = string.IsNullOrEmpty(daily.Forecast_Net_Qty) ? 0 : Convert.ToDecimal(daily.Forecast_Net_Qty);
                         eDIFordPlan.ForecastCumQty = string.IsNullOrEmpty(daily.Forecast_Cum_Qty) ? 0 : Convert.ToDecimal(daily.Forecast_Cum_Qty);
                         eDIFordPlan.ForecastDate = string.IsNullOrEmpty(daily.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(daily.Forecast_Date.Substring(0, 4) + "-" + daily.Forecast_Date.Substring(4, 2) + "-" + daily.Forecast_Date.Substring(6, 2));
-                        eDIFordPlan.CreateDate = System.DateTime.Now;
-                        eDIFordPlan.CreateUserName = string.Empty;
+                        eDIFordPlan.CreateDate = datetimeNow;
+                        eDIFordPlan.CreateUserName = user.Name;
                         eDIFordPlan.Type = "D";
                         eDIFordPlan.PurchaseOrder = daily.Purchase_Order_Num;
                         this.genericMgr.Create(eDIFordPlan);
                         daily.IsHandle = true;
                         this.genericMgr.Update(daily);
+                    }
+
+
+                    var groupDailyPlan = dailyPlans.GroupBy(w => w.Interchange_Control_Num).ToDictionary(d => d.Key, d => d.ToList());
+                    string searchFlowCodeSql = string.Format("select Code from flowmstr where type='Distribution' and CustomerCodes like '%{0}%' and SupplierCodes like '%{1}%'", dailyPlans.First().Ship_To_GSDB_Code, dailyPlans.First().Ship_From_GSDB_Code);
+                    var flowCodes = this.genericMgr.GetDatasetBySql(searchFlowCodeSql).Tables[0];
+                    string flowCode = string.Empty;
+                    foreach (System.Data.DataRow row in flowCodes.Rows)
+                    {
+                        flowCode = row[0].ToString();
+                    }
+                    //if (string.IsNullOrEmpty(flowCode)) continue;
+                    Flow currentFlow = this.flowMgr.LoadFlow(flowCode);
+                    int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + flowCode + "_" + com.Sconit.Entity.MasterData.CodeMaster.TimeUnit.Day.ToString());
+                    foreach (var g in groupDailyPlan)
+                    {
+                        var firstWeek = g.Value.First();
+                        CustomerPlanMstr mstr = new CustomerPlanMstr
+                        {
+                            PlanNo = g.Key,
+                            Flow = flowCode,
+                            Type = com.Sconit.Entity.MasterData.CodeMaster.TimeUnit.Day.ToString(),
+                            Status = com.Sconit.Entity.MasterData.CodeMaster.PlanStatus.Create.ToString(),
+                            CreateDate = datetimeNow,
+                            CreateUser = user.Name,
+                            LastModifyDate = datetimeNow,
+                            LastModifyUser = user.Name,
+                            Version = customerPlanVersion,
+                        };
+                        this.genericMgr.Create(mstr);
+                        foreach (var r in g.Value)
+                        {
+                            var currentFlowDets = currentFlow.FlowDetails.Where(d => d.ReferenceItemCode == r.Part_Num);
+                            FlowDetail flowdet = currentFlowDets != null && currentFlowDets.Count() > 0 ? currentFlowDets.First() : new FlowDetail();
+                            CustomerPlanDet det = new CustomerPlanDet();
+                            det.PlanNo = mstr.PlanNo;
+                            det.Type = mstr.Type;
+                            det.Item = flowdet.Item.Code;
+                            det.ItemDesc = flowdet.Item.Description;
+                            det.ItemRef = r.Part_Num;
+                            det.Uom = r.UOM;
+                            det.UnitCount = flowdet.UnitCount;
+                            det.Qty = string.IsNullOrEmpty(r.Forecast_Net_Qty) ? 0 : Convert.ToDecimal(r.Forecast_Net_Qty); ;
+                            det.Location = flowdet.LocationFrom.Code;
+                            det.DateFrom = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2)); ;
+                            det.DateTo = string.IsNullOrEmpty(r.Forecast_Date) ? System.DateTime.Now.AddDays(-365) : DateTime.Parse(r.Forecast_Date.Substring(0, 4) + "-" + r.Forecast_Date.Substring(4, 2) + "-" + r.Forecast_Date.Substring(6, 2)); ;
+                            //det.StartTime = g.Key;
+                            det.CreateDate = datetimeNow;
+                            det.CreateUser = user.Name;
+                            det.LastModifyDate = datetimeNow;
+                            det.LastModifyUser = user.Name;
+                            det.Version = customerPlanVersion;
+                            this.genericMgr.Create(det);
+                        }
                     }
                 }
                 #endregion
@@ -539,7 +672,7 @@ namespace com.Sconit.Service.EDI.Impl
         }
 
 
-        private void ImportEDIFile(string fileName, string bakFile)
+        private void ImportEDIFile(string fileName, string bakFile,User user)
         {
             string[] datStrs = System.IO.File.ReadAllLines(fileName);
             if (datStrs.Length == 0)
@@ -580,7 +713,7 @@ namespace com.Sconit.Service.EDI.Impl
                 }
                 else
                 {
-                    CreateTemp_FORD_EDI( fistEntity, lineData,  fileName);
+                    CreateTemp_FORD_EDI( fistEntity, lineData,  fileName,user.Name);
                 }
             }
 
@@ -609,8 +742,9 @@ namespace com.Sconit.Service.EDI.Impl
             }
         }
 
-        private void CreateTemp_FORD_EDI(TEMP_FORD_EDI_830 fistEntity, string[] lineData, string fileName)
+        private void CreateTemp_FORD_EDI(TEMP_FORD_EDI_830 fistEntity, string[] lineData, string fileName,string userName)
         {
+            DateTime datetimeNow = System.DateTime.Now;
             if (fileName.Contains("830"))
             {
                 #region 
@@ -662,8 +796,8 @@ namespace com.Sconit.Service.EDI.Impl
                 temp_FORD_EDI_830.Flexible_Forcast_Start_Date = GetLineDataValue(lineData, 36);
                 temp_FORD_EDI_830.Flexible_Forcast_End_Date = GetLineDataValue(lineData, 37);
                 temp_FORD_EDI_830.Forecast_Date_Qual_r = GetLineDataValue(lineData, 38);
-                temp_FORD_EDI_830.CreateDate = System.DateTime.Now;
-                temp_FORD_EDI_830.CreateUserName = "";
+                temp_FORD_EDI_830.CreateDate = datetimeNow;
+                temp_FORD_EDI_830.CreateUserName = userName;
                 temp_FORD_EDI_830.IsHandle = false;
                 temp_FORD_EDI_830.ReadFileName = fileName;
                 this.genericMgr.Create(temp_FORD_EDI_830);
@@ -754,12 +888,17 @@ namespace com.Sconit.Service.EDI.Impl
                 temp_FORD_EDI_862.Forecast_Status = GetLineDataValue(lineData, 27);
                 temp_FORD_EDI_862.Forecast_Date = GetLineDataValue(lineData, 28);
                 temp_FORD_EDI_862.Forecast_Time = GetLineDataValue(lineData, 29);
-                temp_FORD_EDI_862.CreateDate = System.DateTime.Now;
-                temp_FORD_EDI_862.CreateUserName = "";
+                temp_FORD_EDI_862.CreateDate = datetimeNow;
+                temp_FORD_EDI_862.CreateUserName = userName;
                 temp_FORD_EDI_862.IsHandle = false;
                 temp_FORD_EDI_862.ReadFileName = fileName;
                 this.genericMgr.Create(temp_FORD_EDI_862);
             }
+        }
+
+        private void CreateWeeklyPlan()
+        { 
+        
         }
 
     }

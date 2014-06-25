@@ -71,7 +71,7 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                 //                    select det).ToList();
                 //}
             }
-            var groups = (from tak in fordPlanList
+            var groups = (from tak in fordPlanList.OrderBy(f=>f.ForecastDate)
                           group tak by new
                           {
                               tak.Control_Num,
@@ -85,16 +85,25 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                                   List = result.ToList()
                               }).ToList();
 
-
             foreach (var g in groups)
             {
                 var r = g.List.First();
-                //r.Item = string.Empty;
-                //r.ItemDesc = string.Empty;
-                if (currentFlow != null)
+                r.Item = string.Empty;
+                r.ItemDesc = string.Empty;
+                if (currentFlow != null )
                 {
+                    if(string.IsNullOrEmpty(currentFlow.CustomerCodes))
+                    {
+                        ShowErrorMessage("请维护路线的收货工厂");
+                    }
+                    if(string.IsNullOrEmpty(currentFlow.SupplierCodes))
+                    {
+                        ShowErrorMessage("请维护路线的发货工厂");
+                    }
+                    var customerCodes =  currentFlow.CustomerCodes.Split(',');
+                    var supplierCodes =  currentFlow.SupplierCodes.Split(',');
                     var fdet = currentFlow.FlowDetails.Where(d => d.ReferenceItemCode == r.RefItem);
-                    if (fdet != null && fdet.Count() > 0)
+                    if (fdet != null && fdet.Count() > 0 && customerCodes.Contains(r.CustomerCode) && supplierCodes.Contains(r.SupplierCode))
                     {
                         var f = fdet.First();
                         r.Item = f.Item.Code;

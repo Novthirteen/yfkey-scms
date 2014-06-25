@@ -8,29 +8,32 @@ using com.Sconit.Entity.MasterData;
 namespace com.Sconit.Entity.MRP
 {
     [Serializable]
-    public partial class CustomerPlan : EntityBase
+    public partial class CustomerPlanDet : EntityBase
     {
         #region O/R Mapping Properties
-        public int Id { get; set; }
-        public string DateIndex { get; set; }
-        public string DateIndexTo { get; set; }
-        public string Flow { get; set; }
+        public Int32 Id { get; set; }
+        public string PlanNo { get; set; }
+        public string Type { get; set; }
         public string Item { get; set; }
-        public CodeMaster.TimeUnit DateType { get; set; }
-        public Double Qty { get; set; }
-        public Int32 PlanVersion { get; set; }
+        public string ItemDesc { get; set; }
+        public string ItemRef { get; set; }
         public string Uom { get; set; }
-        public string ItemDescription { get; set; }
-        public string ItemReference { get; set; }
-        public decimal UnitQty { get; set; }
-        public string LastModifyUser { get; set; }
+        public decimal UnitCount { get; set; }
+        public decimal Qty { get; set; }
+        public string Location { get; set; }
+        public DateTime? DateFrom { get; set; }
+        public DateTime? DateTo { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime CreateDate { get; set; }
+        public string CreateUser { get; set; }
         public DateTime LastModifyDate { get; set; }
-        
+        public string LastModifyUser { get; set; }
+        public int Version { get; set; }
         #endregion
 
         public override int GetHashCode()
         {
-            if (Id != 0)
+            if (Id != 0 )
             {
                 return Id.GetHashCode();
             }
@@ -42,7 +45,7 @@ namespace com.Sconit.Entity.MRP
 
         public override bool Equals(object obj)
         {
-            CustomerPlan another = obj as CustomerPlan;
+            CustomerPlanDet another = obj as CustomerPlanDet;
 
             if (another == null)
             {

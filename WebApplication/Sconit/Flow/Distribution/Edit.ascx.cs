@@ -90,7 +90,9 @@ public partial class MasterData_Flow_Edit : EditModuleBase
         "IsPickFromBin",
         "IsShipByOrder",
         "TransportationRoute",
-        "TransportPriceList"
+        "TransportPriceList",
+        "CustomerCodes",
+        "SupplierCodes"
 
     };
 

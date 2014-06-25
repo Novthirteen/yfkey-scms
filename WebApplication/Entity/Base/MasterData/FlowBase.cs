@@ -917,6 +917,9 @@ namespace com.Sconit.Entity.MasterData
         public Boolean IsMRP { get; set; }
         public Boolean IsMes { get; set; }
         public String MRPOption { get; set; }
+
+        public string CustomerCodes { get; set; }
+        public string SupplierCodes { get; set; }
         #endregion
 
         public override int GetHashCode()

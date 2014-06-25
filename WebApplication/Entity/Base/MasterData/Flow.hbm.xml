@@ -92,5 +92,7 @@
       <key column="Flow" />
       <one-to-many class="com.Sconit.Entity.MasterData.FlowDetail, com.Sconit.Entity" />
     </bag>
+    <property name="CustomerCodes" column="CustomerCodes" type="String" length="50" />
+    <property name="SupplierCodes" column="SupplierCodes" type="String" length="50" />
   </class>
 </hibernate-mapping>
