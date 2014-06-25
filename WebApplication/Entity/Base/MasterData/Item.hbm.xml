@@ -25,5 +25,7 @@
     <property name="Plant" column="Plant" type="String" length="50" />
     <property name="LeadTime" column="LeadTime" type="Int32"  />
     <property name="SafeStock" column="SafeStock" type="Int32"  />
+    <property name="MaxStock" column="MaxStock" type="Int32"  />
+    <property name="IsMRP" column="IsMRP" type="Boolean"  />
   </class>
 </hibernate-mapping>

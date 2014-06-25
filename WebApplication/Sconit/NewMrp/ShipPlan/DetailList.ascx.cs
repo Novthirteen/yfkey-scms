@@ -111,6 +111,8 @@ from  MRP_ShipPlanDet as det
             searchSql += string.Format(" and m.ReleaseNo ='{0}' ", currentRelesNo);
         }
 
+        searchSql += " order by det.Item asc ";
+
         var flowCodes = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
         var shipPlanDetList = new List<ShipPlanDet>();
         foreach (System.Data.DataRow row in flowCodes.Rows)
