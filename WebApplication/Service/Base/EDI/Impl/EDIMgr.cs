@@ -141,7 +141,7 @@ namespace com.Sconit.Service.EDI.Impl
             }
         }
 
-        //[Transaction(TransactionMode.Requires)]
+        [Transaction(TransactionMode.Requires)]
         public void TransformationPlan(User user)
         {
             try
@@ -223,24 +223,41 @@ namespace com.Sconit.Service.EDI.Impl
                             Version = customerPlanVersion,
                         };
                         this.genericMgr.Create(mstr);
-                        for (int i = 0; i < g.Value.Count-3; i++)
+                        for (int i = 0; i < g.Value.Count; i++)
                         {
                             var r = g.Value[i];
                             var rn = g.Value[i + 1];
                             if (rn.Forecast_Date_Qual_r=="M")
                             {
-                                for (int ii = i; ii < g.Value.Count-i; ii++)
+                                for (int ii = i; ii < g.Value.Count; ii++)
                                 {
                                     var r1 = g.Value[ii];
                                     var sDate = DateTime.Parse(r1.Forecast_Date.Substring(0, 4) + "-" + r1.Forecast_Date.Substring(4, 2) + "-" + r1.Forecast_Date.Substring(6, 2));
-                                    var eDate = new DateTime(sDate.Date.Year, sDate.Date.Month + 1, 1).AddDays(-1);
-                                    TimeSpan ts = sDate - eDate;
+                                    var year = sDate.Date.Year;
+                                    var month = sDate.Date.Month;
+                                    if (sDate.Date.Month == 12)
+                                    {
+                                        year =sDate.Date.Year+ 1;
+                                        month = 0;
+                                    }
+                                    var eDate = new DateTime(year, month+1, 1).AddDays(-1);
+                                    TimeSpan ts = eDate - sDate;
                                     int sub = ts.Days;
                                     int surplusWeekly = sub % 7 > 4 ? sub / 7 + 1 : sub / 7;
                                     if (surplusWeekly == 0)
                                     {
-                                         eDate = new DateTime(sDate.Date.Year, sDate.Date.Month + 2, 1).AddDays(-1);
-                                          ts = sDate - eDate;
+                                        if (sDate.Date.Month == 11)
+                                        {
+                                            year = sDate.Date.Year + 1;
+                                            month = -1;
+                                        }
+                                        else if (sDate.Date.Month == 12)
+                                        {
+                                            year =sDate.Date.Year+ 1;
+                                            month = 0;
+                                        }
+                                        eDate = new DateTime(year, month + 2, 1).AddDays(-1);
+                                         ts = eDate - sDate;
                                           sub = ts.Days;
                                           surplusWeekly = sub % 7 > 4 ? sub / 7 + 1 : sub / 7;
                                     }
@@ -263,14 +280,15 @@ namespace com.Sconit.Service.EDI.Impl
                                             cdet.Uom = fdet.Uom.Code;
                                             cdet.UnitCount = fdet.UnitCount;
                                             cdet.Qty = averageQty<0?0:averageQty;
-                                            cdet.Location = fdet.LocationFrom.Code;
+                                            cdet.Location = currentFlow.LocationFrom != null ? currentFlow.LocationFrom.Code : string.Empty;
                                             cdet.StartTime = sDate;
+                                            cdet.Flow = mstr.Flow;
                                             this.genericMgr.Create(cdet);
                                             sDate = sDate.AddDays(7);
                                         }
                                     }
                                 }
-                                continue;
+                                break;
                             }
                             var currentFlowDets = currentFlow.FlowDetails.Where(d => d.ReferenceItemCode == r.Part_Num);
                             FlowDetail flowdet = currentFlowDets != null && currentFlowDets.Count() > 0 ? currentFlowDets.First() : new FlowDetail();
@@ -291,6 +309,7 @@ namespace com.Sconit.Service.EDI.Impl
                                 det.Location = currentFlow.LocationFrom != null ? currentFlow.LocationFrom.Code : string.Empty;
                                 det.StartTime = det.DateFrom;
                                 det.Version = mstr.Version;
+                                det.Flow = mstr.Flow;
                                 this.genericMgr.Create(det);
                             }
                         }
@@ -400,6 +419,7 @@ namespace com.Sconit.Service.EDI.Impl
                                 det.Location = currentFlow.LocationFrom != null ? currentFlow.LocationFrom.Code : string.Empty;
                                 det.StartTime = det.DateFrom;
                                 det.Version = mstr.Version;
+                                det.Flow = mstr.Flow;
                                 this.genericMgr.Create(det);
                             }
                         }
