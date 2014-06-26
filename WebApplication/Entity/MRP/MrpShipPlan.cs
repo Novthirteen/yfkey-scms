@@ -19,6 +19,8 @@ namespace com.Sconit.Entity.MRP
             }
             FlowDetailIdList.Add(id);
         }
+
+        public IList<string> RefLocs;
         #endregion
     }
 }

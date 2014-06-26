@@ -23,6 +23,25 @@ namespace com.Sconit.Entity.MRP
                 return FlowDetailIdList.Contains(id);
             }
         }
+
+        public IList<string> RefLocs;
+        public bool TryAddRefLoc(string refLoc)
+        {
+            if(RefLocs == null)
+            {
+                RefLocs = new List<string>();
+            }
+
+            if (RefLocs.Contains(refLoc))
+            {
+                return false;
+            }
+            else
+            {
+                RefLocs.Add(refLoc);
+                return true;
+            }
+        }
         #endregion
     }
 }

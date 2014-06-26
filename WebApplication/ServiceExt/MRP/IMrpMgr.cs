@@ -12,10 +12,7 @@ namespace com.Sconit.Service.MRP
     {
         void RunShipPlan(User user);
         void RunShipPlan(DateTime effectiveDate, User user);
-
         void RunMrp(User user);
-
         void RunMrp(DateTime effectiveDate, User user);
-
     }
 }
