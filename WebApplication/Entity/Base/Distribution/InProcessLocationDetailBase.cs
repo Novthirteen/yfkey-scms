@@ -155,6 +155,18 @@ namespace com.Sconit.Entity.Distribution
                 _item = value;
             }
         }
+        private Decimal _receivedQty2;
+        public Decimal ReceivedQty2
+        {
+            get
+            {
+                return _receivedQty2;
+            }
+            set
+            {
+                _receivedQty2 = value;
+            }
+        }
         #endregion
 
         public override int GetHashCode()

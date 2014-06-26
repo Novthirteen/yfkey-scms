@@ -76,5 +76,11 @@ public class LocationMgr : BaseWS
             throw new SoapException(ex.Message, SoapException.ServerFaultCode, Context.Request.Url.AbsoluteUri);
         }
     }
+
+    [WebMethod]
+    public void RunShipPlan(string userCode)
+    {
+        GetService<com.Sconit.Service.MRP.IMrpMgr>("MrpMgr.service").RunShipPlan(TheUserMgr.LoadUser(userCode, false, false));
+    }
 }
 
