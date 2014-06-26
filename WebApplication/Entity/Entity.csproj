@@ -212,6 +212,7 @@
     <Compile Include="Base\MRP\MrpRunLogBase.cs" />
     <Compile Include="Base\MRP\MrpShipPlanBase.cs" />
     <Compile Include="Base\MRP\MrpShipPlanViewBase.cs" />
+    <Compile Include="Base\MRP\RunShipPlanLogBase.cs" />
     <Compile Include="Base\Procurement\AutoOrderTrackBase.cs" />
     <Compile Include="Base\Procurement\ItemFlowPlanBase.cs" />
     <Compile Include="Base\Procurement\ItemFlowPlanDetailBase.cs" />
@@ -393,6 +394,7 @@
     <Compile Include="MRP\MrpRunLog.cs" />
     <Compile Include="MRP\MrpShipPlan.cs" />
     <Compile Include="MRP\MrpShipPlanView.cs" />
+    <Compile Include="MRP\RunShipPlanLog.cs" />
     <Compile Include="Procurement\AutoOrderTrack.cs" />
     <Compile Include="Procurement\ItemFlowPlan.cs" />
     <Compile Include="Procurement\ItemFlowPlanDetail.cs" />
@@ -689,6 +691,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Base\EDI\EDIDailyPlan.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\RunShipPlanLog.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
