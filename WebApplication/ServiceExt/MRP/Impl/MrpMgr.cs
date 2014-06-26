@@ -117,7 +117,7 @@ namespace com.Sconit.Service.MRP.Impl
                 hql = @"from MrpReceivePlan entity where entity.EffectiveDate = ?";
                 hqlMgr.Delete(hql, new object[] { effectiveDate }, new IType[] { NHibernateUtil.DateTime });
 
-                //hql = @"from ExpectTransitInventory entity where entity.EffectiveDate = ?";
+                //hql = @"from expecttransitinventory entity where entity.effectivedate = ?";
                 //hqlMgr.Delete(hql, new object[] { effectiveDate }, new IType[] { NHibernateUtil.DateTime });
 
                 this.hqlMgr.FlushSession();
@@ -148,7 +148,6 @@ namespace com.Sconit.Service.MRP.Impl
                 #region 发运在途
                 DetachedCriteria criteria = DetachedCriteria.For<InProcessLocationDetail>();
 
-                //criteria.CreateAlias("LocationTo", "lt");
                 criteria.CreateAlias("InProcessLocation", "ip");
                 criteria.CreateAlias("OrderLocationTransaction", "olt");
                 criteria.CreateAlias("olt.OrderDetail", "od");
@@ -842,7 +841,7 @@ namespace com.Sconit.Service.MRP.Impl
                 {
                     #region 非生产直接从发运计划变为入库计划
                     MrpReceivePlan mrpReceivePlan = new MrpReceivePlan();
-                    mrpReceivePlan.RefLocs = mrpShipPlan.RefLocs;
+                    mrpReceivePlan.RefFlows = mrpShipPlan.RefFlows;
                     mrpReceivePlan.IsExpire = mrpShipPlan.IsExpire;
                     mrpReceivePlan.ExpireStartTime = mrpShipPlan.ExpireStartTime;
                     mrpReceivePlan.Item = mrpShipPlan.Item;
@@ -860,14 +859,12 @@ namespace com.Sconit.Service.MRP.Impl
                     mrpReceivePlan.EffectiveDate = effectiveDate;
                     mrpReceivePlan.CreateDate = dateTimeNow;
                     mrpReceivePlan.CreateUser = user.Code;
-                    mrpReceivePlan.FlowDetailIdList = mrpShipPlan.FlowDetailIdList;
-                    if (!mrpReceivePlan.TryAddRefLoc(mrpReceivePlan.Location))
+                    if (!mrpReceivePlan.TryAddRefFlow(mrpShipPlan.Flow))
                     {
-                        log.Warn("Receive plan location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "]出现路线循环。");
+
                     }
                     else
                     {
-                        //this.mrpReceivePlanMgr.CreateMrpReceivePlan(mrpReceivePlan);
                         currMrpReceivePlanList.Add(mrpReceivePlan);
                         log.Debug("Transfer ship plan flow[" + mrpShipPlan.Flow + "], qty[" + mrpShipPlan.Qty + "] to receive plan location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "]");
                     }
@@ -963,7 +960,6 @@ namespace com.Sconit.Service.MRP.Impl
                             mrpReceivePlan.EffectiveDate = effectiveDate;
                             mrpReceivePlan.CreateDate = dateTimeNow;
                             mrpReceivePlan.CreateUser = user.Code;
-                            mrpReceivePlan.FlowDetailIdList = mrpShipPlan.FlowDetailIdList;
 
                             //this.mrpReceivePlanMgr.CreateMrpReceivePlan(mrpReceivePlan);
                             currMrpReceivePlanList.Add(mrpReceivePlan);
@@ -1033,22 +1029,11 @@ namespace com.Sconit.Service.MRP.Impl
 
                     MrpShipPlan mrpShipPlan = new MrpShipPlan();
 
-                    if (mrpReceivePlan.ContainFlowDetailId(flowDetail.Id))
-                    {
-                        log.Error("Cycle Flow Detail Find when transfer receive plan location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "] to ship plan flow[" + flowDetail.Flow + "]");
-                        //continue;
-                    }
-                    else
-                    {
-                        mrpShipPlan.FlowDetailIdList = mrpReceivePlan.FlowDetailIdList;
-                        mrpShipPlan.AddFlowDetailId(flowDetail.Id);
-                    }
-
                     mrpShipPlan.Flow = flowDetail.Flow;
                     mrpShipPlan.FlowType = flowDetail.FlowType;
                     mrpShipPlan.Item = flowDetail.Item;
                     mrpShipPlan.ItemDescription = flowDetail.ItemDescription;
-                    if (mrpReceivePlan.SourceDateType != BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK)
+                    if (mrpReceivePlan.SourceType != BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK)
                     {
                         mrpShipPlan.StartTime = mrpReceivePlan.ReceiveTime.AddHours(-Convert.ToDouble(flowDetail.LeadTime));
                     }
@@ -1100,7 +1085,7 @@ namespace com.Sconit.Service.MRP.Impl
                     //mrpShipPlan.ExpireStartTime = mrpReceivePlan.ExpireStartTime;
                     mrpShipPlan.CreateDate = dateTimeNow;
                     mrpShipPlan.CreateUser = user.Code;
-                    mrpShipPlan.RefLocs = mrpReceivePlan.RefLocs;
+                    mrpShipPlan.RefFlows = mrpReceivePlan.RefFlows;
 
                     this.mrpShipPlanMgr.CreateMrpShipPlan(mrpShipPlan);
 

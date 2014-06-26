@@ -593,7 +593,9 @@
     <EmbeddedResource Include="Base\MRP\CustomerScheduleDetail.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\ExpectTransitInventory.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\ExpectTransitInventoryView.hbm.xml" />
-    <EmbeddedResource Include="Base\MRP\MrpReceivePlan.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\MrpReceivePlan.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Base\MRP\MrpRunLog.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\MrpShipPlan.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\MrpShipPlanView.hbm.xml" />

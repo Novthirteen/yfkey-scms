@@ -9,18 +9,7 @@ namespace com.Sconit.Entity.MRP
     public class MrpShipPlan : MrpShipPlanBase
     {
         #region Non O/R Mapping Properties
-        public IList<int> FlowDetailIdList { get; set; }
-
-        public void AddFlowDetailId(int id)
-        {
-            if (FlowDetailIdList == null)
-            {
-                FlowDetailIdList = new List<int>();
-            }
-            FlowDetailIdList.Add(id);
-        }
-
-        public IList<string> RefLocs;
+        public string RefFlows;
         #endregion
     }
 }
