@@ -18,5 +18,6 @@
 		<property name="Location" column="Loc" type="String" length="50" />
 		<property name="StartTime" column="StartTime" type="DateTime"  />
     <property name="Version" column="Version" type="Int32"  />
+    <property name="Flow" column="Flow" type="String" length="50" />
   </class>
 </hibernate-mapping>

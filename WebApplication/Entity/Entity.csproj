@@ -590,7 +590,9 @@
     <EmbeddedResource Include="Base\Mes\Shelf.hbm.xml" />
     <EmbeddedResource Include="Base\Mes\ShelfItem.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\CustomerSchedule.hbm.xml" />
-    <EmbeddedResource Include="Base\MRP\CustomerScheduleDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\CustomerScheduleDetail.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Base\MRP\ExpectTransitInventory.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\ExpectTransitInventoryView.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\MrpReceivePlan.hbm.xml">
