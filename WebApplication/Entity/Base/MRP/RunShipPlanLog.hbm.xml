@@ -8,27 +8,11 @@
         <property name="EffDate" column="EffDate" type="DateTime"  />
         <property name="Lvl" column="Lvl" type="String" length="50" />
         <property name="Item" column="Item" type="String" length="50" />
-        <property name="ItemDesc" column="ItemDesc" type="String" length="50" />
-        <property name="RefItem" column="RefItem" type="String" length="50" />
         <property name="Qty" column="Qty" type="Decimal"/>
-        <property name="UnitQty" column="UnitQty" type="Decimal"/>
-        <property name="MinusQty" column="MinusQty" type="Decimal"/>
-        <property name="EndQty" column="EndQty" type="Decimal"/>
-        <property name="Flow" column="Flow" type="String" length="50" />
         <property name="LocFrom" column="LocFrom" type="String" length="50" />
         <property name="LocTo" column="LocTo" type="String" length="50" />
-        <property name="SourceType" column="SourceType" type="String" length="50" />
-        <property name="SourceDateType" column="SourceDateType" type="String" length="50" />
-        <property name="SourceId" column="SourceId" type="String" length="50" />
-        <property name="InvType" column="InvType" type="String" length="50" />
-        <property name="InvLocation" column="InvLocation" type="String" length="50" />
-        <property name="InvQty" column="InvQty" type="Decimal" />
-        <property name="InvSafeQty" column="InvSafeQty" type="Decimal" />
-        <property name="InvEffDate" column="InvEffDate" type="DateTime" />
-        <property name="EndInvQty" column="EndInvQty" type="Decimal" />
         <property name="StartTime" column="StartTime" type="DateTime" />
         <property name="WindowTime" column="WindowTime" type="DateTime" />
-        <property name="Bom" column="Bom" type="String" length="50" />
         <property name="Msg" column="Msg" type="String"     length="500" />
         <property name="CreateDate" column="CreateDate" type="DateTime" />
         <property name="CreateUser" column="CreateUser" type="String" length="50" />

@@ -106,7 +106,7 @@ namespace com.Sconit.Service.MRP.Impl
                 effectiveDate = effectiveDate.Date;
                 #endregion
 
-                InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始运行发运计划。");
+                InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始运行发运计划");
 
                 try
                 {
@@ -125,33 +125,33 @@ namespace com.Sconit.Service.MRP.Impl
                     #endregion
 
                     #region 获取实时库存和在途
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取数据。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取数据");
                     #region 安全库存
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取安全库存。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取安全库存");
                     hql = @"select fl.Code, fdl.Code, i.Code, fd.SafeStock from FlowDetail as fd 
                                         join fd.Flow as f 
                                         left join fd.LocationTo as fdl 
                                         left join f.LocationTo as fl
                                         join fd.Item as i
-                                        where fd.LocationTo is not null 
-                                        or f.LocationTo is not null";
+                                        where (fd.LocationTo is not null 
+                                        or f.LocationTo is not null) and f.IsActive = 1";
                     IList<object[]> safeQtyList = hqlMgr.FindAll<object[]>(hql);
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取安全库存完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取安全库存完成");
                     #endregion
 
                     #region 实时库存
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取实时库存。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取实时库存");
                     hql = @"select l.Code, i.Code, sum(lld.Qty) from LocationLotDetail as lld
                     join lld.Location as l
                     join lld.Item as i
                     where not lld.Qty = 0 and l.IsMRP = 1 and l.Code not in (?, ?)
                     group by l.Code, i.Code";
                     IList<object[]> invList = hqlMgr.FindAll<object[]>(hql, new object[] { BusinessConstants.SYSTEM_LOCATION_INSPECT, BusinessConstants.SYSTEM_LOCATION_REJECT });
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取实时库存完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取实时库存完成");
                     #endregion
 
                     #region 发运在途
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取发运在途。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取发运在途");
                     DetachedCriteria criteria = DetachedCriteria.For<InProcessLocationDetail>();
 
                     criteria.CreateAlias("InProcessLocation", "ip");
@@ -179,11 +179,11 @@ namespace com.Sconit.Service.MRP.Impl
                       .Add(Projections.GroupProperty("oh.LocationTo"))
                       );
                     IList<object[]> ipDetList = this.criteriaMgr.FindAll<object[]>(criteria);
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取发运在途完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取发运在途完成");
                     #endregion
 
                     #region 检验在途
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取检验在途。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取检验在途");
                     criteria = DetachedCriteria.For<InspectOrderDetail>();
 
                     criteria.CreateAlias("InspectOrder", "io");
@@ -202,15 +202,15 @@ namespace com.Sconit.Service.MRP.Impl
                        );
 
                     IList<object[]> inspLocList = this.criteriaMgr.FindAll<object[]>(criteria);
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取检验在途完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取检验在途完成");
                     #endregion
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取数据完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取数据完成");
                     #endregion
 
                     #region 处理数据
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理数据。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理数据");
                     #region 获取所有库位的安全库存
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理所有库位的安全库存。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理所有库位的安全库存");
                     IList<SafeInventory> locationSafeQtyList = new List<SafeInventory>();
                     if (safeQtyList != null && safeQtyList.Count > 0)
                     {
@@ -233,11 +233,11 @@ namespace com.Sconit.Service.MRP.Impl
 
                         locationSafeQtyList = groupSafeQtyList != null ? groupSafeQtyList.ToList() : new List<SafeInventory>();
                     }
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理所有库位的安全库存完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理所有库位的安全库存完成");
                     #endregion
 
                     #region 获取实时库存
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理实时库存。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理实时库存");
                     IList<MrpLocationLotDetail> inventoryBalanceList = new List<MrpLocationLotDetail>();
                     if (invList != null && invList.Count > 0)
                     {
@@ -253,11 +253,11 @@ namespace com.Sconit.Service.MRP.Impl
                                                                                                          select g.SafeQty).FirstOrDefault()
                                                                                           }).ToList());
                     }
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理实时库存完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理实时库存完成");
                     #endregion
 
                     #region 没有库存的安全库存全部转换为InventoryBalance
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理没有库存的安全库存全部转换为InventoryBalance。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理没有库存的安全库存全部转换为InventoryBalance");
                     if (locationSafeQtyList != null && locationSafeQtyList.Count > 0)
                     {
                         var eqSafeQtyList = from sq in locationSafeQtyList
@@ -299,11 +299,11 @@ namespace com.Sconit.Service.MRP.Impl
                             }
                         }
                     }
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理没有库存的安全库存全部转换为InventoryBalance完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理没有库存的安全库存全部转换为InventoryBalance完成");
                     #endregion
 
                     #region 发运在途 ASN
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理发运在途。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理发运在途");
                     IList<TransitInventory> transitInventoryList = new List<TransitInventory>();
 
                     if (ipDetList != null && ipDetList.Count > 0)
@@ -320,11 +320,11 @@ namespace com.Sconit.Service.MRP.Impl
                             transitInventoryList.Add(transitInventory);
                         }
                     }
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理发运在途完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理发运在途完成");
                     #endregion
 
                     #region 检验在途
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理检验在途。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理检验在途");
                     if (inspLocList != null && inspLocList.Count > 0)
                     {
                         foreach (object[] inspLoc in inspLocList)
@@ -339,15 +339,15 @@ namespace com.Sconit.Service.MRP.Impl
                             transitInventoryList.Add(transitInventory);
                         }
                     }
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理检验在途完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理检验在途完成");
                     #endregion
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理数据完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理数据完成");
                     #endregion
 
                     #region 根据客户需求生成发货计划
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始根据客户需求生成发货计划。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始根据客户需求生成发货计划");
                     #region 获取所有销售路线明细
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取所有销售路线明细。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取所有销售路线明细");
                     criteria = DetachedCriteria.For<Flow>();
 
                     criteria.SetProjection(Projections.ProjectionList()
@@ -358,11 +358,11 @@ namespace com.Sconit.Service.MRP.Impl
                     criteria.Add(Expression.Eq("Type", BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_DISTRIBUTION));
 
                     IList<object[]> flowList = this.criteriaMgr.FindAll<object[]>(criteria);
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取所有销售路线明细完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取所有销售路线明细完成");
                     #endregion
 
                     #region 获取客户需求
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取客户需求。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取客户需求");
                     criteria = DetachedCriteria.For<CustomerScheduleDetail>();
                     criteria.CreateAlias("CustomerSchedule", "cs");
 
@@ -376,11 +376,11 @@ namespace com.Sconit.Service.MRP.Impl
                     #region 取得有效的CustomerScheduleDetail
                     IList<CustomerScheduleDetail> effectiveCustomerScheduleDetailList = customerScheduleDetailMgr.GetEffectiveCustomerScheduleDetail(customerScheduleDetailList, effectiveDate);
                     #endregion
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取客户需求完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取客户需求完成");
                     #endregion
 
                     #region 循环销售路线生成发货计划
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始循环销售路线生成发货计划。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始循环销售路线生成发货计划");
                     if (flowList != null && flowList.Count > 0)
                     {
                         foreach (object[] flow in flowList)
@@ -395,13 +395,13 @@ namespace com.Sconit.Service.MRP.Impl
                             IListHelper.AddRange(mrpShipPlanList, TransferCustomerPlan2ShipPlan(targetCustomerScheduleDetailList != null ? targetCustomerScheduleDetailList.ToList() : null, effectiveDate, dateTimeNow, user));
                         }
                     }
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "循环销售路线生成发货计划完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "循环销售路线生成发货计划完成");
                     #endregion
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "根据客户需求生成发货计划完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "根据客户需求生成发货计划完成");
                     #endregion
 
                     #region 查询并缓存所有FlowDetail
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始查询并缓存所有移库路线明细。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始查询并缓存所有移库路线明细");
                     criteria = DetachedCriteria.For<FlowDetail>();
                     criteria.CreateAlias("Flow", "f");
                     criteria.CreateAlias("Item", "i");
@@ -531,11 +531,11 @@ namespace com.Sconit.Service.MRP.Impl
                         }
                     }
                     #endregion
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "查询并缓存所有移库路线明细完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "查询并缓存所有移库路线明细完成");
                     #endregion
 
                     #region 循环生成入库计划/发货计划
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始循环生成入库计划/发货计划。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始循环生成入库计划/发货计划");
                     if (mrpShipPlanList != null && mrpShipPlanList.Count > 0)
                     {
                         var sortedMrpShipPlanList = from plan in mrpShipPlanList
@@ -547,88 +547,88 @@ namespace com.Sconit.Service.MRP.Impl
                             NestCalculateMrpShipPlanAndReceivePlan(batchNo, effectiveDate, mrpShipPlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
                         }
                     }
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "循环生成入库计划/发货计划完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "循环生成入库计划/发货计划完成");
                     #endregion
 
                     #region 补充安全库存
                     if (inventoryBalanceList != null && inventoryBalanceList.Count > 0)
                     {
-                        //var lackInventoryList = from inv in inventoryBalanceList
-                        //                        where inv.ActiveQty < 0  //可用库存小于0，要补充安全库存
-                        //                        select inv;
+                        var lackInventoryList = from inv in inventoryBalanceList
+                                                where inv.ActiveQty < 0  //可用库存小于0，要补充安全库存
+                                                select inv;
 
-                        //if (lackInventoryList != null && lackInventoryList.Count() > 0)
-                        //{
-                        //    foreach (MrpLocationLotDetail lackInventory in lackInventoryList)
-                        //    {
-                        //        #region 扣减在途，不考虑在途的到货时间
-                        //        var transitConsumed = from trans in transitInventoryList
-                        //                              where trans.Location == lackInventory.Location
-                        //                                  && trans.Item == lackInventory.Item && trans.Qty > 0
-                        //                              select trans;
+                        if (lackInventoryList != null && lackInventoryList.Count() > 0)
+                        {
+                            foreach (MrpLocationLotDetail lackInventory in lackInventoryList)
+                            {
+                                //在途不满足库存短缺
+                                Item item = this.itemMgr.CheckAndLoadItem(lackInventory.Item);
+                                lackInventory.ItemDescription = item.Description;
 
-                        //        if (transitConsumed != null && transitConsumed.Count() > 0)
-                        //        {
-                        //            foreach (TransitInventory inventory in transitConsumed)
-                        //            {
-                        //                if ((-lackInventory.ActiveQty) > inventory.Qty)
-                        //                {
-                        //                    lackInventory.Qty += inventory.Qty;
-                        //                    inventory.Qty = 0;
-                        //                }
-                        //                else
-                        //                {
-                        //                    inventory.Qty += lackInventory.ActiveQty;
-                        //                    lackInventory.Qty = lackInventory.SafeQty;
+                                InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, lackInventory);
 
-                        //                    break;
-                        //                }
-                        //            }
-                        //        }
+                                #region 扣减在途，不考虑在途的到货时间
+                                var transitConsumed = from trans in transitInventoryList
+                                                      where trans.Location == lackInventory.Location
+                                                          && trans.Item == lackInventory.Item && trans.Qty > 0
+                                                      select trans;
 
-                        //        if (lackInventory.ActiveQty == 0)
-                        //        {
-                        //            //在途满足库存短缺
-                        //            continue;
-                        //        }
-                        //        else
-                        //        {
-                        //            //在途不满足库存短缺
-                        //            Item item = this.itemMgr.CheckAndLoadItem(lackInventory.Item);
+                                if (transitConsumed != null && transitConsumed.Count() > 0)
+                                {
+                                    foreach (TransitInventory inventory in transitConsumed)
+                                    {
+                                        if ((-lackInventory.ActiveQty) > inventory.Qty)
+                                        {
+                                            lackInventory.Qty += inventory.Qty;
+                                            inventory.Qty = 0;
+                                        }
+                                        else
+                                        {
+                                            inventory.Qty += lackInventory.ActiveQty;
+                                            lackInventory.Qty = lackInventory.SafeQty;
 
-                        //            MrpReceivePlan mrpReceivePlan = new MrpReceivePlan();
-                        //            mrpReceivePlan.Item = lackInventory.Item;
-                        //            mrpReceivePlan.ItemDescription = item.Description;
-                        //            mrpReceivePlan.Uom = item.Uom.Code;
-                        //            mrpReceivePlan.Location = lackInventory.Location;
-                        //            mrpReceivePlan.Qty = -lackInventory.ActiveQty;
-                        //            mrpReceivePlan.UnitCount = item.UnitCount;
-                        //            mrpReceivePlan.ReceiveTime = effectiveDate;
-                        //            mrpReceivePlan.SourceType = BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK;
-                        //            mrpReceivePlan.SourceDateType = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY;
-                        //            mrpReceivePlan.SourceId = lackInventory.Location;
-                        //            mrpReceivePlan.SourceUnitQty = 1;
-                        //            mrpReceivePlan.EffectiveDate = effectiveDate;
-                        //            mrpReceivePlan.CreateDate = dateTimeNow;
-                        //            mrpReceivePlan.CreateUser = user.Code;
+                                            break;
+                                        }
+                                    }
+                                }
 
-                        //            //this.mrpReceivePlanMgr.CreateMrpReceivePlan(mrpReceivePlan);
+                                if (lackInventory.ActiveQty == 0)
+                                {
+                                    //在途满足库存短缺
+                                    continue;
+                                }
+                                else
+                                {                                   
+                                    MrpReceivePlan mrpReceivePlan = new MrpReceivePlan();
+                                    mrpReceivePlan.Item = lackInventory.Item;
+                                    mrpReceivePlan.ItemDescription = item.Description;
+                                    mrpReceivePlan.Uom = item.Uom.Code;
+                                    mrpReceivePlan.Location = lackInventory.Location;
+                                    mrpReceivePlan.Qty = -lackInventory.ActiveQty;
+                                    mrpReceivePlan.UnitCount = item.UnitCount;
+                                    mrpReceivePlan.ReceiveTime = effectiveDate;
+                                    mrpReceivePlan.SourceType = BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK;
+                                    mrpReceivePlan.SourceDateType = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY;
+                                    mrpReceivePlan.SourceId = lackInventory.Location + "__" + lackInventory.Item;
+                                    mrpReceivePlan.SourceUnitQty = 1;
+                                    mrpReceivePlan.EffectiveDate = effectiveDate;
+                                    mrpReceivePlan.CreateDate = dateTimeNow;
+                                    mrpReceivePlan.CreateUser = user.Code;
 
-                        //            log.Debug("Create receive plan for safe stock, location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "]");
-
-                        //            CalculateNextShipPlan(batchNo, effectiveDate, mrpReceivePlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
-                        //        }
-                        //        #endregion
-                        //    }
-                        //}
+                                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, mrpReceivePlan, "生成毛需求");
+                                    CalculateNextShipPlan(batchNo, effectiveDate, mrpReceivePlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
+                                }
+                                #endregion
+                            }
+                        }
                     }
                     #endregion
 
-                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "运行发运计划完成。");
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "运行发运计划完成");
                 }
                 catch (Exception ex)
                 {
-                    InsertErrRunShipPlanLog(batchNo, effectiveDate, user.Name, "运行发运计划异常，" + ex.Message + "。");
+                    InsertErrRunShipPlanLog(batchNo, effectiveDate, user.Name, "运行发运计划异常，" + ex.Message);
                 }
             }
         }
@@ -849,7 +849,7 @@ namespace com.Sconit.Service.MRP.Impl
                 }
                 else if (mrpShipPlan.Qty < 0)
                 {
-                    InsertErrRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "MrpShipPlan的数量不能小于零。");
+                    InsertErrRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "MrpShipPlan的数量不能小于零");
                     return;
                 }
 
@@ -891,11 +891,11 @@ namespace com.Sconit.Service.MRP.Impl
                     mrpReceivePlan.CreateUser = user.Code;
                     if (!mrpReceivePlan.TryAddRefFlow(mrpShipPlan.Flow))
                     {
-                        InsertErrRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "路线出现循环【" + mrpReceivePlan.RefFlows + "】。");
+                        InsertErrRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "路线出现循环【" + mrpReceivePlan.RefFlows + "】");
                     }
                     else
                     {
-                        InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "生成毛需求。");
+                        InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "生成毛需求");
                         currMrpReceivePlanList.Add(mrpReceivePlan);
                     }
                     #endregion
@@ -903,7 +903,7 @@ namespace com.Sconit.Service.MRP.Impl
                 else
                 {
                     #region 生产，需要分解Bom
-                    InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "开始分解Bom。");
+                    InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "开始分解Bom");
                     Bom bom = this.bomMgr.CheckAndLoadBom(mrpShipPlan.Bom);
                     IList<BomDetail> bomDetailList = this.bomDetailMgr.GetFlatBomDetail(mrpShipPlan.Bom, mrpShipPlan.StartTime);
 
@@ -996,7 +996,7 @@ namespace com.Sconit.Service.MRP.Impl
                             #endregion
                         }
 
-                        InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "分解Bom完成。");
+                        InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "分解Bom完成");
                     }
                     else
                     {
@@ -1017,7 +1017,7 @@ namespace com.Sconit.Service.MRP.Impl
 
         private void CalculateNextShipPlan(int batchNo, DateTime effDate, MrpReceivePlan mrpReceivePlan, IList<MrpLocationLotDetail> inventoryBalanceList, IList<TransitInventory> transitInventoryList, IList<FlowDetailSnapShot> flowDetailSnapShotList, DateTime effectiveDate, DateTime dateTimeNow, User user)
         {
-            InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "开始分解毛需求，查找下游路线。");
+            InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "开始分解毛需求，查找下游路线");
             if (mrpReceivePlan.ReceiveTime < effectiveDate)
             {
                 //如果窗口时间小于effectivedate，不往下计算
@@ -1101,14 +1101,14 @@ namespace com.Sconit.Service.MRP.Impl
 
                     this.mrpShipPlanMgr.CreateMrpShipPlan(mrpShipPlan);
 
-                    InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "毛需求分解成功，找到下游路线。");
+                    InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "毛需求分解成功，找到下游路线");
 
                     NestCalculateMrpShipPlanAndReceivePlan(batchNo, effDate, mrpShipPlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
                 }
             }
             else
             {
-                InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "毛需求无法分解，没有找到下游路线。");
+                InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "毛需求无法分解，没有找到下游路线");
             }
         }
 
@@ -1260,186 +1260,50 @@ namespace com.Sconit.Service.MRP.Impl
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, string msg)
         {
-            RunShipPlanLog runlog = new RunShipPlanLog();
-            runlog.BatchNo = batchNo;
-            runlog.EffDate = effDate;
-            runlog.Lvl = "Info";
-            runlog.Msg = msg;
-            runlog.CreateDate = DateTime.Now;
-            runlog.CreateUser = userName;
-            this.genericMgr.Create(runlog);
+          
         }
 
         private void InsertErrRunShipPlanLog(int batchNo, DateTime effDate, string userName, string msg)
         {
-            RunShipPlanLog runlog = new RunShipPlanLog();
-            runlog.BatchNo = batchNo;
-            runlog.EffDate = effDate;
-            runlog.Lvl = "Error";
-            runlog.Msg = msg;
-            runlog.CreateDate = DateTime.Now;
-            runlog.CreateUser = userName;
-            this.genericMgr.Create(runlog);
+           
         }
 
         private void InsertErrRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, string msg)
         {
-            RunShipPlanLog runLog = new RunShipPlanLog();
-            runLog.BatchNo = batchNo;
-            runLog.EffDate = effDate;
-            runLog.Lvl = "Error";
-            runLog.Item = mrpShipPlan.Item;
-            runLog.ItemDesc = mrpShipPlan.ItemDescription;
-            runLog.Qty = mrpShipPlan.Qty;
-            runLog.UnitQty = mrpShipPlan.UnitQty;
-            runLog.LocFrom = mrpShipPlan.LocationFrom;
-            runLog.LocTo = mrpShipPlan.LocationTo;
-            runLog.Flow = mrpShipPlan.Flow;
-            runLog.SourceType = mrpShipPlan.SourceType;
-            runLog.SourceDateType = mrpShipPlan.SourceDateType;
-            runLog.SourceId = mrpShipPlan.SourceId;
-            runLog.StartTime = mrpShipPlan.StartTime;
-            runLog.WindowTime = mrpShipPlan.WindowTime;
-            runLog.Bom = mrpShipPlan.Bom;
-            runLog.Msg = msg;
-            runLog.CreateDate = DateTime.Now;
-            runLog.CreateUser = userName;
-
-            this.genericMgr.Create(runLog);
+           
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, string msg)
         {
-            RunShipPlanLog runLog = new RunShipPlanLog();
-            runLog.BatchNo = batchNo;
-            runLog.EffDate = effDate;
-            runLog.Lvl = "Info";
-            runLog.Item = mrpShipPlan.Item;
-            runLog.ItemDesc = mrpShipPlan.ItemDescription;
-            runLog.Qty = mrpShipPlan.Qty;
-            runLog.UnitQty = mrpShipPlan.UnitQty;
-            runLog.LocFrom = mrpShipPlan.LocationFrom;
-            runLog.LocTo = mrpShipPlan.LocationTo;
-            runLog.Flow = mrpShipPlan.Flow;
-            runLog.SourceType = mrpShipPlan.SourceType;
-            runLog.SourceDateType = mrpShipPlan.SourceDateType;
-            runLog.SourceId = mrpShipPlan.SourceId;
-            runLog.StartTime = mrpShipPlan.StartTime;
-            runLog.WindowTime = mrpShipPlan.WindowTime;
-            runLog.Bom = mrpShipPlan.Bom;
-            runLog.Msg = msg;
-            runLog.CreateDate = DateTime.Now;
-            runLog.CreateUser = userName;
-
-            this.genericMgr.Create(runLog);
+            
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpReceivePlan mrpReceivePlan, string msg)
         {
-            RunShipPlanLog runLog = new RunShipPlanLog();
-            runLog.BatchNo = batchNo;
-            runLog.EffDate = effDate;
-            runLog.Lvl = "Info";
-            runLog.Item = mrpReceivePlan.Item;
-            runLog.ItemDesc = mrpReceivePlan.ItemDescription;
-            runLog.Qty = mrpReceivePlan.Qty;
-            runLog.UnitQty = 1;
-            runLog.LocTo = mrpReceivePlan.Location;
-            runLog.SourceType = mrpReceivePlan.SourceType;
-            runLog.SourceDateType = mrpReceivePlan.SourceDateType;
-            runLog.SourceId = mrpReceivePlan.SourceId;
-            runLog.Msg = msg;
-            runLog.CreateDate = DateTime.Now;
-            runLog.CreateUser = userName;
-
-            this.genericMgr.Create(runLog);
+           
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, MrpLocationLotDetail inventory)
         {
-            RunShipPlanLog runLog = new RunShipPlanLog();
-            runLog.BatchNo = batchNo;
-            runLog.EffDate = effDate;
-            runLog.Lvl = "Info";
-            runLog.Item = mrpShipPlan.Item;
-            runLog.ItemDesc = mrpShipPlan.ItemDescription;
-            runLog.Qty = mrpShipPlan.Qty;
-            runLog.UnitQty = mrpShipPlan.UnitQty;
-            if (mrpShipPlan.Qty * mrpShipPlan.UnitQty > inventory.ActiveQty)
-            {
-                runLog.MinusQty = inventory.ActiveQty / mrpShipPlan.UnitQty;
-                runLog.EndQty = mrpShipPlan.Qty - inventory.ActiveQty / mrpShipPlan.UnitQty;
-                runLog.EndInvQty = inventory.SafeQty;
-            }
-            else
-            {
-                runLog.MinusQty = mrpShipPlan.Qty;
-                runLog.EndQty = 0;
-                runLog.EndInvQty = inventory.ActiveQty - mrpShipPlan.Qty * mrpShipPlan.UnitQty;
-            }
-            runLog.LocFrom = mrpShipPlan.LocationFrom;
-            runLog.LocTo = mrpShipPlan.LocationTo;
-            runLog.Flow = mrpShipPlan.Flow;
-            runLog.SourceType = mrpShipPlan.SourceType;
-            runLog.SourceDateType = mrpShipPlan.SourceDateType;
-            runLog.SourceId = mrpShipPlan.SourceId;
-            runLog.InvType = "Inventory";
-            runLog.InvLocation = inventory.Location;
-            runLog.InvQty = inventory.Qty;
-            runLog.InvSafeQty = inventory.SafeQty;
-            runLog.StartTime = mrpShipPlan.StartTime;
-            runLog.WindowTime = mrpShipPlan.WindowTime;
-            runLog.Bom = mrpShipPlan.Bom;
-            runLog.Msg = "扣减库存";
-            runLog.CreateDate = DateTime.Now;
-            runLog.CreateUser = userName;
-
-            this.genericMgr.Create(runLog);
+            
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, TransitInventory inventory)
         {
-            RunShipPlanLog runLog = new RunShipPlanLog();
-            runLog.BatchNo = batchNo;
-            runLog.EffDate = effDate;
-            runLog.Lvl = "Info";
-            runLog.Item = mrpShipPlan.Item;
-            runLog.ItemDesc = mrpShipPlan.ItemDescription;
-            runLog.Qty = mrpShipPlan.Qty;
-            runLog.UnitQty = mrpShipPlan.UnitQty;
-            if (mrpShipPlan.Qty * mrpShipPlan.UnitQty > inventory.Qty)
-            {
-                runLog.MinusQty = inventory.Qty / mrpShipPlan.UnitQty;
-                runLog.EndQty = mrpShipPlan.Qty - inventory.Qty / mrpShipPlan.UnitQty;
-                runLog.EndInvQty = 0;
-            }
-            else
-            {
-                runLog.MinusQty = mrpShipPlan.Qty;
-                runLog.EndQty = 0;
-                runLog.EndInvQty = inventory.Qty - mrpShipPlan.Qty * mrpShipPlan.UnitQty;
-            }
-            runLog.LocFrom = mrpShipPlan.LocationFrom;
-            runLog.LocTo = mrpShipPlan.LocationTo;
-            runLog.Flow = mrpShipPlan.Flow;
-            runLog.SourceType = mrpShipPlan.SourceType;
-            runLog.SourceDateType = mrpShipPlan.SourceDateType;
-            runLog.SourceId = mrpShipPlan.SourceId;
-            runLog.InvType = "InTransit";
-            runLog.InvLocation = inventory.Location;
-            runLog.InvQty = inventory.Qty;
-            runLog.InvSafeQty = 0;
-            runLog.InvEffDate = inventory.EffectiveDate;
-            runLog.StartTime = mrpShipPlan.StartTime;
-            runLog.WindowTime = mrpShipPlan.WindowTime;
-            runLog.Bom = mrpShipPlan.Bom;
-            runLog.Msg = "扣减在途库存";
-            runLog.CreateDate = DateTime.Now;
-            runLog.CreateUser = userName;
-
-            this.genericMgr.Create(runLog);
+           
         }
 
+        private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpLocationLotDetail lackInventory)
+        {
+           
+        }
+
+        private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpLocationLotDetail lackInventory, TransitInventory inventory)
+        {
+            
+        }
+
+        
         #endregion
 
         class SafeInventory
@@ -1523,6 +1387,7 @@ namespace com.Sconit.Service.MRP.Impl
                     _item = value;
                 }
             }
+            public string ItemDescription { get; set; }
             private Decimal _safeQty;
             public Decimal SafeQty
             {

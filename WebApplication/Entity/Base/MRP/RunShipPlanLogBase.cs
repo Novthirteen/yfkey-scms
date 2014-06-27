@@ -16,27 +16,11 @@ namespace com.Sconit.Entity.MRP
         public DateTime EffDate { get; set; }
         public string Lvl { get; set; }
         public string Item { get; set; }
-        public string ItemDesc { get; set; }
-        public string RefItem { get; set; }
         public decimal Qty { get; set; }
-        public decimal UnitQty { get; set; }
-        public decimal MinusQty { get; set; }
-        public decimal EndQty { get; set; }
         public string LocFrom { get; set; }
         public string LocTo { get; set; }
-        public string Flow { get; set; }
-        public string SourceType { get; set; }
-        public string SourceDateType { get; set; }
-        public string SourceId { get; set; }
-        public string InvType { get; set; }
-        public string InvLocation { get; set; }
-        public decimal InvQty { get; set; }
-        public decimal InvSafeQty { get; set; }
-        public DateTime? InvEffDate { get; set; }
-        public decimal EndInvQty { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? WindowTime { get; set; }
-        public string Bom { get; set; }
         public string Msg { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
