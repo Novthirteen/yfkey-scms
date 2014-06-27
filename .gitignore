@@ -4,3 +4,4 @@ obj
 bin
 *.datasource
 /WebApplication/Sconit/Reports/Templates/TempFiles
+/WebApplication/Sconit/Config/*.config
