@@ -19,6 +19,5 @@
 		<property name="StartTime" column="StartTime" type="DateTime"  />
     <property name="Version" column="Version" type="Int32"  />
     <property name="Flow" column="Flow" type="String" length="50" />
-    <property name="ReferenceScheduleNo" column="RefScheduleNo" type="String" length="50" />
   </class>
 </hibernate-mapping>

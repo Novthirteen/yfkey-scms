@@ -148,7 +148,6 @@ namespace com.Sconit.Entity.MRP
         public string Bom { get; set; }
         public Int32 Version { get; set; }
         public string Flow { get; set; }
-        public string ReferenceScheduleNo { get; set; }
 
         #endregion
 
