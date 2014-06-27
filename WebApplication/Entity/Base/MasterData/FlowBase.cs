@@ -920,6 +920,8 @@ namespace com.Sconit.Entity.MasterData
 
         public string CustomerCodes { get; set; }
         public string SupplierCodes { get; set; }
+        public string ShipFlow { get; set; }
+        private Decimal? MrpLeadTime { get; set; }
         #endregion
 
         public override int GetHashCode()

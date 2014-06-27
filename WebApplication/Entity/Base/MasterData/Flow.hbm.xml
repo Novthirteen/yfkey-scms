@@ -94,5 +94,7 @@
     </bag>
     <property name="CustomerCodes" column="CustomerCodes" type="String" length="50" />
     <property name="SupplierCodes" column="SupplierCodes" type="String" length="50" />
+    <property name="MrpLeadTime" column="MrpLeadTime" type="Decimal" />
+    <property name="ShipFlow" column="ShipFlow" type="String" length="50" />
   </class>
 </hibernate-mapping>
