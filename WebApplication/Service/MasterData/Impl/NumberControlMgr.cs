@@ -285,10 +285,7 @@ namespace com.Sconit.Service.MasterData.Impl
             ReverseUpdateSequence(BarcodeHelper.GetBarcodePrefix(huId), seq);
         }
 
-        #endregion Customized Methods
-
-        #region Private Methods
-        private String GetNextSequence(string code)
+        public string GetNextSequence(string code)
         {
             SqlParameter[] parm = new SqlParameter[2];
 
@@ -302,7 +299,9 @@ namespace com.Sconit.Service.MasterData.Impl
 
             return parm[1].Value.ToString();
         }
+        #endregion Customized Methods
 
+        #region Private Methods
         private void ReverseUpdateSequence(string code, int seq)
         {
             SqlParameter[] parm = new SqlParameter[2];

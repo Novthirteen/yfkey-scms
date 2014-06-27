@@ -42,6 +42,7 @@ namespace com.Sconit.Service.MasterData
 
         void ReverseUpdateHuId(string huId);
 
+        string GetNextSequence(string code);
         #endregion Customized Methods
     }
 }

@@ -36,13 +36,12 @@ namespace com.Sconit.Service.MRP.Impl
         public IMrpReceivePlanMgr mrpReceivePlanMgr;
         public IExpectTransitInventoryMgr expectTransitInventoryMgr;
         public IGenericMgr genericMgr;
-        public INumberControlMgr iNumberControlMgr;
+        public INumberControlMgr numberControlMgr;
         public IShiftMgr shiftMgr;
         public IFlowMgr flowMgr;
         public IOrderMgr orderMgr;
         public IWorkCalendarMgr workCalendarMgr;
         public IFlowDetailMgr flowDetailMgr;
-
 
         private static log4net.ILog log = log4net.LogManager.GetLogger("Log.MRP");
 
@@ -60,7 +59,7 @@ namespace com.Sconit.Service.MRP.Impl
                         IMrpReceivePlanMgr mrpReceivePlanMgr,
                         IExpectTransitInventoryMgr expectTransitInventoryMgr,
                         IGenericMgr genericMgr,
-                        INumberControlMgr iNumberControlMgr,
+                        INumberControlMgr numberControlMgr,
                         IShiftMgr shiftMgr,
                         IFlowMgr flowMgr,
                         IOrderMgr orderMgr,
@@ -82,7 +81,7 @@ namespace com.Sconit.Service.MRP.Impl
             this.mrpReceivePlanMgr = mrpReceivePlanMgr;
             this.expectTransitInventoryMgr = expectTransitInventoryMgr;
             this.genericMgr = genericMgr;
-            this.iNumberControlMgr = iNumberControlMgr;
+            this.numberControlMgr = numberControlMgr;
             this.shiftMgr = shiftMgr;
             this.flowMgr = flowMgr;
             this.orderMgr = orderMgr;
@@ -100,498 +99,537 @@ namespace com.Sconit.Service.MRP.Impl
         {
             lock (RunShipPlanLock)
             {
+                int batchNo = int.Parse(this.numberControlMgr.GetNextSequence("RunShipPlan"));
                 DateTime dateTimeNow = DateTime.Now;
                 IList<MrpShipPlan> mrpShipPlanList = new List<MrpShipPlan>();
                 #region EffectiveDate格式化
                 effectiveDate = effectiveDate.Date;
                 #endregion
 
-                log.Info("----------------------------------Invincible's dividing line---------------------------------------");
-                log.Info("Start run mrp ship plan:" + effectiveDate.ToLongDateString());
+                InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始运行发运计划。");
 
+                try
+                {
+                    #region 删除有效期相同的ShipPlan、ReceivePlan、TransitInventory
+                    string hql = @"from MrpShipPlan entity where entity.EffectiveDate = ?";
+                    hqlMgr.Delete(hql, new object[] { effectiveDate }, new IType[] { NHibernateUtil.DateTime });
 
-                #region 删除有效期相同的ShipPlan、ReceivePlan、TransitInventory
-                string hql = @"from MrpShipPlan entity where entity.EffectiveDate = ?";
-                hqlMgr.Delete(hql, new object[] { effectiveDate }, new IType[] { NHibernateUtil.DateTime });
+                    //hql = @"from MrpReceivePlan entity where entity.EffectiveDate = ?";
+                    //hqlMgr.Delete(hql, new object[] { effectiveDate }, new IType[] { NHibernateUtil.DateTime });
 
-                hql = @"from MrpReceivePlan entity where entity.EffectiveDate = ?";
-                hqlMgr.Delete(hql, new object[] { effectiveDate }, new IType[] { NHibernateUtil.DateTime });
+                    //hql = @"from expecttransitinventory entity where entity.effectivedate = ?";
+                    //hqlMgr.Delete(hql, new object[] { effectiveDate }, new IType[] { NHibernateUtil.DateTime });
 
-                //hql = @"from ExpectTransitInventory entity where entity.EffectiveDate = ?";
-                //hqlMgr.Delete(hql, new object[] { effectiveDate }, new IType[] { NHibernateUtil.DateTime });
+                    this.hqlMgr.FlushSession();
+                    this.hqlMgr.CleanSession();
+                    #endregion
 
-                this.hqlMgr.FlushSession();
-                this.hqlMgr.CleanSession();
-                #endregion
-
-                #region 获取实时库存和在途
-                #region 安全库存
-                hql = @"select fl.Code, fdl.Code, i.Code, fd.SafeStock from FlowDetail as fd 
+                    #region 获取实时库存和在途
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取数据。");
+                    #region 安全库存
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取安全库存。");
+                    hql = @"select fl.Code, fdl.Code, i.Code, fd.SafeStock from FlowDetail as fd 
                                         join fd.Flow as f 
                                         left join fd.LocationTo as fdl 
                                         left join f.LocationTo as fl
                                         join fd.Item as i
                                         where fd.LocationTo is not null 
                                         or f.LocationTo is not null";
-                IList<object[]> safeQtyList = hqlMgr.FindAll<object[]>(hql);
-                #endregion
+                    IList<object[]> safeQtyList = hqlMgr.FindAll<object[]>(hql);
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取安全库存完成。");
+                    #endregion
 
-                #region 实时库存
-                hql = @"select l.Code, i.Code, sum(lld.Qty) from LocationLotDetail as lld
+                    #region 实时库存
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取实时库存。");
+                    hql = @"select l.Code, i.Code, sum(lld.Qty) from LocationLotDetail as lld
                     join lld.Location as l
                     join lld.Item as i
                     where not lld.Qty = 0 and l.IsMRP = 1 and l.Code not in (?, ?)
                     group by l.Code, i.Code";
-                IList<object[]> invList = hqlMgr.FindAll<object[]>(hql, new object[] { BusinessConstants.SYSTEM_LOCATION_INSPECT, BusinessConstants.SYSTEM_LOCATION_REJECT });
-                #endregion
+                    IList<object[]> invList = hqlMgr.FindAll<object[]>(hql, new object[] { BusinessConstants.SYSTEM_LOCATION_INSPECT, BusinessConstants.SYSTEM_LOCATION_REJECT });
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取实时库存完成。");
+                    #endregion
 
-                #region 发运在途
-                DetachedCriteria criteria = DetachedCriteria.For<InProcessLocationDetail>();
+                    #region 发运在途
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取发运在途。");
+                    DetachedCriteria criteria = DetachedCriteria.For<InProcessLocationDetail>();
 
-                //criteria.CreateAlias("LocationTo", "lt");
-                criteria.CreateAlias("InProcessLocation", "ip");
-                criteria.CreateAlias("OrderLocationTransaction", "olt");
-                criteria.CreateAlias("olt.OrderDetail", "od");
-                criteria.CreateAlias("od.OrderHead", "oh");
-                criteria.CreateAlias("olt.Item", "i");
-                criteria.CreateAlias("od.LocationTo", "lt", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("oh.LocationTo", "ohlt", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("InProcessLocation", "ip");
+                    criteria.CreateAlias("OrderLocationTransaction", "olt");
+                    criteria.CreateAlias("olt.OrderDetail", "od");
+                    criteria.CreateAlias("od.OrderHead", "oh");
+                    criteria.CreateAlias("olt.Item", "i");
+                    criteria.CreateAlias("od.LocationTo", "lt", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("oh.LocationTo", "ohlt", JoinType.LeftOuterJoin);
 
-                criteria.Add(Expression.Eq("ip.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE));
-                criteria.Add(Expression.Eq("oh.SubType", BusinessConstants.CODE_MASTER_ORDER_SUB_TYPE_VALUE_NML));
-                criteria.Add(Expression.In("ip.OrderType", new string[] { 
+                    criteria.Add(Expression.Eq("ip.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE));
+                    criteria.Add(Expression.Eq("oh.SubType", BusinessConstants.CODE_MASTER_ORDER_SUB_TYPE_VALUE_NML));
+                    criteria.Add(Expression.In("ip.OrderType", new string[] { 
                             BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_CUSTOMERGOODS, 
                             BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_PROCUREMENT, 
                             BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_SUBCONCTRACTING, 
                             BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_TRANSFER }));
 
-                criteria.SetProjection(Projections.ProjectionList()
-                  .Add(Projections.GroupProperty("od.LocationTo"))
-                  .Add(Projections.GroupProperty("i.Code"))
-                  .Add(Projections.Sum("Qty"))
-                  .Add(Projections.Sum("ReceivedQty2"))
-                  .Add(Projections.GroupProperty("ip.ArriveTime"))
-                  .Add(Projections.GroupProperty("oh.LocationTo"))
-                  );
-                IList<object[]> ipDetList = this.criteriaMgr.FindAll<object[]>(criteria);
-                #endregion
+                    criteria.SetProjection(Projections.ProjectionList()
+                      .Add(Projections.GroupProperty("od.LocationTo"))
+                      .Add(Projections.GroupProperty("i.Code"))
+                      .Add(Projections.Sum("Qty"))
+                      .Add(Projections.Sum("ReceivedQty2"))
+                      .Add(Projections.GroupProperty("ip.ArriveTime"))
+                      .Add(Projections.GroupProperty("oh.LocationTo"))
+                      );
+                    IList<object[]> ipDetList = this.criteriaMgr.FindAll<object[]>(criteria);
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取发运在途完成。");
+                    #endregion
 
-                #region 检验在途
-                criteria = DetachedCriteria.For<InspectOrderDetail>();
+                    #region 检验在途
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取检验在途。");
+                    criteria = DetachedCriteria.For<InspectOrderDetail>();
 
-                criteria.CreateAlias("InspectOrder", "io");
-                criteria.CreateAlias("LocationTo", "lt");
-                criteria.CreateAlias("LocationLotDetail", "lld");
-                criteria.CreateAlias("lld.Item", "i");
+                    criteria.CreateAlias("InspectOrder", "io");
+                    criteria.CreateAlias("LocationTo", "lt");
+                    criteria.CreateAlias("LocationLotDetail", "lld");
+                    criteria.CreateAlias("lld.Item", "i");
 
-                criteria.Add(Expression.Eq("io.IsSeperated", false));
-                criteria.Add(Expression.Eq("io.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE));
-
-                criteria.SetProjection(Projections.ProjectionList()
-                   .Add(Projections.GroupProperty("lt.Code").As("Location"))
-                   .Add(Projections.GroupProperty("i.Code").As("Item"))
-                   .Add(Projections.Sum("lld.Qty"))
-                   .Add(Projections.GroupProperty("io.EstimateInspectDate"))
-                   );
-
-                IList<object[]> inspLocList = this.criteriaMgr.FindAll<object[]>(criteria);
-                #endregion
-                #endregion
-
-                #region 处理数据
-                #region 获取所有库位的安全库存
-                IList<SafeInventory> locationSafeQtyList = new List<SafeInventory>();
-                if (safeQtyList != null && safeQtyList.Count > 0)
-                {
-                    var unGroupSafeQtyList = from safeQty in safeQtyList
-                                             select new
-                                             {
-                                                 Location = (safeQty[1] != null ? (string)safeQty[1] : (string)safeQty[0]),
-                                                 Item = (string)safeQty[2],
-                                                 SafeQty = safeQty[3] != null ? (decimal)safeQty[3] : 0
-                                             };
-
-                    var groupSafeQtyList = from g in unGroupSafeQtyList
-                                           group g by new { g.Location, g.Item } into result
-                                           select new SafeInventory
-                                           {
-                                               Location = result.Key.Location,
-                                               Item = result.Key.Item,
-                                               SafeQty = result.Max(g => g.SafeQty)
-                                           };
-
-                    locationSafeQtyList = groupSafeQtyList != null ? groupSafeQtyList.ToList() : new List<SafeInventory>();
-                }
-                #endregion
-
-                #region 获取实时库存
-                IList<MrpLocationLotDetail> inventoryBalanceList = new List<MrpLocationLotDetail>();
-                if (invList != null && invList.Count > 0)
-                {
-                    IListHelper.AddRange<MrpLocationLotDetail>(inventoryBalanceList, (from inv in invList
-                                                                                      select new MrpLocationLotDetail
-                                                                                      {
-                                                                                          Location = (string)inv[0],
-                                                                                          Item = (string)inv[1],
-                                                                                          Qty = (decimal)inv[2],
-                                                                                          SafeQty = (from g in locationSafeQtyList
-                                                                                                     where g.Location == (string)inv[0]
-                                                                                                        && g.Item == (string)inv[1]
-                                                                                                     select g.SafeQty).FirstOrDefault()
-                                                                                      }).ToList());
-                }
-                #endregion
-
-                #region 没有库存的安全库存全部转换为InventoryBalance
-                if (locationSafeQtyList != null && locationSafeQtyList.Count > 0)
-                {
-                    var eqSafeQtyList = from sq in locationSafeQtyList
-                                        join inv in inventoryBalanceList on new { Location = sq.Location, Item = sq.Item } equals new { Location = inv.Location, Item = inv.Item }
-                                        select sq;
-
-                    IList<SafeInventory> lackSafeQtyList = null;
-                    if (eqSafeQtyList != null && eqSafeQtyList.Count() > 0)
-                    {
-                        lackSafeQtyList = locationSafeQtyList.Except(eqSafeQtyList.ToList(), new SafeInventoryComparer()).ToList();
-                    }
-                    else
-                    {
-                        lackSafeQtyList = locationSafeQtyList;
-                    }
-
-                    if (lackSafeQtyList != null && lackSafeQtyList.Count > 0)
-                    {
-                        var mlldList = from sq in lackSafeQtyList
-                                       where sq.SafeQty > 0
-                                       select new MrpLocationLotDetail
-                                       {
-                                           Location = sq.Location,
-                                           Item = sq.Item,
-                                           Qty = 0,
-                                           SafeQty = sq.SafeQty
-                                       };
-
-                        if (mlldList != null && mlldList.Count() > 0)
-                        {
-                            if (inventoryBalanceList == null)
-                            {
-                                inventoryBalanceList = mlldList.ToList();
-                            }
-                            else
-                            {
-                                IListHelper.AddRange<MrpLocationLotDetail>(inventoryBalanceList, mlldList.ToList());
-                            }
-                        }
-                    }
-                }
-                #endregion
-
-                #region 发运在途 ASN
-                IList<TransitInventory> transitInventoryList = new List<TransitInventory>();
-
-                if (ipDetList != null && ipDetList.Count > 0)
-                {
-                    foreach (object[] ipDet in ipDetList)
-                    {
-                        //记录在途库存
-                        TransitInventory transitInventory = new TransitInventory();
-                        transitInventory.Location = ipDet[0] != null ? ((Location)ipDet[0]).Code : (ipDet[5] != null ? ((Location)ipDet[5]).Code : null);
-                        transitInventory.Item = (string)ipDet[1];
-                        transitInventory.Qty = (decimal)ipDet[2] - (decimal)ipDet[3];
-                        transitInventory.EffectiveDate = (DateTime)ipDet[4];
-
-                        transitInventoryList.Add(transitInventory);
-                    }
-                }
-                #endregion
-
-                #region 检验在途
-                if (inspLocList != null && inspLocList.Count > 0)
-                {
-                    foreach (object[] inspLoc in inspLocList)
-                    {
-                        //记录在途库存
-                        TransitInventory transitInventory = new TransitInventory();
-                        transitInventory.Location = (string)inspLoc[0];
-                        transitInventory.Item = (string)inspLoc[1];
-                        transitInventory.Qty = (decimal)inspLoc[2];
-                        transitInventory.EffectiveDate = (DateTime)inspLoc[3];
-
-                        transitInventoryList.Add(transitInventory);
-                        log.Debug("In-Process inspect order detail records as transit inventory. location[" + transitInventory.Location + "], item[" + transitInventory.Item + "], qty[" + transitInventory.Qty + "], effectiveDate[" + transitInventory.EffectiveDate + "]");
-                    }
-                }
-                #endregion
-                #endregion
-
-                #region 根据客户需求生成发货计划
-                #region 获取所有销售路线明细
-                criteria = DetachedCriteria.For<Flow>();
-
-                criteria.SetProjection(Projections.ProjectionList()
-                    .Add(Projections.GroupProperty("Code"))
-                    .Add(Projections.GroupProperty("MRPOption")));
-
-                criteria.Add(Expression.Eq("IsActive", true));
-                criteria.Add(Expression.Eq("Type", BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_DISTRIBUTION));
-
-                IList<object[]> flowList = this.criteriaMgr.FindAll<object[]>(criteria);
-                #endregion
-
-                #region 获取客户需求
-                criteria = DetachedCriteria.For<CustomerScheduleDetail>();
-                criteria.CreateAlias("CustomerSchedule", "cs");
-
-                criteria.Add(Expression.Eq("cs.Type", BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY));
-                criteria.Add(Expression.Eq("cs.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT));
-                criteria.Add(Expression.Ge("StartTime", effectiveDate));
-
-                IList<CustomerScheduleDetail> customerScheduleDetailList = this.criteriaMgr.FindAll<CustomerScheduleDetail>(criteria);
-
-                #region 取得有效的CustomerScheduleDetail
-                IList<CustomerScheduleDetail> effectiveCustomerScheduleDetailList = customerScheduleDetailMgr.GetEffectiveCustomerScheduleDetail(customerScheduleDetailList, effectiveDate);
-                #endregion
-                #endregion
-
-                #region 循环销售路线生成发货计划
-                if (flowList != null && flowList.Count > 0)
-                {
-                    foreach (object[] flow in flowList)
-                    {
-                        string flowCode = (string)flow[0];
-                        string mrpOption = (string)flow[1];
-
-                        var targetCustomerScheduleDetailList = from det in effectiveCustomerScheduleDetailList
-                                                               where det.CustomerSchedule.Flow == flowCode
-                                                               select det;
-
-                        IListHelper.AddRange(mrpShipPlanList, TransferCustomerPlan2ShipPlan(targetCustomerScheduleDetailList != null ? targetCustomerScheduleDetailList.ToList() : null, effectiveDate, dateTimeNow, user));
-                    }
-                }
-                #endregion
-                #endregion
-
-                #region 查询并缓存所有FlowDetail
-                criteria = DetachedCriteria.For<FlowDetail>();
-                criteria.CreateAlias("Flow", "f");
-                criteria.CreateAlias("Item", "i");
-                criteria.CreateAlias("i.Uom", "iu");
-                criteria.CreateAlias("Uom", "u");
-                criteria.CreateAlias("i.Location", "il", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("i.Bom", "ib", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("i.Routing", "ir", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("LocationFrom", "lf", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("LocationTo", "lt", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("f.LocationFrom", "flf", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("f.LocationTo", "flt", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("Bom", "b", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("Routing", "r", JoinType.LeftOuterJoin);
-                criteria.CreateAlias("f.Routing", "fr", JoinType.LeftOuterJoin);
-
-                criteria.SetProjection(Projections.ProjectionList()
-                    .Add(Projections.GroupProperty("f.Code").As("Flow"))
-                    .Add(Projections.GroupProperty("f.Type").As("FlowType"))
-                    .Add(Projections.GroupProperty("i.Code").As("Item"))
-                    .Add(Projections.GroupProperty("lf.Code").As("LocationFrom"))
-                    .Add(Projections.GroupProperty("lt.Code").As("LocationTo"))
-                    .Add(Projections.GroupProperty("flf.Code").As("FlowLocationFrom"))
-                    .Add(Projections.GroupProperty("flt.Code").As("FlowLocationTo"))
-                    .Add(Projections.GroupProperty("MRPWeight").As("MRPWeight"))
-                    .Add(Projections.GroupProperty("b.Code").As("Bom"))
-                    .Add(Projections.GroupProperty("r.Code").As("Routing"))
-                    .Add(Projections.GroupProperty("fr.Code").As("FlowRouting"))
-                    .Add(Projections.GroupProperty("iu.Code").As("ItemUom"))
-                    .Add(Projections.GroupProperty("u.Code").As("Uom"))
-                    .Add(Projections.GroupProperty("f.LeadTime").As("LeadTime"))
-                    .Add(Projections.GroupProperty("ib.Code").As("ItemBom"))
-                    .Add(Projections.GroupProperty("ir.Code").As("ItemRouting"))
-                    .Add(Projections.GroupProperty("il.Code").As("ItemLocation"))
-                    .Add(Projections.GroupProperty("UnitCount").As("UnitCount"))
-                    .Add(Projections.GroupProperty("i.Desc1").As("ItemDesc1"))
-                    .Add(Projections.GroupProperty("i.Desc2").As("ItemDesc2"))
-                    .Add(Projections.GroupProperty("Id").As("Id"))
-                    );
-
-                criteria.Add(Expression.Eq("f.IsActive", true));
-                criteria.Add(Expression.Eq("f.Type", BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_TRANSFER));
-                criteria.Add(Expression.Gt("MRPWeight", 0));
-                criteria.Add(Expression.Eq("f.IsMRP", true));
-
-                IList<object[]> flowDetailList = this.criteriaMgr.FindAll<object[]>(criteria);
-
-                var targetFlowDetailList = from fd in flowDetailList
-                                           select new FlowDetailSnapShot
-                                           {
-                                               Flow = (string)fd[0],
-                                               FlowType = (string)fd[1],
-                                               Item = (string)fd[2],
-                                               LocationFrom = fd[3] != null ? (string)fd[3] : fd[5] != null ? (string)fd[5] : (string)fd[16],
-                                               LocationTo = fd[4] != null ? (string)fd[4] : (string)fd[6],
-                                               MRPWeight = (int)fd[7],
-                                               Bom = (string)fd[1] != BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION ? null : fd[8] != null ? (string)fd[8] : fd[14] != null ? (string)fd[14] : (string)fd[2],  //FlowDetail --> Item.Bom --> Item.Code
-                                               Routing = (string)fd[1] != BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION ? null : fd[9] != null ? (string)fd[9] : fd[10] != null ? (string)fd[10] : fd[15] != null ? (string)fd[15] : null, //FlowDetail --> Flow --> Item.Routing
-                                               BaseUom = (string)fd[11],
-                                               Uom = (string)fd[12],
-                                               LeadTime = fd[13] != null ? (decimal)fd[13] : 0,
-                                               UnitCount = (decimal)fd[17],
-                                               ItemDescription = ((fd[18] != null ? fd[18] : string.Empty) + ((fd[19] != null && fd[19] != string.Empty) ? "[" + fd[19] + "]" : string.Empty)),
-                                               Id = (int)fd[20]
-                                           };
-
-                IList<FlowDetailSnapShot> flowDetailSnapShotList = new List<FlowDetailSnapShot>();
-                if (targetFlowDetailList != null && targetFlowDetailList.Count() > 0)
-                {
-                    flowDetailSnapShotList = targetFlowDetailList.ToList();
-                }
-
-                #region 处理引用
-                if (flowDetailSnapShotList != null && flowDetailSnapShotList.Count > 0)
-                {
-                    criteria = DetachedCriteria.For<Flow>();
-
-                    criteria.CreateAlias("LocationFrom", "flf", JoinType.LeftOuterJoin);
-                    criteria.CreateAlias("LocationTo", "flt", JoinType.LeftOuterJoin);
-                    criteria.CreateAlias("Routing", "fr", JoinType.LeftOuterJoin);
+                    criteria.Add(Expression.Eq("io.IsSeperated", false));
+                    criteria.Add(Expression.Eq("io.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE));
 
                     criteria.SetProjection(Projections.ProjectionList()
-                        .Add(Projections.GroupProperty("Code").As("Flow"))
-                        .Add(Projections.GroupProperty("Type").As("FlowType"))
-                        .Add(Projections.GroupProperty("ReferenceFlow").As("ReferenceFlow"))
-                        .Add(Projections.GroupProperty("flf.Code").As("FlowLocationFrom"))
-                        .Add(Projections.GroupProperty("flt.Code").As("FlowLocationTo"))
-                        .Add(Projections.GroupProperty("fr.Code").As("FlowRouting"))
-                        );
+                       .Add(Projections.GroupProperty("lt.Code").As("Location"))
+                       .Add(Projections.GroupProperty("i.Code").As("Item"))
+                       .Add(Projections.Sum("lld.Qty"))
+                       .Add(Projections.GroupProperty("io.EstimateInspectDate"))
+                       );
 
-                    criteria.Add(Expression.Eq("IsActive", true));
-                    criteria.Add(Expression.IsNotNull("ReferenceFlow"));
-                    criteria.Add(Expression.Eq("IsMRP", true));
-                    criteria.Add(Expression.Not(Expression.Eq("Type", BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_DISTRIBUTION)));
+                    IList<object[]> inspLocList = this.criteriaMgr.FindAll<object[]>(criteria);
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取检验在途完成。");
+                    #endregion
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取数据完成。");
+                    #endregion
 
-                    IList<object[]> refFlowList = this.criteriaMgr.FindAll<object[]>(criteria);
-
-                    if (refFlowList != null && refFlowList.Count > 0)
+                    #region 处理数据
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理数据。");
+                    #region 获取所有库位的安全库存
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理所有库位的安全库存。");
+                    IList<SafeInventory> locationSafeQtyList = new List<SafeInventory>();
+                    if (safeQtyList != null && safeQtyList.Count > 0)
                     {
-                        foreach (object[] refFlow in refFlowList)
-                        {
-                            var refFlowDetailList = from fd in flowDetailSnapShotList
-                                                    where string.Compare(fd.Flow, (string)refFlow[2]) == 0
-                                                    select fd;
+                        var unGroupSafeQtyList = from safeQty in safeQtyList
+                                                 select new
+                                                 {
+                                                     Location = (safeQty[1] != null ? (string)safeQty[1] : (string)safeQty[0]),
+                                                     Item = (string)safeQty[2],
+                                                     SafeQty = safeQty[3] != null ? (decimal)safeQty[3] : 0
+                                                 };
 
-                            if (refFlowDetailList != null && refFlowDetailList.Count() > 0)
-                            {
-                                IListHelper.AddRange(flowDetailSnapShotList, (from fd in refFlowDetailList
-                                                                              select new FlowDetailSnapShot
-                                                                              {
-                                                                                  Flow = (string)refFlow[0],
-                                                                                  FlowType = (string)refFlow[1],
-                                                                                  Item = fd.Item,
-                                                                                  LocationFrom = (string)refFlow[3],
-                                                                                  LocationTo = (string)refFlow[4],
-                                                                                  MRPWeight = fd.MRPWeight,
-                                                                                  Bom = fd.Bom,
-                                                                                  Routing = (string)refFlow[5],
-                                                                                  BaseUom = fd.BaseUom,
-                                                                                  Uom = fd.Uom,
-                                                                                  LeadTime = fd.LeadTime,
-                                                                                  UnitCount = fd.UnitCount,
-                                                                                  ItemDescription = fd.ItemDescription
-                                                                              }).ToList());
-                            }
-                        }
+                        var groupSafeQtyList = from g in unGroupSafeQtyList
+                                               group g by new { g.Location, g.Item } into result
+                                               select new SafeInventory
+                                               {
+                                                   Location = result.Key.Location,
+                                                   Item = result.Key.Item,
+                                                   SafeQty = result.Max(g => g.SafeQty)
+                                               };
+
+                        locationSafeQtyList = groupSafeQtyList != null ? groupSafeQtyList.ToList() : new List<SafeInventory>();
                     }
-                }
-                #endregion
-                #endregion
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理所有库位的安全库存完成。");
+                    #endregion
 
-                #region 补充安全库存
-                if (inventoryBalanceList != null && inventoryBalanceList.Count > 0)
-                {
-                    var lackInventoryList = from inv in inventoryBalanceList
-                                            where inv.ActiveQty < 0  //可用库存小于0，要补充安全库存
-                                            select inv;
-
-                    if (lackInventoryList != null && lackInventoryList.Count() > 0)
+                    #region 获取实时库存
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理实时库存。");
+                    IList<MrpLocationLotDetail> inventoryBalanceList = new List<MrpLocationLotDetail>();
+                    if (invList != null && invList.Count > 0)
                     {
-                        foreach (MrpLocationLotDetail lackInventory in lackInventoryList)
+                        IListHelper.AddRange<MrpLocationLotDetail>(inventoryBalanceList, (from inv in invList
+                                                                                          select new MrpLocationLotDetail
+                                                                                          {
+                                                                                              Location = (string)inv[0],
+                                                                                              Item = (string)inv[1],
+                                                                                              Qty = (decimal)inv[2],
+                                                                                              SafeQty = (from g in locationSafeQtyList
+                                                                                                         where g.Location == (string)inv[0]
+                                                                                                            && g.Item == (string)inv[1]
+                                                                                                         select g.SafeQty).FirstOrDefault()
+                                                                                          }).ToList());
+                    }
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理实时库存完成。");
+                    #endregion
+
+                    #region 没有库存的安全库存全部转换为InventoryBalance
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理没有库存的安全库存全部转换为InventoryBalance。");
+                    if (locationSafeQtyList != null && locationSafeQtyList.Count > 0)
+                    {
+                        var eqSafeQtyList = from sq in locationSafeQtyList
+                                            join inv in inventoryBalanceList on new { Location = sq.Location, Item = sq.Item } equals new { Location = inv.Location, Item = inv.Item }
+                                            select sq;
+
+                        IList<SafeInventory> lackSafeQtyList = null;
+                        if (eqSafeQtyList != null && eqSafeQtyList.Count() > 0)
                         {
-                            #region 扣减在途，不考虑在途的到货时间
-                            var transitConsumed = from trans in transitInventoryList
-                                                  where trans.Location == lackInventory.Location
-                                                      && trans.Item == lackInventory.Item && trans.Qty > 0
-                                                  select trans;
+                            lackSafeQtyList = locationSafeQtyList.Except(eqSafeQtyList.ToList(), new SafeInventoryComparer()).ToList();
+                        }
+                        else
+                        {
+                            lackSafeQtyList = locationSafeQtyList;
+                        }
 
-                            if (transitConsumed != null && transitConsumed.Count() > 0)
+                        if (lackSafeQtyList != null && lackSafeQtyList.Count > 0)
+                        {
+                            var mlldList = from sq in lackSafeQtyList
+                                           where sq.SafeQty > 0
+                                           select new MrpLocationLotDetail
+                                           {
+                                               Location = sq.Location,
+                                               Item = sq.Item,
+                                               Qty = 0,
+                                               SafeQty = sq.SafeQty
+                                           };
+
+                            if (mlldList != null && mlldList.Count() > 0)
                             {
-                                foreach (TransitInventory inventory in transitConsumed)
+                                if (inventoryBalanceList == null)
                                 {
-                                    if ((-lackInventory.ActiveQty) > inventory.Qty)
-                                    {
-                                        lackInventory.Qty += inventory.Qty;
-                                        inventory.Qty = 0;
-                                    }
-                                    else
-                                    {
-                                        inventory.Qty += lackInventory.ActiveQty;
-                                        lackInventory.Qty = lackInventory.SafeQty;
-
-                                        break;
-                                    }
+                                    inventoryBalanceList = mlldList.ToList();
+                                }
+                                else
+                                {
+                                    IListHelper.AddRange<MrpLocationLotDetail>(inventoryBalanceList, mlldList.ToList());
                                 }
                             }
-
-                            if (lackInventory.ActiveQty == 0)
-                            {
-                                //在途满足库存短缺
-                                continue;
-                            }
-                            else
-                            {
-                                //在途不满足库存短缺
-                                Item item = this.itemMgr.CheckAndLoadItem(lackInventory.Item);
-
-                                MrpReceivePlan mrpReceivePlan = new MrpReceivePlan();
-                                mrpReceivePlan.Item = lackInventory.Item;
-                                mrpReceivePlan.Uom = item.Uom.Code;
-                                mrpReceivePlan.Location = lackInventory.Location;
-                                mrpReceivePlan.Qty = -lackInventory.ActiveQty;
-                                mrpReceivePlan.UnitCount = item.UnitCount;
-                                mrpReceivePlan.ReceiveTime = effectiveDate;
-                                mrpReceivePlan.SourceType = BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK;
-                                mrpReceivePlan.SourceDateType = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY;
-                                mrpReceivePlan.SourceId = lackInventory.Location;
-                                mrpReceivePlan.SourceUnitQty = 1;
-                                mrpReceivePlan.EffectiveDate = effectiveDate;
-                                mrpReceivePlan.CreateDate = dateTimeNow;
-                                mrpReceivePlan.CreateUser = user.Code;
-                                mrpReceivePlan.ItemDescription = item.Description;
-
-                                //this.mrpReceivePlanMgr.CreateMrpReceivePlan(mrpReceivePlan);
-
-                                log.Debug("Create receive plan for safe stock, location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "]");
-
-                                CalculateNextShipPlan(mrpReceivePlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
-                            }
-                            #endregion
                         }
                     }
-                }
-                #endregion
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理没有库存的安全库存全部转换为InventoryBalance完成。");
+                    #endregion
 
-                #region 循环生成入库计划/发货计划
-                if (mrpShipPlanList != null && mrpShipPlanList.Count > 0)
-                {
-                    var sortedMrpShipPlanList = from plan in mrpShipPlanList
-                                                orderby plan.StartTime ascending
-                                                select plan;
+                    #region 发运在途 ASN
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理发运在途。");
+                    IList<TransitInventory> transitInventoryList = new List<TransitInventory>();
 
-                    foreach (MrpShipPlan mrpShipPlan in sortedMrpShipPlanList)
+                    if (ipDetList != null && ipDetList.Count > 0)
                     {
-                        NestCalculateMrpShipPlanAndReceivePlan(mrpShipPlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
-                    }
-                }
-                #endregion
+                        foreach (object[] ipDet in ipDetList)
+                        {
+                            //记录在途库存
+                            TransitInventory transitInventory = new TransitInventory();
+                            transitInventory.Location = ipDet[0] != null ? ((Location)ipDet[0]).Code : (ipDet[5] != null ? ((Location)ipDet[5]).Code : null);
+                            transitInventory.Item = (string)ipDet[1];
+                            transitInventory.Qty = (decimal)ipDet[2] - (decimal)ipDet[3];
+                            transitInventory.EffectiveDate = (DateTime)ipDet[4];
 
-                log.Info("End run ship plan effectivedate:" + effectiveDate.ToLongDateString());
+                            transitInventoryList.Add(transitInventory);
+                        }
+                    }
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理发运在途完成。");
+                    #endregion
+
+                    #region 检验在途
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始处理检验在途。");
+                    if (inspLocList != null && inspLocList.Count > 0)
+                    {
+                        foreach (object[] inspLoc in inspLocList)
+                        {
+                            //记录在途库存
+                            TransitInventory transitInventory = new TransitInventory();
+                            transitInventory.Location = (string)inspLoc[0];
+                            transitInventory.Item = (string)inspLoc[1];
+                            transitInventory.Qty = (decimal)inspLoc[2];
+                            transitInventory.EffectiveDate = (DateTime)inspLoc[3];
+
+                            transitInventoryList.Add(transitInventory);
+                        }
+                    }
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理检验在途完成。");
+                    #endregion
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "处理数据完成。");
+                    #endregion
+
+                    #region 根据客户需求生成发货计划
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始根据客户需求生成发货计划。");
+                    #region 获取所有销售路线明细
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取所有销售路线明细。");
+                    criteria = DetachedCriteria.For<Flow>();
+
+                    criteria.SetProjection(Projections.ProjectionList()
+                        .Add(Projections.GroupProperty("Code"))
+                        .Add(Projections.GroupProperty("MRPOption")));
+
+                    criteria.Add(Expression.Eq("IsActive", true));
+                    criteria.Add(Expression.Eq("Type", BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_DISTRIBUTION));
+
+                    IList<object[]> flowList = this.criteriaMgr.FindAll<object[]>(criteria);
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取所有销售路线明细完成。");
+                    #endregion
+
+                    #region 获取客户需求
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始获取客户需求。");
+                    criteria = DetachedCriteria.For<CustomerScheduleDetail>();
+                    criteria.CreateAlias("CustomerSchedule", "cs");
+
+                    criteria.Add(Expression.Eq("cs.Type", BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY));
+                    criteria.Add(Expression.Eq("cs.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT));
+                    criteria.Add(Expression.Ge("StartTime", effectiveDate));
+                    criteria.Add(Expression.Gt("Qty", decimal.Zero));
+
+                    IList<CustomerScheduleDetail> customerScheduleDetailList = this.criteriaMgr.FindAll<CustomerScheduleDetail>(criteria);
+
+                    #region 取得有效的CustomerScheduleDetail
+                    IList<CustomerScheduleDetail> effectiveCustomerScheduleDetailList = customerScheduleDetailMgr.GetEffectiveCustomerScheduleDetail(customerScheduleDetailList, effectiveDate);
+                    #endregion
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "获取客户需求完成。");
+                    #endregion
+
+                    #region 循环销售路线生成发货计划
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始循环销售路线生成发货计划。");
+                    if (flowList != null && flowList.Count > 0)
+                    {
+                        foreach (object[] flow in flowList)
+                        {
+                            string flowCode = (string)flow[0];
+                            string mrpOption = (string)flow[1];
+
+                            var targetCustomerScheduleDetailList = from det in effectiveCustomerScheduleDetailList
+                                                                   where det.CustomerSchedule.Flow == flowCode
+                                                                   select det;
+
+                            IListHelper.AddRange(mrpShipPlanList, TransferCustomerPlan2ShipPlan(targetCustomerScheduleDetailList != null ? targetCustomerScheduleDetailList.ToList() : null, effectiveDate, dateTimeNow, user));
+                        }
+                    }
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "循环销售路线生成发货计划完成。");
+                    #endregion
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "根据客户需求生成发货计划完成。");
+                    #endregion
+
+                    #region 查询并缓存所有FlowDetail
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始查询并缓存所有移库路线明细。");
+                    criteria = DetachedCriteria.For<FlowDetail>();
+                    criteria.CreateAlias("Flow", "f");
+                    criteria.CreateAlias("Item", "i");
+                    criteria.CreateAlias("i.Uom", "iu");
+                    criteria.CreateAlias("Uom", "u");
+                    criteria.CreateAlias("i.Location", "il", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("i.Bom", "ib", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("i.Routing", "ir", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("LocationFrom", "lf", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("LocationTo", "lt", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("f.LocationFrom", "flf", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("f.LocationTo", "flt", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("Bom", "b", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("Routing", "r", JoinType.LeftOuterJoin);
+                    criteria.CreateAlias("f.Routing", "fr", JoinType.LeftOuterJoin);
+
+                    criteria.SetProjection(Projections.ProjectionList()
+                        .Add(Projections.GroupProperty("f.Code").As("Flow"))
+                        .Add(Projections.GroupProperty("f.Type").As("FlowType"))
+                        .Add(Projections.GroupProperty("i.Code").As("Item"))
+                        .Add(Projections.GroupProperty("lf.Code").As("LocationFrom"))
+                        .Add(Projections.GroupProperty("lt.Code").As("LocationTo"))
+                        .Add(Projections.GroupProperty("flf.Code").As("FlowLocationFrom"))
+                        .Add(Projections.GroupProperty("flt.Code").As("FlowLocationTo"))
+                        .Add(Projections.GroupProperty("MRPWeight").As("MRPWeight"))
+                        .Add(Projections.GroupProperty("b.Code").As("Bom"))
+                        .Add(Projections.GroupProperty("r.Code").As("Routing"))
+                        .Add(Projections.GroupProperty("fr.Code").As("FlowRouting"))
+                        .Add(Projections.GroupProperty("iu.Code").As("ItemUom"))
+                        .Add(Projections.GroupProperty("u.Code").As("Uom"))
+                        .Add(Projections.GroupProperty("f.LeadTime").As("LeadTime"))
+                        .Add(Projections.GroupProperty("ib.Code").As("ItemBom"))
+                        .Add(Projections.GroupProperty("ir.Code").As("ItemRouting"))
+                        .Add(Projections.GroupProperty("il.Code").As("ItemLocation"))
+                        .Add(Projections.GroupProperty("UnitCount").As("UnitCount"))
+                        .Add(Projections.GroupProperty("i.Desc1").As("ItemDesc1"))
+                        .Add(Projections.GroupProperty("i.Desc2").As("ItemDesc2"))
+                        .Add(Projections.GroupProperty("Id").As("Id"))
+                        );
+
+                    criteria.Add(Expression.Eq("f.IsActive", true));
+                    criteria.Add(Expression.Eq("f.Type", BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_TRANSFER));
+                    criteria.Add(Expression.Gt("MRPWeight", 0));
+                    criteria.Add(Expression.Eq("f.IsMRP", true));
+
+                    IList<object[]> flowDetailList = this.criteriaMgr.FindAll<object[]>(criteria);
+
+                    var targetFlowDetailList = from fd in flowDetailList
+                                               select new FlowDetailSnapShot
+                                               {
+                                                   Flow = (string)fd[0],
+                                                   FlowType = (string)fd[1],
+                                                   Item = (string)fd[2],
+                                                   LocationFrom = fd[3] != null ? (string)fd[3] : fd[5] != null ? (string)fd[5] : (string)fd[16],
+                                                   LocationTo = fd[4] != null ? (string)fd[4] : (string)fd[6],
+                                                   MRPWeight = (int)fd[7],
+                                                   Bom = (string)fd[1] != BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION ? null : fd[8] != null ? (string)fd[8] : fd[14] != null ? (string)fd[14] : (string)fd[2],  //FlowDetail --> Item.Bom --> Item.Code
+                                                   Routing = (string)fd[1] != BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION ? null : fd[9] != null ? (string)fd[9] : fd[10] != null ? (string)fd[10] : fd[15] != null ? (string)fd[15] : null, //FlowDetail --> Flow --> Item.Routing
+                                                   BaseUom = (string)fd[11],
+                                                   Uom = (string)fd[12],
+                                                   LeadTime = fd[13] != null ? (decimal)fd[13] : 0,
+                                                   UnitCount = (decimal)fd[17],
+                                                   ItemDescription = ((fd[18] != null ? fd[18] : string.Empty) + ((fd[19] != null && fd[19] != string.Empty) ? "[" + fd[19] + "]" : string.Empty)),
+                                                   Id = (int)fd[20]
+                                               };
+
+                    IList<FlowDetailSnapShot> flowDetailSnapShotList = new List<FlowDetailSnapShot>();
+                    if (targetFlowDetailList != null && targetFlowDetailList.Count() > 0)
+                    {
+                        flowDetailSnapShotList = targetFlowDetailList.ToList();
+                    }
+
+                    #region 处理引用
+                    if (flowDetailSnapShotList != null && flowDetailSnapShotList.Count > 0)
+                    {
+                        criteria = DetachedCriteria.For<Flow>();
+
+                        criteria.CreateAlias("LocationFrom", "flf", JoinType.LeftOuterJoin);
+                        criteria.CreateAlias("LocationTo", "flt", JoinType.LeftOuterJoin);
+                        criteria.CreateAlias("Routing", "fr", JoinType.LeftOuterJoin);
+
+                        criteria.SetProjection(Projections.ProjectionList()
+                            .Add(Projections.GroupProperty("Code").As("Flow"))
+                            .Add(Projections.GroupProperty("Type").As("FlowType"))
+                            .Add(Projections.GroupProperty("ReferenceFlow").As("ReferenceFlow"))
+                            .Add(Projections.GroupProperty("flf.Code").As("FlowLocationFrom"))
+                            .Add(Projections.GroupProperty("flt.Code").As("FlowLocationTo"))
+                            .Add(Projections.GroupProperty("fr.Code").As("FlowRouting"))
+                            );
+
+                        criteria.Add(Expression.Eq("IsActive", true));
+                        criteria.Add(Expression.IsNotNull("ReferenceFlow"));
+                        criteria.Add(Expression.Eq("IsMRP", true));
+                        criteria.Add(Expression.Not(Expression.Eq("Type", BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_DISTRIBUTION)));
+
+                        IList<object[]> refFlowList = this.criteriaMgr.FindAll<object[]>(criteria);
+
+                        if (refFlowList != null && refFlowList.Count > 0)
+                        {
+                            foreach (object[] refFlow in refFlowList)
+                            {
+                                var refFlowDetailList = from fd in flowDetailSnapShotList
+                                                        where string.Compare(fd.Flow, (string)refFlow[2]) == 0
+                                                        select fd;
+
+                                if (refFlowDetailList != null && refFlowDetailList.Count() > 0)
+                                {
+                                    IListHelper.AddRange(flowDetailSnapShotList, (from fd in refFlowDetailList
+                                                                                  select new FlowDetailSnapShot
+                                                                                  {
+                                                                                      Flow = (string)refFlow[0],
+                                                                                      FlowType = (string)refFlow[1],
+                                                                                      Item = fd.Item,
+                                                                                      LocationFrom = (string)refFlow[3],
+                                                                                      LocationTo = (string)refFlow[4],
+                                                                                      MRPWeight = fd.MRPWeight,
+                                                                                      Bom = fd.Bom,
+                                                                                      Routing = (string)refFlow[5],
+                                                                                      BaseUom = fd.BaseUom,
+                                                                                      Uom = fd.Uom,
+                                                                                      LeadTime = fd.LeadTime,
+                                                                                      UnitCount = fd.UnitCount,
+                                                                                      ItemDescription = fd.ItemDescription
+                                                                                  }).ToList());
+                                }
+                            }
+                        }
+                    }
+                    #endregion
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "查询并缓存所有移库路线明细完成。");
+                    #endregion
+
+                    #region 循环生成入库计划/发货计划
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "开始循环生成入库计划/发货计划。");
+                    if (mrpShipPlanList != null && mrpShipPlanList.Count > 0)
+                    {
+                        var sortedMrpShipPlanList = from plan in mrpShipPlanList
+                                                    orderby plan.StartTime ascending
+                                                    select plan;
+
+                        foreach (MrpShipPlan mrpShipPlan in sortedMrpShipPlanList)
+                        {
+                            NestCalculateMrpShipPlanAndReceivePlan(batchNo, effectiveDate, mrpShipPlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
+                        }
+                    }
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "循环生成入库计划/发货计划完成。");
+                    #endregion
+
+                    #region 补充安全库存
+                    if (inventoryBalanceList != null && inventoryBalanceList.Count > 0)
+                    {
+                        //var lackInventoryList = from inv in inventoryBalanceList
+                        //                        where inv.ActiveQty < 0  //可用库存小于0，要补充安全库存
+                        //                        select inv;
+
+                        //if (lackInventoryList != null && lackInventoryList.Count() > 0)
+                        //{
+                        //    foreach (MrpLocationLotDetail lackInventory in lackInventoryList)
+                        //    {
+                        //        #region 扣减在途，不考虑在途的到货时间
+                        //        var transitConsumed = from trans in transitInventoryList
+                        //                              where trans.Location == lackInventory.Location
+                        //                                  && trans.Item == lackInventory.Item && trans.Qty > 0
+                        //                              select trans;
+
+                        //        if (transitConsumed != null && transitConsumed.Count() > 0)
+                        //        {
+                        //            foreach (TransitInventory inventory in transitConsumed)
+                        //            {
+                        //                if ((-lackInventory.ActiveQty) > inventory.Qty)
+                        //                {
+                        //                    lackInventory.Qty += inventory.Qty;
+                        //                    inventory.Qty = 0;
+                        //                }
+                        //                else
+                        //                {
+                        //                    inventory.Qty += lackInventory.ActiveQty;
+                        //                    lackInventory.Qty = lackInventory.SafeQty;
+
+                        //                    break;
+                        //                }
+                        //            }
+                        //        }
+
+                        //        if (lackInventory.ActiveQty == 0)
+                        //        {
+                        //            //在途满足库存短缺
+                        //            continue;
+                        //        }
+                        //        else
+                        //        {
+                        //            //在途不满足库存短缺
+                        //            Item item = this.itemMgr.CheckAndLoadItem(lackInventory.Item);
+
+                        //            MrpReceivePlan mrpReceivePlan = new MrpReceivePlan();
+                        //            mrpReceivePlan.Item = lackInventory.Item;
+                        //            mrpReceivePlan.ItemDescription = item.Description;
+                        //            mrpReceivePlan.Uom = item.Uom.Code;
+                        //            mrpReceivePlan.Location = lackInventory.Location;
+                        //            mrpReceivePlan.Qty = -lackInventory.ActiveQty;
+                        //            mrpReceivePlan.UnitCount = item.UnitCount;
+                        //            mrpReceivePlan.ReceiveTime = effectiveDate;
+                        //            mrpReceivePlan.SourceType = BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK;
+                        //            mrpReceivePlan.SourceDateType = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY;
+                        //            mrpReceivePlan.SourceId = lackInventory.Location;
+                        //            mrpReceivePlan.SourceUnitQty = 1;
+                        //            mrpReceivePlan.EffectiveDate = effectiveDate;
+                        //            mrpReceivePlan.CreateDate = dateTimeNow;
+                        //            mrpReceivePlan.CreateUser = user.Code;
+
+                        //            //this.mrpReceivePlanMgr.CreateMrpReceivePlan(mrpReceivePlan);
+
+                        //            log.Debug("Create receive plan for safe stock, location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "]");
+
+                        //            CalculateNextShipPlan(batchNo, effectiveDate, mrpReceivePlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
+                        //        }
+                        //        #endregion
+                        //    }
+                        //}
+                    }
+                    #endregion
+
+                    InsertInfoRunShipPlanLog(batchNo, effectiveDate, user.Name, "运行发运计划完成。");
+                }
+                catch (Exception ex)
+                {
+                    InsertErrRunShipPlanLog(batchNo, effectiveDate, user.Name, "运行发运计划异常，" + ex.Message + "。");
+                }
             }
         }
 
@@ -800,13 +838,8 @@ namespace com.Sconit.Service.MRP.Impl
             return mrpShipPlanList;
         }
 
-        private void NestCalculateMrpShipPlanAndReceivePlan(MrpShipPlan mrpShipPlan, IList<MrpLocationLotDetail> inventoryBalanceList, IList<TransitInventory> transitInventoryList, IList<FlowDetailSnapShot> flowDetailSnapShotList, DateTime effectiveDate, DateTime dateTimeNow, User user)
+        private void NestCalculateMrpShipPlanAndReceivePlan(int batchNo, DateTime effDate, MrpShipPlan mrpShipPlan, IList<MrpLocationLotDetail> inventoryBalanceList, IList<TransitInventory> transitInventoryList, IList<FlowDetailSnapShot> flowDetailSnapShotList, DateTime effectiveDate, DateTime dateTimeNow, User user)
         {
-            //if (mrpShipPlan.IsExpire)
-            //{
-            //    return; //过期需求不往下传递
-            //}
-
             if (mrpShipPlan.LocationFrom != null && mrpShipPlan.LocationFrom.Trim() != string.Empty)
             {
                 #region 消耗本机物料
@@ -816,19 +849,15 @@ namespace com.Sconit.Service.MRP.Impl
                 }
                 else if (mrpShipPlan.Qty < 0)
                 {
-                    throw new TechnicalException("Mrp Ship Plan Qty Can't < 0");
+                    InsertErrRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "MrpShipPlan的数量不能小于零。");
+                    return;
                 }
 
                 //回冲库存
-                BackFlushInventory(mrpShipPlan, mrpShipPlan.Item, mrpShipPlan.UnitQty, inventoryBalanceList);
+                BackFlushInventory(batchNo, effDate, mrpShipPlan, inventoryBalanceList, user);
 
                 //回冲在途
-                BackFlushTransitInventory(mrpShipPlan, mrpShipPlan.Item, mrpShipPlan.UnitQty, transitInventoryList);
-                //if (mrpShipPlan.StartTime >= effectiveDate      //只有StartTime>= EffectiveDate才能回冲
-                //|| mrpShipPlan.SourceType == BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK)  //或者回冲安全库存
-                //{
-
-                //}
+                BackFlushTransitInventory(batchNo, effDate, mrpShipPlan, transitInventoryList, user);
                 #endregion
 
                 #region 生成入库计划
@@ -842,7 +871,7 @@ namespace com.Sconit.Service.MRP.Impl
                 {
                     #region 非生产直接从发运计划变为入库计划
                     MrpReceivePlan mrpReceivePlan = new MrpReceivePlan();
-                    mrpReceivePlan.RefLocs = mrpShipPlan.RefLocs;
+                    mrpReceivePlan.RefFlows = mrpShipPlan.RefFlows;
                     mrpReceivePlan.IsExpire = mrpShipPlan.IsExpire;
                     mrpReceivePlan.ExpireStartTime = mrpShipPlan.ExpireStartTime;
                     mrpReceivePlan.Item = mrpShipPlan.Item;
@@ -860,23 +889,21 @@ namespace com.Sconit.Service.MRP.Impl
                     mrpReceivePlan.EffectiveDate = effectiveDate;
                     mrpReceivePlan.CreateDate = dateTimeNow;
                     mrpReceivePlan.CreateUser = user.Code;
-                    mrpReceivePlan.FlowDetailIdList = mrpShipPlan.FlowDetailIdList;
-                    if (!mrpReceivePlan.TryAddRefLoc(mrpReceivePlan.Location))
+                    if (!mrpReceivePlan.TryAddRefFlow(mrpShipPlan.Flow))
                     {
-                        log.Warn("Receive plan location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "]出现路线循环。");
+                        InsertErrRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "路线出现循环【" + mrpReceivePlan.RefFlows + "】。");
                     }
                     else
                     {
-                        //this.mrpReceivePlanMgr.CreateMrpReceivePlan(mrpReceivePlan);
+                        InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "生成毛需求。");
                         currMrpReceivePlanList.Add(mrpReceivePlan);
-                        log.Debug("Transfer ship plan flow[" + mrpShipPlan.Flow + "], qty[" + mrpShipPlan.Qty + "] to receive plan location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "]");
                     }
                     #endregion
                 }
                 else
                 {
                     #region 生产，需要分解Bom
-                    log.Debug("Production flow start resolve bom");
+                    InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "开始分解Bom。");
                     Bom bom = this.bomMgr.CheckAndLoadBom(mrpShipPlan.Bom);
                     IList<BomDetail> bomDetailList = this.bomDetailMgr.GetFlatBomDetail(mrpShipPlan.Bom, mrpShipPlan.StartTime);
 
@@ -963,18 +990,18 @@ namespace com.Sconit.Service.MRP.Impl
                             mrpReceivePlan.EffectiveDate = effectiveDate;
                             mrpReceivePlan.CreateDate = dateTimeNow;
                             mrpReceivePlan.CreateUser = user.Code;
-                            mrpReceivePlan.FlowDetailIdList = mrpShipPlan.FlowDetailIdList;
 
                             //this.mrpReceivePlanMgr.CreateMrpReceivePlan(mrpReceivePlan);
                             currMrpReceivePlanList.Add(mrpReceivePlan);
                             #endregion
                         }
+
+                        InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "分解Bom完成。");
                     }
                     else
                     {
-                        log.Error("Can't find bom detial for code " + mrpShipPlan.Bom);
+                        InsertErrRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "没有找到到Bom【" + mrpShipPlan.Bom + "】");
                     }
-                    log.Debug("Production flow end resolve bom");
                     #endregion
                 }
                 #endregion
@@ -982,15 +1009,15 @@ namespace com.Sconit.Service.MRP.Impl
                 #region 计算下游发运计划
                 foreach (MrpReceivePlan mrpReceivePlan in currMrpReceivePlanList)
                 {
-                    log.Debug("Transfer ship plan flow[" + mrpShipPlan.Flow + "], qty[" + mrpShipPlan.Qty + "] to receive plan location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "]");
-                    CalculateNextShipPlan(mrpReceivePlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
+                    CalculateNextShipPlan(batchNo, effectiveDate, mrpReceivePlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
                 }
                 #endregion
             }
         }
 
-        private void CalculateNextShipPlan(MrpReceivePlan mrpReceivePlan, IList<MrpLocationLotDetail> inventoryBalanceList, IList<TransitInventory> transitInventoryList, IList<FlowDetailSnapShot> flowDetailSnapShotList, DateTime effectiveDate, DateTime dateTimeNow, User user)
+        private void CalculateNextShipPlan(int batchNo, DateTime effDate, MrpReceivePlan mrpReceivePlan, IList<MrpLocationLotDetail> inventoryBalanceList, IList<TransitInventory> transitInventoryList, IList<FlowDetailSnapShot> flowDetailSnapShotList, DateTime effectiveDate, DateTime dateTimeNow, User user)
         {
+            InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "开始分解毛需求，查找下游路线。");
             if (mrpReceivePlan.ReceiveTime < effectiveDate)
             {
                 //如果窗口时间小于effectivedate，不往下计算
@@ -1001,25 +1028,6 @@ namespace com.Sconit.Service.MRP.Impl
                                      where det.LocationTo == mrpReceivePlan.Location
                                     && det.Item == mrpReceivePlan.Item
                                      select det;
-
-            //#region 如果有多条下游路线，根据Item.DefaultFlow过滤
-            //if (nextFlowDetailList != null && nextFlowDetailList.Count() > 1)
-            //{
-            //    Item item = this.itemMgr.LoadItem(mrpReceivePlan.Item);
-
-            //    if (item.DefaultFlow != null && item.DefaultFlow.Trim() != string.Empty)
-            //    {
-            //        var defaultFlow = from det in nextFlowDetailList
-            //                          where det.Flow == item.DefaultFlow
-            //                          select det;
-
-            //        if (defaultFlow != null && defaultFlow.Count() > 0)
-            //        {
-            //            nextFlowDetailList = defaultFlow;
-            //        }
-            //    }
-            //}
-            //#endregion
 
             if (nextFlowDetailList != null && nextFlowDetailList.Count() > 0)
             {
@@ -1033,22 +1041,11 @@ namespace com.Sconit.Service.MRP.Impl
 
                     MrpShipPlan mrpShipPlan = new MrpShipPlan();
 
-                    if (mrpReceivePlan.ContainFlowDetailId(flowDetail.Id))
-                    {
-                        log.Error("Cycle Flow Detail Find when transfer receive plan location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "] to ship plan flow[" + flowDetail.Flow + "]");
-                        //continue;
-                    }
-                    else
-                    {
-                        mrpShipPlan.FlowDetailIdList = mrpReceivePlan.FlowDetailIdList;
-                        mrpShipPlan.AddFlowDetailId(flowDetail.Id);
-                    }
-
                     mrpShipPlan.Flow = flowDetail.Flow;
                     mrpShipPlan.FlowType = flowDetail.FlowType;
                     mrpShipPlan.Item = flowDetail.Item;
                     mrpShipPlan.ItemDescription = flowDetail.ItemDescription;
-                    if (mrpReceivePlan.SourceDateType != BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK)
+                    if (mrpReceivePlan.SourceType != BusinessConstants.CODE_MASTER_MRP_SOURCE_TYPE_VALUE_SAFE_STOCK)
                     {
                         mrpShipPlan.StartTime = mrpReceivePlan.ReceiveTime.AddHours(-Convert.ToDouble(flowDetail.LeadTime));
                     }
@@ -1100,22 +1097,22 @@ namespace com.Sconit.Service.MRP.Impl
                     //mrpShipPlan.ExpireStartTime = mrpReceivePlan.ExpireStartTime;
                     mrpShipPlan.CreateDate = dateTimeNow;
                     mrpShipPlan.CreateUser = user.Code;
-                    mrpShipPlan.RefLocs = mrpReceivePlan.RefLocs;
+                    mrpShipPlan.RefFlows = mrpReceivePlan.RefFlows;
 
                     this.mrpShipPlanMgr.CreateMrpShipPlan(mrpShipPlan);
 
-                    log.Debug("Transfer receive plan location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "], qty[" + mrpReceivePlan.Qty + "], sourceType[" + mrpReceivePlan.SourceType + "], sourceId[" + (mrpReceivePlan.SourceId != null ? mrpReceivePlan.SourceId : string.Empty) + "] to ship plan flow[" + mrpShipPlan.Flow + "], qty[" + mrpShipPlan.Qty + "]");
+                    InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, "毛需求分解成功，找到下游路线。");
 
-                    NestCalculateMrpShipPlanAndReceivePlan(mrpShipPlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
+                    NestCalculateMrpShipPlanAndReceivePlan(batchNo, effDate, mrpShipPlan, inventoryBalanceList, transitInventoryList, flowDetailSnapShotList, effectiveDate, dateTimeNow, user);
                 }
             }
             else
             {
-                log.Warn("Can't find next flow for location[" + mrpReceivePlan.Location + "], item[" + mrpReceivePlan.Item + "]");
+                InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpReceivePlan, "毛需求无法分解，没有找到下游路线。");
             }
         }
 
-        private void BackFlushInventory(MrpShipPlan mrpShipPlan, string itemCode, decimal unitQty, IList<MrpLocationLotDetail> inventoryBalanceList)
+        private void BackFlushInventory(int batchNo, DateTime effDate, MrpShipPlan mrpShipPlan, IList<MrpLocationLotDetail> inventoryBalanceList, User user)
         {
             #region 先消耗库存
             if (mrpShipPlan.Qty == 0)
@@ -1125,23 +1122,22 @@ namespace com.Sconit.Service.MRP.Impl
 
             var inventoryConsumed = from inv in inventoryBalanceList
                                     where inv.Location == mrpShipPlan.LocationFrom
-                                    && inv.Item == itemCode && inv.Qty > inv.SafeQty
+                                    && inv.Item == mrpShipPlan.Item && inv.Qty > inv.SafeQty
                                     select inv;
 
             if (inventoryConsumed != null && inventoryConsumed.Count() > 0)
             {
                 foreach (MrpLocationLotDetail inventory in inventoryConsumed)
                 {
-                    if (mrpShipPlan.Qty * unitQty > inventory.ActiveQty)
+                    InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, inventory);
+                    if (mrpShipPlan.Qty * mrpShipPlan.UnitQty > inventory.ActiveQty)
                     {
-                        log.Debug("Backflush inventory for mrpShipPlan flow[" + mrpShipPlan.Flow + "], item[" + itemCode + "], qty[" + mrpShipPlan.Qty + "], sourceType[" + mrpShipPlan.SourceType + "], sourceId[" + (mrpShipPlan.SourceId != null ? mrpShipPlan.SourceId : string.Empty) + "], backflushQty[" + inventory.ActiveQty / unitQty + "]");
-                        mrpShipPlan.Qty -= inventory.ActiveQty / unitQty;
+                        mrpShipPlan.Qty -= inventory.ActiveQty / mrpShipPlan.UnitQty;
                         inventory.Qty = inventory.SafeQty;
                     }
                     else
                     {
-                        log.Debug("Backflush inventory for mrpShipPlan flow[" + mrpShipPlan.Flow + "], item[" + itemCode + "], qty[" + mrpShipPlan.Qty + "], sourceType[" + mrpShipPlan.SourceType + "], sourceId[" + (mrpShipPlan.SourceId != null ? mrpShipPlan.SourceId : string.Empty) + "], backflushQty[" + mrpShipPlan.Qty * unitQty + "]");
-                        inventory.Qty -= mrpShipPlan.Qty * unitQty;
+                        inventory.Qty -= mrpShipPlan.Qty * mrpShipPlan.UnitQty;
                         mrpShipPlan.Qty = 0;
 
                         break;
@@ -1151,7 +1147,7 @@ namespace com.Sconit.Service.MRP.Impl
             #endregion
         }
 
-        private void BackFlushTransitInventory(MrpShipPlan mrpShipPlan, string itemCode, decimal unitQty, IList<TransitInventory> transitInventoryList)
+        private void BackFlushTransitInventory(int batchNo, DateTime effDate, MrpShipPlan mrpShipPlan, IList<TransitInventory> transitInventoryList, User user)
         {
             #region 再根据ShipPlan的StartTime < 在途库存的EffectiveDate消耗在途库存
             if (mrpShipPlan.Qty == 0)
@@ -1161,7 +1157,7 @@ namespace com.Sconit.Service.MRP.Impl
 
             var transitConsumed = from trans in transitInventoryList
                                   where trans.Location == mrpShipPlan.LocationFrom
-                                      && trans.Item == itemCode && trans.Qty > 0
+                                      && trans.Item == mrpShipPlan.Item && trans.Qty > 0
                                       && trans.EffectiveDate <= mrpShipPlan.StartTime
                                   select trans;
 
@@ -1169,16 +1165,16 @@ namespace com.Sconit.Service.MRP.Impl
             {
                 foreach (TransitInventory inventory in transitConsumed)
                 {
-                    if (mrpShipPlan.Qty * unitQty > inventory.Qty)
+                    InsertInfoRunShipPlanLog(batchNo, effDate, user.Name, mrpShipPlan, inventory);
+
+                    if (mrpShipPlan.Qty * mrpShipPlan.UnitQty > inventory.Qty)
                     {
-                        log.Debug("Backflush transit inventory for mrpShipPlan flow[" + mrpShipPlan.Flow + "], item[" + itemCode + "], qty[" + mrpShipPlan.Qty + "], sourceType[" + mrpShipPlan.SourceType + "], sourceId[" + (mrpShipPlan.SourceId != null ? mrpShipPlan.SourceId : string.Empty) + "], effectiveDate[" + inventory.EffectiveDate + "], backflushQty[" + inventory.Qty / unitQty + "]");
-                        mrpShipPlan.Qty -= inventory.Qty / unitQty;
+                        mrpShipPlan.Qty -= inventory.Qty / mrpShipPlan.UnitQty;
                         inventory.Qty = 0;
                     }
                     else
                     {
-                        log.Debug("Backflush transit inventory for mrpShipPlan flow[" + mrpShipPlan.Flow + "], item[" + itemCode + "], qty[" + mrpShipPlan.Qty + "], sourceType[" + mrpShipPlan.SourceType + "], sourceId[" + (mrpShipPlan.SourceId != null ? mrpShipPlan.SourceId : string.Empty) + "], effectiveDate[" + inventory.EffectiveDate + "], backflushQty[" + mrpShipPlan.Qty * unitQty + "]");
-                        inventory.Qty -= mrpShipPlan.Qty * unitQty;
+                        inventory.Qty -= mrpShipPlan.Qty * mrpShipPlan.UnitQty;
                         mrpShipPlan.Qty = 0;
 
                         break;
@@ -1261,6 +1257,189 @@ namespace com.Sconit.Service.MRP.Impl
             }
             #endregion
         }
+
+        private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, string msg)
+        {
+            RunShipPlanLog runlog = new RunShipPlanLog();
+            runlog.BatchNo = batchNo;
+            runlog.EffDate = effDate;
+            runlog.Lvl = "Info";
+            runlog.Msg = msg;
+            runlog.CreateDate = DateTime.Now;
+            runlog.CreateUser = userName;
+            this.genericMgr.Create(runlog);
+        }
+
+        private void InsertErrRunShipPlanLog(int batchNo, DateTime effDate, string userName, string msg)
+        {
+            RunShipPlanLog runlog = new RunShipPlanLog();
+            runlog.BatchNo = batchNo;
+            runlog.EffDate = effDate;
+            runlog.Lvl = "Error";
+            runlog.Msg = msg;
+            runlog.CreateDate = DateTime.Now;
+            runlog.CreateUser = userName;
+            this.genericMgr.Create(runlog);
+        }
+
+        private void InsertErrRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, string msg)
+        {
+            RunShipPlanLog runLog = new RunShipPlanLog();
+            runLog.BatchNo = batchNo;
+            runLog.EffDate = effDate;
+            runLog.Lvl = "Error";
+            runLog.Item = mrpShipPlan.Item;
+            runLog.ItemDesc = mrpShipPlan.ItemDescription;
+            runLog.Qty = mrpShipPlan.Qty;
+            runLog.UnitQty = mrpShipPlan.UnitQty;
+            runLog.LocFrom = mrpShipPlan.LocationFrom;
+            runLog.LocTo = mrpShipPlan.LocationTo;
+            runLog.Flow = mrpShipPlan.Flow;
+            runLog.SourceType = mrpShipPlan.SourceType;
+            runLog.SourceDateType = mrpShipPlan.SourceDateType;
+            runLog.SourceId = mrpShipPlan.SourceId;
+            runLog.StartTime = mrpShipPlan.StartTime;
+            runLog.WindowTime = mrpShipPlan.WindowTime;
+            runLog.Bom = mrpShipPlan.Bom;
+            runLog.Msg = msg;
+            runLog.CreateDate = DateTime.Now;
+            runLog.CreateUser = userName;
+
+            this.genericMgr.Create(runLog);
+        }
+
+        private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, string msg)
+        {
+            RunShipPlanLog runLog = new RunShipPlanLog();
+            runLog.BatchNo = batchNo;
+            runLog.EffDate = effDate;
+            runLog.Lvl = "Info";
+            runLog.Item = mrpShipPlan.Item;
+            runLog.ItemDesc = mrpShipPlan.ItemDescription;
+            runLog.Qty = mrpShipPlan.Qty;
+            runLog.UnitQty = mrpShipPlan.UnitQty;
+            runLog.LocFrom = mrpShipPlan.LocationFrom;
+            runLog.LocTo = mrpShipPlan.LocationTo;
+            runLog.Flow = mrpShipPlan.Flow;
+            runLog.SourceType = mrpShipPlan.SourceType;
+            runLog.SourceDateType = mrpShipPlan.SourceDateType;
+            runLog.SourceId = mrpShipPlan.SourceId;
+            runLog.StartTime = mrpShipPlan.StartTime;
+            runLog.WindowTime = mrpShipPlan.WindowTime;
+            runLog.Bom = mrpShipPlan.Bom;
+            runLog.Msg = msg;
+            runLog.CreateDate = DateTime.Now;
+            runLog.CreateUser = userName;
+
+            this.genericMgr.Create(runLog);
+        }
+
+        private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpReceivePlan mrpReceivePlan, string msg)
+        {
+            RunShipPlanLog runLog = new RunShipPlanLog();
+            runLog.BatchNo = batchNo;
+            runLog.EffDate = effDate;
+            runLog.Lvl = "Info";
+            runLog.Item = mrpReceivePlan.Item;
+            runLog.ItemDesc = mrpReceivePlan.ItemDescription;
+            runLog.Qty = mrpReceivePlan.Qty;
+            runLog.UnitQty = 1;
+            runLog.LocTo = mrpReceivePlan.Location;
+            runLog.SourceType = mrpReceivePlan.SourceType;
+            runLog.SourceDateType = mrpReceivePlan.SourceDateType;
+            runLog.SourceId = mrpReceivePlan.SourceId;
+            runLog.Msg = msg;
+            runLog.CreateDate = DateTime.Now;
+            runLog.CreateUser = userName;
+
+            this.genericMgr.Create(runLog);
+        }
+
+        private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, MrpLocationLotDetail inventory)
+        {
+            RunShipPlanLog runLog = new RunShipPlanLog();
+            runLog.BatchNo = batchNo;
+            runLog.EffDate = effDate;
+            runLog.Lvl = "Info";
+            runLog.Item = mrpShipPlan.Item;
+            runLog.ItemDesc = mrpShipPlan.ItemDescription;
+            runLog.Qty = mrpShipPlan.Qty;
+            runLog.UnitQty = mrpShipPlan.UnitQty;
+            if (mrpShipPlan.Qty * mrpShipPlan.UnitQty > inventory.ActiveQty)
+            {
+                runLog.MinusQty = inventory.ActiveQty / mrpShipPlan.UnitQty;
+                runLog.EndQty = mrpShipPlan.Qty - inventory.ActiveQty / mrpShipPlan.UnitQty;
+                runLog.EndInvQty = inventory.SafeQty;
+            }
+            else
+            {
+                runLog.MinusQty = mrpShipPlan.Qty;
+                runLog.EndQty = 0;
+                runLog.EndInvQty = inventory.ActiveQty - mrpShipPlan.Qty * mrpShipPlan.UnitQty;
+            }
+            runLog.LocFrom = mrpShipPlan.LocationFrom;
+            runLog.LocTo = mrpShipPlan.LocationTo;
+            runLog.Flow = mrpShipPlan.Flow;
+            runLog.SourceType = mrpShipPlan.SourceType;
+            runLog.SourceDateType = mrpShipPlan.SourceDateType;
+            runLog.SourceId = mrpShipPlan.SourceId;
+            runLog.InvType = "Inventory";
+            runLog.InvLocation = inventory.Location;
+            runLog.InvQty = inventory.Qty;
+            runLog.InvSafeQty = inventory.SafeQty;
+            runLog.StartTime = mrpShipPlan.StartTime;
+            runLog.WindowTime = mrpShipPlan.WindowTime;
+            runLog.Bom = mrpShipPlan.Bom;
+            runLog.Msg = "扣减库存";
+            runLog.CreateDate = DateTime.Now;
+            runLog.CreateUser = userName;
+
+            this.genericMgr.Create(runLog);
+        }
+
+        private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, TransitInventory inventory)
+        {
+            RunShipPlanLog runLog = new RunShipPlanLog();
+            runLog.BatchNo = batchNo;
+            runLog.EffDate = effDate;
+            runLog.Lvl = "Info";
+            runLog.Item = mrpShipPlan.Item;
+            runLog.ItemDesc = mrpShipPlan.ItemDescription;
+            runLog.Qty = mrpShipPlan.Qty;
+            runLog.UnitQty = mrpShipPlan.UnitQty;
+            if (mrpShipPlan.Qty * mrpShipPlan.UnitQty > inventory.Qty)
+            {
+                runLog.MinusQty = inventory.Qty / mrpShipPlan.UnitQty;
+                runLog.EndQty = mrpShipPlan.Qty - inventory.Qty / mrpShipPlan.UnitQty;
+                runLog.EndInvQty = 0;
+            }
+            else
+            {
+                runLog.MinusQty = mrpShipPlan.Qty;
+                runLog.EndQty = 0;
+                runLog.EndInvQty = inventory.Qty - mrpShipPlan.Qty * mrpShipPlan.UnitQty;
+            }
+            runLog.LocFrom = mrpShipPlan.LocationFrom;
+            runLog.LocTo = mrpShipPlan.LocationTo;
+            runLog.Flow = mrpShipPlan.Flow;
+            runLog.SourceType = mrpShipPlan.SourceType;
+            runLog.SourceDateType = mrpShipPlan.SourceDateType;
+            runLog.SourceId = mrpShipPlan.SourceId;
+            runLog.InvType = "InTransit";
+            runLog.InvLocation = inventory.Location;
+            runLog.InvQty = inventory.Qty;
+            runLog.InvSafeQty = 0;
+            runLog.InvEffDate = inventory.EffectiveDate;
+            runLog.StartTime = mrpShipPlan.StartTime;
+            runLog.WindowTime = mrpShipPlan.WindowTime;
+            runLog.Bom = mrpShipPlan.Bom;
+            runLog.Msg = "扣减在途库存";
+            runLog.CreateDate = DateTime.Now;
+            runLog.CreateUser = userName;
+
+            this.genericMgr.Create(runLog);
+        }
+
         #endregion
 
         class SafeInventory
@@ -1270,7 +1449,7 @@ namespace com.Sconit.Service.MRP.Impl
             public decimal SafeQty { get; set; }
         }
 
-        class TransitInventory
+        public class TransitInventory
         {
             public string Location { get; set; }
             public string Item { get; set; }
@@ -1318,145 +1497,7 @@ namespace com.Sconit.Service.MRP.Impl
             public decimal UnitQty { get; set; }
         }
 
-        //class MrpReceivePlan
-        //{
-        //    private string _location;
-        //    public string Location
-        //    {
-        //        get
-        //        {
-        //            return _location;
-        //        }
-        //        set
-        //        {
-        //            _location = value;
-        //        }
-        //    }
-        //    private string _item;
-        //    public string Item
-        //    {
-        //        get
-        //        {
-        //            return _item;
-        //        }
-        //        set
-        //        {
-        //            _item = value;
-        //        }
-        //    }
-        //    private Decimal _qty;
-        //    public Decimal Qty
-        //    {
-        //        get
-        //        {
-        //            return _qty;
-        //        }
-        //        set
-        //        {
-        //            _qty = value;
-        //        }
-        //    }
-        //    private Decimal _unitCount;
-        //    public Decimal UnitCount
-        //    {
-        //        get
-        //        {
-        //            return _unitCount;
-        //        }
-        //        set
-        //        {
-        //            _unitCount = value;
-        //        }
-        //    }
-        //    private DateTime _receiveTime;
-        //    public DateTime ReceiveTime
-        //    {
-        //        get
-        //        {
-        //            return _receiveTime;
-        //        }
-        //        set
-        //        {
-        //            _receiveTime = value;
-        //        }
-        //    }
-        //    private string _sourceDateType;
-        //    public string SourceDateType
-        //    {
-        //        get
-        //        {
-        //            return _sourceDateType;
-        //        }
-        //        set
-        //        {
-        //            _sourceDateType = value;
-        //        }
-        //    }
-        //    private string _sourceType;
-        //    public string SourceType
-        //    {
-        //        get
-        //        {
-        //            return _sourceType;
-        //        }
-        //        set
-        //        {
-        //            _sourceType = value;
-        //        }
-        //    }
-        //    private string _sourceId;
-        //    public string SourceId
-        //    {
-        //        get
-        //        {
-        //            return _sourceId;
-        //        }
-        //        set
-        //        {
-        //            _sourceId = value;
-        //        }
-        //    }
-        //    private Boolean _isExpire;
-        //    public Boolean IsExpire
-        //    {
-        //        get
-        //        {
-        //            return _isExpire;
-        //        }
-        //        set
-        //        {
-        //            _isExpire = value;
-        //        }
-        //    }
-        //    private string _uom;
-        //    public string Uom
-        //    {
-        //        get
-        //        {
-        //            return _uom;
-        //        }
-        //        set
-        //        {
-        //            _uom = value;
-        //        }
-        //    }
-        //    private DateTime? _expireStartTime;
-        //    public DateTime? ExpireStartTime
-        //    {
-        //        get
-        //        {
-        //            return _expireStartTime;
-        //        }
-        //        set
-        //        {
-        //            _expireStartTime = value;
-        //        }
-        //    }
-        //    public string ItemDescription { get; set; }
-        //    public string ItemReference { get; set; }
-        //}
-
-        class MrpLocationLotDetail
+        public class MrpLocationLotDetail
         {
             private string _location;
             public string Location

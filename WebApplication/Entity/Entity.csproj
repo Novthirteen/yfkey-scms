@@ -213,6 +213,7 @@
     <Compile Include="Base\MRP\MrpRunLogBase.cs" />
     <Compile Include="Base\MRP\MrpShipPlanBase.cs" />
     <Compile Include="Base\MRP\MrpShipPlanViewBase.cs" />
+    <Compile Include="Base\MRP\RunShipPlanLogBase.cs" />
     <Compile Include="Base\Procurement\AutoOrderTrackBase.cs" />
     <Compile Include="Base\Procurement\ItemFlowPlanBase.cs" />
     <Compile Include="Base\Procurement\ItemFlowPlanDetailBase.cs" />
@@ -395,6 +396,7 @@
     <Compile Include="MRP\MrpRunLog.cs" />
     <Compile Include="MRP\MrpShipPlan.cs" />
     <Compile Include="MRP\MrpShipPlanView.cs" />
+    <Compile Include="MRP\RunShipPlanLog.cs" />
     <Compile Include="Procurement\AutoOrderTrack.cs" />
     <Compile Include="Procurement\ItemFlowPlan.cs" />
     <Compile Include="Procurement\ItemFlowPlanDetail.cs" />
@@ -597,7 +599,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Base\MRP\ExpectTransitInventory.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\ExpectTransitInventoryView.hbm.xml" />
-    <EmbeddedResource Include="Base\MRP\MrpReceivePlan.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\MrpReceivePlan.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Base\MRP\MrpRunLog.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\MrpShipPlan.hbm.xml" />
     <EmbeddedResource Include="Base\MRP\MrpShipPlanView.hbm.xml" />

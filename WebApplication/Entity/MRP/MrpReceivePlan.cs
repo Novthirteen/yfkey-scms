@@ -9,37 +9,25 @@ namespace com.Sconit.Entity.MRP
     public class MrpReceivePlan : MrpReceivePlanBase
     {
         #region Non O/R Mapping Properties
-
-        public IList<int> FlowDetailIdList { get; set; }
-
-        public bool ContainFlowDetailId(int id)
+        public string RefFlows;
+        public bool TryAddRefFlow(string refFlow)
         {
-            if (FlowDetailIdList == null)
+            if (RefFlows == null)
             {
-                return false;
-            }
-            else
-            {
-                return FlowDetailIdList.Contains(id);
-            }
-        }
-
-        public IList<string> RefLocs;
-        public bool TryAddRefLoc(string refLoc)
-        {
-            if(RefLocs == null)
-            {
-                RefLocs = new List<string>();
-            }
-
-            if (RefLocs.Contains(refLoc))
-            {
-                return false;
-            }
-            else
-            {
-                RefLocs.Add(refLoc);
+                RefFlows = "->" + refFlow;
                 return true;
+            }
+            else
+            {
+                if (RefFlows.IndexOf("->" + refFlow) > -1)
+                {
+                    return false;
+                }
+                else
+                {
+                    RefFlows += "->" + refFlow;
+                    return true;
+                }
             }
         }
         #endregion

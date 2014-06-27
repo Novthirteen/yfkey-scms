@@ -107,14 +107,14 @@ namespace com.Sconit.Service.MRP.Impl
                             if (!minDateFrom.HasValue)
                             {
                                 //最新日程，全部是有效的
-                                IListHelper.AddRange<CustomerScheduleDetail>(effectiveCustomerScheduleDetailList, orderedAndGroupedDetail.List);
+                                IListHelper.AddRange<CustomerScheduleDetail>(effectiveCustomerScheduleDetailList, orderedAndGroupedDetail.List.OrderBy(o => o.DateFrom).ToList());
                             }
                             else
                             {
                                 #region 旧日程，只有小于最小开始日期是有效的
                                 var effDetail = (from det in orderedAndGroupedDetail.List
                                                  where det.DateFrom < minDateFrom
-                                                 select det);
+                                                 select det).OrderBy(o => o.DateFrom);
 
                                 if (effDetail != null && effDetail.Count() > 0)
                                 {
