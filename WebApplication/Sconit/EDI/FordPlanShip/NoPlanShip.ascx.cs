@@ -41,7 +41,7 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
             currentFlow = TheFlowMgr.LoadFlow(flowCode, this.CurrentUser.Code, true);
             if (currentFlow != null && currentFlow.FlowDetails != null && currentFlow.FlowDetails.Count > 0)
             {
-                if (string.IsNullOrEmpty(currentFlow.SupplierCodes))
+                if (!string.IsNullOrEmpty(currentFlow.SupplierCodes))
                 {
                     foreach (var supplierCode in currentFlow.SupplierCodes.Split(','))
                     {
@@ -52,7 +52,7 @@ public partial class EDI_FordPlan_NoPlanShip : ListModuleBase
                 {
                     ShowErrorMessage("请维护发货路线的发货工厂。");
                 }
-                if (string.IsNullOrEmpty(currentFlow.CustomerCodes))
+                if (!string.IsNullOrEmpty(currentFlow.CustomerCodes))
                 {
                     foreach (var customerCode in currentFlow.CustomerCodes.Split(','))
                     {
