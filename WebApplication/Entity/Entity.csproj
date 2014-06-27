@@ -204,6 +204,7 @@
     <Compile Include="Base\Mes\ProductLineUserBase.cs" />
     <Compile Include="Base\Mes\ShelfBase.cs" />
     <Compile Include="Base\Mes\ShelfItemBase.cs" />
+    <Compile Include="Base\MRP\RunShipPlanLogBase.cs" />
     <Compile Include="Base\MRP\CustomerScheduleBase.cs" />
     <Compile Include="Base\MRP\CustomerScheduleDetailBase.cs" />
     <Compile Include="Base\MRP\ExpectTransitInventoryBase.cs" />
@@ -385,6 +386,7 @@
     <Compile Include="Mes\ProductLineUser.cs" />
     <Compile Include="Mes\Shelf.cs" />
     <Compile Include="Mes\ShelfItem.cs" />
+    <Compile Include="MRP\RunShipPlanLog.cs" />
     <Compile Include="MRP\CustomerSchedule.cs" />
     <Compile Include="MRP\CustomerScheduleDetail.cs" />
     <Compile Include="MRP\ExpectTransitInventory.cs" />
