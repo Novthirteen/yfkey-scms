@@ -5,3 +5,4 @@ bin
 *.datasource
 /WebApplication/Sconit/Reports/Templates/TempFiles
 /WebApplication/Sconit/Config/*.config
+/WebApplication/Sconit/Config/properties.config

@@ -144,8 +144,12 @@
                                 MinimumValue="0" MaximumValue="100000" ValidationGroup="vgSave" />
                         </td>
                         <td class="td01">
+                        发运路线
                         </td>
                         <td class="td02">
+                            <uc3:textbox ID="tbShipFlow" runat="server" Visible="true" DescField="Description" ValueField="Code"
+                    ServiceMethod="GetFlowList" ServicePath="FlowMgr.service" 
+                    AutoPostBack="true" MustMatch="true" Width="250" />
                         </td>
                     </tr>
                 </table>

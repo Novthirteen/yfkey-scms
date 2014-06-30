@@ -40,6 +40,8 @@ public partial class MasterData_Item_New : NewModuleBase
 
     public void PageCleanup()
     {
+        ((TextBox)(this.FV_Item.FindControl("tbLeadTime"))).Text = string.Empty;
+        ((TextBox)(this.FV_Item.FindControl("tbSafeStock"))).Text = string.Empty;
         ((TextBox)(this.FV_Item.FindControl("tbCode"))).Text = string.Empty;
         ((TextBox)(this.FV_Item.FindControl("tbCount"))).Text = "1";
         ((CheckBox)(this.FV_Item.FindControl("tbIsActive"))).Checked = true;

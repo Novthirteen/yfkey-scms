@@ -19,6 +19,9 @@
 		<property name="StartTime" column="StartTime" type="DateTime"  />
     <property name="Version" column="Version" type="Int32"  />
     <property name="Flow" column="Flow" type="String" length="50" />
-    <property name="ReferenceScheduleNo" column="RefScheduleNo" type="String" length="50" />
+    <property name="ReferenceScheduleNo" column="ReferenceScheduleNo" type="String" length="50" />
+    <property name="ShipQty" column="ShipQty" type="Decimal"  />
+    <property name="ShipFlow" column="ShipFlow" type="String" length="50" />
+    <property name="FordPlanId" column="FordPlanId" type="Int32"  />
   </class>
 </hibernate-mapping>

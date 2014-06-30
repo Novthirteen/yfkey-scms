@@ -41,10 +41,11 @@
         <siteMapNode url="~/Main.aspx?mid=EDI.FordPlanShip" title="$Resources:Language, FordPlanShip" description="FordPlanShip"/>
         <siteMapNode url="~/Main.aspx?mid=EDI.FordPlanShip__act--NewAction" title="$Resources:Language, FordNoPlanShip" description="FordNoPlanShip"/>
         <!--<siteMapNode url="" title="$Resources:Language,Scheduling"  description="Scheduling" >-->
-          <siteMapNode url="~/Main.aspx?mid=NewMrp.CustomerPlan" title="$Resources:Language,CustomerPlan"  description="CustomerPlan" />
-        <siteMapNode url="~/Main.aspx?mid=NewMrp.ProductPlan" title="$Resources:Language,ProductPlan"  description="ProductPlan"  />
+        <siteMapNode url="~/Main.aspx?mid=NewMrp.CustomerSchedule" title="$Resources:Language,CustomerPlan"  description="CustomerPlan" />
+        <siteMapNode url="~/Main.aspx?mid=NewMrp.ShipPlan" title="$Resources:Language,ShipPlan"  description="ShipPlan" />
+        <!--<siteMapNode url="~/Main.aspx?mid=NewMrp.ProductPlan" title="$Resources:Language,ProductPlan"  description="ProductPlan"  />
         <siteMapNode url="~/Main.aspx?mid=NewMrp.ShiftPlan" title="$Resources:Language,ShiftPlan"  description="ShiftPlan"  />
-        <siteMapNode url="~/Main.aspx?mid=NewMrp.ProcurementPlan" title="$Resources:Language,ProcurementPlan"  description="ProcurementPlan"  />
+        <siteMapNode url="~/Main.aspx?mid=NewMrp.ProcurementPlan" title="$Resources:Language,ProcurementPlan"  description="ProcurementPlan"  />-->
         <!--<siteMapNode url="~/Main.aspx?mid=NewMrp.TransferPlan" title="$Resources:Language,TransferPlan"  description="TransferPlan"  />-->
         <!--</siteMapNode>-->
       </siteMapNode>

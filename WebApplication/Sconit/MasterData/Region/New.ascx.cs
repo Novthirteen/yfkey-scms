@@ -33,6 +33,7 @@ public partial class MasterData_Region_New : NewModuleBase
         ((TextBox)(this.FV_Region.FindControl("tbCode"))).Text = string.Empty;
         ((TextBox)(this.FV_Region.FindControl("tbName"))).Text = string.Empty;
         ((CheckBox)(this.FV_Region.FindControl("cbIsActive"))).Checked = true;
+        ((TextBox)(this.FV_Region.FindControl("tbPlant"))).Text = string.Empty;
     }
 
     protected void checkRegionExists(object source, ServerValidateEventArgs args)
@@ -59,6 +60,7 @@ public partial class MasterData_Region_New : NewModuleBase
          {
              TextBox tbCode = (TextBox)(this.FV_Region.FindControl("tbCode"));
              TextBox tbName = (TextBox)(this.FV_Region.FindControl("tbName"));
+             TextBox tbPlant = (TextBox)(this.FV_Region.FindControl("tbPlant"));
              CheckBox cbIsActive = (CheckBox)(this.FV_Region.FindControl("cbIsActive"));
              com.Sconit.Control.CodeMstrDropDownList ddlRegionType = (com.Sconit.Control.CodeMstrDropDownList)this.FV_Region.FindControl("ddlRegionType");
 
@@ -67,6 +69,7 @@ public partial class MasterData_Region_New : NewModuleBase
              region.Name = tbName.Text.Trim();
              region.IsActive = cbIsActive.Checked;
              region.RegionType = ddlRegionType.SelectedValue;
+             region.Plant = tbPlant.Text.Trim();
              TheRegionMgr.CreateRegion(region, this.CurrentUser);
              if (CreateEvent != null)
              {

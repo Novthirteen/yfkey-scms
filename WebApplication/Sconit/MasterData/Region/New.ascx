@@ -45,8 +45,10 @@
                     </tr>
                     <tr>
                         <td class="td01">
+                            <asp:Literal ID="lblPlant" runat="server" Text="${MasterData.Region.Plant}:" />
                         </td>
                         <td class="td02">
+                            <asp:TextBox ID="tbPlant" runat="server" Text='<%# Bind("Plant") %>' Width="250"></asp:TextBox>
                         </td>
                         <td class="td01">
                         </td>

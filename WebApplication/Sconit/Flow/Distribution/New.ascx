@@ -153,6 +153,17 @@
                                 ErrorMessage="${Common.Validator.Valid.Number}" Display="Dynamic" Type="Integer"
                                 MinimumValue="0" MaximumValue="100000" ValidationGroup="vgSave" />
                         </td>
+                        
+                    </tr>
+                    <tr>
+                    <td class="td01">
+                        发运路线
+                        </td>
+                        <td class="td02">
+                            <uc3:textbox ID="tbShipFlow" runat="server" Visible="true" DescField="Description" ValueField="Code"
+                    ServiceMethod="GetFlowList" ServicePath="FlowMgr.service" 
+                    AutoPostBack="true" MustMatch="true" Width="250" />
+                        </td>
                     </tr>
                 </table>
             </fieldset>
@@ -174,9 +185,14 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="4" >
-                        每个工厂之间逗号（,）分开
+                        <tr>
+                    <td class="td01">
                         </td>
+                        <td colspan="3" >
+                        <span style="color:Green">每个工厂之间逗号（,）分开</span>
+                        </td>
+                        
+                    </tr>
                         
                     </tr>
                 </table>

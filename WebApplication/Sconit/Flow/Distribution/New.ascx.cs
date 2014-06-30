@@ -40,7 +40,8 @@ public partial class MasterData_Flow_New : NewModuleBase
         Controls_TextBox tbCarrier = (Controls_TextBox)(this.FV_Flow.FindControl("tbCarrier"));
         tbCarrier.ServiceParameter = "string:" + this.CurrentUser.Code;
         tbCarrier.DataBind();
-
+        Controls_TextBox tbShipFlow = (Controls_TextBox)this.FV_Flow.FindControl("tbShipFlow");
+        tbShipFlow.ServiceParameter = "string:" + this.CurrentUser.Code + ",bool:false,bool:false,bool:true,bool:false,bool:false,bool:false,string:" + BusinessConstants.PARTY_AUTHRIZE_OPTION_BOTH;
         if (!IsPostBack)
         {
             BillSettleTermDataBind();
@@ -179,6 +180,12 @@ public partial class MasterData_Flow_New : NewModuleBase
             flow.Currency = TheCurrencyMgr.LoadCurrency(currencyCode);
         }
 
+        Controls_TextBox tbShipFlow = (Controls_TextBox)this.FV_Flow.FindControl("tbShipFlow");
+        if (tbShipFlow != null && tbShipFlow.Text.Trim() != string.Empty)
+        {
+            flow.ShipFlow = tbShipFlow.Text;
+        }
+
         flow.Type = BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_DISTRIBUTION;
         flow.AntiResolveHu = BusinessConstants.CODE_MASTER_ANTI_RESOLVE_HU_VALUE_NOT_RESOLVE;
         flow.CreateUser = this.CurrentUser;
@@ -211,6 +218,9 @@ public partial class MasterData_Flow_New : NewModuleBase
 
     public void PageCleanup()
     {
+
+        ((Controls_TextBox)this.FV_Flow.FindControl("tbShipFlow")).Text = string.Empty;    //发运路线
+
         ((Controls_TextBox)this.FV_Flow.FindControl("tbRefFlow")).Text = string.Empty;
         ((Controls_TextBox)this.FV_Flow.FindControl("tbPartyFrom")).Text = string.Empty;
         ((Controls_TextBox)this.FV_Flow.FindControl("tbPartyTo")).Text = string.Empty;

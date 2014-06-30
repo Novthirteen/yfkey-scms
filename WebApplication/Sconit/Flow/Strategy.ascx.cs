@@ -65,7 +65,8 @@ public partial class MasterData_Flow_Strategy : EditModuleBase
         "WinTime7",
         "LastModifyUser",
         "LastModifyDate",
-        "Interval"
+        "Interval"   ,
+        "MrpLeadTime"   
     };
 
     public void InitPageParameter(string flowCode)

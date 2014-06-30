@@ -92,7 +92,8 @@ public partial class MasterData_Flow_Edit : EditModuleBase
         "TransportationRoute",
         "TransportPriceList",
         "CustomerCodes",
-        "SupplierCodes"
+        "SupplierCodes",
+        "ShipFlow"
 
     };
 
@@ -132,6 +133,7 @@ public partial class MasterData_Flow_Edit : EditModuleBase
         Flow oldFlow = TheFlowMgr.LoadFlow(FlowCode);
         CloneHelper.CopyProperty(oldFlow, flow, EditFields, true);
 
+        Controls_TextBox tbShipFlow = (Controls_TextBox)this.FV_Flow.FindControl("tbShipFlow");
         Controls_TextBox tbRefFlow = (Controls_TextBox)this.FV_Flow.FindControl("tbRefFlow");
         Controls_TextBox tbPartyFrom = (Controls_TextBox)this.FV_Flow.FindControl("tbPartyFrom");
         Controls_TextBox tbPartyTo = (Controls_TextBox)this.FV_Flow.FindControl("tbPartyTo");
@@ -155,6 +157,10 @@ public partial class MasterData_Flow_Edit : EditModuleBase
         com.Sconit.Control.CodeMstrDropDownList ddlCreateHuOption = (com.Sconit.Control.CodeMstrDropDownList)this.FV_Flow.FindControl("ddlCreateHuOption");
         DropDownList ddlBillSettleTerm = (DropDownList)this.FV_Flow.FindControl("ddlBillSettleTerm");
 
+        if (tbShipFlow != null && tbShipFlow.Text.Trim() != string.Empty)
+        {
+            flow.ShipFlow = tbShipFlow.Text;
+        }
         if (tbRefFlow != null && tbRefFlow.Text.Trim() != string.Empty)
         {
             flow.ReferenceFlow = TheFlowMgr.CheckAndLoadFlow(tbRefFlow.Text.Trim()).Code;
@@ -276,6 +282,7 @@ public partial class MasterData_Flow_Edit : EditModuleBase
     private void UpdateView(Flow flow)
     {
 
+        Controls_TextBox tbShipFlow = (Controls_TextBox)this.FV_Flow.FindControl("tbShipFlow");
         Controls_TextBox tbRefFlow = (Controls_TextBox)this.FV_Flow.FindControl("tbRefFlow");
         Controls_TextBox tbPartyFrom = (Controls_TextBox)this.FV_Flow.FindControl("tbPartyFrom");
         Controls_TextBox tbPartyTo = (Controls_TextBox)this.FV_Flow.FindControl("tbPartyTo");
@@ -315,6 +322,11 @@ public partial class MasterData_Flow_Edit : EditModuleBase
         tbCarrier.DataBind();
 
         BillSettleTermDataBind();
+
+        if (!string.IsNullOrEmpty(flow.ShipFlow))
+        {
+            tbShipFlow.Text = flow.ShipFlow;
+        }
 
         if (flow.ReferenceFlow != null)
         {

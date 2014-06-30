@@ -16,6 +16,11 @@ using NHibernate;
 using NHibernate.Expression;
 using NHibernate.SqlCommand;
 using NHibernate.Type;
+using System.Data.SqlClient;
+using System.Data;
+using System.IO;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 
 namespace com.Sconit.Service.MRP.Impl
 {
@@ -91,7 +96,14 @@ namespace com.Sconit.Service.MRP.Impl
 
         public void RunShipPlan(User user)
         {
-            RunShipPlan(DateTime.Now, user);
+            lock (RunShipPlanLock)
+            {
+                //RunShipPlan(DateTime.Now, user);
+                SqlParameter[] sqlParameterArr = new SqlParameter[1];
+                sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
+                sqlParameterArr[0].Value = user.Code;
+                this.genericMgr.GetDatasetByStoredProcedure("RunShipPlan", sqlParameterArr);
+            }
         }
 
         private static object RunShipPlanLock = new object();
@@ -641,6 +653,453 @@ namespace com.Sconit.Service.MRP.Impl
         public void RunMrp(DateTime effectiveDate, User user)
         {
         }
+
+        #region  Import  CustomerPlan
+        private static object readCustomerPlanFromXlsLock = new object();
+        [Transaction(TransactionMode.Requires)]
+        public List<CustomerScheduleDetail> ReadCustomerPlanFromXls(Stream inputStream, string dateType, User user)
+        {
+            lock (readCustomerPlanFromXlsLock)
+            {
+                DateTime startDate = DateTime.Today;
+                DateTime endDate = startDate.AddDays(14);
+                if (dateType ==BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK)
+                {
+                    endDate = startDate.AddDays(7*30);
+                }
+
+                if (startDate > endDate)
+                {
+                    throw new BusinessErrorException("开始日期必须小于结束日期");
+                }
+
+                if (inputStream.Length == 0)
+                {
+                    throw new BusinessErrorException("Import.Stream.Empty");
+                }
+
+                HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+
+                Sheet sheet = workbook.GetSheetAt(0);
+
+                IEnumerator rows = sheet.GetRowEnumerator();
+
+                Row dateRow = sheet.GetRow(5);
+
+                ImportHelper.JumpRows(rows, 6);
+
+                var customerPlanList = new List<CustomerScheduleDetail>();
+
+                int colRefScheduleNo = 0;//路线
+                int colFlow = 1;//路线
+                int colItemCode = 2;//物料代码
+                int colRefItemCode = 4;//参考物料号
+
+                List<string> errorMessages = new List<string>();
+                var flowDets = this.genericMgr.GetDatasetBySql(@"select d.Flow,d.Item,d.RefItemCode,i.Desc1,d.UC,d.Uom,m.LocFrom,isnull(m.MrpLeadTime,0)as MrpLeadTime,m.ShipFlow from FlowDet as d 
+                                                                inner join Item as i on i.Code=d.Item 
+                                                                inner join FlowMstr as m on d.Flow=m.Code 
+                                                                where m.type='Distribution' and d.RefItemCode is not null and d.RefItemCode<>''").Tables[0];
+                var allActiveFlowDetList = new List<object[]>();
+                foreach (System.Data.DataRow row in flowDets.Rows)
+                {
+                    allActiveFlowDetList.Add(new object[] { row[0].ToString(), row[1].ToString(), row[2].ToString(), row[3].ToString(), Convert.ToDecimal(row[4].ToString()), row[5].ToString(), row[6].ToString(), Convert.ToDecimal(row[7].ToString()), row[8].ToString() });
+                }
+                //
+                var flowCodelist = allActiveFlowDetList.Select(d => d[0]).Distinct();
+
+                var refScheduleNos = this.genericMgr.GetDatasetBySql(@"select RefScheduleNo from dbo.CustScheduleMstr group by RefScheduleNo").Tables[0];
+                var refScheduleNoList = new List<string>();
+                foreach (System.Data.DataRow row in flowDets.Rows)
+                {
+                    refScheduleNoList.Add(row[0].ToString());
+                }
+
+                while (rows.MoveNext())
+                {
+                    string refScheduleNo = string.Empty;
+                    string itemReference = null;
+                    string flowCode = null;
+                    string itemCode = null;
+
+                    HSSFRow row = (HSSFRow)rows.Current;
+                    if (!ImportHelper.CheckValidDataRow(row, 0, 3))
+                    {
+                        break;//边界
+                    }
+                    string rowIndex = (row.RowNum + 1).ToString();
+                    #region 客户版本号
+                    refScheduleNo = ImportHelper.GetCellStringValue(row.GetCell(colRefScheduleNo));
+                    if (string.IsNullOrEmpty(refScheduleNo))
+                    {
+                        errorMessages.Add(string.Format("客户版本号,第{0}行", rowIndex));
+                        continue;
+                    }
+                    else
+                    {
+                        if (refScheduleNoList.Contains(refScheduleNo))
+                        {
+                            errorMessages.Add(string.Format("客户版本号{0}已经存在,第{1}行", flowCode, rowIndex));
+                            continue;
+                        }
+                    }
+
+                    #endregion
+
+                    #region 读取路线代码
+                    flowCode = ImportHelper.GetCellStringValue(row.GetCell(colFlow));
+                    if (string.IsNullOrEmpty(flowCode))
+                    {
+                        errorMessages.Add(string.Format("路线不能为空,第{0}行", rowIndex));
+                        continue;
+                    }
+                    else
+                    {
+                        if (!flowCodelist.Contains(flowCode))
+                        {
+                            errorMessages.Add(string.Format("路线{0}不是销售路线,第{1}行", flowCode, rowIndex));
+                            continue;
+                        }
+                    }
+
+                    #endregion
+
+                    #region 读取物料代码
+                    try
+                    {
+                         itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItemCode));
+                        if (itemCode == null)
+                        {
+                            errorMessages.Add(string.Format("物料不能为空,第{0}行", rowIndex));
+                            continue;
+                        }
+                        var checkItem = allActiveFlowDetList.Where(d => d[0] == flowCode && d[1] == itemCode);
+                        if (checkItem == null || checkItem.Count() == 0)
+                        {
+                            errorMessages.Add(string.Format("物料号{0}不存在销售路线{2}中请维护,第{1}行.", itemCode, rowIndex, flowCode));
+                            continue;
+                        }
+                    }
+                    catch
+                    {
+                        errorMessages.Add(string.Format("读取物料时出错,第{0}行.", rowIndex));
+                        continue;
+                    }
+                    #endregion
+
+                    #region 客户零件号
+                    try
+                    {
+                        itemReference = ImportHelper.GetCellStringValue(row.GetCell(colRefItemCode));
+                        if (string.IsNullOrEmpty(itemReference))
+                        {
+                            errorMessages.Add(string.Format("客户零件号不能为空,第{0}行." , rowIndex));
+                            continue;
+                        }
+                        var checkItem = allActiveFlowDetList.Where(d => d[0] == flowCode && d[1] == itemCode && d[2] == itemReference);
+                        if (checkItem == null || checkItem.Count() == 0)
+                        {
+                            errorMessages.Add(string.Format("物料号{0}客户零件号{3}销售路线{2},不匹配请维护,第{1}行.", itemCode, rowIndex, flowCode, itemReference));
+                            continue;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessages.Add(string.Format("读取单位出错,第{0}行." + ex.Message, rowIndex));
+                        continue;
+                    }
+
+                    #endregion
+
+                    #region 读取数量
+                    try
+                    {
+                        for (int i = 5; ; i++)
+                        {
+                            if (i > 56)
+                            {
+                                break;
+                            }
+                            Cell dateCell = dateRow.GetCell(i);
+                            string dateIndex = null;
+
+                            #region 读取计划日期
+                            if (dateCell != null)
+                            {
+                                DateTime currentDateTime = DateTime.Today;
+                                if (dateCell.CellType == CellType.STRING)
+                                {
+                                    dateIndex = dateCell.StringCellValue;
+                                }
+                                else
+                                {
+                                    if (dateType == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
+                                    {
+                                        if (dateCell.CellType == CellType.NUMERIC)
+                                        {
+                                            dateIndex = dateCell.DateCellValue.ToString("yyyy-MM-dd");
+                                            currentDateTime = Convert.ToDateTime(dateIndex);
+                                        }
+                                        else
+                                        {
+                                            throw new BusinessErrorException("天的时间索引必须为文本或日期格式");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        dateIndex = dateCell.DateCellValue.ToString("yyyy-MM-dd");
+                                        //周一
+                                        currentDateTime = DateTimeHelper.GetWeekStart(Convert.ToDateTime(dateIndex));
+                                    }
+                                }
+
+                                if (currentDateTime.CompareTo(startDate) < 0)
+                                {
+                                    continue;
+                                }
+                                if (currentDateTime.CompareTo(endDate) > 0)
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                            #endregion
+
+                            decimal qty = 0;
+                            if (row.GetCell(i) != null)
+                            {
+                                if (row.GetCell(i).CellType == CellType.NUMERIC)
+                                {
+                                    qty = Convert.ToDecimal(row.GetCell(i).NumericCellValue);
+                                }
+                                else
+                                {
+                                    string qtyValue = ImportHelper.GetCellStringValue(row.GetCell(i));
+                                    if (qtyValue != null)
+                                    {
+                                        qty = Convert.ToDecimal(qtyValue);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+
+                            if (qty < 0)
+                            {
+                                errorMessages.Add(string.Format("数量不能小于0,第{0}行", rowIndex));
+                                continue;
+                            }
+                            else if (qty == 0)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                //d.Flow,d.Item,d.RefItemCode,i.Desc1,d.UC,d.Uom,m.LocFrom
+                                CustomerScheduleDetail det = new CustomerScheduleDetail();
+                                det.ReferenceScheduleNo = refScheduleNo;
+                                det.Item = itemCode;
+                                det.ItemDescription = (string)(allActiveFlowDetList.FirstOrDefault(d=>d[1]==itemCode)[3]);
+                                det.ItemReference = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[2]);
+                                det.Type = dateType;
+                                det.DateFrom = Convert.ToDateTime(dateIndex);
+                                det.DateTo = dateType == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK ? det.DateFrom.AddDays(7) : det.DateFrom;
+                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[5]);
+                                det.UnitCount = (decimal)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[4]);
+                                det.Qty = qty;
+                                det.Location = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[6]);
+                                //det.StartTime = det.DateFrom;
+                                det.StartTime = det.DateFrom.AddDays(Convert.ToInt32(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[7])).Date;
+                                //det.Version = mstr.Version;
+                                det.Flow = flowCode;
+                                //det.ReferenceScheduleNo = mstr.ReferenceScheduleNo;
+                                det.ShipFlow = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[8]);
+                                det.ShipQty = 0;
+                                det.FordPlanId = 0;
+                                //this.genericMgr.Create(det);
+                                customerPlanList.Add(det);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessages.Add(ex.Message);
+                    }
+                    #endregion
+                }
+
+                if (errorMessages.Count > 0)
+                {
+                    string errorMes = string.Empty;
+                    foreach (var error in errorMessages)
+                    {
+                        errorMes += error + "-";
+                    }
+                    throw new BusinessErrorException(errorMes);
+                }
+
+                Dictionary<string, int> planVersions = new Dictionary<string, int>();
+                foreach (var allFlowCode in customerPlanList.Select(p => p.Flow).Distinct())
+                {
+                    planVersions.Add(allFlowCode, numberControlMgr.GenerateNumberNextSequence(string.Format("CustomerPlan_{0}_{1}",allFlowCode.ToString(), dateType.ToString() )));
+                }
+
+                var custmerPlnaGroup = customerPlanList.GroupBy(g => new { g.Flow,g.ReferenceScheduleNo }).ToDictionary(d=>d.Key,d=>d.ToList());
+
+                foreach (var g in custmerPlnaGroup)
+                {
+                    DateTime datetimeNow = System.DateTime.Now;
+                    CustomerSchedule mstr = new CustomerSchedule
+                     {
+                         ReferenceScheduleNo = g.Key.ReferenceScheduleNo,
+                         Flow = g.Key.Flow,
+                         Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT,
+                         Type = g.Value.First().Type,
+                         CreateDate = datetimeNow,
+                         CreateUser = user.Code,
+                         LastModifyDate = datetimeNow,
+                         LastModifyUser = user.Code,
+                         Version = planVersions[g.Key.Flow],
+                         ShipFlow = g.Value.First().ShipFlow,
+                     };
+                    this.genericMgr.Create(mstr);
+                    foreach (var r in g.Value)
+                    {
+                        CustomerScheduleDetail det = new CustomerScheduleDetail();
+                        det.CustomerSchedule = mstr;
+                        this.genericMgr.Create(det);
+                    }
+                }
+
+                return customerPlanList;
+            }
+        }
+
+        private decimal ConvertUomQty(string itemCode, string sourceUomCode, decimal sourceQty, string targetUomCode)
+        {
+            if (itemCode == null || sourceUomCode == null || targetUomCode == null)
+            {
+                //throw new BusinessErrorException("UomConversion Error:itemCode Or sourceUomCode Or targetUomCode is null");
+                log.Error("UomConversion Error:itemCode Or sourceUomCode Or targetUomCode is null");
+                return sourceQty;
+            }
+
+            if (sourceUomCode == targetUomCode || sourceQty == 0)
+            {
+                return sourceQty;
+            }
+
+            DetachedCriteria criteria = DetachedCriteria.For(typeof(UomConversion));
+            criteria.Add(Expression.Or(Expression.IsNull("Item"), Expression.Eq("Item.Code", itemCode)));
+
+            IList<UomConversion> unGroupUomConversionList = criteriaMgr.FindAll<UomConversion>(criteria);
+            if (unGroupUomConversionList != null)
+            {
+                List<UomConversion> uomConversionList = unGroupUomConversionList.Where(u => u.Item != null).ToList();
+                foreach (UomConversion y in unGroupUomConversionList)
+                {
+                    if (uomConversionList.Where(x => (StringHelper.Eq(x.AlterUom.Code, y.AlterUom.Code) && StringHelper.Eq(x.BaseUom.Code, y.BaseUom.Code))
+                        || (StringHelper.Eq(x.AlterUom.Code, y.BaseUom.Code) && StringHelper.Eq(x.BaseUom.Code, y.AlterUom.Code))).Count() == 0)
+                    {
+                        uomConversionList.Add(y);
+                    }
+                }
+                foreach (UomConversion u in uomConversionList)
+                {
+                    //顺
+                    if (StringHelper.Eq(u.BaseUom.Code, sourceUomCode))
+                    {
+                        u.Qty = sourceQty * u.AlterQty / u.BaseQty;
+                        u.IsAsc = true;
+                        if (StringHelper.Eq(u.AlterUom.Code, targetUomCode))
+                        {
+                            return u.Qty.Value;
+                        }
+                    }
+                    //反
+                    else if (StringHelper.Eq(u.AlterUom.Code, sourceUomCode))
+                    {
+                        u.Qty = sourceQty * u.BaseQty / u.AlterQty;
+                        u.IsAsc = false;
+                        if (StringHelper.Eq(u.BaseUom.Code, targetUomCode))
+                        {
+                            return u.Qty.Value;
+                        }
+                    }
+                }
+
+                for (int i = 1; i < uomConversionList.Count; i++)
+                {
+                    foreach (UomConversion uomConversion1 in uomConversionList)
+                    {
+                        if (uomConversion1.Qty.HasValue)
+                        {
+                            foreach (UomConversion uomConversion2 in uomConversionList)
+                            {
+                                //顺
+                                if (uomConversion1.IsAsc)
+                                {
+                                    //顺
+                                    if (StringHelper.Eq(uomConversion2.BaseUom.Code, uomConversion1.AlterUom.Code) && !uomConversion2.Qty.HasValue)
+                                    {
+                                        uomConversion2.Qty = uomConversion1.Qty.Value * uomConversion2.AlterQty / uomConversion2.BaseQty;
+                                        uomConversion2.IsAsc = true;
+                                        if (StringHelper.Eq(uomConversion2.AlterUom.Code, targetUomCode))
+                                        {
+                                            return uomConversion2.Qty.Value;
+                                        }
+                                    }
+                                    //反
+                                    else if (StringHelper.Eq(uomConversion2.AlterUom.Code, uomConversion1.AlterUom.Code) && !uomConversion2.Qty.HasValue)
+                                    {
+                                        uomConversion2.Qty = uomConversion1.Qty.Value * uomConversion2.BaseQty / uomConversion2.AlterQty;
+                                        uomConversion2.IsAsc = false;
+                                        if (StringHelper.Eq(uomConversion2.BaseUom.Code, targetUomCode))
+                                        {
+                                            return uomConversion2.Qty.Value;
+                                        }
+                                    }
+                                }
+                                //反
+                                else
+                                {
+                                    //顺
+                                    if (StringHelper.Eq(uomConversion2.BaseUom.Code, uomConversion1.BaseUom.Code) && !uomConversion2.Qty.HasValue)
+                                    {
+                                        uomConversion2.Qty = uomConversion1.Qty.Value * uomConversion2.AlterQty / uomConversion2.BaseQty;
+                                        uomConversion2.IsAsc = true;
+                                        if (StringHelper.Eq(uomConversion2.AlterUom.Code, targetUomCode))
+                                        {
+                                            return uomConversion2.Qty.Value;
+                                        }
+                                    }
+                                    //反
+                                    else if (StringHelper.Eq(uomConversion2.AlterUom.Code, uomConversion1.BaseUom.Code) && !uomConversion2.Qty.HasValue)
+                                    {
+                                        uomConversion2.Qty = uomConversion1.Qty.Value * uomConversion2.BaseQty / uomConversion2.AlterQty;
+                                        uomConversion2.IsAsc = false;
+                                        if (StringHelper.Eq(uomConversion2.BaseUom.Code, targetUomCode))
+                                        {
+                                            return uomConversion2.Qty.Value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            log.Error("UomConversion.Error.NotFound,itemCode:" + itemCode + ",sourceUomCode:" + sourceUomCode + ",targetUomCode:" + targetUomCode);
+            return sourceQty;
+        }
+
+        #endregion
+
 
         #region Private Methods
         private void ProcessEffectiveInventoryBalance(ref IList<MrpLocationLotDetail> inventoryBalanceList, object[] invLoc, IList<SafeInventory> safeQtyList, DateTime effectiveDate, DateTime dateTimeNow, User user)
