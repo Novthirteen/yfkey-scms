@@ -249,10 +249,10 @@ BEGIN
 		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempShipFlowDet
 		while (@RowId <= @MaxRowId)
 		begin
-			declare @ActiveQty decimal(18, 8)
-			declare @LastActiveQty decimal(18, 8)
-			declare @Flow varchar(50)
-			declare @Item varchar(50)
+			declare @ActiveQty decimal(18, 8) = null
+			declare @LastActiveQty decimal(18, 8) = null
+			declare @Flow varchar(50) = null
+			declare @Item varchar(50) = null
 
 			select @ActiveQty = ActiveQty, @Flow = Flow, @Item = Item from #tempShipFlowDet where RowId = @RowId
 			if (@ActiveQty > 0)
@@ -282,9 +282,14 @@ BEGIN
 		where d.ActiveQty < 0 and p.Flow is null
 
 		--日期小于今天的量全部转为今天
+		--更新
 		update b set ShipQty = b.ShipQty + a.ShipQty
-		from #tempShipPlan as a inner join #tempShipPlan as b on a.Flow = b.Flow and a.ITem = b.Item
+		from #tempShipPlan as a inner join #tempShipPlan as b on a.Flow = b.Flow and a.Item = b.Item
 		where b.StartTime = @DateNow and a.StartTime < @DateNow
+		update b set ShipQty = 0
+		from #tempShipPlan as a inner join #tempShipPlan as b on a.Flow = b.Flow and a.Item = b.Item
+		where b.StartTime = @DateNow and a.StartTime < @DateNow
+		--新增
 		insert into #tempShipPlan(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
 		select a.Flow, a.Item, a.ItemDesc, a.RefItemCode, a.ShipQty, a.Uom, a.BaseUom, a.UnitQty, a.UC, a.LocFrom, a.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
 		from #tempShipPlan as a left join #tempShipPlan as b on a.Flow = b.Flow and a.ITem = b.Item and b.StartTime = @DateNow

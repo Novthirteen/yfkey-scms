@@ -92,3 +92,113 @@ alter table Item add SafeStock int
 go
 alter table Region add Plant varchar(50)
 go
+
+/****** Object:  Table [dbo].[MRP_ProductionPlanMstr]    Script Date: 2014/7/1 15:58:50 ******/
+DROP TABLE [dbo].[MRP_ProductionPlanMstr]
+GO
+
+/****** Object:  Table [dbo].[MRP_ProductionPlanMstr]    Script Date: 2014/7/1 15:58:50 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[MRP_ProductionPlanMstr](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ReleaseNo] [int] NULL,
+	[BatchNo] [int] NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [varchar](50) NULL,
+ CONSTRAINT [PK_MRP_ProdutcionPlanMstr] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+/****** Object:  Table [dbo].[MRP_ProductionPlanDet]    Script Date: 2014/7/1 15:59:10 ******/
+DROP TABLE [dbo].[MRP_ProductionPlanDet]
+GO
+
+/****** Object:  Table [dbo].[MRP_ProductionPlanDet]    Script Date: 2014/7/1 15:59:10 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[MRP_ProductionPlanDet](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ProductionPlanId] [int] NULL,
+	[Item] [varchar](50) NULL,
+	[ItemDesc] [varchar](50) NULL,
+	[RefItemCode] [varchar](50) NULL,
+	[OrgQty] [decimal](18, 8) NULL,
+	[Qty] [decimal](18, 8) NULL,
+	[Uom] [varchar](5) NULL,
+	[StartTime] [datetime] NULL,
+	[WindowTime] [datetime] NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [varchar](50) NULL,
+	[LastModifyUser] [varchar](50) NULL,
+	[LastModifyDate] [datetime] NULL,
+	[Version] [int] NULL,
+ CONSTRAINT [PK_MRP_ProductionPlanDet] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+/****** Object:  Table [dbo].[MRP_RunProductionPlanLog]    Script Date: 2014/7/1 15:59:25 ******/
+DROP TABLE [dbo].[MRP_RunProductionPlanLog]
+GO
+
+/****** Object:  Table [dbo].[MRP_RunProductionPlanLog]    Script Date: 2014/7/1 15:59:25 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[MRP_RunProductionPlanLog](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[BatchNo] [int] NULL,
+	[Lvl] [varchar](50) NULL,
+	[Item] [varchar](50) NULL,
+	[Bom] [varchar](50) NULL,
+	[EffDate] [datetime] NULL,
+	[Msg] [varchar](500) NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [varchar](50) NULL,
+ CONSTRAINT [PK_MRP_RunProductionPlanLog] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
