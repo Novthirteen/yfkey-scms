@@ -65,6 +65,7 @@ CREATE TABLE [dbo].[MRP_ShipPlanDet](
 	[Item] [varchar](50) NULL,
 	[ItemDesc] [varchar](50) NULL,
 	[RefItemCode] [varchar](50) NULL,
+	[OrgShipQty] [decimal](18, 8) NULL,
 	[ShipQty] [decimal](18, 8) NULL,
 	[Uom] [varchar](5) NULL,
 	[BaseUom] [varchar](5) NULL,
@@ -84,5 +85,10 @@ CREATE TABLE [dbo].[MRP_ShipPlanDet](
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
-
 GO
+alter table Item add LeadTime int
+go
+alter table Item add SafeStock int
+go
+alter table Region add Plant varchar(50)
+go
