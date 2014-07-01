@@ -242,6 +242,8 @@ BEGIN
 		from #tempEffCustScheduleDet as req inner join #tempShipFlowDet as flow on req.ShipFlow = flow.Flow and req.Item = flow.Item
 
 		--根据开始时间依次扣减库存（含在途库存，不考虑在途库存的到货时间）
+		set @RowId = null
+		set @MaxRowId = null
 		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempShipFlowDet
 		while (@RowId <= @MaxRowId)
 		begin
