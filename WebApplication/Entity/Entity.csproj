@@ -204,6 +204,8 @@
     <Compile Include="Base\Mes\ProductLineUserBase.cs" />
     <Compile Include="Base\Mes\ShelfBase.cs" />
     <Compile Include="Base\Mes\ShelfItemBase.cs" />
+    <Compile Include="Base\MRP\ShipPlanMstrBase.cs" />
+    <Compile Include="Base\MRP\ShipPlanDetBase.cs" />
     <Compile Include="Base\MRP\RunShipPlanLogBase.cs" />
     <Compile Include="Base\MRP\CustomerScheduleBase.cs" />
     <Compile Include="Base\MRP\CustomerScheduleDetailBase.cs" />
@@ -213,7 +215,6 @@
     <Compile Include="Base\MRP\MrpRunLogBase.cs" />
     <Compile Include="Base\MRP\MrpShipPlanBase.cs" />
     <Compile Include="Base\MRP\MrpShipPlanViewBase.cs" />
-    <Compile Include="Base\MRP\RunShipPlanLogBase.cs" />
     <Compile Include="Base\Procurement\AutoOrderTrackBase.cs" />
     <Compile Include="Base\Procurement\ItemFlowPlanBase.cs" />
     <Compile Include="Base\Procurement\ItemFlowPlanDetailBase.cs" />
@@ -386,7 +387,8 @@
     <Compile Include="Mes\ProductLineUser.cs" />
     <Compile Include="Mes\Shelf.cs" />
     <Compile Include="Mes\ShelfItem.cs" />
-    <Compile Include="MRP\RunShipPlanLog.cs" />
+    <Compile Include="MRP\ShipPlanDet.cs" />
+    <Compile Include="MRP\ShipPlanMstr.cs" />
     <Compile Include="MRP\CustomerSchedule.cs" />
     <Compile Include="MRP\CustomerScheduleDetail.cs" />
     <Compile Include="MRP\ExpectTransitInventory.cs" />
@@ -696,6 +698,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Base\MRP\RunShipPlanLog.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ShipPlanDet.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ShipPlanMstr.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

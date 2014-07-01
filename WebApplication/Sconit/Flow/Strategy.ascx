@@ -84,8 +84,14 @@
                         <td class="td01">
                             <asp:Literal ID="WinTime" runat="server" Text="${MasterData.Flow.Strategy.WinTime}:" />
                         </td>
-                        <td class="td02" colspan="3">
+                        <td class="td02" >
                             <asp:Literal ID="Tips" runat="server" Text="${MasterData.Flow.Strategy.WinTime.Format}" />
+                        </td>
+                        <td class="td01">
+                        Mrp提前期(天)
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="lblMrpLeadTime" runat="server" Text='<%# Bind("MrpLeadTime","{0:0.########}") %>'></asp:TextBox>
                         </td>
                     </tr>
                     <tr>
@@ -98,6 +104,7 @@
                                 ControlToValidate="tbWinTime1" ErrorMessage="${MasterData.Flow.Strategy.WinTime.Correct.Format}"
                                 ValidationGroup="vgSave"></asp:RegularExpressionValidator>
                         </td>
+                        
                     </tr>
                     <tr>
                         <td class="td01">

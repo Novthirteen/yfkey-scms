@@ -114,6 +114,7 @@ namespace com.Sconit.Entity.MRP
 
         public string Type { get; set; }
         public Int32 Version { get; set; }
+        public string ShipFlow { get; set; }
         #endregion
 
         public override int GetHashCode()

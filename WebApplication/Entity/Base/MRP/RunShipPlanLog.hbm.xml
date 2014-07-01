@@ -4,17 +4,20 @@
         <id name="Id" column="Id" type="Int32" unsaved-value="0" >
             <generator class="identity" />
         </id>
-        <property name="BatchNo" column="BatchNo" type="Int32"  />
-        <property name="EffDate" column="EffDate" type="DateTime"  />
-        <property name="Lvl" column="Lvl" type="String" length="50" />
-        <property name="Item" column="Item" type="String" length="50" />
-        <property name="Qty" column="Qty" type="Decimal"/>
-        <property name="LocFrom" column="LocFrom" type="String" length="50" />
-        <property name="LocTo" column="LocTo" type="String" length="50" />
-        <property name="StartTime" column="StartTime" type="DateTime" />
-        <property name="WindowTime" column="WindowTime" type="DateTime" />
-        <property name="Msg" column="Msg" type="String"     length="500" />
-        <property name="CreateDate" column="CreateDate" type="DateTime" />
-        <property name="CreateUser" column="CreateUser" type="String" length="50" />
+      <property name="BatchNo" column="BatchNo" type="Int32"  />
+      <property name="EffDate" column="EffDate" type="DateTime"  />
+      <property name="Lvl" column="Lvl" type="String" length="50" />
+      <property name="Item" column="Item" type="String" length="50" />
+      <property name="Qty" column="Qty" type="Decimal"  />
+      <property name="Uom" column="Uom" type="String" length="50" />
+      <property name="LocFrom" column="LocFrom" type="String" length="50" />
+      <property name="LocTo" column="LocTo" type="String" length="50" />
+      <property name="Flow" column="Flow" type="String" length="50" />
+      <property name="StartTime" column="StartTime" type="DateTime"  />
+      <property name="WindowTime" column="WindowTime" type="DateTime"  />
+      <property name="Msg" column="Msg" type="String" length="500" />
+      <property name="CreateDate" column="CreateDate" type="DateTime"  />
+      <property name="CreateUser" column="CreateUser" type="String" length="50" />
+      <property name="Version" column="Version" type="Int32"  />
     </class>
 </hibernate-mapping>

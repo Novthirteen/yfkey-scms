@@ -933,4 +933,7 @@
   <data name="TransferPlan" xml:space="preserve">
     <value>TransferPlan</value>
   </data>
+  <data name="ShipPlan" xml:space="preserve">
+    <value>ShipPlan</value>
+  </data>
 </root>

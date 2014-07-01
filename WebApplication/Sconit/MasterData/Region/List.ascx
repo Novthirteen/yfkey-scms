@@ -12,6 +12,7 @@
                 <asp:BoundField DataField="Name" HeaderText="${MasterData.Region.Name}" SortExpression="Name" />
                 <asp:CheckBoxField DataField="IsActive" HeaderText="${MasterData.Region.IsActive}"
                     SortExpression="IsActive" />
+                <asp:BoundField DataField="Plant" HeaderText="${MasterData.Region.Plant}" SortExpression="Plant" />
                 <asp:TemplateField HeaderText="${Common.GridView.Action}">
                     <ItemTemplate>
                         <asp:LinkButton ID="lbtnEdit" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "Code") %>'

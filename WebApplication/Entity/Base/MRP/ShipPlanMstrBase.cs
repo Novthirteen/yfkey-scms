@@ -7,25 +7,21 @@ using System.Collections.Generic;
 namespace com.Sconit.Entity.MRP
 {
     [Serializable]
-    public abstract class RunShipPlanLogBase : EntityBase
+    public abstract class ShipPlanMstrBase : EntityBase
     {
         #region O/R Mapping Properties
 
         public Int32 Id { get; set; }
+        public Int32 ReleaseNo { get; set; }
         public Int32 BatchNo { get; set; }
         public DateTime EffDate { get; set; }
-        public string Lvl { get; set; }
-        public string Item { get; set; }
-        public decimal Qty { get; set; }
-        public string Uom { get; set; }
-        public string LocFrom { get; set; }
-        public string LocTo { get; set; }
-        public string Flow { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? WindowTime { get; set; }
-        public string Msg { get; set; }
+        public string Status { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
+        public DateTime LastModifyDate { get; set; }
+        public string LastModifyUser { get; set; }
+        public DateTime? ReleaseDate { get; set; }
+        public string ReleaseUser { get; set; }
         public Int32 Version { get; set; }
         #endregion
 
@@ -43,7 +39,7 @@ namespace com.Sconit.Entity.MRP
 
         public override bool Equals(object obj)
         {
-            RunShipPlanLogBase another = obj as RunShipPlanLogBase;
+            ShipPlanMstrBase another = obj as ShipPlanMstrBase;
 
             if (another == null)
             {

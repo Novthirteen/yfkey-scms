@@ -1125,4 +1125,7 @@
   <data name="TransferPlan" xml:space="preserve">
     <value>领料计划</value>
   </data>
+  <data name="ShipPlan" xml:space="preserve">
+    <value>发运计划</value>
+  </data>
 </root>

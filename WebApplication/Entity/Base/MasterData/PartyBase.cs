@@ -112,6 +112,8 @@ namespace com.Sconit.Entity.MasterData
         }
         #endregion
 
+        public string Plant { get; set; }
+
 
         #endregion
 

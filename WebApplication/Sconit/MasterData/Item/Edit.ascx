@@ -9,10 +9,10 @@
                 <legend>${MasterData.Item.UpdateItem}</legend>
                 <table class="mtable">
                     <tr>
-                        <td class="td02" rowspan="7" style="width: 150px">
+                        <td class="td02" rowspan="8" style="width: 150px">
                             <asp:Image ID="imgUpload" ImageUrl='<%# Eval("ImageUrl") %>' runat="server" Width="150px" />
                         </td>
-                        <td class="td01" style="width: 100px">
+                        <td class="td01">
                             <asp:Literal ID="lblCode" runat="server" Text="${MasterData.Item.Code}:" />
                         </td>
                         <td class="td02">
@@ -26,7 +26,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="td01" style="width: 100px">
+                        <td class="td01">
                             <asp:Literal ID="ltlDesc1" runat="server" Text="${MasterData.Item.Description}1:" />
                         </td>
                         <td class="td02">
@@ -43,7 +43,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="td01" style="width: 100px">
+                        <td class="td01">
                             <asp:Literal ID="ltlUom" runat="server" Text="${MasterData.Item.Uom}:" />
                         </td>
                         <td class="td02">
@@ -61,7 +61,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="td01" style="width: 100px">
+                        <td class="td01">
                             <asp:Literal ID="ltlCount" runat="server" Text="${MasterData.Item.Uc}:" />
                         </td>
                         <td class="td02">
@@ -83,7 +83,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="td01" style="width: 100px">
+                        <td class="td01">
                             <asp:Literal ID="ltlBom" runat="server" Text="${MasterData.Item.Bom}:" />
                         </td>
                         <td class="td02">
@@ -100,7 +100,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="td01" style="width: 100px">
+                        <td class="td01">
                             <asp:Literal ID="lblItemCategory" runat="server" Text="${MasterData.Item.Category}:" />
                         </td>
                         <td class="td02">
@@ -116,7 +116,27 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="td01" style="width: 100px">
+                        <td class="td01">
+                            <asp:Literal ID="ltlLeadTime" runat="server" Text="${MasterData.Item.LeadTime}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbLeadTime" runat="server" Text='<%# Bind("LeadTime") %>'></asp:TextBox>
+                            <asp:RangeValidator ID="rvtbLeadTime" ControlToValidate="tbLeadTime" runat="server"
+                                Display="Dynamic" ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="1000000"
+                                MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
+                        </td>
+                        <td class="td01">
+                            <asp:Literal ID="ltlSafeStock" runat="server" Text="${MasterData.Item.SafeStock}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbSafeStock" runat="server" Text='<%# Bind("SafeStock") %>'></asp:TextBox>
+                            <asp:RangeValidator ID="rvSafeStock" ControlToValidate="tbSafeStock" runat="server"
+                                Display="Dynamic" ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="1000000"
+                                MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td01">
                             <asp:Literal ID="lblPlant" runat="server" Text="${MasterData.Item.Plant}:" />
                         </td>
                         <td class="td02">

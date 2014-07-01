@@ -6,22 +6,24 @@ GO
 
 SET ANSI_PADDING ON
 GO
-
 IF EXISTS(SELECT * FROM sys.objects WHERE type='P' AND name='RunShipPlan') 
-     DROP PROCEDURE RunShipPlan
+DROP PROCEDURE RunShipPlan
 GO
-
-CREATE PROCEDURE [dbo].RunShipPlan
+CREATE PROCEDURE [dbo].RunShipPlan --exec RunShipPlan 'su'
 (
 	@RunUser varchar(50)
 ) --WITH ENCRYPTION
 AS 
 BEGIN 
 	set nocount on
-	declare @DateTimeNow datetime = GetDate()
-	declare @DateNow datetime = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow))
-	declare @Msg nvarchar(MAX) = ''
-	declare @trancount int = @@trancount
+	declare @DateTimeNow datetime 
+	set @DateTimeNow=GetDate()
+	declare @DateNow datetime 
+	set @DateNow= CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow,121))
+	declare @Msg nvarchar(MAX) 
+	set @Msg=''
+	declare @trancount int 
+	set @trancount=@@trancount
 	declare @ReleaseNo int
 	declare @BatchNo int
 	declare @MaxMstrId int
@@ -75,7 +77,7 @@ BEGIN
 		create table #tempShipFlowDet
 		(
 			RowId int Identity(1, 1),
-			Flow varchar(50),
+			Flow varchar(50) collate Chinese_PRC_CI_AS ,
 			LeadTime decimal(18 ,8),
 			Item varchar(50),
 			ItemDesc varchar(100),
@@ -164,16 +166,16 @@ BEGIN
 		--计算单位换算
 		update #tempEffCustScheduleDet set UnitQty = 1 where Uom = BaseUom
 		update det set UnitQty = c.BaseQty / c.AltQty
-		from #tempEffCustScheduleDet as det inner join UomConv as c on det.Item = c.Item and det.Uom = c.AltUom and det.BaseUom = c.BaseUom
+		from #tempEffCustScheduleDet as det inner join UomConv as c on det.Item = c.Item collate Chinese_PRC_CI_AS and det.Uom = c.AltUom collate Chinese_PRC_CI_AS and det.BaseUom = c.BaseUom collate Chinese_PRC_CI_AS
 		where det.UnitQty is null
 		update det set UnitQty =  c.AltQty / c.BaseQty
-		from #tempEffCustScheduleDet as det inner join UomConv as c on det.Item = c.Item and det.Uom = c.BaseUom and det.BaseUom = c.AltUom
+		from #tempEffCustScheduleDet as det inner join UomConv as c on det.Item = c.Item collate Chinese_PRC_CI_AS and det.Uom = c.BaseUom collate Chinese_PRC_CI_AS and det.BaseUom = c.AltUom collate Chinese_PRC_CI_AS
 		where det.UnitQty is null
 		update det set UnitQty = c.BaseQty / c.AltQty
-		from #tempEffCustScheduleDet as det inner join UomConv as c on det.Uom = c.AltUom and det.BaseUom = c.BaseUom
+		from #tempEffCustScheduleDet as det inner join UomConv as c on det.Uom = c.AltUom collate Chinese_PRC_CI_AS and det.BaseUom = c.BaseUom  collate Chinese_PRC_CI_AS 
 		where det.UnitQty is null and c.Item is null
 		update det set UnitQty =  c.AltQty / c.BaseQty
-		from #tempEffCustScheduleDet as det inner join UomConv as c on det.Uom = c.BaseUom and det.BaseUom = c.AltUom
+		from #tempEffCustScheduleDet as det inner join UomConv as c on det.Uom = c.BaseUom collate Chinese_PRC_CI_AS  and det.BaseUom = c.AltUom collate Chinese_PRC_CI_AS 
 		where det.UnitQty is null and c.Item is null
 
 		--删除没有维护单位换算的物料
@@ -197,27 +199,27 @@ BEGIN
 		--更新在途数量
 		update #tempShipFlowDet set InTransitQty = ISNULL(t.InTransitQty, 0), ActiveQty = LocQty + ISNULL(t.InTransitQty, 0) - SafeStock
 		from #tempShipFlowDet as det left join (select oMstr.Flow, oDet.Item, SUM(iDet.Qty - ISNULL(iDet.RecQty, 0)) as InTransitQty from IpDet as iDet
-												inner join IpMstr as iMstr on iDet.IpNo = iMstr.IpNo
-												inner join OrderLocTrans as oTrans on iDet.OrderLocTransId = oTrans.Id
-												inner join OrderDet as oDet on oTrans.OrderDetId = oDet.Id
-												inner join OrderMstr as oMstr on oDet.OrderNo = oMstr.OrderNo
+												inner join IpMstr as iMstr on iDet.IpNo = iMstr.IpNo  collate Chinese_PRC_CI_AS 
+												inner join OrderLocTrans as oTrans on iDet.OrderLocTransId = oTrans.Id 
+												inner join OrderDet as oDet on oTrans.OrderDetId = oDet.Id 
+												inner join OrderMstr as oMstr on oDet.OrderNo = oMstr.OrderNo collate Chinese_PRC_CI_AS 
 												where oMstr.flow in (select distinct Flow from #tempShipFlowDet)
 												and iMstr.[Status] = 'Create' and oMstr.SubType = 'Nml'
-												group by oMstr.Flow, oDet.Item) as t on det.Flow = t.Flow and det.Item = t.Item
+												group by oMstr.Flow, oDet.Item) as t on det.Flow = t.Flow collate Chinese_PRC_CI_AS  and det.Item = t.Item collate Chinese_PRC_CI_AS 
 
 		--计算单位换算
-		update #tempShipFlowDet set UnitQty = 1 where Uom = BaseUom
+		update #tempShipFlowDet set UnitQty = 1 where Uom = BaseUom collate Chinese_PRC_CI_AS 
 		update det set UnitQty = c.BaseQty / c.AltQty
-		from #tempShipFlowDet as det inner join UomConv as c on det.Item = c.Item and det.Uom = c.AltUom and det.BaseUom = c.BaseUom
+		from #tempShipFlowDet as det inner join UomConv as c on det.Item = c.Item collate Chinese_PRC_CI_AS  and det.Uom = c.AltUom collate Chinese_PRC_CI_AS  and det.BaseUom = c.BaseUom collate Chinese_PRC_CI_AS 
 		where det.UnitQty is null
 		update det set UnitQty =  c.AltQty / c.BaseQty
-		from #tempShipFlowDet as det inner join UomConv as c on det.Item = c.Item and det.Uom = c.BaseUom and det.BaseUom = c.AltUom
+		from #tempShipFlowDet as det inner join UomConv as c on det.Item = c.Item  collate Chinese_PRC_CI_AS and det.Uom = c.BaseUom collate Chinese_PRC_CI_AS  and det.BaseUom = c.AltUom collate Chinese_PRC_CI_AS 
 		where det.UnitQty is null
 		update det set UnitQty = c.BaseQty / c.AltQty
-		from #tempShipFlowDet as det inner join UomConv as c on det.Uom = c.AltUom and det.BaseUom = c.BaseUom
+		from #tempShipFlowDet as det inner join UomConv as c on det.Uom = c.AltUom collate Chinese_PRC_CI_AS  and det.BaseUom = c.BaseUom collate Chinese_PRC_CI_AS 
 		where det.UnitQty is null and c.Item is null
 		update det set UnitQty =  c.AltQty / c.BaseQty
-		from #tempShipFlowDet as det inner join UomConv as c on det.Uom = c.BaseUom and det.BaseUom = c.AltUom
+		from #tempShipFlowDet as det inner join UomConv as c on det.Uom = c.BaseUom collate Chinese_PRC_CI_AS  and det.BaseUom = c.AltUom collate Chinese_PRC_CI_AS 
 		where det.UnitQty is null and c.Item is null
 		
 		--删除没有维护单位换算的物料
@@ -237,9 +239,9 @@ BEGIN
 		-----------------------------↓计算发运计划-----------------------------
 		--转有发运路线的（毛需求）
 		insert into #tempShipPlan(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
-		select flow.Flow, flow.Item, req.ItemDesc, flow.RefItemCode, (req.Qty - req.ShipQty) * req.UnitQty / flow.UnitQty, --先把客户日程的单位转为基本单位，在转为发运计划的单位
+		select flow.Flow, flow.Item, req.ItemDesc, req.ItemRef, (req.Qty - req.ShipQty) * req.UnitQty / flow.UnitQty, --先把客户日程的单位转为基本单位，在转为发运计划的单位
 		req.Uom, req.BaseUom, req.UnitQty, flow.UC, flow.LocFrom, flow.LocTo, DATEADD(day, -flow.LeadTime, StartTime), StartTime  --客户日程的开始时间就是发运计划的窗口时间
-		from #tempEffCustScheduleDet as req inner join #tempShipFlowDet as flow on req.ShipFlow = flow.Flow and req.Item = flow.Item
+		from #tempEffCustScheduleDet as req inner join #tempShipFlowDet as flow on req.ShipFlow = flow.Flow collate Chinese_PRC_CI_AS  and req.Item = flow.Item collate Chinese_PRC_CI_AS 
 
 		--根据开始时间依次扣减库存（含在途库存，不考虑在途库存的到货时间）
 		set @RowId = null
@@ -270,12 +272,13 @@ BEGIN
 		from #tempEffCustScheduleDet where ShipFlow is null
 
 		--低于安全库存的转为当天的发运计划
-		update #tempShipPlan set ShipQty -= d.ActiveQty
-		from #tempShipPlan as p inner join #tempShipFlowDet as d on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
+		--update #tempShipPlan set ShipQty -= d.ActiveQty
+		update #tempShipPlan set ShipQty =ShipQty- d.ActiveQty
+		from #tempShipPlan as p inner join #tempShipFlowDet as d on p.Flow = d.Flow  collate Chinese_PRC_CI_AS and p.Item = d.Item  collate Chinese_PRC_CI_AS and p.StartTime = @DateNow
 		where d.ActiveQty < 0
 		insert into #tempShipPlan(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
 		select d.Flow, d.Item, d.ItemDesc, d.RefItemCode, -d.ActiveQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
-		from #tempShipFlowDet as d left join #tempShipPlan as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
+		from #tempShipFlowDet as d left join #tempShipPlan as p on p.Flow = d.Flow  collate Chinese_PRC_CI_AS and p.Item = d.Item  collate Chinese_PRC_CI_AS and p.StartTime = @DateNow
 		where d.ActiveQty < 0 and p.Flow is null
 
 		--日期小于今天的量全部转为今天

@@ -242,6 +242,9 @@ namespace com.Sconit.Entity.MasterData
                 _isMes = value;
             }
         }
+
+        public Int32 LeadTime { get; set; }
+        public Int32 SafeStock { get; set; }
         #endregion
 
 		public override int GetHashCode()

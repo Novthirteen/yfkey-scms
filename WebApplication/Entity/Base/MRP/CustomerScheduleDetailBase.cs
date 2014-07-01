@@ -149,6 +149,9 @@ namespace com.Sconit.Entity.MRP
         public Int32 Version { get; set; }
         public string Flow { get; set; }
         public string ReferenceScheduleNo { get; set; }
+        public Decimal ShipQty { get; set; }
+        public string ShipFlow { get; set; }
+        public Int32 FordPlanId { get; set; }
 
         #endregion
 
