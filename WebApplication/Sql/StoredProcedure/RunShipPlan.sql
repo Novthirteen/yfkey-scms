@@ -28,6 +28,7 @@ BEGIN
 	declare @MinWindowTime datetime
 	declare @RowId int
 	declare @MaxRowId int
+	declare @DistributionFlow varchar(50)
 	
 	exec GetNextSequence 'RunShipPlan', @BatchNo output
 	begin try
@@ -63,6 +64,12 @@ BEGIN
 			Location varchar(50),
 			StartTime datetime,
 			WindowTime datetime
+		)
+
+		create table #tempDistributionFlow
+		(
+			RowId int Identity(1, 1),
+			Flow varchar(50),
 		)
 
 		create table #tempShipFlowDet
@@ -108,6 +115,8 @@ BEGIN
 		update det set ShipQty = p.CurrenCumQty
 		from CustScheduleDet as det inner join EDI_FordPlan as p on det.FordPlanId = p.Id
 
+
+
 		-----------------------------↓获取客户日程-----------------------------
 		--选取开始日期大于等于当天的所有客户日程
 		insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, ShipQty,
@@ -127,20 +136,29 @@ BEGIN
 
 		--取最新日程的所有明细，旧日程的明细要删除和最新日程重复的明细，依次循环得到有效日程
 		--原理：防止客户给出的日程没有包含最近几天的需求，最近几天的只能取旧日程上的明细，但是要保证和最新的日程不出现重复
-		select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet
-		select @MinWindowTime = MIN(WindowTime) from #tempEffCustScheduleDet where MstrId = @MaxMstrId
-		while exists(select top 1 1 from #tempEffCustScheduleDet where MstrId < @MaxMstrId and WindowTime > @MinWindowTime)
+		insert into #tempDistributionFlow(Flow) select distinct Flow from #tempEffCustScheduleDet
+		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempDistributionFlow
+		while @RowId <= @MaxRowId
 		begin
-			delete from #tempEffCustScheduleDet where MstrId < @MaxMstrId and WindowTime > @MinWindowTime
-			if exists(select top 1 1 from #tempEffCustScheduleDet where MstrId < @MaxMstrId)
-			begin --没有更小版本的客户日程，跳出循环
-				break;
+			select @DistributionFlow = Flow from #tempDistributionFlow where RowId = @RowId
+
+			select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow
+			select @MinWindowTime = MIN(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
+			while exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime)
+			begin
+				delete from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime
+				if exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId)
+				begin --没有更小版本的客户日程，跳出循环
+					break;
+				end
+				else
+				begin --取下一个版本的客户日程
+					select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId
+					select @MinWindowTime = MIN(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
+				end
 			end
-			else
-			begin --取下一个版本的客户日程
-				select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where MstrId < @MaxMstrId
-				select @MinWindowTime = MIN(WindowTime) from #tempEffCustScheduleDet where MstrId = @MaxMstrId
-			end
+
+			set @RowId = @RowId + 1
 		end
 
 		--计算单位换算
@@ -165,10 +183,11 @@ BEGIN
 		-----------------------------↑获取客户日程-----------------------------
 
 
+
 		-----------------------------↓获取发运路线-----------------------------
 		--获取发运路线和发运库位的库存（中间仓库存）
 		insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, LocQty, SafeStock)
-		select det.Flow, ISNULL(mstr.MRPLeadTime, 0) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, det.UC, mstr.LocFrom, mstr.LocTo, ISNULL(loc.Qty, 0), ISNULL(SafeStock, 0) 
+		select det.Flow, ISNULL(mstr.MRPLeadTime, 0) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, det.UC, mstr.LocFrom, mstr.LocTo, ISNULL(loc.Qty, 0), ISNULL(det.SafeStock, 0) 
 		from FlowDet as det
 		inner join FlowMstr as mstr on det.Flow = mstr.Code
 		inner join Item as i on det.Item = i.Code
@@ -205,6 +224,12 @@ BEGIN
 		insert into #tempMsg(Lvl, Flow, Item, Uom, LocFrom, LocTo, Msg) 
 		select 'Error', Flow, Item, Uom, LocFrom, LocTo, N'发运路线的物料没有维护单位换算' from #tempShipFlowDet where UnitQty is null
 		delete from #tempShipFlowDet where UnitQty is null
+
+		--发运路线没有维护物料
+		insert into #tempMsg(Lvl, Flow, Item, Uom, LocFrom, LocTo, Msg) 
+		select 'Error', c.ShipFlow, c.Item, c.Uom, c.Location, null, N'物料在发运路线中不存在' 
+		from #tempEffCustScheduleDet as c left join #tempShipFlowDet as f on c.ShipFlow = f.Flow and c.Item = f.Item
+		where f.RowId is null
 		-----------------------------↑获取发运路线-----------------------------
 
 
@@ -250,6 +275,16 @@ BEGIN
 		select d.Flow, d.Item, d.ItemDesc, d.RefItemCode, -d.ActiveQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
 		from #tempShipFlowDet as d left join #tempShipPlan as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
 		where d.ActiveQty < 0 and p.Flow is null
+
+		--日期小于今天的量全部转为今天
+		update b set ShipQty = b.ShipQty + a.ShipQty
+		from #tempShipPlan as a inner join #tempShipPlan as b on a.Flow = b.Flow and a.ITem = b.Item
+		where b.StartTime = @DateNow and a.StartTime < @DateNow
+		insert into #tempShipPlan(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
+		select a.Flow, a.Item, a.ItemDesc, a.RefItemCode, a.ShipQty, a.Uom, a.BaseUom, a.UnitQty, a.UC, a.LocFrom, a.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
+		from #tempShipPlan as a left join #tempShipPlan as b on a.Flow = b.Flow and a.ITem = b.Item and b.StartTime = @DateNow
+		inner join #tempShipFlowDet as d on a.Flow = d.Flow and a.Item = d.Item
+		where a.StartTime < @DateNow and b.Flow is null
 		-----------------------------↑计算发运计划-----------------------------
 
 		if @trancount = 0
