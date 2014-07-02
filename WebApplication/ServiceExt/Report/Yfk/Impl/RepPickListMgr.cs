@@ -11,10 +11,10 @@ namespace com.Sconit.Service.Report.Yfk.Impl
     [Transactional]
     public class RepPickListMgr : RepTemplate1
     {
-      
+
         private IPickListMgr pickListMgr;
         private IFlowMgr flowMgr;
-        
+
         public RepPickListMgr(String reportTemplateFolder, IPickListMgr pickListMgr, IFlowMgr flowMgr)
         {
             this.flowMgr = flowMgr;
@@ -42,89 +42,89 @@ namespace com.Sconit.Service.Report.Yfk.Impl
         {
             try
             {
-                
-                    PickList pickList = (PickList)list[0];
-                    IList<PickListDetail> pickListDetails = pickList.PickListDetails;
 
-                    if (pickList == null
-                        || pickListDetails == null || pickListDetails.Count == 0)
+                PickList pickList = (PickList)list[0];
+                IList<PickListDetail> pickListDetails = pickList.PickListDetails;
+
+                if (pickList == null
+                    || pickListDetails == null || pickListDetails.Count == 0)
+                {
+                    return false;
+                }
+                if (pickList.PartyFrom.Code == "YFK-RW" || pickList.PartyFrom.Code == "YFK-RM-HD")
+                // if (!pickList.PartyFrom.Code.Contains("YFK-BJ") && (pickList.PartyFrom.Code.Contains("-RM") || pickList.PartyFrom.Code.Contains("RM-")))
+                {
+                    pickListDetails = pickListDetails.OrderBy(pd => pd.PrintLocationCode).ToList();
+                }
+                this.barCodeFontName = this.GetBarcodeFontName(0, 7);
+                //this.SetRowCellBarCode(0, 0, 7);
+                this.CopyPage(pickListDetails.Count);
+
+                this.FillHead(pickList);
+
+
+                int pageIndex = 1;
+                int rowIndex = 0;
+                int rowTotal = 0;
+                int no = 1;
+                foreach (PickListDetail pickListDetail in pickListDetails)
+                {
+
+                    // No.	
+                    this.SetRowCell(pageIndex, rowIndex, 0, "" + (no++));
+
+                    //零件号 Item Code
+                    this.SetRowCell(pageIndex, rowIndex, 1, pickListDetail.Item.Code);
+
+                    //描述Description
+                    this.SetRowCell(pageIndex, rowIndex, 2, pickListDetail.Item.Description);
+
+                    //单包装UC
+                    this.SetRowCell(pageIndex, rowIndex, 3, pickListDetail.UnitCount.ToString("0.########"));
+
+                    //需求 Request	包装
+                    int UCs = (int)Math.Ceiling(pickListDetail.Qty / pickListDetail.UnitCount);
+                    this.SetRowCell(pageIndex, rowIndex, 4, UCs.ToString());
+
+                    //需求 Request	零件数
+                    this.SetRowCell(pageIndex, rowIndex, 5, pickListDetail.Qty.ToString("0.########"));
+
+                    //库位(loc)
+                    this.SetRowCell(pageIndex, rowIndex, 6, pickListDetail.PrintLocationCode);
+                    //批号（LOT）
+                    this.SetRowCell(pageIndex, rowIndex, 7, pickListDetail.LotNo != null ? pickListDetail.LotNo : String.Empty);
+
+                    //实收 Received	包装
+                    this.SetRowCell(pageIndex, rowIndex, 8, String.Empty);
+
+                    //实收 Received	零件数
+                    this.SetRowCell(pageIndex, rowIndex, 9, String.Empty);
+
+                    //备注
+                    this.SetRowCell(pageIndex, rowIndex, 10, pickListDetail.Memo);
+
+
+                    if (this.isPageBottom(rowIndex, rowTotal))//页的最后一行
                     {
-                        return false;
+                        pageIndex++;
+                        rowIndex = 0;
                     }
-                    //if (pickList.PartyFrom.Code == "YFK-RW" || pickList.PartyFrom.Code == "YFK-RM-HD")
-                    if (!pickList.PartyFrom.Code.Contains("YFK-BJ") && (pickList.PartyFrom.Code.Contains("-RM") || pickList.PartyFrom.Code.Contains("RM-")))
+                    else
                     {
-                        pickListDetails = pickListDetails.OrderBy(pd => pd.PrintLocationCode).ToList();
+                        rowIndex++;
                     }
-                    this.barCodeFontName = this.GetBarcodeFontName(0, 7);
-                    //this.SetRowCellBarCode(0, 0, 7);
-                    this.CopyPage(pickListDetails.Count);
+                    rowTotal++;
+                }
 
-                    this.FillHead(pickList);
+                this.sheet.DisplayGridlines = false;
+                this.sheet.IsPrintGridlines = false;
 
+                if (pickList.IsPrinted == null || pickList.IsPrinted == false)
+                {
+                    pickList.IsPrinted = true;
+                    pickListMgr.UpdatePickList(pickList);
+                }
 
-                    int pageIndex = 1;
-                    int rowIndex = 0;
-                    int rowTotal = 0;
-                    int no = 1;
-                    foreach (PickListDetail pickListDetail in pickListDetails)
-                    {
-
-                        // No.	
-                        this.SetRowCell(pageIndex, rowIndex, 0, "" + (no++));
-
-                        //零件号 Item Code
-                        this.SetRowCell(pageIndex, rowIndex, 1, pickListDetail.Item.Code);
-
-                        //描述Description
-                        this.SetRowCell(pageIndex, rowIndex, 2, pickListDetail.Item.Description);
-
-                        //单包装UC
-                        this.SetRowCell(pageIndex, rowIndex, 3, pickListDetail.UnitCount.ToString("0.########"));
-
-                        //需求 Request	包装
-                        int UCs = (int)Math.Ceiling(pickListDetail.Qty / pickListDetail.UnitCount);
-                        this.SetRowCell(pageIndex, rowIndex, 4, UCs.ToString());
-
-                        //需求 Request	零件数
-                        this.SetRowCell(pageIndex, rowIndex, 5, pickListDetail.Qty.ToString("0.########"));
-
-                        //库位(loc)
-                        this.SetRowCell(pageIndex, rowIndex, 6, pickListDetail.PrintLocationCode);
-                        //批号（LOT）
-                        this.SetRowCell(pageIndex, rowIndex, 7, pickListDetail.LotNo != null ? pickListDetail.LotNo : String.Empty);
-
-                        //实收 Received	包装
-                        this.SetRowCell(pageIndex, rowIndex, 8, String.Empty);
-
-                        //实收 Received	零件数
-                        this.SetRowCell(pageIndex, rowIndex, 9, String.Empty);
-
-                        //备注
-                        this.SetRowCell(pageIndex, rowIndex, 10, pickListDetail.Memo);
-
-
-                        if (this.isPageBottom(rowIndex, rowTotal))//页的最后一行
-                        {
-                            pageIndex++;
-                            rowIndex = 0;
-                        }
-                        else
-                        {
-                            rowIndex++;
-                        }
-                        rowTotal++;
-                    }
-
-                    this.sheet.DisplayGridlines = false;
-                    this.sheet.IsPrintGridlines = false;
-
-                    if (pickList.IsPrinted == null || pickList.IsPrinted == false)
-                    {
-                        pickList.IsPrinted = true;
-                        pickListMgr.UpdatePickList(pickList);
-                    }
-                
             }
             catch (Exception)
             {
@@ -141,7 +141,7 @@ namespace com.Sconit.Service.Report.Yfk.Impl
          */
         private void FillHead(PickList pickList)
         {
-            
+
 
             //订单号:
             string orderCode = Utility.BarcodeHelper.GetBarcodeStr(pickList.PickListNo, this.barCodeFontName);
@@ -149,12 +149,12 @@ namespace com.Sconit.Service.Report.Yfk.Impl
             //Order No.:
             this.SetRowCell(1, 7, pickList.PickListNo);
 
-            if (pickList.PickListDetails == null 
-                    || pickList.PickListDetails[0] == null 
-                    || pickList.PickListDetails[0].OrderLocationTransaction == null 
-                    || pickList.PickListDetails[0].OrderLocationTransaction.OrderDetail == null 
+            if (pickList.PickListDetails == null
+                    || pickList.PickListDetails[0] == null
+                    || pickList.PickListDetails[0].OrderLocationTransaction == null
+                    || pickList.PickListDetails[0].OrderLocationTransaction.OrderDetail == null
                     || pickList.PickListDetails[0].OrderLocationTransaction.OrderDetail.OrderHead == null
-                    || "Normal".Equals(pickList.PickListDetails[0].OrderLocationTransaction.OrderDetail.OrderHead.Priority)) 
+                    || "Normal".Equals(pickList.PickListDetails[0].OrderLocationTransaction.OrderDetail.OrderHead.Priority))
             {
                 this.SetRowCell(2, 4, "");
             }
