@@ -19,6 +19,8 @@ namespace com.Sconit.Service.MRP
 
         List<CustomerScheduleDetail> ReadCustomerPlanFromXls(Stream inputStream, string dateType, User user);
 
+        List<ShiftPlanDet> ReadShiftPlanFromXls(Stream inputStream, User user);
+
         void UpdateShipPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user);
     }
 }

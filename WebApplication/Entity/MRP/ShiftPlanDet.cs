@@ -6,7 +6,10 @@ using System.Collections.Generic;
 namespace com.Sconit.Entity.MRP
 {
     [Serializable]
-    public class ShiftPlanDe : ShiftPlanDetBase
+    public class ShiftPlanDet : ShiftPlanDetBase
     {
+
+        public string Status { get; set; }
+        public Int32 Version { get; set; }
     }
 }

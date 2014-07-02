@@ -204,6 +204,9 @@
     <Compile Include="Base\Mes\ProductLineUserBase.cs" />
     <Compile Include="Base\Mes\ShelfBase.cs" />
     <Compile Include="Base\Mes\ShelfItemBase.cs" />
+    <Compile Include="Base\MRP\LocationDetSnapShotBase.cs" />
+    <Compile Include="Base\MRP\ShiftPlanDetBase.cs" />
+    <Compile Include="Base\MRP\ShiftPlanMstrBase.cs" />
     <Compile Include="Base\MRP\RunProductionPlanLogBase.cs" />
     <Compile Include="Base\MRP\ProductionPlanDetBase.cs" />
     <Compile Include="Base\MRP\ProductionPlanMstrBase.cs" />
@@ -391,6 +394,9 @@
     <Compile Include="Mes\ProductLineUser.cs" />
     <Compile Include="Mes\Shelf.cs" />
     <Compile Include="Mes\ShelfItem.cs" />
+    <Compile Include="MRP\LocationDetSnapShot.cs" />
+    <Compile Include="MRP\ShiftPlanDet.cs" />
+    <Compile Include="MRP\ShiftPlanMstr.cs" />
     <Compile Include="MRP\RunProductionPlanLog.cs" />
     <Compile Include="MRP\ProductionPlanMstr.cs" />
     <Compile Include="MRP\ProductionPlanDet.cs" />
@@ -722,6 +728,19 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Base\MRP\ShipPlanDetTrace.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ShiftPlanMstr.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ShiftPlanDet.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\LocationDetSnapShot.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

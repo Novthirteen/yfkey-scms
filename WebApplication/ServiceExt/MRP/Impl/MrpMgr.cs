@@ -1175,6 +1175,241 @@ namespace com.Sconit.Service.MRP.Impl
         }
         #endregion
 
+        #region    Import ShipPlan
+        private static object readShiftPlanFromXlsLock = new object();
+        [Transaction(TransactionMode.Requires)]
+        public List<ShiftPlanDet> ReadShiftPlanFromXls(Stream inputStream, User user)
+        {
+            lock (readShiftPlanFromXlsLock)
+            {
+                DateTime startDate = DateTime.Today;
+                DateTime endDate = DateTime.Today.AddDays(30);
+                List<ShiftPlanDet> shiftPlanList = new List<ShiftPlanDet>();
+                IList<Shift> shifts = shiftMgr.GetAllShift();
+                if (inputStream.Length == 0)
+                {
+                    throw new BusinessErrorException("Import.Stream.Empty");
+                }
+                HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+                Sheet sheet = workbook.GetSheetAt(0);
+                IEnumerator rows = sheet.GetRowEnumerator();
+                Row dateRow = sheet.GetRow(0);
+                Row shiftRow = sheet.GetRow(1);
+                ImportHelper.JumpRows(rows, 2);
+
+                #region 列定义
+                int colFlow = 0;//生产线
+                int colItem = 1;//物料代码
+                #endregion
+
+                var flowCodes = this.genericMgr.GetDatasetBySql(" select Code,desc1 from flowmstr  where [Type]='Production' ").Tables[0];
+                IList<object[]> flowCodeList = new List<object[]>();
+                foreach (System.Data.DataRow flowRow in flowCodes.Rows)
+                {
+                    flowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString() });
+                }
+                //var flowDic = this.flowMgr.GetAllFlow().Where(p => p.Type == BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION)
+                //   .ToDictionary(d => d.Code, d => d);
+                while (rows.MoveNext())
+                {
+                    HSSFRow row = (HSSFRow)rows.Current;
+                    if (!ImportHelper.CheckValidDataRow(row, 0, 3))
+                    {
+                        break;//边界
+                    }
+
+                    string flowCode = string.Empty;
+                    string itemCode = string.Empty;
+
+                    #region 读取生产线
+                    flowCode = ImportHelper.GetCellStringValue(row.GetCell(colFlow));
+                    if (string.IsNullOrEmpty(flowCode))
+                    {
+                        continue;
+                        //throw new BusinessErrorException("Import.PSModel.Empty.Error.Flow", (row.RowNum + 1).ToString());
+                    }
+
+                    if (flowCodeList.Where(d => (d[0]).ToString() == flowCode).Count() == 0)
+                    {
+                        throw new BusinessErrorException(string.Format("生产线{0}不存在,请注意,区分大小写:{1}", flowCode, (row.RowNum + 1).ToString()));
+                    }
+                    #endregion
+
+                    #region 读取成品代码
+                    try
+                    {
+                        itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
+                        if (string.IsNullOrEmpty(itemCode))
+                        {
+                            throw new BusinessErrorException("Import.PSModel.Empty.Error.ItemCode", (row.RowNum + 1).ToString());
+                        }
+                    }
+                    catch
+                    {
+                        throw new BusinessErrorException("Import.PSModel.Read.Error.ItemCode", (row.RowNum + 1).ToString());
+                    }
+                    #endregion
+
+                    #region
+                    int startColIndex = 2;
+                    while (true)
+                    {
+                        Cell dateCell = dateRow.GetCell(startColIndex);
+
+                        DateTime planDate = DateTime.Now;
+                        if (dateCell == null)
+                        {
+                            break;
+                        }
+                        try
+                        {
+                            try
+                            {
+                                planDate = dateCell.DateCellValue;
+                            }
+                            catch (Exception)
+                            {
+                                planDate = Convert.ToDateTime(dateCell.StringCellValue);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            break;
+                        }
+                        if (planDate < startDate)
+                        {
+                            startColIndex += 3;
+                            continue;
+                        }
+                        else if (planDate > endDate)
+                        {
+                            break;
+                        }
+                        for (int i = 0; i < 3; i++)
+                        {
+                            string shiftName = ImportHelper.GetCellStringValue(shiftRow.GetCell(startColIndex));
+                            string qty_ = ImportHelper.GetCellStringValue(row.GetCell(startColIndex));
+                            startColIndex++;
+                            var shift = shifts.FirstOrDefault(s => StringHelper.Eq(s.ShiftName, shiftName));
+                            if (shift == null)
+                            {
+                                continue;
+                            }
+                            decimal planQty = 0;
+                            if (qty_ != null)
+                            {
+                                bool isSuccess = decimal.TryParse(qty_, out planQty);
+                                if (!isSuccess)
+                                {
+                                    throw new BusinessErrorException(string.Format("数量输入有误,行{0}", (row.RowNum + 1).ToString()));
+                                }
+
+                                if (planQty < 0)
+                                {
+                                    throw new BusinessErrorException(string.Format("班产计划数量不能小于0,行:{0}", (row.RowNum + 1).ToString()));
+                                }
+                                ShiftPlanDet shiftPlan = new ShiftPlanDet();
+                                shiftPlan.ProdLine = flowCode;
+                                shiftPlan.Item = itemCode;
+                                shiftPlan.Qty = planQty;
+                                shiftPlan.PlanDate = planDate;
+                                shiftPlan.Shift = shift.Code;
+                                shiftPlanList.Add(shiftPlan);
+                            }
+                        }
+                        startColIndex += 1;
+                    }
+                    #endregion
+                }
+                if (shiftPlanList.Count == 0)
+                {
+                    throw new BusinessErrorException("Import.Result.Error.ImportNothing");
+                }
+
+                List<string> errorMessages = new List<string>();
+                var groupShiftPlanByFlow = shiftPlanList.GroupBy(p => p.ProdLine);
+                foreach (var groupShiftPlan in groupShiftPlanByFlow)
+                {
+                    var flowDetails = this.GetFlowDetails(groupShiftPlan.Key);
+                    foreach (var shiftPlan in groupShiftPlan)
+                    {
+                        var checkeFdets = flowDetails.Where(p => p.Item.Code == shiftPlan.Item);
+                        var flowDetail = flowDetails == null ? null : flowDetails.First();
+                        if (flowDetail != null)
+                        {
+                            shiftPlan.ItemDesc = flowDetail.Item.Description;
+                            shiftPlan.RefItemCode = flowDetail.ReferenceItemCode;
+                            shiftPlan.Uom = flowDetail.Uom.Code;
+                            shiftPlan.UnitQty = uomConversionMgr.ConvertUomQty(flowDetail.Item.Code, flowDetail.Uom, 1, flowDetail.Item.Uom);
+                        }
+                        else
+                        {
+                            errorMessages.Add(string.Format("没有找到路线{0}中匹配的物料{1}", shiftPlan.ProdLine, shiftPlan.Item));
+                        }
+                    }
+                }
+
+                if (errorMessages.Count > 0)
+                {
+                    throw new BusinessErrorException(string.Format("导入时出现错误:{0}", string.Join(",", errorMessages.Distinct().ToArray())));
+                }
+
+                var planDateList = shiftPlanList.Select(p => p.PlanDate.ToString("yyyy-MM-dd")).Distinct().ToArray();
+
+                string sql = string.Format(" Delete MRP_ShiftPlanDet  where exists(select 1 from MRP_ShiftPlanMstr as m where m.Id=PlanId and m.Status='Create') and ProdLine in in('{0}');delete MRP_ShiftPlanMstr where Status='Create' and ProdLine in ('{0}') ", string.Join("','", shiftPlanList.Select(p => p.ProdLine).Distinct().ToArray()));
+                this.genericMgr.ExecuteSql(sql, null);
+                //Dictionary<string, int> planVersions = new Dictionary<string, int>();
+                //foreach (var allFlowCode in shiftPlanList.Select(p => p.ProdLine).Distinct())
+                //{
+                //    planVersions.Add(allFlowCode, numberControlMgr.GenerateNumberNextSequence(string.Format("MRP_ShiftPlan_{0}", allFlowCode)));
+                //}
+
+                string searchVersions = "select ProdLineNo,Max(Version) from  MRP_ShiftPlanMstr group by  ProdLineNo";
+
+                var versions = this.genericMgr.GetDatasetBySql(searchVersions).Tables[0];
+                Dictionary<string, int> planVersions = new Dictionary<string, int>();
+                foreach (System.Data.DataRow row in versions.Rows)
+                {
+                    planVersions.Add(row[0].ToString(),int.Parse(row[1].ToString()));
+                }
+                var groupByFlow = shiftPlanList.GroupBy(g => g.ProdLine);
+                foreach (var gb in groupByFlow)
+                {
+                    DateTime dateNow = System.DateTime.Now;
+                    var version=planVersions.Keys.Contains(gb.First().ProdLine)? planVersions[gb.First().ProdLine]+1:1;
+                    ShiftPlanMstr m = new ShiftPlanMstr(); 
+                    m.RefPlanNo= gb.First().ProdLine+"-"+version.ToString().PadLeft(3,'0');
+                    m.ProdLine = gb.First().ProdLine;
+                    m.Status= "Create";
+                    m.CreateDate = dateNow;
+                    m.CreateUser= user.Code;
+                    m.LastModifyDate = dateNow;
+                    m.LastModifyUser = user.Code;
+                    m.Version = version;
+                    this.genericMgr.Create(m);
+
+                    foreach (var g in gb)
+                    {
+                        g.PlanId = m.Id;
+                        g.RefPlanNo = m.RefPlanNo;
+                        g.ProdLine = m.ProdLine;
+                        g.CreateDate = dateNow;
+                        g.CreateUser = user.Code;
+                        this.genericMgr.Create(g);
+                    }
+                }
+                return shiftPlanList;
+            }
+        }
+
+        private IList<FlowDetail> GetFlowDetails(string flowCode)
+        {
+            var flowMaster = this.genericMgr.FindById<Flow>(flowCode);
+            return flowMaster.FlowDetails;
+        }
+
+        #endregion
+
 
         #region Private Methods
         private void ProcessEffectiveInventoryBalance(ref IList<MrpLocationLotDetail> inventoryBalanceList, object[] invLoc, IList<SafeInventory> safeQtyList, DateTime effectiveDate, DateTime dateTimeNow, User user)

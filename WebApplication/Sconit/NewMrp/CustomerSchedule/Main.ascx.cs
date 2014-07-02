@@ -151,7 +151,7 @@ public partial class NewMrp_CustomerSchedule_Main : MainModuleBase
             this.ltlPlanVersion.Text = string.Empty;
             return;
         }
-        var customerPlanListDic = customerPlanList.GroupBy(p => new { p.Flow, p.Item, p.Version })
+        var customerPlanListDic = customerPlanList.GroupBy(p => new { p.Flow, p.Version })
            .ToDictionary(d => d.Key, d => d.ToList());
 
         List<CustomerScheduleDetail> customerPlanLogList = new List<CustomerScheduleDetail>();
