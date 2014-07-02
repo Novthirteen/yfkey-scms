@@ -8,8 +8,8 @@
             <td class="td01">
                 <asp:RadioButtonList ID="rblAction" runat="server" RepeatDirection="Horizontal" AutoPostBack="true"
                     CssClass="floatright" OnSelectedIndexChanged="rblAction_SelectedIndexChanged">
-                    <asp:ListItem Text="查询" Value="Search" Selected="True" />
-                    <asp:ListItem Text="导入" Value="Import" />
+                    <asp:ListItem Text="明细" Value="Search" Selected="True" />
+                    <asp:ListItem Text="汇总" Value="Import" />
                 </asp:RadioButtonList>
             </td>
             <td class="td02">
@@ -30,7 +30,7 @@
                 <uc3:textbox ID="tbFlow" runat="server" DescField="Description" ValueField="Code"
                     ServicePath="FlowMgr.service" MustMatch="true" Width="250" ServiceMethod="GetFlowList" />
             </td>
-             <td class="td01">
+            <td class="td01">
                 物料代码
             </td>
             <td class="td02">
@@ -38,7 +38,6 @@
                     DescField="Description" ValueField="Code" ServicePath="ItemMgr.service" ServiceMethod="GetCacheAllItem" />
             </td>
         </tr>
-       
         <tr>
             <td class="td01">
                 发运日期 从
@@ -57,60 +56,130 @@
         </tr>
         <tr>
             <td class="ttd01">
+                发运计划版本号
             </td>
             <td class="ttd02">
+                <asp:TextBox ID="tbReleaseNo" runat="server" />
             </td>
             <td>
-               <%-- <asp:RadioButtonList ID="rblSearchDateType" runat="server" RepeatDirection="Horizontal" AutoPostBack="true"
-                    CssClass="floatright" OnSelectedIndexChanged="rblSearchDateType_SelectedIndexChanged">
-                    <asp:ListItem Text="天" Value="Daily" Selected="True" />
-                    <asp:ListItem Text="周" Value="Weekly" />
-                </asp:RadioButtonList>--%>
             </td>
             <td class="td02">
-                <asp:Button ID="btnSave" runat="server" Text="查询" OnClick="btnSearch_Click" />
-                <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" OnClick="btnExport_Click" />
+                <asp:Button ID="btnSearch" runat="server" Text="查询" OnClick="btnSearch_Click" />
+                <asp:Button ID="btnSave" runat="server" Text="保存" OnClick="btnSave_Click" />
+                <%--<asp:Button ID="btReplace" Text="" runat="server"   OnClick="btnReplace_Click"   Style="display: none" />--%>
+                <input type="hidden" id="btSeqHidden" runat="server" />
+                <input type="hidden" id="btQtyHidden" runat="server" />
                 <%--<asp:Button ID="btnRunShipPlan" runat="server" Text="生成发运计划" OnClick="btnRunShipPlan_Click" />--%>
             </td>
         </tr>
     </table>
+    <div id="list" runat="server">
+    </div>
     <table class="mtable" runat="server" id="tblImport" visible="false">
         <tr>
             <td class="td01">
-                类型:
+                发运计划版本
             </td>
             <td class="td02">
-                <table>
-                    <tr>
-                        <td>
-                            <asp:RadioButtonList ID="rblDateType" runat="server" RepeatDirection="Horizontal"
-                                CssClass="floatright">
-                                <asp:ListItem Text="天" Value="4" Selected="True" />
-                                <asp:ListItem Text="周" Value="5" />
-                            </asp:RadioButtonList>
-                        </td>
-                        <td>
-                            <asp:HyperLink ID="hlTemplate1" runat="server" Text="模板(天)" NavigateUrl="~/Reports/Templates/MRP/客户计划(天).xls" />
-                            <asp:HyperLink ID="hlTemplate2" runat="server" Text="模板(周)" NavigateUrl="~/Reports/Templates/MRP/客户计划(周).xls" />
-                        </td>
-                    </tr>
-                </table>
+                <asp:TextBox ID="tbMstrReleaseNo" runat="server" />
             </td>
             <td class="td01">
-                请选择文件:
+                状态
             </td>
             <td class="td02">
-                <asp:FileUpload ID="fileUpload" ContentEditable="false" runat="server" />
-                <%--<cc1:Button ID="btnImport" runat="server" Text="导入" OnClick="btnImport_Click" />--%>
-                <asp:Button ID="btnImport" runat="server" Text="${Common.Button.Import}" OnClick="btnImport_Click"
-                    CssClass="apply" />
+                <select id="StatusSelect" runat="server">
+                    <option selected="selected" value=""></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="ttd01">
+            </td>
+            <td class="ttd02">
+            </td>
+            <td>
+            </td>
+            <td class="td02">
+                <asp:Button ID="btnMstrSearch" runat="server" Text="查询" OnClick="btnMstrSearch_Click" />
+                <asp:Button ID="btmSubmit" runat="server" Text="释放" OnClick="btnSubmit_Click" />
             </td>
         </tr>
     </table>
     <asp:Literal ID="ltlPlanVersion" runat="server" />
-    <div id="list" runat="server">
+    <div id="mstrList" runat="server">
     </div>
 </div>
+<script type="text/javascript">
+    function doclick() {
+        debugger
+        //        alert($("#mstrList").html());
+        //    var allHtml = $("#ctl01_list").html();
+        var allFlow = "";
+        var allItem = "";
+        var allId = "";
+        var allQty = "";
+        $("#ctl01_list tbody input").each(function () {
+            if (allFlow == "") {
+                debugger
+                alert($(this).flow);
+                allFlow = $(this).flow;
+                allItem = +$(this).item;
+                allId = $(this).id;
+                allQty = $(this).val();
+            } else {
+                allFlow += "," + $(this).flow;
+                allItem += "," + $(this).item;
+                allId += "," + $(this).id;
+                allQty += "," + $(this).val();
+            }
+        });
+        alert(allFlow);
+    }
+
+
+    function doFocusClick(e) {
+        var cSeq = $(e).attr("seq");
+        var cQty = $(e).val();
+        var valSeqs = $("#ctl01_btSeqHidden").val();
+        var valQtys = $("#ctl01_btQtyHidden").val();
+        if (valSeqs == "[object]") valSeqs = "";
+        if (valQtys == "[object]") valQtys = "";
+        if (valSeqs != "") {
+            var vSeqlArr = valSeqs.split(",");
+            var vQtylArr = valQtys.split(",");
+            var ii = 1;
+            for (var i = 0; i < vSeqlArr.length; i++) {
+                if (cSeq == vSeqlArr[i]) {
+                    vQtylArr[i] = cQty;
+                    ii = 0;
+                }
+            }
+            if (ii == 1) {
+                $("#ctl01_btSeqHidden").val(valSeqs + "," + cSeq);
+                $("#ctl01_btQtyHidden").val(valQtys + "," + cQty);
+            } else {
+                valSeqs = "";
+                valQtys = "";
+                for (var i = 0; i < vSeqlArr.length; i++) {
+                    if (valSeqs == "") {
+                        valSeqs = vSeqlArr[i];
+                        valQtys = vQtylArr[i];
+                    } else {
+                        valSeqs += "," + vSeqlArr[i];
+                        valQtys += "," + vQtylArr[i];
+                    }
+                }
+                $("#ctl01_btSeqHidden").val(valSeqs);
+                $("#ctl01_btQtyHidden").val(valQtys);
+            }
+        } else {
+            $("#ctl01_btSeqHidden").val(cSeq);
+            $("#ctl01_btQtyHidden").val(cQty);
+        }
+        //        $("#ctl01_ucList_btHidden").val(e);
+        //        document.getElementById('ctl01_ucList_btShowDetail').click();
+    }
+</script>
 <!----new-->
 <%--<script type="text/javascript">
     function timedMsg(url) {

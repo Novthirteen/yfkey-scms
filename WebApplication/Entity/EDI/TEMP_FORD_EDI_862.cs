@@ -9,7 +9,7 @@ namespace com.Sconit.Entity.EDI
     public class TEMP_FORD_EDI_862 : TEMP_FORD_EDI_862Base
     {
         #region Non O/R Mapping Properties
-
+        public string TempFlow { get; set; }
 
         #endregion
     }

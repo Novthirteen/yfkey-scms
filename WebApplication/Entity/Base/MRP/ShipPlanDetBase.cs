@@ -31,6 +31,10 @@ namespace com.Sconit.Entity.MRP
         public DateTime LastModifyDate { get; set; }
         public string LastModifyUser { get; set; }
         public Int32 Version { get; set; }
+        public decimal OrgShipQty { get; set; }
+        public decimal ReqQty { get; set; }
+        
+        
 
 		public override int GetHashCode()
         {

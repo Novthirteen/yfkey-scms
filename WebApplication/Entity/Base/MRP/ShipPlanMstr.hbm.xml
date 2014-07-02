@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
-	<class name="com.Sconit.Entity.MRP.ShipPlanMstr, com.Sconit.Entity" table="ShipPlanMstr" lazy="false">
+	<class name="com.Sconit.Entity.MRP.ShipPlanMstr, com.Sconit.Entity" table="MRP_ShipPlanMstr" lazy="false">
 		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
 			<generator class="identity" />
 		</id>

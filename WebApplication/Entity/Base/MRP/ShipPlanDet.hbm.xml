@@ -25,5 +25,7 @@
     <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
     <property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
     <property name="Version" column="Version" type="Int32"  />
+    <property name="OrgShipQty" column="OrgShipQty" type="Decimal"  />
+    <property name="ReqQty" column="ReqQty" type="Decimal"  />
   </class>
 </hibernate-mapping>

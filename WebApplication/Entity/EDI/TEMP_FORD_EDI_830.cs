@@ -10,6 +10,7 @@ namespace com.Sconit.Entity.EDI
     {
         #region Non O/R Mapping Properties
 
+        public string TempFlow { get; set; }
 
         #endregion
     }

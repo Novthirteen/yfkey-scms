@@ -684,9 +684,9 @@ namespace com.Sconit.Service.MRP.Impl
 
                 IEnumerator rows = sheet.GetRowEnumerator();
 
-                Row dateRow = sheet.GetRow(5);
+                Row dateRow = sheet.GetRow(1);
 
-                ImportHelper.JumpRows(rows, 6);
+                ImportHelper.JumpRows(rows, 2);
 
                 var customerPlanList = new List<CustomerScheduleDetail>();
 
@@ -773,7 +773,7 @@ namespace com.Sconit.Service.MRP.Impl
                             errorMessages.Add(string.Format("物料不能为空,第{0}行", rowIndex));
                             continue;
                         }
-                        var checkItem = allActiveFlowDetList.Where(d => d[0] == flowCode && d[1] == itemCode);
+                        var checkItem = allActiveFlowDetList.Where(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode);
                         if (checkItem == null || checkItem.Count() == 0)
                         {
                             errorMessages.Add(string.Format("物料号{0}不存在销售路线{2}中请维护,第{1}行.", itemCode, rowIndex, flowCode));
@@ -796,7 +796,7 @@ namespace com.Sconit.Service.MRP.Impl
                             errorMessages.Add(string.Format("客户零件号不能为空,第{0}行." , rowIndex));
                             continue;
                         }
-                        var checkItem = allActiveFlowDetList.Where(d => d[0] == flowCode && d[1] == itemCode && d[2] == itemReference);
+                        var checkItem = allActiveFlowDetList.Where(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode && d[2].ToString() == itemReference);
                         if (checkItem == null || checkItem.Count() == 0)
                         {
                             errorMessages.Add(string.Format("物料号{0}客户零件号{3}销售路线{2},不匹配请维护,第{1}行.", itemCode, rowIndex, flowCode, itemReference));
@@ -904,21 +904,21 @@ namespace com.Sconit.Service.MRP.Impl
                                 CustomerScheduleDetail det = new CustomerScheduleDetail();
                                 det.ReferenceScheduleNo = refScheduleNo;
                                 det.Item = itemCode;
-                                det.ItemDescription = (string)(allActiveFlowDetList.FirstOrDefault(d=>d[1]==itemCode)[3]);
-                                det.ItemReference = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[2]);
+                                det.ItemDescription = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[3]);
+                                det.ItemReference = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[2]);
                                 det.Type = dateType;
                                 det.DateFrom = Convert.ToDateTime(dateIndex);
                                 det.DateTo = dateType == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK ? det.DateFrom.AddDays(7) : det.DateFrom;
-                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[5]);
-                                det.UnitCount = (decimal)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[4]);
+                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[5]);
+                                det.UnitCount = (decimal)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[4]);
                                 det.Qty = qty;
-                                det.Location = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[6]);
+                                det.Location = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[6]);
                                 //det.StartTime = det.DateFrom;
-                                det.StartTime = det.DateFrom.AddDays(Convert.ToInt32(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[7])).Date;
+                                det.StartTime = det.DateFrom.AddDays(Convert.ToInt32(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[7])).Date;
                                 //det.Version = mstr.Version;
                                 det.Flow = flowCode;
                                 //det.ReferenceScheduleNo = mstr.ReferenceScheduleNo;
-                                det.ShipFlow = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1] == itemCode)[8]);
+                                det.ShipFlow = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[8]);
                                 det.ShipQty = 0;
                                 det.FordPlanId = 0;
                                 //this.genericMgr.Create(det);
@@ -970,9 +970,9 @@ namespace com.Sconit.Service.MRP.Impl
                     this.genericMgr.Create(mstr);
                     foreach (var r in g.Value)
                     {
-                        CustomerScheduleDetail det = new CustomerScheduleDetail();
-                        det.CustomerSchedule = mstr;
-                        this.genericMgr.Create(det);
+                        r.Version = mstr.Version;
+                        r.CustomerSchedule = mstr;
+                        this.genericMgr.Create(r);
                     }
                 }
 
@@ -1098,6 +1098,54 @@ namespace com.Sconit.Service.MRP.Impl
             return sourceQty;
         }
 
+        #endregion
+
+        #region    修改发货计划
+        [Transaction(TransactionMode.Requires)]
+        public void UpdateShipPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList,IList<string> dateFrom,User user)
+        {
+            var dateTimeNow=System.DateTime.Now;
+            for (int i = 0; i < idList.Count; i++)
+            {
+                int id = int.Parse(idList[i]);
+                if (id == 0)
+                {
+                    IList<ShipPlanMstr> pMaster = this.genericMgr.FindAllWithCustomQuery<ShipPlanMstr>(" select m from ShipPlanMstr as m where m.ReleaseNo=? ",new object[]{ releaseNoList[i]});
+                    IList<ShipPlanDet> searchPlandets = this.genericMgr.FindAllWithCustomQuery<ShipPlanDet>(" select d from ShipPlanDet as d where d.Flow=? and d.Item=? and d.ShipPlanId=? ", new object[] { flowList[i], itemList[i], pMaster.First().Id });
+                    if (searchPlandets != null && searchPlandets.Count > 0)
+                    {
+                        var first = searchPlandets.First();
+                        ShipPlanDet newShipPlanDet = new ShipPlanDet();
+                        newShipPlanDet.ShipPlanId = first.ShipPlanId;
+                        newShipPlanDet.Flow = first.Flow;
+                        newShipPlanDet.Item = first.Item;
+                        newShipPlanDet.ItemDesc = first.ItemDesc;
+                        newShipPlanDet.RefItemCode = first.RefItemCode;
+                        newShipPlanDet.ShipQty = Convert.ToDecimal(qtyList[i]);
+                        newShipPlanDet.Uom = first.Uom;
+                        newShipPlanDet.BaseUom = first.BaseUom;
+                        newShipPlanDet.UnitCount = first.ShipPlanId;
+                        newShipPlanDet.UnitQty = first.ShipPlanId;
+                        newShipPlanDet.LocFrom = first.LocFrom;
+                        newShipPlanDet.LocTo = first.LocTo;
+                        newShipPlanDet.OrgShipQty = 0;
+                        newShipPlanDet.WindowTime = Convert.ToDateTime(dateFrom[i]);
+                        newShipPlanDet.StartTime = Convert.ToDateTime(dateFrom[i]);
+                        newShipPlanDet.CreateDate = dateTimeNow;
+                        newShipPlanDet.CreateUser = user.Code;
+                        newShipPlanDet.LastModifyDate = dateTimeNow;
+                        newShipPlanDet.LastModifyUser = user.Code;
+                        newShipPlanDet.Version = 1;
+                        newShipPlanDet.Id = 0;
+                        this.genericMgr.Create(newShipPlanDet);
+                    }
+                }
+                else
+                {
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_ShipPlanDet set ShipQty={0},Version=Version+1 where id={1} ",qtyList[i],id));
+                }
+            }
+        }
         #endregion
 
 

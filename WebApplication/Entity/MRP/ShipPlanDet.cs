@@ -10,6 +10,15 @@ namespace com.Sconit.Entity.MRP
         #region Non O/R Mapping Properties
 
         //TODO: Add Non O/R Mapping Properties here. 
+        public int ReleaseNo { get; set; }
+
+        public string Status { get; set; }
+
+        public decimal InitStock { get; set; }
+
+        public decimal SafeStock { get; set; }
+
+        public decimal InTransitQty { get; set; }
 
         #endregion
     }
