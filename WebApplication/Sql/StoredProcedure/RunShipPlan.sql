@@ -97,8 +97,7 @@ BEGIN
 		
 		create table #tempShipPlanDet
 		(
-			RowId int Identity(1, 1),
-			UUID varchar(50), 
+			UUID varchar(50) primary key, 
 			DistributionFlow varchar(50),
 			Flow varchar(50),
 			Item varchar(50),
@@ -120,7 +119,7 @@ BEGIN
 
 		create table #tempShipPlanDetTrace
 		(
-			DetRowId int,
+			RowId int identity(1, 1)  primary key,
 			UUID varchar(50), 
 			DistributionFlow varchar(50),
 			Item varchar(50),
@@ -264,8 +263,8 @@ BEGIN
 		from #tempEffCustScheduleDet where ShipFlow is null
 
 		--记录需求中间表
-		insert into #tempShipPlanDetTrace(DetRowId, UUID, DistributionFlow, Item, ReqDate, ReqQty) 
-		select RowId, UUID, DistributionFlow, Item, StartTime, ShipQty from #tempShipPlanDet
+		insert into #tempShipPlanDetTrace(UUID, DistributionFlow, Item, ReqDate, ReqQty) 
+		select UUID, DistributionFlow, Item, StartTime, ShipQty from #tempShipPlanDet
 
 		--合并相同发运路线+物料的需求
 		--合并毛需求至一行（最小UUID)
@@ -278,7 +277,7 @@ BEGIN
 		from #tempShipPlanDet as p inner join
 		(select MIN(UUID) as MinUUID, Flow, Item, StartTime from #tempShipPlanDet group by Flow, Item, StartTime having count(1) > 1) as t
 		on p.Flow = t.Flow and p.Item = t.Item and p.StartTime = t.StartTime
-		inner join #tempShipPlanDetTrace as dt on p.RowId = dt.DetRowId
+		inner join #tempShipPlanDetTrace as dt on p.UUID = dt.UUID
 		--删除重复毛需求
 		delete p from #tempShipPlanDet as p inner join
 		(select MIN(UUID) as MinUUID, Flow, Item, StartTime from #tempShipPlanDet group by Flow, Item, StartTime having count(1) > 1) as t
@@ -322,12 +321,12 @@ BEGIN
 		where d.ActiveQty < 0 and p.Flow is null
 
 		--日期小于今天的量全部转为今天
-		--更新
-		update at set DetRowId = bt.DetRowId, UUID = bt.UUID
+		--有今天的数据
+		update at set UUID = bt.UUID
 		from #tempShipPlanDet as a 
 		inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
-		inner join #tempShipPlanDetTrace as at on a.RowId = at.DetRowId
-		inner join #tempShipPlanDetTrace as bt on b.RowId = bt.DetRowId
+		inner join #tempShipPlanDetTrace as at on a.UUID = at.UUID
+		inner join #tempShipPlanDetTrace as bt on b.UUID = bt.UUID
 		where b.StartTime = @DateNow and a.StartTime < @DateNow
 		update b set ShipQty = b.ShipQty + a.ShipQty
 		from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
@@ -335,16 +334,15 @@ BEGIN
 		update a set ShipQty = 0
 		from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
 		where b.StartTime = @DateNow and a.StartTime < @DateNow
-		--新增
-		insert into #tempShipPlanDet(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
-		select a.Flow, a.Item, a.ItemDesc, a.RefItemCode, a.ShipQty, a.Uom, a.BaseUom, a.UnitQty, a.UC, a.LocFrom, a.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
+		--没有今天的数据
+		update a set StartTime = @DateNow, WindowTime = DATEADD(day, d.LeadTime, @DateNow) 
 		from #tempShipPlanDet as a left join #tempShipPlanDet as b on a.Flow = b.Flow and a.ITem = b.Item and b.StartTime = @DateNow
 		inner join #tempShipFlowDet as d on a.Flow = d.Flow and a.Item = d.Item
 		where a.StartTime < @DateNow and b.Flow is null
 
 		--汇总发运需求
 		update d set ReqQty = ISNULL(dt.ReqQty, 0) from #tempShipPlanDet as d 
-		left join (select DetRowId, SUM(ISNULL(ReqQty, 0)) as ReqQty from #tempShipPlanDetTrace group by DetRowId) as dt on d.RowId = dt.DetRowId
+		left join (select UUID, SUM(ISNULL(ReqQty, 0)) as ReqQty from #tempShipPlanDetTrace group by UUID) as dt on d.UUID = dt.UUID
 		-----------------------------↑计算发运计划-----------------------------
 
 		if @trancount = 0
@@ -370,8 +368,8 @@ BEGIN
 		set @ShipPlanId = @@Identity
 		
 		--新增发运计划期初库存
-		insert into MRP_ShipPlanInitLocationDet(ShipPlanId, Location, Item, InitStock, SafeStock, InTransitQty)
-		select @ShipPlanId, LocTo, Item, LocQty, SafeStock, InTransitQty from #tempShipFlowDet
+		insert into MRP_ShipPlanInitLocationDet(ShipPlanId, Location, Item, InitStock, SafeStock, InTransitQty, CreateDate, CreateUser)
+		select @ShipPlanId, LocTo, Item, LocQty, SafeStock, InTransitQty, @DateTimeNow, @RunUser from #tempShipFlowDet
 
 		--新增发运计划明细
 		insert into MRP_ShipPlanDet(ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
@@ -380,7 +378,7 @@ BEGIN
 		select @ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
 		ReqQty, ShipQty, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
 		@DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
-		from #tempShipPlanDet where ShipQty > 0
+		from #tempShipPlanDet
 
 		--新增发运计划明细追溯表
 		insert into MRP_ShipPlanDetTrace(ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, CreateDate, CreateUser)
