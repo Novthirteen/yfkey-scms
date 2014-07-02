@@ -183,16 +183,15 @@ BEGIN
 			end
 
 			--日期小于今天的量全部转为今天
-			--更新
+			--有今天的数据
 			update b set Qty = b.Qty + a.Qty
 			from #tempCurrentLevlProductPlan as a inner join #tempCurrentLevlProductPlan as b on a.Item = b.Item
 			where b.StartTime = @DateNow and a.StartTime < @DateNow	
 			update a set Qty = 0
 			from #tempCurrentLevlProductPlan as a inner join #tempCurrentLevlProductPlan as b on a.Item = b.Item
 			where b.StartTime = @DateNow and a.StartTime < @DateNow	
-			--新增
-			insert into #tempCurrentLevlProductPlan(Item, ItemDesc, RefItemCode, Uom, Qty, StartTime, WindowTime)
-			select a.Item, a.ItemDesc, a.RefItemCode, a.Uom, a.Qty, @DateNow, DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow) 
+			--没有今天的数据
+			update a set StartTime = @DateNow, WindowTime = DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow) 
 			from #tempCurrentLevlProductPlan as a left join #tempCurrentLevlProductPlan as b on a.ITem = b.Item and b.StartTime = @DateNow
 			inner join Item as i on a.Item = i.Code
 			where a.StartTime < @DateNow and b.Item is null
