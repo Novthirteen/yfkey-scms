@@ -321,9 +321,8 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"select m.ReleaseNo,m.BatchNo,m.Status,m.LastModifyDate,m.LastModifyUser,l.Item,i.desc1,l.Flow,l.Msg from MRP_ShipPlanMstr as  m 
-left join MRP_RunShipPlanLog as l on m.BatchNo=l.BatchNo
-left join Item as i on l.Item=i.Code where 1=1  ";
+        var searchSql = @"select m.ReleaseNo,m.BatchNo,m.Status,m.LastModifyDate,m.LastModifyUser,l.Item,i.desc1,l.PlanDate,l.Msg,l.Qty,l.Bom from MRP_PurchasePlanMstr as m left join MRP_RunPurchasePlanLog as l on m.Batchno=l.BatchNo
+left join Item as i on l.Item=i.Code where 1=1 ";
        
 
         if (!string.IsNullOrEmpty(this.StatusSelect.Value))
@@ -337,11 +336,11 @@ left join Item as i on l.Item=i.Code where 1=1  ";
         }
 
         var allResult = TheGenericMgr.GetDatasetBySql(searchSql+" order by m.ReleaseNo desc ").Tables[0];
-        var shipPlanMstrList = new List<ShipPlanMstr>();
+        var purchasePlanMstrList = new List<PurchasePlanMstr>();
         foreach (System.Data.DataRow row in allResult.Rows)
         {
-            //m.ReleaseNo,m.BatchNo,m.Status,m.LastModifyDate,m.LastModifyUser,l.Item,i.desc1,l.Flow,l.Msg
-            shipPlanMstrList.Add(new ShipPlanMstr
+            //m.ReleaseNo,m.BatchNo,m.Status,m.LastModifyDate,m.LastModifyUser,l.Item,i.desc1,l.PlanDate,l.Msg
+            purchasePlanMstrList.Add(new PurchasePlanMstr
             {
                 ReleaseNo =int.Parse( row[0].ToString()),
                 BatchNo = int.Parse(row[1].ToString()),
@@ -350,30 +349,32 @@ left join Item as i on l.Item=i.Code where 1=1  ";
                 LastModifyUser = row[4].ToString(),
                 Item = row[5].ToString(),
                 ItemDesc =row[6].ToString(),
-                Flow =row[7].ToString(),
-                Msg =row[8].ToString(),
+                PlanDate =row[7].ToString(),
+                Msg = row[8].ToString(),
+                Qty =string.IsNullOrEmpty(row[9].ToString())?null:(decimal?) Convert.ToDecimal(row[9].ToString()),
+                Bom = row[10].ToString(),
             });
         }
-        ListTable(shipPlanMstrList);
+        ListTable(purchasePlanMstrList);
     }
 
-    private void ListTable(IList<ShipPlanMstr> shipPlanMstrList)
+    private void ListTable(IList<PurchasePlanMstr> purchasePlanMstrList)
     {
-        if (shipPlanMstrList == null || shipPlanMstrList.Count == 0)
+        if (purchasePlanMstrList == null || purchasePlanMstrList.Count == 0)
         {
             this.mstrList.InnerHtml = "没有查到符合条件的记录";
             this.ltlPlanVersion.Text = string.Empty;
             return;
         }
 
-        var planByReleaseNo = shipPlanMstrList.GroupBy(p => p.ReleaseNo);
+        var planByReleaseNo = purchasePlanMstrList.GroupBy(p => p.ReleaseNo);
 
         StringBuilder str = new StringBuilder();
         //str.Append(CopyString());
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = CopyString();
-        str.Append("<thead><tr class='GVHeader'><th>行数</th><th>发运计划版本</th><th>状态</th><th>最后修改用户</th><th>最后修改时间</th><th>路线</th><th>物料号</th><th>物料描述</th><th>错误消息</th>");
+        str.Append("<thead><tr class='GVHeader'><th>行数</th><th>采购计划版本</th><th>状态</th><th>最后修改用户</th><th>最后修改时间</th><th>物料号</th><th>物料描述</th><th>Bom</th><th>生产日期</th><th>数量</th><th>错误消息</th>");
         str.Append("</tr></thead>");
         str.Append("<tbody>");
 
@@ -419,14 +420,21 @@ left join Item as i on l.Item=i.Code where 1=1  ";
                 {
                     str.Append("<td></td><td></td><td></td><td></td><td></td>");
                 }
-                str.Append("<td>");
-                str.Append(r.Flow);
-                str.Append("</td>");
+               
                 str.Append("<td>");
                 str.Append(r.Item);
                 str.Append("</td>");
                 str.Append("<td>");
                 str.Append(r.ItemDesc);
+                str.Append("</td>");
+                str.Append("<td>");
+                str.Append(r.Bom);
+                str.Append("</td>");
+                str.Append("<td>");
+                str.Append(r.PlanDate);
+                str.Append("</td>");
+                str.Append("<td>");
+                str.Append(r.Qty);
                 str.Append("</td>");
                 str.Append("<td>");
                 str.Append(r.Msg);
