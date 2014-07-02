@@ -54,7 +54,7 @@ public partial class NewMrp_ShipPlan_Main : MainModuleBase
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"select det.Flow,det.Item,i.Desc1,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,det.ShipQty,det.OrgShipQty,m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,det.ReqQty,l.InitStock,l.SafeStock, l.InTransitQty,det.UUID
+        var searchSql = @"select det.Flow,det.Item,i.Desc1,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,det.ShipQty,det.OrgShipQty,m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,det.ReqQty,l.InitStock,l.SafeStock, l.InTransitQty,det.UUID ,det.StartTime
 from  MRP_ShipPlanDet as det 
  inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
  inner join Item as i on i.Code=det.Item 
@@ -123,6 +123,7 @@ from  MRP_ShipPlanDet as det
                 SafeStock = Convert.ToDecimal(row[17]),
                 InTransitQty = Convert.ToDecimal(row[18]),
                 UUID = row[19].ToString(),
+                StartTime = Convert.ToDateTime(row[20]),
             });
         }
         if (string.IsNullOrEmpty(this.tbReleaseNo.Text.Trim()) && shipPlanDetList.Count>0)
@@ -172,7 +173,7 @@ from  MRP_ShipPlanDet as det
             }
         }
 
-        var planByDateIndexs = shipPlanDetList.GroupBy(p => p.WindowTime).OrderBy(p => p.Key);
+        var planByDateIndexs = shipPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
         var planByFlowItems = shipPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item,p.LocFrom,p.LocTo });
 
         StringBuilder str = new StringBuilder();
@@ -219,7 +220,7 @@ from  MRP_ShipPlanDet as det
         foreach (var planByFlowItem in planByFlowItems)
         {
             var firstPlan = planByFlowItem.First();
-            var planDic = planByFlowItem.GroupBy(d=>d.WindowTime).ToDictionary(d => d.Key, d => d.Sum(q=>q.ShipQty));
+            var planDic = planByFlowItem.GroupBy(d=>d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q=>q.ShipQty));
             l++;
             if (l % 2 == 0)
             {
