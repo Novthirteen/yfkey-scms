@@ -290,7 +290,7 @@ public partial class CostCenterFilter_Edit : EditModuleBase
             StringBuilder cc = new StringBuilder();
             cc.Append("select c.orderno,sum(vol) as V,plant,tactbill.billedqty*tactbill.unitprice as cost1,min(tbilldet.amount) as cost from " +
                       "(select a.orderno,orderdet.packvol,qty,orderdet.packvol*qty as vol,item.plant  from (" +
-                      "select orderloctransid,ipdet.ipno,sum(qty) as  QTY ,orderno " +
+                      "select orderloctransid,ipdet.ipno,sum(abs(qty)) as  QTY ,orderno " +
                         "from torderdet  join ipdet on torderdet.ipno=ipdet.ipno " +
                         "where orderno in(" +
                         "select tordermstr.orderno from tactbill " +

@@ -197,9 +197,10 @@ namespace com.Sconit.Service.EDI.Impl
                     }
                     string upIsHandleSql = string.Format("update TEMP_FORD_EDI_830 set IsHandle=1 where Interchange_Control_Num in ('{0}')",string.Join("','", weeklyPlans.Select(w=>w.Interchange_Control_Num).Distinct().ToArray()));
                     this.genericMgr.ExecuteSql(upIsHandleSql);
+
                     #region 周计划转客户需求
                     var groupWeeklys = weeklyPlans.GroupBy(w => w.Interchange_Control_Num).ToDictionary(d => d.Key, d => d.OrderBy(rd => rd.Forecast_Date).ToList());
-                    Dictionary<string, int> versionDic = new Dictionary<string, int>();
+
                     foreach (var g in groupWeeklys)
                     {
                         string searchFlowCodeSql = string.Format("select Code from flowmstr where type='Distribution' and CustomerCodes like '%{0}%' and SupplierCodes like '%{1}%'", g.Value.First().Ship_To_GSDB_Code, g.Value.First().Ship_From_GSDB_Code);
@@ -209,31 +210,31 @@ namespace com.Sconit.Service.EDI.Impl
                         {
                             flowCode = row[0].ToString();
                         }
-                        //if (string.IsNullOrEmpty(flowCode)) continue;
-                        Flow currentFlow = this.flowMgr.LoadFlow(flowCode);
+                        foreach (var v in g.Value)
+                        {
+                            v.TempFlow = flowCode;
+                        }
+                    }
+                    var groupWeeklyByFlow = weeklyPlans.GroupBy(w => w.TempFlow).ToDictionary(d => d.Key, d => d.OrderBy(rd => rd.Forecast_Date).ToList());
+                    IList<CustomerScheduleDetail> tempDetList = new List<CustomerScheduleDetail>();
+                    foreach (var g in groupWeeklyByFlow)
+                    {
+                        Flow currentFlow = this.flowMgr.LoadFlow(g.Key);
                         if (currentFlow == null) continue;
-                        int customerPlanVersion = 0;
-                        if (versionDic.Where(d=>d.Key==currentFlow.Code).Count() == 0)
-                        {
-                            customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + flowCode + "_" + BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK);
-                            versionDic.Add(currentFlow.Code, customerPlanVersion);
-                        }
-                        else
-                        {
-                            customerPlanVersion = versionDic[currentFlow.Code];
-                        }
-                        var firstWeek = g.Value.First();
+                        int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + currentFlow.Code + "_" + BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK);
                         var mrpLeadtime = currentFlow.MrpLeadTime.HasValue ? Convert.ToDouble(-currentFlow.MrpLeadTime.Value) : 0;
                         CustomerSchedule mstr = new CustomerSchedule
                         {
-                            ReferenceScheduleNo = g.Key,
-                            Flow = flowCode,
+                            ReferenceScheduleNo = g.Key + "-Weekly-" + customerPlanVersion.ToString().PadLeft(3,'0'),
+                            Flow = g.Key,
                             Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT,
                             Type = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK,
                             CreateDate = datetimeNow,
                             CreateUser = user.Code,
                             LastModifyDate = datetimeNow,
                             LastModifyUser = user.Code,
+                            ReleaseDate=  datetimeNow,
+                            ReleaseUser=user.Code,
                             Version = customerPlanVersion,
                             ShipFlow = currentFlow.ShipFlow,
                         };
@@ -284,6 +285,7 @@ namespace com.Sconit.Service.EDI.Impl
                                         FlowDetail fdet = cFlowDets != null && cFlowDets.Count() > 0 ? cFlowDets.First() : new FlowDetail();
                                         if (fdet.Item != null)
                                         {
+                                            #region
                                             CustomerScheduleDetail cdet = new CustomerScheduleDetail();
                                             cdet.CustomerSchedule = mstr;
                                             cdet.Item = fdet.Item.Code;
@@ -302,9 +304,11 @@ namespace com.Sconit.Service.EDI.Impl
                                             cdet.ReferenceScheduleNo = mstr.ReferenceScheduleNo;
                                             cdet.ShipFlow = mstr.ShipFlow;
                                             cdet.ShipQty = 0;
-                                            cdet.FordPlanId = planList.FirstOrDefault(d => d.RefItem == r1.Part_Num && d.Control_Num == mstr.ReferenceScheduleNo && d.ForecastDate == firstDate).Id;
-                                            this.genericMgr.Create(cdet);
+                                            cdet.FordPlanId = planList.FirstOrDefault(d => d.RefItem == r1.Part_Num && d.Control_Num == r1.Interchange_Control_Num && d.ForecastDate == firstDate).Id;
+                                            //this.genericMgr.Create(cdet);
+                                            tempDetList.Add(cdet);
                                             sDate = sDate.AddDays(7);
+                                            #endregion
                                         }
                                     }
                                 }
@@ -314,6 +318,7 @@ namespace com.Sconit.Service.EDI.Impl
                             FlowDetail flowdet = currentFlowDets != null && currentFlowDets.Count() > 0 ? currentFlowDets.First() : new FlowDetail();
                             if (flowdet.Item != null)
                             {
+                                #region
                                 CustomerScheduleDetail det = new CustomerScheduleDetail();
                                 det.CustomerSchedule = mstr;
                                 det.Item = flowdet.Item != null ? flowdet.Item.Code : string.Empty;
@@ -334,10 +339,23 @@ namespace com.Sconit.Service.EDI.Impl
                                 det.ReferenceScheduleNo = mstr.ReferenceScheduleNo;
                                 det.ShipFlow = mstr.ShipFlow;
                                 det.ShipQty = 0;
-                                det.FordPlanId = planList.FirstOrDefault(d => d.RefItem == r.Part_Num && d.Control_Num == mstr.ReferenceScheduleNo && d.ForecastDate==det.DateFrom).Id;
-                                this.genericMgr.Create(det);
+                                det.FordPlanId = planList.FirstOrDefault(d => d.RefItem == r.Part_Num && d.Control_Num == r.Interchange_Control_Num && d.ForecastDate==det.DateFrom).Id;
+                                //this.genericMgr.Create(det);
+                                tempDetList.Add(det);
+                                #endregion
                             }
                         }
+                        if(tempDetList.Count>0){
+                            var groupbyItem = tempDetList.GroupBy(d => new { d.Item, d.DateFrom });
+                            foreach (var gi in groupbyItem)
+                            {
+                                var det = gi.First();
+                                det.Qty = gi.Sum(gd => gd.Qty);
+                                this.genericMgr.Create(det);
+                            }
+                            tempDetList.Clear();
+                        }
+
                     }
                     #endregion
                 }
@@ -398,9 +416,11 @@ namespace com.Sconit.Service.EDI.Impl
                     }
                     string upIsHandleSql = string.Format("update TEMP_FORD_EDI_862 set IsHandle=1 where Interchange_Control_Num in ('{0}')", string.Join("','", dailyPlans.Select(w => w.Interchange_Control_Num).Distinct().ToArray()));
                     this.genericMgr.ExecuteSql(upIsHandleSql);
+
+                    
                     #region   天计划转客户需求
                     var groupDailyPlan = dailyPlans.GroupBy(w => w.Interchange_Control_Num).ToDictionary(d => d.Key, d => d.ToList());
-                    Dictionary<string, int> versionDic = new Dictionary<string, int>();
+
                     foreach (var g in groupDailyPlan)
                     {
                         string searchFlowCodeSql = string.Format("select Code from flowmstr where type='Distribution' and CustomerCodes like '%{0}%' and SupplierCodes like '%{1}%'", g.Value.First().Ship_To_GSDB_Code, g.Value.First().Ship_From_GSDB_Code);
@@ -410,31 +430,32 @@ namespace com.Sconit.Service.EDI.Impl
                         {
                             flowCode = row[0].ToString();
                         }
-                        //if (string.IsNullOrEmpty(flowCode)) continue;
-                        Flow currentFlow = this.flowMgr.LoadFlow(flowCode);
+                        foreach (var v in g.Value)
+                        {
+                            v.TempFlow = flowCode;
+                        }
+                    }
+                    var groupdailyByFlow = dailyPlans.GroupBy(w => w.TempFlow).ToDictionary(d => d.Key, d => d.OrderBy(rd => rd.Forecast_Date).ToList());
+
+                    IList<CustomerScheduleDetail> tempDetList = new List<CustomerScheduleDetail>();
+                    foreach (var g in groupdailyByFlow)
+                    {
+                        Flow currentFlow = this.flowMgr.LoadFlow(g.Key);
                         if (currentFlow == null) continue;
-                        int customerPlanVersion = 0;
-                        if (versionDic.Where(d => d.Key == currentFlow.Code).Count() == 0)
-                        {
-                            customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + flowCode + "_" + BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK);
-                            versionDic.Add(currentFlow.Code, customerPlanVersion);
-                        }
-                        else
-                        {
-                            customerPlanVersion = versionDic[currentFlow.Code];
-                        }
-                        //int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + flowCode + "_" + BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY);
+                        int customerPlanVersion = numberControlMgr.GenerateNumberNextSequence("CustomerPlan_" + g.Key + "_" + BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK);
                         var firstWeek = g.Value.First();
                         CustomerSchedule mstr = new CustomerSchedule
                         {
-                            ReferenceScheduleNo = g.Key,
-                            Flow = flowCode,
+                            ReferenceScheduleNo = g.Key + "-Daily-" + customerPlanVersion.ToString().PadLeft(3,'0'),
+                            Flow = g.Key,
                             Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT,
                             Type = BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY,
                             CreateDate = datetimeNow,
                             CreateUser = user.Code,
                             LastModifyDate = datetimeNow,
                             LastModifyUser = user.Code,
+                            ReleaseDate = datetimeNow,
+                            ReleaseUser = user.Code,
                             Version = customerPlanVersion,
                             ShipFlow = currentFlow.ShipFlow,
                         };
@@ -465,9 +486,21 @@ namespace com.Sconit.Service.EDI.Impl
                                 det.ReferenceScheduleNo = mstr.ReferenceScheduleNo;
                                 det.ShipFlow = mstr.ShipFlow;
                                 det.ShipQty = 0;
-                                det.FordPlanId = planList.FirstOrDefault(d => d.RefItem == r.Part_Num && d.Control_Num == mstr.ReferenceScheduleNo && d.ForecastDate.AddDays(-mrpLeadtime)==det.DateFrom).Id;
+                                det.FordPlanId = planList.FirstOrDefault(d => d.RefItem == r.Part_Num && d.Control_Num == r.Interchange_Control_Num && d.ForecastDate==det.DateFrom).Id;
+                                //this.genericMgr.Create(det);
+                                tempDetList.Add(det);
+                            }
+                        }
+                        if (tempDetList.Count > 0)
+                        {
+                            var groupbyItem = tempDetList.GroupBy(d => new { d.Item,d.DateFrom});
+                            foreach (var gi in groupbyItem)
+                            {
+                                var det = gi.First();
+                                det.Qty = gi.Sum(gd => gd.Qty);
                                 this.genericMgr.Create(det);
                             }
+                            tempDetList.Clear();
                         }
                     }
                     #endregion
