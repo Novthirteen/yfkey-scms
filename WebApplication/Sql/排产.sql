@@ -169,7 +169,6 @@ GO
 CREATE TABLE [dbo].[MRP_ShipPlanDet](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[ShipPlanId] [int] NULL,
-	[OrgUUID] [varchar](50) NULL,
 	[UUID] [varchar](50) NULL,
 	[Flow] [varchar](50) NULL,
 	[Item] [varchar](50) NULL,
@@ -182,9 +181,7 @@ CREATE TABLE [dbo].[MRP_ShipPlanDet](
 	[UC] [decimal](18, 8) NULL,
 	[LocFrom] [varchar](50) NULL,
 	[LocTo] [varchar](50) NULL,
-	[OrgStartTime] [datetime] NULL,
 	[StartTime] [datetime] NULL,
-	[OrgWindowtime] [datetime] NULL,
 	[WindowTime] [datetime] NULL,
 	[CreateDate] [datetime] NULL,
 	[CreateUser] [varchar](50) NULL,
@@ -211,7 +208,6 @@ GO
 CREATE TABLE [dbo].[MRP_ShipPlanDetTrace](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[ShipPlanId] [int] NULL,
-	[OrgUUID] [varchar](50) NULL,
 	[UUID] [varchar](50) NULL,
 	[DistributionFlow] [varchar](50) NULL,
 	[Item] [varchar](50) NULL,

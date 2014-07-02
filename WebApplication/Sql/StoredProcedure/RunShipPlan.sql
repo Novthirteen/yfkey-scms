@@ -98,7 +98,6 @@ BEGIN
 		create table #tempShipPlanDet
 		(
 			RowId int Identity(1, 1),
-			OrgUUID varchar(50), 
 			UUID varchar(50), 
 			DistributionFlow varchar(50),
 			Flow varchar(50),
@@ -112,9 +111,7 @@ BEGIN
 			UC decimal(18, 8),
 			LocFrom varchar(50),
 			LocTo varchar(50),
-			OrgStartTime datetime,
 			StartTime datetime,
-			OrgWindowTime datetime,
 			WindowTime datetime
 		)
 
@@ -123,7 +120,6 @@ BEGIN
 		create table #tempShipPlanDetTrace
 		(
 			DetRowId int,
-			OrgUUID varchar(50), 
 			UUID varchar(50), 
 			DistributionFlow varchar(50),
 			Item varchar(50),
@@ -322,18 +318,17 @@ BEGIN
 
 		--日期小于今天的量全部转为今天
 		--更新
-		select * from #tempShipPlanDetTrace
-		update at set UUID = bt.UUID, OrgUUID = at.UUID
+		update at set UUID = bt.UUID
 		from #tempShipPlanDet as a 
 		inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
 		inner join #tempShipPlanDetTrace as at on a.RowId = at.DetRowId
 		inner join #tempShipPlanDetTrace as bt on b.RowId = bt.DetRowId
 		where b.StartTime = @DateNow and a.StartTime < @DateNow
-		select * from #tempShipPlanDetTrace
-		update a set UUID = b.UUID, OrgUUID = a.UUID, StartTime = b.StartTime, 
-		OrgStartTime = a.StartTime, WindowTime = b.WindowTime, OrgWindowTime = a.WindowTime
-		from #tempShipPlanDet as a 
-		inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
+		update b set ShipQty = b.ShipQty + a.ShipQty
+		from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
+		where b.StartTime = @DateNow and a.StartTime < @DateNow
+		update b set ShipQty = 0
+		from #tempShipPlanDet as a inner join #tempShipPlanDet as b on a.Flow = b.Flow and a.Item = b.Item
 		where b.StartTime = @DateNow and a.StartTime < @DateNow
 		--新增
 		insert into #tempShipPlanDet(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
@@ -370,17 +365,17 @@ BEGIN
 		select @ShipPlanId, LocTo, Item, LocQty, SafeStock, InTransitQty from #tempShipFlowDet
 
 		--新增发运计划明细
-		insert into MRP_ShipPlanDet(ShipPlanId, OrgUUID, UUID, Flow, Item, ItemDesc, RefItemCode, 
-		OrgShipQty, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, OrgStartTime, StartTime, OrgWindowTime, WindowTime, 
+		insert into MRP_ShipPlanDet(ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
+		OrgShipQty, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
 		CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
-		select @ShipPlanId, OrgUUID, UUID, Flow, Item, ItemDesc, RefItemCode, 
-		ShipQty, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, OrgStartTime, StartTime, OrgWindowTime,WindowTime, 
+		select @ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
+		ShipQty, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
 		@DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
 		from #tempShipPlanDet where ShipQty > 0
 
 		--新增发运计划明细追溯表
-		insert into MRP_ShipPlanDetTrace(ShipPlanId, OrgUUID,  UUID, DistributionFlow, Item, ReqDate, ReqQty, CreateDate, CreateUser)
-		select @ShipPlanId, OrgUUID, UUID, DistributionFlow, Item, ReqDate, ReqQty, @DateTimeNow, @RunUser from #tempShipPlanDetTrace
+		insert into MRP_ShipPlanDetTrace(ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, CreateDate, CreateUser)
+		select @ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, @DateTimeNow, @RunUser from #tempShipPlanDetTrace
 		-----------------------------↑生成发运计划-----------------------------
 
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Flow, Item, Qty, Uom, LocFrom, LocTo, StartTime, WindowTime, Msg, CreateDate, CreateUser) 
