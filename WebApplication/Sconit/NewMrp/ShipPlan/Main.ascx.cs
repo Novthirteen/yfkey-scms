@@ -54,7 +54,7 @@ public partial class NewMrp_ShipPlan_Main : MainModuleBase
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"select det.Flow,det.Item,i.Desc1,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,det.ShipQty,det.OrgShipQty,m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,det.ReqQty,l.InitStock,l.SafeStock, l.InTransitQty
+        var searchSql = @"select det.Flow,det.Item,i.Desc1,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,det.ShipQty,det.OrgShipQty,m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,det.ReqQty,l.InitStock,l.SafeStock, l.InTransitQty,det.UUID
 from  MRP_ShipPlanDet as det 
  inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
  inner join Item as i on i.Code=det.Item 
@@ -122,6 +122,7 @@ from  MRP_ShipPlanDet as det
                 InitStock = Convert.ToDecimal(row[16]),
                 SafeStock = Convert.ToDecimal(row[17]),
                 InTransitQty = Convert.ToDecimal(row[18]),
+                UUID = row[19].ToString(),
             });
         }
         if (string.IsNullOrEmpty(this.tbReleaseNo.Text.Trim()) && shipPlanDetList.Count>0)
@@ -138,9 +139,6 @@ from  MRP_ShipPlanDet as det
         {
             ListTable(shipPlanDetList);
         }
-       
-        var flowMaxVersionDic = new Dictionary<string, int>();
-        ListTable(shipPlanDetList);
     }
 
     private void ListTable(IList<ShipPlanDet> shipPlanDetList)
@@ -150,6 +148,28 @@ from  MRP_ShipPlanDet as det
             this.list.InnerHtml = "没有查到符合条件的记录";
             this.ltlPlanVersion.Text = string.Empty;
             return;
+        }
+
+        IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
+        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.UUID in ('{0}') ",string.Join("','", shipPlanDetList.Select(d=>d.UUID).Distinct().ToArray())));
+
+        if (traceList.Count > 0)
+        {
+            foreach (var sd in shipPlanDetList)
+            {
+                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).ToList();
+                var showText = string.Empty;
+                if (currentLogs != null && currentLogs.Count>0)
+                {
+                    showText = "<table><thead><tr><th>销售路线</th><th>物料</th><th>需求日期</th><th>需求数</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentLogs)
+                    {
+                        showText += "<td>" + c.DistributionFlow + "</td><td>" + c.Item + "</td><td>" + c.ReqDate + "</td><td>" + c.ReqQty + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.Logs = showText;
+            }
         }
 
         var planByDateIndexs = shipPlanDetList.GroupBy(p => p.WindowTime).OrderBy(p => p.Key);
@@ -241,7 +261,7 @@ from  MRP_ShipPlanDet as det
                 //var qty = planDic.Keys.Contains(planByDateIndex.Key) ? planDic[planByDateIndex.Key] : 0;
                 var curenPlan = planByFlowItem.Where(p => p.WindowTime == planByDateIndex.Key);
                 var shipPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new ShipPlanDet();
-                str.Append("<td>");
+                str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", shipPlanDet.Logs));
                 str.Append(shipPlanDet.ReqQty.ToString("0.##"));
                 str.Append("</td>");
                 if (firstPlan.Status ==BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)
@@ -257,7 +277,7 @@ from  MRP_ShipPlanDet as det
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty -= shipPlanDet.ShipQty;
+                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty;
                 str.Append("<td>");
                 str.Append(InitStockQty.ToString("0.##"));
                 str.Append("</td>");
@@ -359,7 +379,7 @@ left join Item as i on l.Item=i.Code where 1=1  ";
     {
         if (shipPlanMstrList == null || shipPlanMstrList.Count == 0)
         {
-            this.list.InnerHtml = "没有查到符合条件的记录";
+            this.mstrList.InnerHtml = "没有查到符合条件的记录";
             this.ltlPlanVersion.Text = string.Empty;
             return;
         }
@@ -470,11 +490,11 @@ left join Item as i on l.Item=i.Code where 1=1  ";
                 </script>";
     }
 
-    protected void btnRunShipPlan_Click(object sender, EventArgs e)
+    protected void btnRunProdPlan_Click(object sender, EventArgs e)
     {
         try
         {
-            TheMrpMgr.RunShipPlan(this.CurrentUser);
+            TheMrpMgr.RunProductionPlan(this.CurrentUser);
             ShowSuccessMessage("生成成功。");
         }
         catch (SqlException ex)

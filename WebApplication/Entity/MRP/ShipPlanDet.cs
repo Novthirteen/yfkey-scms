@@ -20,6 +20,8 @@ namespace com.Sconit.Entity.MRP
 
         public decimal InTransitQty { get; set; }
 
+        public string Logs { get; set; }
+
         #endregion
     }
 }

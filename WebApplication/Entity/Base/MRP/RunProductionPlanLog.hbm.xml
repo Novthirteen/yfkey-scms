@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <class name="com.Sconit.Entity.MRP.RunProductionPlanLog, com.Sconit.Entity" table="MRP_RunProductionPlanLog" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+      <!--Id, BatchNo, Lvl, Item, Bom, EffDate, Msg, CreateDate, CreateUser-->
+      <property name="BatchNo" column="BatchNo" type="Int32"  />
+      <property name="Lvl" column="Lvl" type="String" length="50" />
+      <property name="Item" column="Item" type="String" length="50" />
+      <property name="Bom" column="Bom" type="String" length="50" />
+      <property name="EffDate" column="EffDate" type="DateTime"  />
+      <property name="Msg" column="Msg" type="String" length="500" />
+      <property name="CreateDate" column="CreateDate" type="DateTime"  />
+      <property name="CreateUser" column="CreateUser" type="String" length="50" />
+    </class>
+</hibernate-mapping>

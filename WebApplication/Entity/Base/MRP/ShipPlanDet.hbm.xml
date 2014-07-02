@@ -4,9 +4,10 @@
 		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
 			<generator class="identity" />
 		</id>
-    <!--Id, ShipPlanId, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC,
-    //LocFrom, LocTo, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version-->
+    <!--Id, ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime,
+    WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version, OrgShipQty, ReqQty-->
     <property name="ShipPlanId" column="ShipPlanId" type="Int32"  />
+    <property name="UUID" column="UUID" type="String" length="50" />
     <property name="Flow" column="Flow" type="String" length="50" />
     <property name="Item" column="Item" type="String" length="50" />
 		<property name="ItemDesc" column="ItemDesc" type="String" length="510" />
