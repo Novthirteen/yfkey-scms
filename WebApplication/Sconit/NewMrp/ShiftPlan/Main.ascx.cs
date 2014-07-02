@@ -355,7 +355,7 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         {
             var currentDate = planByDateIndex.Key;
             ii++;
-            str.Append("<th rowspan='3'>");
+            str.Append("<th colspan='3'>");
             str.Append(currentDate.ToString("yyyy-MM-dd"));
             str.Append("</th>");
         }

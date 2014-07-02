@@ -1223,7 +1223,7 @@ namespace com.Sconit.Service.MRP.Impl
         }
         #endregion
 
-        #region    Import ShipPlan
+        #region    Import ShiftPlan
         private static object readShiftPlanFromXlsLock = new object();
         [Transaction(TransactionMode.Requires)]
         public List<ShiftPlanDet> ReadShiftPlanFromXls(Stream inputStream, User user)
@@ -1365,7 +1365,6 @@ namespace com.Sconit.Service.MRP.Impl
                                 shiftPlanList.Add(shiftPlan);
                             }
                         }
-                        startColIndex += 1;
                     }
                     #endregion
                 }
