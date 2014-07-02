@@ -20,9 +20,12 @@ AS
 BEGIN 
 	set nocount on
 	begin try
-		declare @Msg nvarchar(MAX) = ''
+		declare @Msg nvarchar(MAX)
 		declare @MaxRowId int
-		declare @ExpandLevel int = 1
+		declare @ExpandLevel int
+
+		set @Msg = ''
+		set @ExpandLevel = 1
 
 		create table #tempBomDetail
 		(

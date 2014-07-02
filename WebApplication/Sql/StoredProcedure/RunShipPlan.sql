@@ -16,14 +16,10 @@ CREATE PROCEDURE [dbo].RunShipPlan --exec RunShipPlan 'su'
 AS 
 BEGIN 
 	set nocount on
-	declare @DateTimeNow datetime 
-	set @DateTimeNow=GetDate()
-	declare @DateNow datetime 
-	set @DateNow= CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow,121))
-	declare @Msg nvarchar(MAX) 
-	set @Msg=''
-	declare @trancount int 
-	set @trancount=@@trancount
+	declare @DateTimeNow datetime
+	declare @DateNow datetime
+	declare @Msg nvarchar(MAX)
+	declare @trancount int
 	declare @ReleaseNo int
 	declare @BatchNo int
 	declare @MaxMstrId int
@@ -32,6 +28,11 @@ BEGIN
 	declare @MaxRowId int
 	declare @DistributionFlow varchar(50)
 	declare @ShipPlanId int
+
+	set @DateTimeNow = GetDate()
+	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
+	set @Msg = ''
+	set @trancount = @@trancount
 	
 	exec GetNextSequence 'RunShipPlan', @BatchNo output
 	begin try
@@ -59,7 +60,6 @@ BEGIN
 			ItemDesc varchar(100),
 			ItemRef varchar(50),
 			Qty decimal(18, 8),
-			ShipQty decimal(18, 8),
 			Uom varchar(5),
 			BaseUom varchar(5),
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
@@ -129,16 +129,16 @@ BEGIN
 		)
 
 		--更新福特计划的发货数
-		update det set ShipQty = p.CurrenCumQty
-		from CustScheduleDet as det inner join EDI_FordPlan as p on det.FordPlanId = p.Id
+		--update det set ShipQty = p.CurrenCumQty
+		--from CustScheduleDet as det inner join EDI_FordPlan as p on det.FordPlanId = p.Id
 
 
 
 		-----------------------------↓获取客户日程-----------------------------
 		--选取开始日期大于等于当天的所有客户日程
-		insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, ShipQty,
+		insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty,
 		Uom, BaseUom, UC, Location, StartTime, WindowTime)
-		select det.Id, mstr.Id as MstrId, mstr.Flow, mstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty, ISNULL(det.ShipQty, 0) as ShipQty,
+		select det.Id, mstr.Id as MstrId, mstr.Flow, mstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty,
 		det.Uom, i.Uom as BaseUom, det.UC, det.Loc as Location, det.StartTime, det.DateFrom as WindowTime
 		from CustScheduleDet as det inner join CustScheduleMstr as mstr on det.ScheduleId = mstr.Id
 		inner join Item as i on det.Item = i.Code
@@ -208,7 +208,7 @@ BEGIN
 		from FlowDet as det
 		inner join FlowMstr as mstr on det.Flow = mstr.Code
 		inner join Item as i on det.Item = i.Code
-		left join LocationDet as loc on det.Item = loc.Item and mstr.LocTo = loc.Location
+		left join MRP_LocationDetSnapShot as loc on det.Item = loc.Item and mstr.LocTo = loc.Location
 		where Flow in (select ShipFlow from FlowMstr where [Type] = 'Distribution' and IsActive = 1 and ShipFlow is not null)
 
 		--更新在途数量
@@ -254,16 +254,15 @@ BEGIN
 		-----------------------------↓计算发运计划-----------------------------
 		--转有发运路线的（毛需求）
 		insert into #tempShipPlanDet(UUID, DistributionFlow, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
-		select NEWID(), req.Flow, flow.Flow, flow.Item, req.ItemDesc, req.ItemRef, (req.Qty - req.ShipQty) * req.UnitQty / flow.UnitQty, --先把客户日程的单位转为基本单位，在转为发运计划的单位
+		select NEWID(), req.Flow, flow.Flow, flow.Item, req.ItemDesc, req.ItemRef, req.Qty * req.UnitQty / flow.UnitQty, --先把客户日程的单位转为基本单位，在转为发运计划的单位
 		req.Uom, req.BaseUom, req.UnitQty, flow.UC, flow.LocFrom, flow.LocTo, DATEADD(day, -flow.LeadTime, StartTime), StartTime  --客户日程的开始时间就是发运计划的窗口时间
 		from #tempEffCustScheduleDet as req inner join #tempShipFlowDet as flow on req.ShipFlow = flow.Flow and req.Item = flow.Item
 
 		--转没有发运路线的，销售路线直接就是发运路线
 		insert into #tempShipPlanDet(UUID, DistributionFlow, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
-		select NEWID(), Flow, Flow, Item, ItemDesc, ItemRef, (Qty - ShipQty), Uom, BaseUom, UnitQty, UC, Location, null, StartTime, WindowTime
+		select NEWID(), Flow, Flow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UnitQty, UC, Location, null, StartTime, WindowTime
 		from #tempEffCustScheduleDet where ShipFlow is null
 
-		select * from #tempShipPlanDet
 		--记录需求中间表
 		insert into #tempShipPlanDetTrace(DetRowId, UUID, DistributionFlow, Item, ReqDate, ReqQty) 
 		select RowId, UUID, DistributionFlow, Item, StartTime, ShipQty from #tempShipPlanDet
@@ -292,10 +291,14 @@ BEGIN
 		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempShipFlowDet
 		while (@RowId <= @MaxRowId)
 		begin
-			declare @ActiveQty decimal(18, 8) = null
-			declare @LastActiveQty decimal(18, 8) = null
-			declare @Flow varchar(50) = null
-			declare @Item varchar(50) = null
+			declare @ActiveQty decimal(18, 8)
+			declare @LastActiveQty decimal(18, 8)
+			declare @Flow varchar(50)
+			declare @Item varchar(50)
+			set @ActiveQty = null
+			set @LastActiveQty = null
+			set @Flow = null
+			set @Item = null
 
 			select @ActiveQty = ActiveQty, @Flow = Flow, @Item = Item from #tempShipFlowDet where RowId = @RowId
 			if (@ActiveQty > 0)

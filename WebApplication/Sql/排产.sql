@@ -359,3 +359,36 @@ GO
 SET ANSI_PADDING OFF
 GO
 
+/****** Object:  Table [dbo].[MRP_LocationDetSnapShot]    Script Date: 2014/7/2 13:03:54 ******/
+DROP TABLE [dbo].[MRP_LocationDetSnapShot]
+GO
+
+/****** Object:  Table [dbo].[MRP_LocationDetSnapShot]    Script Date: 2014/7/2 13:03:54 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[MRP_LocationDetSnapShot](
+	[Item] [varchar](50) NOT NULL,
+	[Location] [varchar](50) NOT NULL,
+	[Plant] [varchar](50) NULL,
+	[Qty] [decimal](18, 8) NULL,
+	[InTransitQty] [decimal](18, 8) NULL,
+	[InspectQty] [decimal](18, 8) NULL,
+	[Effdate] [datetime] NULL,
+ CONSTRAINT [PK_MRP_LocationDetSnapShot] PRIMARY KEY CLUSTERED 
+(
+	[Item] ASC,
+	[Location] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO

@@ -19,10 +19,10 @@ CREATE PROCEDURE [dbo].RunProductionPlan
 AS 
 BEGIN 
 	set nocount on
-	declare @DateTimeNow datetime = GetDate()
-	declare @DateNow datetime = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow))
-	declare @Msg nvarchar(MAX) = ''
-	declare @trancount int = @@trancount
+	declare @DateTimeNow datetime
+	declare @DateNow datetime
+	declare @Msg nvarchar(MAX)
+	declare @trancount int
 	declare @BatchNo int
 	declare @ShipPlanReleaseNo int
 	declare @RowId int
@@ -32,10 +32,15 @@ BEGIN
 	declare @GroupSeq int
 	declare @MaxGroupSeq int
 	declare @Item varchar(50)
-	declare @Bom varchar(50) = null
+	declare @Bom varchar(50)
 	declare @Qty decimal(18, 8)
 	declare @LastQty decimal(18, 8)
 	declare @Effdate datetime
+
+	set @DateTimeNow = GetDate()
+	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
+	set @Msg = ''
+	set @trancount = @@trancount
 
 	exec GetNextSequence 'RunProductionPlan', @BatchNo output
 	begin try
@@ -137,46 +142,19 @@ BEGIN
 
 
 		-----------------------------↓循环分解Bom，添加下层生产计划-----------------------------
-		declare @ExpandLevel int = 1
+		declare @ExpandLevel int
+		set @ExpandLevel = 1
 		while exists(select top 1 1 from #tempCurrentLevlProductPlan)
 		begin
 			-----------------------------↓计算可用库存-----------------------------
 			insert into #tempLocatoinDet(Item, Qty)
 			select Item, SUM(Qty) - MAX(ISNULL(i.SafeStock, 0)) as ActiveQty
-			from (
-			--获取库存
-			select det.Item, SUM(Qty) as Qty
-			from LocationDet as det
-			inner join Location as l on det.Location = l.Code
-			inner join Region as r on l.Region = r.Code
-			inner join (select distinct Item from #tempCurrentLevlProductPlan) as p on det.Item = p.Item
-			where l.IsMRP = 1 and r.Plant = @Plant and l.Code not in ('Inspect', 'Reject')
-			group by det.Item
-			union all
-			--获取检验库存
-			select loc.Item, SUM(loc.Qty) as InspectQty 
-			from InspectDet as det 
-			inner join LocationLotDet as loc on det.LocLotDetId = loc.Id
-			inner join InspectMstr as mstr on det.InspNo = mstr.InspNo
-			inner join Location as l on det.LocTo = l.Code
-			inner join Region as r on l.Region = r.Code
+			from 
+			(
+			select loc.Item, (loc.Qty + loc.InTransitQty + loc.InspectQty) as Qty  from MRP_LocationDetSnapShot as loc
 			inner join (select distinct Item from #tempCurrentLevlProductPlan) as p on loc.Item = p.Item
-			where mstr.IsSeperated = 0 and mstr.[Status] = 'Create'
-			and l.IsMRP = 1 and r.Plant = @Plant
-			group by loc.Item
-			union all
-			--获取在途
-			select oDet.Item, SUM(iDet.Qty - ISNULL(iDet.RecQty, 0)) as InTransitQty 
-			from IpDet as iDet
-			inner join IpMstr as iMstr on iDet.IpNo = iMstr.IpNo
-			inner join OrderLocTrans as oTrans on iDet.OrderLocTransId = oTrans.Id
-			inner join Location as l on oTrans.Loc = l.Code
-			inner join Region as r on l.Region = r.Code
-			inner join OrderDet as oDet on oTrans.OrderDetId = oDet.Id
-			inner join OrderMstr as oMstr on oDet.OrderNo = oMstr.OrderNo
-			inner join (select distinct Item from #tempCurrentLevlProductPlan) as p on iDet.Item = p.Item
-			where oMstr.[Type] <> 'Distribution' and iMstr.[Status] = 'Create' and oMstr.SubType = 'Nml' and r.Plant = @Plant
-			group by oDet.Item) as a inner join Item as i on a.Item = i.Code 
+			where loc.Plant = @Plant
+			) as a inner join Item as i on a.Item = i.Code 
 			group by Item
 			-----------------------------↑计算可用库存-----------------------------
 
