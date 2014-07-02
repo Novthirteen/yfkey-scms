@@ -281,5 +281,81 @@ GO
 SET ANSI_PADDING OFF
 GO
 
+/****** Object:  Table [dbo].[MRP_ShiftPlanMstr]    Script Date: 2014/7/2 10:28:08 ******/
+DROP TABLE [dbo].[MRP_ShiftPlanMstr]
+GO
 
+/****** Object:  Table [dbo].[MRP_ShiftPlanMstr]    Script Date: 2014/7/2 10:28:08 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[MRP_ShiftPlanMstr](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[RefPlanNo] [varchar](50) NULL,
+	[ProdLine] [varchar](50) NULL,
+	[Status] [varchar](50) NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [varchar](50) NULL,
+	[ReleaseDate] [datetime] NULL,
+	[ReleaseUser] [varchar](50) NULL,
+	[LastModifyDate] [datetime] NULL,
+	[LastModifyUser] [varchar](50) NULL,
+	[Version] [int] NULL,
+ CONSTRAINT [PK_MRP_ShiftPlanMstr] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+/****** Object:  Table [dbo].[MRP_ShiftPlanDet]    Script Date: 2014/7/2 10:35:03 ******/
+DROP TABLE [dbo].[MRP_ShiftPlanDet]
+GO
+
+/****** Object:  Table [dbo].[MRP_ShiftPlanDet]    Script Date: 2014/7/2 10:35:03 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[MRP_ShiftPlanDet](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[PlanId] [int] NULL,
+	[RefPlanNo] [varchar](50) NULL,
+	[ProdLine] [varchar](50) NULL,
+	[Item] [varchar](50) NULL,
+	[ItemDesc] [varchar](100) NULL,
+	[RefItemCode] [varchar](50) NULL,
+	[Qty] [decimal](18, 8) NULL,
+	[Uom] [varchar](5) NULL,
+	[UnitQty] [decimal](18, 8) NULL,
+	[PlanDate] [datetime] NULL,
+	[Shift] [varchar](50) NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [varchar](50) NULL,
+ CONSTRAINT [PK_MRP_ShiftPlanDet] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
 
