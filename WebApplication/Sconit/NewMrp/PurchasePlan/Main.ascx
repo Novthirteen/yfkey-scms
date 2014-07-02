@@ -9,7 +9,7 @@
                 <asp:RadioButtonList ID="rblAction" runat="server" RepeatDirection="Horizontal" AutoPostBack="true"
                     CssClass="floatright" OnSelectedIndexChanged="rblAction_SelectedIndexChanged">
                     <asp:ListItem Text="明细" Value="Search" Selected="True" />
-                    <asp:ListItem Text="汇总" Value="Import" />
+                    <asp:ListItem Text="日志" Value="Import" />
                 </asp:RadioButtonList>
             </td>
             <td class="td02">

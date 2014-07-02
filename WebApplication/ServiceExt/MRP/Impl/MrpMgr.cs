@@ -1404,7 +1404,7 @@ namespace com.Sconit.Service.MRP.Impl
 
                 var planDateList = shiftPlanList.Select(p => p.PlanDate.ToString("yyyy-MM-dd")).Distinct().ToArray();
 
-                string sql = string.Format(" Delete MRP_ShiftPlanDet  where exists(select 1 from MRP_ShiftPlanMstr as m where m.Id=PlanId and m.Status='Create') and ProdLine in in('{0}');delete MRP_ShiftPlanMstr where Status='Create' and ProdLine in ('{0}') ", string.Join("','", shiftPlanList.Select(p => p.ProdLine).Distinct().ToArray()));
+                string sql = string.Format(" Delete MRP_ShiftPlanDet  where exists(select 1 from MRP_ShiftPlanMstr as m where m.Id=PlanId and m.Status='Create') and ProdLine in ('{0}');delete MRP_ShiftPlanMstr where Status='Create' and ProdLine in ('{0}') ", string.Join("','", shiftPlanList.Select(p => p.ProdLine).Distinct().ToArray()));
                 this.genericMgr.ExecuteSql(sql, null);
                 //Dictionary<string, int> planVersions = new Dictionary<string, int>();
                 //foreach (var allFlowCode in shiftPlanList.Select(p => p.ProdLine).Distinct())
@@ -1412,7 +1412,7 @@ namespace com.Sconit.Service.MRP.Impl
                 //    planVersions.Add(allFlowCode, numberControlMgr.GenerateNumberNextSequence(string.Format("MRP_ShiftPlan_{0}", allFlowCode)));
                 //}
 
-                string searchVersions = "select ProdLineNo,Max(Version) from  MRP_ShiftPlanMstr group by  ProdLineNo";
+                string searchVersions = "select ProdLine,Max(Version) from  MRP_ShiftPlanMstr group by  ProdLine";
 
                 var versions = this.genericMgr.GetDatasetBySql(searchVersions).Tables[0];
                 Dictionary<string, int> planVersions = new Dictionary<string, int>();

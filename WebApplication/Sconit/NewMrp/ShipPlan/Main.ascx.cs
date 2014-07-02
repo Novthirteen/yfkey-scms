@@ -181,7 +181,7 @@ from  MRP_ShipPlanDet as det
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = CopyString();
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>行数</th><th rowspan='2'>发运计划版本</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>期初库存</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>行数</th><th rowspan='2'>发运计划版本</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -252,10 +252,13 @@ from  MRP_ShipPlanDet as det
             str.Append(firstPlan.SafeStock.ToString("0.##"));
             str.Append("</td>");
             str.Append("<td>");
-            str.Append((firstPlan.InTransitQty + firstPlan.InitStock).ToString("0.##"));
+            str.Append((firstPlan.InitStock).ToString("0.##"));
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append((firstPlan.InTransitQty).ToString("0.##"));
             str.Append("</td>");
 
-            var InitStockQty = firstPlan.InTransitQty + firstPlan.InitStock;
+            var InitStockQty = firstPlan.InitStock;
             foreach (var planByDateIndex in planByDateIndexs)
             {
                 //str.Append("<th >需求数</th><th >发货数</th><th >期末</th>");
@@ -618,6 +621,7 @@ left join Item as i on l.Item=i.Code where 1=1  ";
             }
             TheMrpMgr.UpdateShipPlanQty(flowList, itemList, idList, shipQtyList, releaseNoList,dateFromList, this.CurrentUser);
             ShowSuccessMessage("修改成功。");
+            this.btnSearch_Click(null,null);
         }
         catch (Exception ex)
         {

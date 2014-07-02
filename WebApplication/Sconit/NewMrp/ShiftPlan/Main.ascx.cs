@@ -20,7 +20,7 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
     {
         //this.ucPreview.BtnCreateClick += new System.EventHandler(this.CalculateProdPlan_Render);
 
-       
+
     }
 
     protected void btnImport_Click(object sender, EventArgs e)
@@ -229,7 +229,7 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
 
     protected void btnSearch_Click(object sender, EventArgs e)
     {
-        string hql = @" select det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId where 1=1 ";
+        string hql = @" select det.Id,det.PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId where 1=1 ";
         DateTime startTime = DateTime.Today;
         if (this.tbStartDate.Text.Trim() != string.Empty)
         {
@@ -252,26 +252,26 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         {
             hql += string.Format(" and det.ProdLine in ('{0}') ", flowCodeValues);
         }
-        if (this.ltlPlanVersion.Text.Trim()!=string.Empty)
+        if (this.ltlPlanVersion.Text.Trim() != string.Empty)
         {
             hql += string.Format(" and m.Version ={0} ", this.ltlPlanVersion.Text.Trim());
         }
 
         var allResult = TheGenericMgr.GetDatasetBySql(hql).Tables[0];
-        var shiftPlans = new List<ShiftPlanDet>();
+        var pdPlanList = new List<ShiftPlanDet>();
         foreach (System.Data.DataRow row in allResult.Rows)
         {
             //det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,
             //det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version
-            shiftPlans.Add(new ShiftPlanDet
+            pdPlanList.Add(new ShiftPlanDet
             {
-                Id =int.Parse(row[0].ToString()),
+                Id = int.Parse(row[0].ToString()),
                 PlanId = int.Parse(row[1].ToString()),
                 RefPlanNo = row[2].ToString(),
                 ProdLine = row[3].ToString(),
                 Item = row[4].ToString(),
                 ItemDesc = row[5].ToString(),
-                RefItemCode =row[6].ToString(),
+                RefItemCode = row[6].ToString(),
                 Qty = Convert.ToDecimal(row[7]),
                 Uom = row[8].ToString(),
                 PlanDate = Convert.ToDateTime(row[9]),
@@ -282,7 +282,6 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
             });
         }
 
-        IList<ShiftPlanDet> pdPlanList = TheGenericMgr.FindAllWithCustomQuery<ShiftPlanDet>(hql);
         pdPlanList = pdPlanList == null || pdPlanList.Count == 0 ? new List<ShiftPlanDet>() : pdPlanList;
 
         if (string.IsNullOrEmpty(this.ltlPlanVersion.Text.Trim()) && pdPlanList.Count > 0)
@@ -314,21 +313,38 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         var planByDateIndexs = shiftPlanList.GroupBy(p => p.PlanDate).OrderBy(p => p.Key);
 
         #region
-                var shiptPlanListDic = shiptPlanList.GroupBy(p => new { p.ProdLine, p.Version })
-           .ToDictionary(d => d.Key, d => d.ToList());
+        var shiptPlanListDic = shiftPlanList.GroupBy(p => new { p.ProdLine, p.Version })
+   .ToDictionary(d => d.Key, d => d.ToList());
         List<ShiftPlanDet> shiftPlanDetLogs = new List<ShiftPlanDet>();
         string hql = @" select det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version from MRP_ShiftPlanDet as det inner join MRP_ShiftPlanMstr as m on m.Id=det.PlanId
-                     where 1=1 and det.ProdLine=? and m.Version=? ";
+                     where 1=1 and det.ProdLine='{0}' and m.Version={1} ";
         foreach (var dic in shiptPlanListDic)
         {
-            var customerPlans = dic.Value;
-            var paramList = new List<object> { customerPlans.First().Type, customerPlans.First().Version - 1, customerPlans.First().Flow };
-            var rr = this.TheGenericMgr.FindAllWithCustomQuery<CustomerScheduleDetail>(hql, paramList.ToArray());
-            if (rr != null && rr.Count > 0)
+            var sPlan = dic.Value;
+            var allResult = TheGenericMgr.GetDatasetBySql(string.Format(hql, sPlan.First().ProdLine, sPlan.First().Version - 1)).Tables[0];
+            foreach (System.Data.DataRow row in allResult.Rows)
             {
-                customerPlanLogList.AddRange(rr);
+                //det.Id,det,PlanId,det.RefPlanNo,det.ProdLine,det.Item,det.ItemDesc,det.RefItemCode,
+                //det.Qty,det.Uom,Det.PlanDate,det.Shift,det.CreateDate,m.Status,m.Version
+                shiftPlanDetLogs.Add(new ShiftPlanDet
+                {
+                    Id = int.Parse(row[0].ToString()),
+                    PlanId = int.Parse(row[1].ToString()),
+                    RefPlanNo = row[2].ToString(),
+                    ProdLine = row[3].ToString(),
+                    Item = row[4].ToString(),
+                    ItemDesc = row[5].ToString(),
+                    RefItemCode = row[6].ToString(),
+                    Qty = Convert.ToDecimal(row[7]),
+                    Uom = row[8].ToString(),
+                    PlanDate = Convert.ToDateTime(row[9]),
+                    Shift = row[10].ToString(),
+                    CreateDate = Convert.ToDateTime(row[11]),
+                    Status = row[12].ToString(),
+                    Version = Convert.ToInt32(row[13].ToString()),
+                });
             }
-                }
+        }
         #endregion
 
         StringBuilder str = new StringBuilder();
@@ -388,7 +404,8 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
             var firstPlan = planByFlowItem.Value.First();
             //var currentShiftPlans = shiftPlanList.Where(s => s.ProdLine == firstPlan.ProdLine);
             //var currentShiftPlan = currentShiftPlans != null && currentShiftPlans.Count() > 0 ? currentShiftPlans.First() : new ShiftPlanDet();
-            var prevShiftPlan = planByFlowItem.Value.Where(sl => sl.Version != firstPlan.Version).Count()>0? planByFlowItem.Value.Where(sl => sl.Version != firstPlan.Version).OrderByDescending(sl => sl.Version).First() : new ShiftPlanDet();
+            var logLists = shiftPlanDetLogs.Where(sl => sl.Version == firstPlan.Version - 1 && sl.ProdLine == firstPlan.ProdLine).Count() > 0 ? shiftPlanDetLogs.Where(sl => sl.Version == firstPlan.Version - 1 && sl.ProdLine == firstPlan.ProdLine) : new List<ShiftPlanDet>();
+            var prevShiftPlan = logLists.Count() > 0 ? logLists.First() : new ShiftPlanDet();
             //var planDic = planByFlowItem.Value.GroupBy(p => p.PlanDate).ToDictionary(d => d.Key, d =>d.ToList() });
             l++;
             if (l % 2 == 0)
@@ -435,8 +452,10 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
             }
             foreach (var planByDateIndex in planByDateIndexs)
             {
-                    var shiftplanLogByDates = shiftPlanLogList.Where(s => s.PlanDate == planByDateIndex.Key && s.Flow == planByFlowItem.Key.Flow && s.Item == planByFlowItem.Key.Item);
-                    var shiftPlnaLogs = shiftplanLogByDates != null ? shiftplanLogByDates.Where(s => s.PlanVersion == shiftplanLogByDates.Max(m => m.PlanVersion)) : null;
+                var shiftplansByDate = planByFlowItem.Value.Where(s => s.PlanDate == planByDateIndex.Key && s.Item == planByFlowItem.Key.Item);
+                if (shiftplansByDate != null && shiftplansByDate.Count() > 0)
+                {
+                    var shiftplanLogByDates = logLists.Where(s => s.PlanDate == planByDateIndex.Key && s.ProdLine == planByFlowItem.Key.ProdLine && s.Item == planByFlowItem.Key.Item);
 
                     #region
                     var aShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "A");
@@ -444,7 +463,7 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
                     var cShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "C");
                     if (aShift != null && aShift.Count() > 0)
                     {
-                        var currentLog = shiftPlnaLogs != null ? shiftPlnaLogs.Where(s => s.Shift == aShift.First().Shift) : null;
+                        var currentLog = shiftplanLogByDates != null ? shiftplanLogByDates.Where(s => s.Shift == aShift.First().Shift) : null;
                         if (currentLog != null && currentLog.Count() > 0)
                         {
                             if (currentLog.First().Qty != aShift.First().Qty)
@@ -461,17 +480,15 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
                             str.Append("<td>");
                         }
                         str.Append(aShift.First().Qty.ToString("0.##") + " </td> ");
-                        str.Append("<td>" + aShift.First().Memo + "</td>");
                     }
                     else
                     {
-                        str.Append("<td></td>");
                         str.Append("<td></td>");
 
                     }
                     if (bShift != null && bShift.Count() > 0)
                     {
-                        var currentLog = shiftPlnaLogs != null ? shiftPlnaLogs.Where(s => s.Shift == bShift.First().Shift) : null;
+                        var currentLog = shiftplanLogByDates != null ? shiftplanLogByDates.Where(s => s.Shift == bShift.First().Shift) : null;
                         if (currentLog != null && currentLog.Count() > 0)
                         {
                             if (currentLog.First().Qty != bShift.First().Qty)
@@ -488,17 +505,15 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
                             str.Append("<td>");
                         }
                         str.Append(bShift.First().Qty.ToString("0.##") + " </td> ");
-                        str.Append("<td>" + bShift.First().Memo + "</td>");
                     }
                     else
                     {
-                        str.Append("<td></td>");
                         str.Append("<td></td>");
 
                     }
                     if (cShift != null && cShift.Count() > 0)
                     {
-                        var currentLog = shiftPlnaLogs != null ? shiftPlnaLogs.Where(s => s.Shift == cShift.First().Shift) : null;
+                        var currentLog = shiftplanLogByDates != null ? shiftplanLogByDates.Where(s => s.Shift == cShift.First().Shift) : null;
                         if (currentLog != null && currentLog.Count() > 0)
                         {
                             if (currentLog.First().Qty != cShift.First().Qty)
@@ -515,11 +530,9 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
                             str.Append("<td>");
                         }
                         str.Append(cShift.First().Qty.ToString("0.##") + " </td> ");
-                        str.Append("<td>" + cShift.First().Memo + "</td>");
                     }
                     else
                     {
-                        str.Append("<td></td>");
                         str.Append("<td></td>");
 
                     }
@@ -535,10 +548,6 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
                     str.Append("<td></td>");
 
                 }
-                invQtyByDate = invQtyByDate + qtys[1] - outQty + Convert.ToDecimal((shiftplansByDate != null ? shiftplansByDate.Sum(s => s.Qty) : 0));
-                str.Append("<td>");
-                str.Append(invQtyByDate.ToString("0.##"));
-                str.Append("</td>");
             }
             str.Append("</tr>");
         }
