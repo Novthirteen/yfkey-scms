@@ -7,23 +7,18 @@ using System.Collections.Generic;
 namespace com.Sconit.Entity.MRP
 {
     [Serializable]
-    public abstract class ShipPlanDetBase : EntityBase
+    public abstract class ProductionPlanDetBase : EntityBase
     {
-        //Id, ShipPlanId, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo,
-        //StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version
+        //Id, ProductionPlanId, Item, ItemDesc, RefItemCode, OrgQty, Qty, Uom,
+    //StartTime, WindowTime, CreateDate, CreateUser, LastModifyUser, LastModifyDate, Version
         public Int32 Id { get; set; }
-        public Int32 ShipPlanId { get; set; }
-        public string Flow { get; set; }
+        public Int32 ProductionPlanId { get; set; }
         public string Item { get; set; }
         public string ItemDesc { get; set; }
         public string RefItemCode { get; set; }
-        public decimal ShipQty { get; set; }
+        public decimal OrgQty { get; set; }
+        public decimal Qty { get; set; }
         public string Uom { get; set; }
-        public string BaseUom { get; set; }
-        public decimal UnitQty { get; set; }
-        public decimal UnitCount { get; set; }
-        public string LocFrom { get; set; }
-        public string LocTo { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime WindowTime { get; set; }
         public DateTime CreateDate { get; set; }
@@ -31,9 +26,6 @@ namespace com.Sconit.Entity.MRP
         public DateTime LastModifyDate { get; set; }
         public string LastModifyUser { get; set; }
         public Int32 Version { get; set; }
-        public decimal OrgShipQty { get; set; }
-        public decimal ReqQty { get; set; }
-        public string UUID { get; set; }
         
         
 

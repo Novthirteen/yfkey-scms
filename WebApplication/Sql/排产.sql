@@ -22,7 +22,7 @@ alter table Item add SafeStock int
 go
 alter table Region add Plant varchar(50)
 go
-/****** Object:  Table [dbo].[MRP_ShipPlanMstr]    Script Date: 2014/7/2 22:36:49 ******/
+
 DROP TABLE [dbo].[MRP_ShipPlanMstr]
 GO
 /****** Object:  Table [dbo].[MRP_ShipPlanInitLocationDet]    Script Date: 2014/7/2 22:36:49 ******/

@@ -69,7 +69,7 @@
                 <%--<asp:Button ID="btReplace" Text="" runat="server"   OnClick="btnReplace_Click"   Style="display: none" />--%>
                 <input type="hidden" id="btSeqHidden" runat="server" />
                 <input type="hidden" id="btQtyHidden" runat="server" />
-                <%--<asp:Button ID="btnRunShipPlan" runat="server" Text="生成发运计划" OnClick="btnRunShipPlan_Click" />--%>
+                <asp:Button ID="btnRunProdPlan" runat="server" Text="生成主生产需求" OnClick="btnRunProdPlan_Click" />
             </td>
         </tr>
     </table>
@@ -108,33 +108,55 @@
     <asp:Literal ID="ltlPlanVersion" runat="server" />
     <div id="mstrList" runat="server">
     </div>
+    <div id="ShowTraceDiv" style="position:absolute; ">
+    </div>
 </div>
 <script type="text/javascript">
-    function doclick() {
-        debugger
-        //        alert($("#mstrList").html());
-        //    var allHtml = $("#ctl01_list").html();
-        var allFlow = "";
-        var allItem = "";
-        var allId = "";
-        var allQty = "";
-        $("#ctl01_list tbody input").each(function () {
-            if (allFlow == "") {
-                debugger
-                alert($(this).flow);
-                allFlow = $(this).flow;
-                allItem = +$(this).item;
-                allId = $(this).id;
-                allQty = $(this).val();
-            } else {
-                allFlow += "," + $(this).flow;
-                allItem += "," + $(this).item;
-                allId += "," + $(this).id;
-                allQty += "," + $(this).val();
-            }
-        });
-        alert(allFlow);
+    function doTdClick(e) {
+        var htmlt = $(e).attr("tital");
+        htmlt = htmlt.replace("<table>", "<table class='GV' style=' border:1 solid black;background-color:White'>");
+//        htmlt = htmlt.replace("<td>", "<td style='border:1px' >");
+        htmlt = htmlt.replace(/<td>/g, "<td style='border:1px solid black' >");
+//        a.replace(/,/g, ".");   
+        htmlt = htmlt.replace("<thead><tr>", "<thead><tr class='GVHeader' onclick='hideClick()'>");
+        htmlt = htmlt.replace(/<tr>/g, "<tr style='border:1px solid black' >");
+        $("#ShowTraceDiv").html(htmlt);
+        var obj = document.getElementById("ShowTraceDiv");
+        obj.style.left = event.x;
+        obj.style.top = event.y;
+        $(obj).show();
     }
+
+    function hideClick() {
+        $("#ShowTraceDiv").hide()
+    }
+
+
+//    function doclick() {
+//        debugger
+//        //        alert($("#mstrList").html());
+//        //    var allHtml = $("#ctl01_list").html();
+//        var allFlow = "";
+//        var allItem = "";
+//        var allId = "";
+//        var allQty = "";
+//        $("#ctl01_list tbody input").each(function () {
+//            if (allFlow == "") {
+//                debugger
+//                alert($(this).flow);
+//                allFlow = $(this).flow;
+//                allItem = +$(this).item;
+//                allId = $(this).id;
+//                allQty = $(this).val();
+//            } else {
+//                allFlow += "," + $(this).flow;
+//                allItem += "," + $(this).item;
+//                allId += "," + $(this).id;
+//                allQty += "," + $(this).val();
+//            }
+//        });
+//        alert(allFlow);
+//    }
 
 
     function doFocusClick(e) {

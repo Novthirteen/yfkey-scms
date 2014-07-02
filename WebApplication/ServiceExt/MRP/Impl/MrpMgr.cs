@@ -106,6 +106,33 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
 
+        private static object RunProductionPlanLock = new object();
+        [Transaction(TransactionMode.Requires)]
+        public void RunProductionPlan(User user)
+        {
+            lock (RunProductionPlanLock)
+            {
+                string searchPlanSql = @"select r.Plant from MRP_ShipPlanDet as d  inner join Location as l on l.Code=d.LocFrom inner join Region as r on r.Code=l.Region group by r.Plant";
+                var plans = this.genericMgr.GetDatasetBySql(searchPlanSql).Tables[0];
+                var planList = new List<string>();
+                foreach (System.Data.DataRow row in plans.Rows)
+                {
+                    planList.Add(row[0].ToString());
+                }
+                //RunShipPlan(DateTime.Now, user);
+                foreach (var plan in planList)
+                {
+                    SqlParameter[] sqlParameterArr = new SqlParameter[2];
+                    sqlParameterArr[0] = new SqlParameter("@Plant", SqlDbType.VarChar, 50);
+                    sqlParameterArr[0].Value = plan;
+                    sqlParameterArr[1] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
+                    sqlParameterArr[1].Value = user.Code;
+                    this.genericMgr.GetDatasetByStoredProcedure("RunProductionPlan", sqlParameterArr);  
+                }
+                
+            }
+        }
+
         private static object RunShipPlanLock = new object();
         public void RunShipPlan(DateTime effectiveDate, User user)
         {
