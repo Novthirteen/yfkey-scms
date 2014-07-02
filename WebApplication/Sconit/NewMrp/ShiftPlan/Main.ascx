@@ -60,6 +60,7 @@
             </td>
             <td class="td02">
                 <asp:Button ID="btnSave" runat="server" Text="查询" OnClick="btnSearch_Click" />
+                <asp:Button ID="btmSubmit" runat="server" Text="释放" OnClick="btnSubmit_Click" />
                 <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" OnClick="btnExport_Click" />
                 <%--<asp:Button ID="btnMrpCalculate" runat="server" Text="Mrp运算" OnClick="btnMrpCalculate_Click" />--%>
             </td>

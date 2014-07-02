@@ -349,7 +349,7 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
 
         StringBuilder str = new StringBuilder();
         string headStr = CopyString();
-        str.Append("<tr class='GVHeader'><th rowspan='2'>Seq</th><th rowspan='2'>客户版本号</th><th rowspan='2'>生产线</th><th rowspan='2'>物料号</th><th rowspan='2' >物料描述</th><th rowspan='2'>版本号</th><th rowspan='2'>排产时间</th><th rowspan='2'>上次排产时间</th>");
+        str.Append("<tr class='GVHeader'><th rowspan='2'>Seq</th><th rowspan='2'>客户版本号</th><th rowspan='2'>生产线</th><th rowspan='2'>状态</th><th rowspan='2'>物料号</th><th rowspan='2' >物料描述</th><th rowspan='2'>版本号</th><th rowspan='2'>排产时间</th><th rowspan='2'>上次排产时间</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -425,6 +425,9 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
             str.Append("</td>");
             str.Append("<td>");
             str.Append(firstPlan.ProdLine);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.Status);
             str.Append("</td>");
             str.Append("<td>");
             str.Append(firstPlan.Item);
@@ -616,6 +619,59 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         //        ((CheckBox)e.Row.Cells[7].FindControl("cbQtyC")).Enabled = false;
         //    }
         //}
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            string flowCodeValues = this.tbFlow.Value.Trim();
+            if (!string.IsNullOrEmpty(flowCodeValues))
+            {
+                flowCodeValues = flowCodeValues.Replace("\r\n", ",");
+                flowCodeValues = flowCodeValues.Replace("\n", ",");
+            }
+            if (!string.IsNullOrEmpty(flowCodeValues))
+            {
+                var allFlows = flowCodeValues.Split(',');
+                if (allFlows != null && allFlows.Length > 1)
+                {
+                    throw new BusinessErrorException("只能选择一条生产线进行释放。");
+                }
+                IList<ShiftPlanMstr> mstr = TheGenericMgr.FindAllWithCustomQuery<ShiftPlanMstr>(string.Format(" select m from ShiftPlanMstr as m where m.Status='{0}' and m.ProdLine='{1}' ", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE, flowCodeValues));
+                if (mstr != null && mstr.Count > 0)
+                {
+                    ShiftPlanMstr m = mstr.First();
+                    DateTime dateNow = System.DateTime.Now;
+                    m.LastModifyUser = this.CurrentUser.Code;
+                    m.LastModifyDate = dateNow;
+                    m.ReleaseDate = dateNow;
+                    m.ReleaseUser = this.CurrentUser.Code;
+                    m.Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT;
+                    m.Version += 1;
+                    TheGenericMgr.Update(m);
+                    ShowSuccessMessage("释放成功。");
+                }
+                else
+                {
+                    ShowErrorMessage("没有需要释放的班产计划。");
+                }
+            }
+            else
+            {
+                throw new BusinessErrorException("请选择生产线，进行释放。");
+            }
+
+        }
+        catch (BusinessErrorException be)
+        {
+            ShowErrorMessage(be.Message);
+        }
+        catch (Exception ex)
+        {
+
+            ShowErrorMessage(ex.Message);
+        }
     }
 
 
