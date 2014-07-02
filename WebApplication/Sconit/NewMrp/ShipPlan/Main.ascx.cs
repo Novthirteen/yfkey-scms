@@ -260,7 +260,7 @@ from  MRP_ShipPlanDet as det
             {
                 //str.Append("<th >需求数</th><th >发货数</th><th >期末</th>");
                 //var qty = planDic.Keys.Contains(planByDateIndex.Key) ? planDic[planByDateIndex.Key] : 0;
-                var curenPlan = planByFlowItem.Where(p => p.WindowTime == planByDateIndex.Key);
+                var curenPlan = planByFlowItem.Where(p => p.StartTime == planByDateIndex.Key);
                 var shipPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new ShipPlanDet();
                 str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", shipPlanDet.Logs));
                 str.Append(shipPlanDet.ReqQty.ToString("0.##"));

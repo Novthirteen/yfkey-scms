@@ -202,24 +202,15 @@ BEGIN
 
 		-----------------------------↓获取发运路线-----------------------------
 		--获取发运路线和发运库位的库存（中间仓库存）
-		insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, LocQty, SafeStock)
-		select det.Flow, ISNULL(mstr.MRPLeadTime, 0) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, det.UC, mstr.LocFrom, mstr.LocTo, ISNULL(loc.Qty, 0), ISNULL(det.SafeStock, 0) 
+		insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, 
+		LocQty, InTransitQty, SafeStock, ActiveQty)
+		select det.Flow, ISNULL(mstr.MRPLeadTime, 0) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, det.UC, mstr.LocFrom, mstr.LocTo, 
+		ISNULL(loc.Qty, 0), ISNULL(loc.InTransitQty, 0), ISNULL(det.SafeStock, 0), (ISNULL(loc.Qty, 0) + ISNULL(loc.InTransitQty, 0) - ISNULL(det.SafeStock, 0))
 		from FlowDet as det
 		inner join FlowMstr as mstr on det.Flow = mstr.Code
 		inner join Item as i on det.Item = i.Code
 		left join MRP_LocationDetSnapShot as loc on det.Item = loc.Item and mstr.LocTo = loc.Location
 		where Flow in (select ShipFlow from FlowMstr where [Type] = 'Distribution' and IsActive = 1 and ShipFlow is not null)
-
-		--更新在途数量
-		update #tempShipFlowDet set InTransitQty = ISNULL(t.InTransitQty, 0), ActiveQty = LocQty + ISNULL(t.InTransitQty, 0) - SafeStock
-		from #tempShipFlowDet as det left join (select oMstr.Flow, oDet.Item, SUM(iDet.Qty - ISNULL(iDet.RecQty, 0)) as InTransitQty from IpDet as iDet
-												inner join IpMstr as iMstr on iDet.IpNo = iMstr.IpNo 
-												inner join OrderLocTrans as oTrans on iDet.OrderLocTransId = oTrans.Id 
-												inner join OrderDet as oDet on oTrans.OrderDetId = oDet.Id 
-												inner join OrderMstr as oMstr on oDet.OrderNo = oMstr.OrderNo 
-												where oMstr.flow in (select distinct Flow from #tempShipFlowDet)
-												and iMstr.[Status] = 'Create' and oMstr.SubType = 'Nml'
-												group by oMstr.Flow, oDet.Item) as t on det.Flow = t.Flow  and det.Item = t.Item 
 
 		--计算单位换算
 		update #tempShipFlowDet set UnitQty = 1 where Uom = BaseUom 
@@ -294,8 +285,8 @@ BEGIN
 			declare @LastActiveQty decimal(18, 8)
 			declare @Flow varchar(50)
 			declare @Item varchar(50)
-			set @ActiveQty = null
-			set @LastActiveQty = null
+			set @ActiveQty = 0
+			set @LastActiveQty = 0
 			set @Flow = null
 			set @Item = null
 
@@ -311,14 +302,19 @@ BEGIN
 			set @RowId = @RowId + 1
 		end
 
+
 		--低于安全库存的转为当天的发运计划
-		update #tempShipPlanDet set ShipQty = ShipQty - d.ActiveQty
+		update p set ShipQty = ShipQty - d.ActiveQty
 		from #tempShipPlanDet as p inner join #tempShipFlowDet as d on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
 		where d.ActiveQty < 0
 		insert into #tempShipPlanDet(Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
 		select d.Flow, d.Item, d.ItemDesc, d.RefItemCode, -d.ActiveQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
 		from #tempShipFlowDet as d left join #tempShipPlanDet as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
 		where d.ActiveQty < 0 and p.Flow is null
+
+		--删除小于今天并且发运数为0的计划
+		delete from #tempShipPlanDetTrace where UUID in (select UUID from #tempShipPlanDet where StartTime < @DateNow and ShipQty <= 0)
+		delete from #tempShipPlanDet where StartTime < @DateNow and ShipQty <= 0
 
 		--日期小于今天的量全部转为今天
 		--有今天的数据
@@ -339,6 +335,8 @@ BEGIN
 		from #tempShipPlanDet as a left join #tempShipPlanDet as b on a.Flow = b.Flow and a.ITem = b.Item and b.StartTime = @DateNow
 		inner join #tempShipFlowDet as d on a.Flow = d.Flow and a.Item = d.Item
 		where a.StartTime < @DateNow and b.Flow is null
+		--删除开始日期小于今天的发运计划
+		delete from #tempShipPlanDet where StartTime < @DateNow
 
 		--汇总发运需求
 		update d set ReqQty = ISNULL(dt.ReqQty, 0) from #tempShipPlanDet as d 

@@ -376,7 +376,7 @@ BEGIN
 		begin
 			set @Item = null
 			set @Qty = null
-			set @LastQty = null
+			set @LastQty = 0
 
 			select @Qty = ActiveQty, @Item = Item from #tempLocatoinDet where RowId = @RowId
 			if (@Qty > 0)
@@ -389,6 +389,20 @@ BEGIN
 			
 			set @RowId = @RowId + 1
 		end
+
+		--低于安全库存的转为当天的物料需求计划
+		update p set BasePurchaseQty = BasePurchaseQty - d.ActiveQty
+		from #tempMergeMaterialPlanDet as p inner join #tempLocatoinDet as d on p.Item = d.Item and p.StartTime = @DateNow
+		where d.ActiveQty < 0
+		insert into #tempMergeMaterialPlanDet(UUID, Item, ItemDesc, BaseReqQty, BasePurchaseQty, BaseUom, StartTime, WindowTime)
+		select NEWID(), d.Item, i.Desc1, 0, -d.ActiveQty, i.Uom, @DateNow, DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow) 
+		from #tempLocatoinDet as d left join #tempMergeMaterialPlanDet as p on p.Item = d.Item and p.StartTime = @DateNow
+		inner join Item as i on d.Item = i.Code
+		where d.ActiveQty < 0 and p.Item is null
+
+		--删除小于今天并且物料需求为0的计划
+		delete from #tempMaterialPlanDetTrace where UUID in (select UUID from #tempMergeMaterialPlanDet where StartTime < @DateNow and BasePurchaseQty <= 0)
+		delete from #tempMergeMaterialPlanDet where StartTime < @DateNow and BasePurchaseQty <= 0
 
 		--日期小于今天的量全部转为今天
 		--有今天的数据
