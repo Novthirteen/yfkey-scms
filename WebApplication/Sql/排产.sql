@@ -174,6 +174,8 @@ CREATE TABLE [dbo].[MRP_ShipPlanDet](
 	[Item] [varchar](50) NULL,
 	[ItemDesc] [varchar](50) NULL,
 	[RefItemCode] [varchar](50) NULL,
+	[ReqQty] [decimal](18, 8) NULL,
+	[OrgShipQty] [decimal](18, 8) NULL,
 	[ShipQty] [decimal](18, 8) NULL,
 	[Uom] [varchar](5) NULL,
 	[BaseUom] [varchar](5) NULL,
@@ -188,7 +190,6 @@ CREATE TABLE [dbo].[MRP_ShipPlanDet](
 	[LastModifyDate] [datetime] NULL,
 	[LastModifyUser] [varchar](50) NULL,
 	[Version] [int] NULL,
-	[OrgShipQty] [decimal](18, 8) NULL,
  CONSTRAINT [PK_MRP_ShipPlanDet] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
