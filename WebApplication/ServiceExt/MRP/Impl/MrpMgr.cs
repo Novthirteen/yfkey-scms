@@ -1151,8 +1151,8 @@ namespace com.Sconit.Service.MRP.Impl
                         newShipPlanDet.ShipQty = Convert.ToDecimal(qtyList[i]);
                         newShipPlanDet.Uom = first.Uom;
                         newShipPlanDet.BaseUom = first.BaseUom;
-                        newShipPlanDet.UnitCount = first.ShipPlanId;
-                        newShipPlanDet.UnitQty = first.ShipPlanId;
+                        newShipPlanDet.UnitCount = first.UnitCount;
+                        newShipPlanDet.UnitQty = first.UnitQty;
                         newShipPlanDet.LocFrom = first.LocFrom;
                         newShipPlanDet.LocTo = first.LocTo;
                         newShipPlanDet.OrgShipQty = 0;
@@ -1170,6 +1170,54 @@ namespace com.Sconit.Service.MRP.Impl
                 else
                 {
                     this.genericMgr.ExecuteSql(string.Format(" update MRP_ShipPlanDet set ShipQty={0},Version=Version+1 where id={1} ",qtyList[i],id));
+                }
+            }
+        }
+        #endregion
+
+        #region    修改采购计划
+        [Transaction(TransactionMode.Requires)]
+        public void UpdatePurchasePlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user)
+        {
+            var dateTimeNow = System.DateTime.Now;
+            for (int i = 0; i < idList.Count; i++)
+            {
+                int id = int.Parse(idList[i]);
+                if (id == 0)
+                {
+                    IList<PurchasePlanMstr> pMaster = this.genericMgr.FindAllWithCustomQuery<PurchasePlanMstr>(" select m from PurchasePlanMstr as m where m.ReleaseNo=? ", new object[] { releaseNoList[i] });
+                    IList<PurchasePlanDet> searchPlandets = this.genericMgr.FindAllWithCustomQuery<PurchasePlanDet>(" select d from PurchasePlanDet as d where d.Flow=? and d.Item=? and d.PurchasePlanId=? ", new object[] { flowList[i], itemList[i], pMaster.First().Id });
+                    if (searchPlandets != null && searchPlandets.Count > 0)
+                    {
+                        //Id, PurchasePlanId, UUID, Flow, Item, ItemDesc, RefItemCode, ReqQty, OrgPurchaseQty, 
+                        //PurchaseQty, Uom, BaseUom, UnitQty, UC, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version
+                        var first = searchPlandets.First();
+                        PurchasePlanDet newPlan = new PurchasePlanDet();
+                        newPlan.PurchasePlanId = first.PurchasePlanId;
+                        newPlan.Flow = first.Flow;
+                        newPlan.Item = first.Item;
+                        newPlan.ItemDesc = first.ItemDesc;
+                        newPlan.RefItemCode = first.RefItemCode;
+                        newPlan.PurchaseQty = Convert.ToDecimal(qtyList[i]);
+                        newPlan.Uom = first.Uom;
+                        newPlan.BaseUom = first.BaseUom;
+                        newPlan.UnitCount = first.UnitCount;
+                        newPlan.UnitQty = first.UnitQty;
+                        newPlan.OrgPurchaseQty = 0;
+                        newPlan.WindowTime = Convert.ToDateTime(dateFrom[i]);
+                        newPlan.StartTime = Convert.ToDateTime(dateFrom[i]);
+                        newPlan.CreateDate = dateTimeNow;
+                        newPlan.CreateUser = user.Code;
+                        newPlan.LastModifyDate = dateTimeNow;
+                        newPlan.LastModifyUser = user.Code;
+                        newPlan.Version = 1;
+                        newPlan.Id = 0;
+                        this.genericMgr.Create(newPlan);
+                    }
+                }
+                else
+                {
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_PurchasePlanDet set PurchaseQty={0},Version=Version+1 where id={1} ", qtyList[i], id));
                 }
             }
         }

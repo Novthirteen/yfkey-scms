@@ -285,20 +285,20 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         IList<ShiftPlanDet> pdPlanList = TheGenericMgr.FindAllWithCustomQuery<ShiftPlanDet>(hql);
         pdPlanList = pdPlanList == null || pdPlanList.Count == 0 ? new List<ShiftPlanDet>() : pdPlanList;
 
-        //if (string.IsNullOrEmpty(this.ltlPlanVersion.Text.Trim()) && pdPlanList.Count > 0)
-        //{
-        //    var activePlanList = new List<ShiftPlanDet>();
-        //    var groupByFlowVersion = pdPlanList.GroupBy(d => new { d.ProdLine }).ToDictionary(d => d.Key, d => d.OrderByDescending(g => g.Version).ToList());
-        //    foreach (var g in groupByFlowVersion)
-        //    {
-        //        activePlanList.AddRange(pdPlanList.Where(s => s.ProdLine == g.Key.ProdLine && s.Version == g.Value.Max(m => m.Version)));
-        //    }
-        //    ListTable(activePlanList);
-        //}
-        //else
-        //{
-        //    ListTable(pdPlanList);
-        //}
+        if (string.IsNullOrEmpty(this.ltlPlanVersion.Text.Trim()) && pdPlanList.Count > 0)
+        {
+            var activePlanList = new List<ShiftPlanDet>();
+            var groupByFlowVersion = pdPlanList.GroupBy(d => new { d.ProdLine }).ToDictionary(d => d.Key, d => d.OrderByDescending(g => g.Version).ToList());
+            foreach (var g in groupByFlowVersion)
+            {
+                activePlanList.AddRange(pdPlanList.Where(s => s.ProdLine == g.Key.ProdLine && s.Version == g.Value.Max(m => m.Version)));
+            }
+            ListTable(activePlanList);
+        }
+        else
+        {
+            ListTable(pdPlanList);
+        }
 
         ListTable(pdPlanList);
     }
@@ -312,6 +312,9 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
         }
         var groupByFlowItems = shiftPlanList.OrderBy(p => p.ProdLine).GroupBy(d => new { d.ProdLine, d.Item }).ToDictionary(d => d.Key, d => d.ToList());
         var planByDateIndexs = shiftPlanList.GroupBy(p => p.PlanDate).OrderBy(p => p.Key);
+
+
+
         #region
         //        var shiptPlanListDic = shiptPlanList.GroupBy(p => new { p.ProdLine, p.Version })
 //           .ToDictionary(d => d.Key, d => d.ToList());
