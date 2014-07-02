@@ -18,110 +18,108 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        //this.tbFlow.ServiceParameter = "string:" + this.CurrentUser.Code + ",bool:false,bool:false,bool:false,bool:true,bool:false,bool:false,string:"
-        //    + BusinessConstants.PARTY_AUTHRIZE_OPTION_TO;
-        this.ucPreview.BtnCreateClick += new System.EventHandler(this.CalculateProdPlan_Render);
+        //this.ucPreview.BtnCreateClick += new System.EventHandler(this.CalculateProdPlan_Render);
 
        
     }
 
     protected void btnImport_Click(object sender, EventArgs e)
     {
-        try
-        {
-            var shiftPlanList = TheMrpMgr.ReadShiftPlanFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser);
-            if (shiftPlanList != null && shiftPlanList.Count() > 0)
-            {
-                shiftPlanList = shiftPlanList.Where(s => s.Qty > 0).ToList();
-                IList<OrderHead> ohList = ConvertShiftPlanToOrders(shiftPlanList, 0);
-                this.ucPreview.Visible = true;
-                this.ucPreview.InitPageParameter(ohList, BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION);
-            }
-            //this.CalculateProdPlan();
-            ShowSuccessMessage("导入成功。");
+        //try
+        //{
+        //    var shiftPlanList = TheMrpMgr.ReadShiftPlanFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser);
+        //    if (shiftPlanList != null && shiftPlanList.Count() > 0)
+        //    {
+        //        shiftPlanList = shiftPlanList.Where(s => s.Qty > 0).ToList();
+        //        IList<OrderHead> ohList = ConvertShiftPlanToOrders(shiftPlanList, 0);
+        //        this.ucPreview.Visible = true;
+        //        this.ucPreview.InitPageParameter(ohList, BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION);
+        //    }
+        //    //this.CalculateProdPlan();
+        //    ShowSuccessMessage("导入成功。");
 
-            //this.ListTable(shiftPlanList);
-        }
-        catch (BusinessErrorException ex)
-        {
-            ShowErrorMessage(ex);
-        }
+        //    //this.ListTable(shiftPlanList);
+        //}
+        //catch (BusinessErrorException ex)
+        //{
+        //    ShowErrorMessage(ex);
+        //}
     }
 
-    private IList<OrderHead> ConvertShiftPlanToOrders(IList<ShiftPlan> shiftPlanList, int leadTime)
-    {
-        IList<OrderHead> orderHeadList = new List<OrderHead>();
-        if (shiftPlanList != null && shiftPlanList.Count > 0)
-        {
-            List<FlowDetail> tempFlowdets = new List<FlowDetail>();
-            //string searchExistsSql = string.Format("select d.orderNo,d.Item,d.orderqty,isnull(d.recqty,0) as recqty from orderdet as d where exists(select 1 from ordermstr as m where m.orderno=d.orderno and m.type='Production' and m.Status in('In-Process') ) and d.orderqty>d.recqty and d.Item in('{0}') ",string.Join("','", shiftPlanList.Select(s=>s.Item).Distinct().ToArray()));
-            //var existsDetRows = TheGenericMgr.GetDatasetBySql(searchExistsSql).Tables[0];
-            //var existsDetList = new List<TempOrderDet>();
-            //foreach (System.Data.DataRow row in existsDetRows.Rows)
-            //{
-            //    existsDetList.Add(new TempOrderDet{
-            //        OrderNo = row[0].ToString(),
-            //        ItemCode = row[1].ToString(),
-            //        OrderedQty = Convert.ToDecimal(row[2].ToString()),
-            //        ReceivedQty = Convert.ToDecimal(row[3].ToString()),
-            //    });
-            //}
-            foreach (ShiftPlan sps in shiftPlanList)
-            {
-                var currentFlowDet = TheGenericMgr.GetDatasetBySql(string.Format("select  Id,orderlotsize,item  from flowdet where flow='{0}' and item='{1}' ", sps.Flow, sps.Item)).Tables[0];
-                int flowDetId = 0;
-                decimal orderLotSize = 0;
-                foreach (System.Data.DataRow row in currentFlowDet.Rows)
-                {
-                    flowDetId = Convert.ToInt32((object)row[0]);
-                    orderLotSize = !string.IsNullOrEmpty(row[1].ToString()) ? (decimal)Convert.ToDecimal(row[1].ToString()) : 0;
-                }
-                IList<decimal> reqQtyList = OrderHelper.SplitByOrderLotSize((decimal)sps.Qty, orderLotSize);
-                DateTime startTime = TheShiftMgr.GetShiftStartTime(sps.PlanDate, sps.Shift);
-                DateTime windowTime = startTime.AddHours(Convert.ToDouble(leadTime));
+    //private IList<OrderHead> ConvertShiftPlanToOrders(IList<ShiftPlan> shiftPlanList, int leadTime)
+    //{
+    //    IList<OrderHead> orderHeadList = new List<OrderHead>();
+    //    if (shiftPlanList != null && shiftPlanList.Count > 0)
+    //    {
+    //        List<FlowDetail> tempFlowdets = new List<FlowDetail>();
+    //        //string searchExistsSql = string.Format("select d.orderNo,d.Item,d.orderqty,isnull(d.recqty,0) as recqty from orderdet as d where exists(select 1 from ordermstr as m where m.orderno=d.orderno and m.type='Production' and m.Status in('In-Process') ) and d.orderqty>d.recqty and d.Item in('{0}') ",string.Join("','", shiftPlanList.Select(s=>s.Item).Distinct().ToArray()));
+    //        //var existsDetRows = TheGenericMgr.GetDatasetBySql(searchExistsSql).Tables[0];
+    //        //var existsDetList = new List<TempOrderDet>();
+    //        //foreach (System.Data.DataRow row in existsDetRows.Rows)
+    //        //{
+    //        //    existsDetList.Add(new TempOrderDet{
+    //        //        OrderNo = row[0].ToString(),
+    //        //        ItemCode = row[1].ToString(),
+    //        //        OrderedQty = Convert.ToDecimal(row[2].ToString()),
+    //        //        ReceivedQty = Convert.ToDecimal(row[3].ToString()),
+    //        //    });
+    //        //}
+    //        foreach (ShiftPlan sps in shiftPlanList)
+    //        {
+    //            var currentFlowDet = TheGenericMgr.GetDatasetBySql(string.Format("select  Id,orderlotsize,item  from flowdet where flow='{0}' and item='{1}' ", sps.Flow, sps.Item)).Tables[0];
+    //            int flowDetId = 0;
+    //            decimal orderLotSize = 0;
+    //            foreach (System.Data.DataRow row in currentFlowDet.Rows)
+    //            {
+    //                flowDetId = Convert.ToInt32((object)row[0]);
+    //                orderLotSize = !string.IsNullOrEmpty(row[1].ToString()) ? (decimal)Convert.ToDecimal(row[1].ToString()) : 0;
+    //            }
+    //            IList<decimal> reqQtyList = OrderHelper.SplitByOrderLotSize((decimal)sps.Qty, orderLotSize);
+    //            DateTime startTime = TheShiftMgr.GetShiftStartTime(sps.PlanDate, sps.Shift);
+    //            DateTime windowTime = startTime.AddHours(Convert.ToDouble(leadTime));
 
-                //int i = 0;
-                foreach (decimal reqQty in reqQtyList)
-                {
-                    OrderHead oh = new OrderHead();
-                    Flow currentFlow = TheFlowMgr.LoadFlow(sps.Flow, CurrentUser.Code, true);
-                    if (tempFlowdets.Where(d => d.Flow.Code == currentFlow.Code).Count() > 0)
-                    {
-                        currentFlow.FlowDetails = tempFlowdets.Where(d => d.Flow.Code == currentFlow.Code).ToList();
-                    }
-                    else
-                    {
-                        tempFlowdets.AddRange(currentFlow.FlowDetails);
-                    }
-                    currentFlow.FlowDetails = currentFlow.FlowDetails.Where(d => d.Id == flowDetId).ToList();
-                    oh = TheOrderMgr.TransferFlow2Order(currentFlow, BusinessConstants.CODE_MASTER_ORDER_SUB_TYPE_VALUE_NML, false, DateTime.Now);
-                    oh.Priority = BusinessConstants.CODE_MASTER_ORDER_PRIORITY_VALUE_NORMAL;
+    //            //int i = 0;
+    //            foreach (decimal reqQty in reqQtyList)
+    //            {
+    //                OrderHead oh = new OrderHead();
+    //                Flow currentFlow = TheFlowMgr.LoadFlow(sps.Flow, CurrentUser.Code, true);
+    //                if (tempFlowdets.Where(d => d.Flow.Code == currentFlow.Code).Count() > 0)
+    //                {
+    //                    currentFlow.FlowDetails = tempFlowdets.Where(d => d.Flow.Code == currentFlow.Code).ToList();
+    //                }
+    //                else
+    //                {
+    //                    tempFlowdets.AddRange(currentFlow.FlowDetails);
+    //                }
+    //                currentFlow.FlowDetails = currentFlow.FlowDetails.Where(d => d.Id == flowDetId).ToList();
+    //                oh = TheOrderMgr.TransferFlow2Order(currentFlow, BusinessConstants.CODE_MASTER_ORDER_SUB_TYPE_VALUE_NML, false, DateTime.Now);
+    //                oh.Priority = BusinessConstants.CODE_MASTER_ORDER_PRIORITY_VALUE_NORMAL;
 
-                    oh.StartTime = startTime;
-                    oh.WindowTime = windowTime;
+    //                oh.StartTime = startTime;
+    //                oh.WindowTime = windowTime;
 
-                    oh.GetOrderDetailByFlowDetailIdAndItemCode(flowDetId, sps.Item).RequiredQty = reqQty;
-                    oh.GetOrderDetailByFlowDetailIdAndItemCode(flowDetId, sps.Item).OrderedQty = reqQty;
-                    oh.Shift = TheShiftMgr.LoadShift(sps.Shift);
+    //                oh.GetOrderDetailByFlowDetailIdAndItemCode(flowDetId, sps.Item).RequiredQty = reqQty;
+    //                oh.GetOrderDetailByFlowDetailIdAndItemCode(flowDetId, sps.Item).OrderedQty = reqQty;
+    //                oh.Shift = TheShiftMgr.LoadShift(sps.Shift);
 
-                    //if (i == 0)
-                    //{
-                    //    oh.ExistsProdDetails = existsDetList.Where(e => e.ItemCode == sps.Item).ToList();
-                    //} 
-                    //i++;
+    //                //if (i == 0)
+    //                //{
+    //                //    oh.ExistsProdDetails = existsDetList.Where(e => e.ItemCode == sps.Item).ToList();
+    //                //} 
+    //                //i++;
 
 
-                    orderHeadList.Add(oh);
+    //                orderHeadList.Add(oh);
 
-                    startTime = windowTime;
-                    windowTime = startTime.AddHours(Convert.ToDouble(leadTime));
-                }
-            }
-        }
+    //                startTime = windowTime;
+    //                windowTime = startTime.AddHours(Convert.ToDouble(leadTime));
+    //            }
+    //        }
+    //    }
 
-        OrderHelper.FilterZeroOrderQty(orderHeadList);
-        return orderHeadList;
-    }
+    //    OrderHelper.FilterZeroOrderQty(orderHeadList);
+    //    return orderHeadList;
+    //}
 
 
     //protected void btnSearch_Click(object sender, EventArgs e)
@@ -1107,324 +1105,318 @@ public partial class NewMrp_ShiftPlan_Main : MainModuleBase
     }
 
     #region    MRP运算
-    protected void btnMrpCalculate_Click(object sender, EventArgs e)
-    {
-        try
-        {
-            //IList<OrderHead> orderHeadList = (IList<OrderHead>)((object[])sender)[0];
+    //protected void btnMrpCalculate_Click(object sender, EventArgs e)
+    //{
+    //    try
+    //    {
+    //        DateTime startTime = DateTime.Today;
+    //        if (startTime < DateTime.Today)
+    //        {
+    //            ShowWarningMessage("时间不能小于今天");
+    //            return;
+    //        }
+    //        string dateIndex = startTime.ToString("yyyy-MM-dd");
+    //        string dateIndexTo = startTime.AddDays(13).ToString("yyyy-MM-dd");
+    //        var sqlParams = new SqlParameter[5];
+    //        sqlParams[0] = new SqlParameter("@FlowType", "Procurement");
+    //        sqlParams[1] = new SqlParameter("@Operation", null);
+    //        sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
+    //        sqlParams[3] = new SqlParameter("@DateFrom", startTime);
+    //        sqlParams[4] = new SqlParameter("@IsShow0", false);
+    //        var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
+    //        var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
+    //        var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
+    //        if (firmPlanList == null || firmPlanList.Count == 0)
+    //        {
+    //            this.list.InnerHtml = "没有运算采购需求。";
+    //        }
+    //        var planInvDic = planInvList
+    //           .GroupBy(p => p.ItemCode).Select(p => new PlanInv
+    //           {
+    //               InvQty = p.Sum(q => q.InvQty),
+    //               ItemCode = p.Key,
+    //               SafeStock = p.First().SafeStock,
+    //               MaxStock = p.First().MaxStock,
+    //               RecQty = p.Sum(q => q.RecQty)
+    //           }).ToDictionary(d => d.ItemCode, d => d);
+    //        var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
+    //            .ToDictionary(d => d.Key, d => d);
+    //        string searchSql = string.Format("select Code,Desc1 from Item ");
+    //        var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
+    //        foreach (System.Data.DataRow row in itemDescs.Rows)
+    //        {
+    //            var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
+    //            if (plans != null && plans.Count() > 0)
+    //            {
+    //                foreach (var plan in plans)
+    //                {
+    //                    plan.ItemDescription = row[1].ToString();
+    //                }
+    //            }
+    //        }
+    //        //int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
+    //        IList<ProcurementPlan> procurementPlanList = new List<ProcurementPlan>();
+    //        foreach (var flowItems in planByFlowItems)
+    //        {
+    //            var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
+    //            var finalQty = planInv.InvQty + planInv.RecQty;
+    //            foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
+    //            {
+    //                var orderQty = firmPlan.OutQty;
+    //                finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
+    //                if (finalQty < planInv.SafeStock)
+    //                {
+    //                    orderQty = planInv.SafeStock - finalQty;
+    //                    //outQty += planInv.SafeStock - finalQty;
+    //                    finalQty += planInv.SafeStock - finalQty;
+    //                }
+    //                else if (finalQty > planInv.SafeStock)
+    //                {
+    //                    orderQty = 0;
+    //                }
 
-            DateTime startTime = DateTime.Today;
-            //if (this.tbStartDate.Text.Trim() != string.Empty)
-            //{
-            //    DateTime.TryParse(this.tbStartDate.Text.Trim(), out startTime);
-            //}
-            if (startTime < DateTime.Today)
-            {
-                ShowWarningMessage("时间不能小于今天");
-                return;
-            }
-            string dateIndex = startTime.ToString("yyyy-MM-dd");
-            string dateIndexTo = startTime.AddDays(13).ToString("yyyy-MM-dd");
-            var sqlParams = new SqlParameter[5];
-            sqlParams[0] = new SqlParameter("@FlowType", "Procurement");
-            sqlParams[1] = new SqlParameter("@Operation", null);
-            sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
-            sqlParams[3] = new SqlParameter("@DateFrom", startTime);
-            sqlParams[4] = new SqlParameter("@IsShow0", false);
-            var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
-            var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
-            var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
-            if (firmPlanList == null || firmPlanList.Count == 0)
-            {
-                this.list.InnerHtml = "没有运算采购需求。";
-            }
-            var planInvDic = planInvList
-               .GroupBy(p => p.ItemCode).Select(p => new PlanInv
-               {
-                   InvQty = p.Sum(q => q.InvQty),
-                   ItemCode = p.Key,
-                   SafeStock = p.First().SafeStock,
-                   MaxStock = p.First().MaxStock,
-                   RecQty = p.Sum(q => q.RecQty)
-               }).ToDictionary(d => d.ItemCode, d => d);
-            var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
-                .ToDictionary(d => d.Key, d => d);
-            string searchSql = string.Format("select Code,Desc1 from Item ");
-            var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-            foreach (System.Data.DataRow row in itemDescs.Rows)
-            {
-                var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
-                if (plans != null && plans.Count() > 0)
-                {
-                    foreach (var plan in plans)
-                    {
-                        plan.ItemDescription = row[1].ToString();
-                    }
-                }
-            }
-            //int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
-            IList<ProcurementPlan> procurementPlanList = new List<ProcurementPlan>();
-            foreach (var flowItems in planByFlowItems)
-            {
-                var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
-                var finalQty = planInv.InvQty + planInv.RecQty;
-                foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
-                {
-                    var orderQty = firmPlan.OutQty;
-                    finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
-                    if (finalQty < planInv.SafeStock)
-                    {
-                        orderQty = planInv.SafeStock - finalQty;
-                        //outQty += planInv.SafeStock - finalQty;
-                        finalQty += planInv.SafeStock - finalQty;
-                    }
-                    else if (finalQty > planInv.SafeStock)
-                    {
-                        orderQty = 0;
-                    }
+    //                ProcurementPlan prPlan = new ProcurementPlan
+    //                {
+    //                    PlanDate = firmPlan.PlanDate.Date,
+    //                    Flow = firmPlan.FlowCode,
+    //                    Item = firmPlan.ItemCode,
+    //                    ItemDescription = firmPlan.ItemDescription,
+    //                    Uom = firmPlan.UomCode,
+    //                    //UnitQty = firmPlan.uni,
+    //                    Location = firmPlan.LocationTo,
+    //                    SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
+    //                    MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
+    //                    InvQty = Convert.ToDecimal(planInv.InvQty),
+    //                    InQty = Convert.ToDecimal(firmPlan.InQty),
+    //                    OutQty = Convert.ToDecimal(firmPlan.OutQty),
+    //                    OrderQty = Convert.ToDecimal(orderQty),
+    //                    FinalQty = Convert.ToDecimal(finalQty),
+    //                    Supplier = firmPlan.Supplier,
+    //                };
+    //                procurementPlanList.Add(prPlan);
+    //            }
+    //        }
+    //        TheMrpMgr.MrpCalculate(null, this.CurrentUser.Code, procurementPlanList);
+    //    }
+    //    catch (BusinessErrorException ex)
+    //    {
+    //        ShowErrorMessage(ex);
+    //    }
+    //}
 
-                    ProcurementPlan prPlan = new ProcurementPlan
-                    {
-                        PlanDate = firmPlan.PlanDate.Date,
-                        Flow = firmPlan.FlowCode,
-                        Item = firmPlan.ItemCode,
-                        ItemDescription = firmPlan.ItemDescription,
-                        Uom = firmPlan.UomCode,
-                        //UnitQty = firmPlan.uni,
-                        Location = firmPlan.LocationTo,
-                        SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
-                        MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
-                        InvQty = Convert.ToDecimal(planInv.InvQty),
-                        InQty = Convert.ToDecimal(firmPlan.InQty),
-                        OutQty = Convert.ToDecimal(firmPlan.OutQty),
-                        OrderQty = Convert.ToDecimal(orderQty),
-                        FinalQty = Convert.ToDecimal(finalQty),
-                        Supplier = firmPlan.Supplier,
-                    };
-                    procurementPlanList.Add(prPlan);
-                }
-            }
-            TheMrpMgr.MrpCalculate(null, this.CurrentUser.Code, procurementPlanList);
-        }
-        catch (BusinessErrorException ex)
-        {
-            ShowErrorMessage(ex);
-        }
-    }
+    //void MrpCalculate_Render(object sender, EventArgs e)
+    //{
+    //    IList<OrderHead> orderHeadList = (IList<OrderHead>)((object[])sender)[0];
 
-    void MrpCalculate_Render(object sender, EventArgs e)
-    {
-        IList<OrderHead> orderHeadList = (IList<OrderHead>)((object[])sender)[0];
-
-        DateTime startTime = DateTime.Today;
-        //if (this.tbStartDate.Text.Trim() != string.Empty)
-        //{
-        //    DateTime.TryParse(this.tbStartDate.Text.Trim(), out startTime);
-        //}
-        if (startTime < DateTime.Today)
-        {
-            ShowWarningMessage("时间不能小于今天");
-            return;
-        }
-        string dateIndex = startTime.ToString("yyyy-MM-dd");
-        string dateIndexTo = startTime.AddDays(13).ToString("yyyy-MM-dd");
-        var sqlParams = new SqlParameter[5];
-        sqlParams[0] = new SqlParameter("@FlowType", "Procurement");
-        sqlParams[1] = new SqlParameter("@Operation", null);
-        sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
-        sqlParams[3] = new SqlParameter("@DateFrom", startTime);
-        sqlParams[4] = new SqlParameter("@IsShow0", false);
-        var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
-        var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
-        var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
-        if (firmPlanList == null || firmPlanList.Count == 0)
-        {
-            this.list.InnerHtml = "没有运算采购需求。";
-        }
-        var planInvDic = planInvList
-           .GroupBy(p => p.ItemCode).Select(p => new PlanInv
-           {
-               InvQty = p.Sum(q => q.InvQty),
-               ItemCode = p.Key,
-               SafeStock = p.First().SafeStock,
-               MaxStock = p.First().MaxStock,
-               RecQty = p.Sum(q => q.RecQty)
-           }).ToDictionary(d => d.ItemCode, d => d);
-        var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
-            .ToDictionary(d=>d.Key,d=>d);
-        string searchSql = string.Format("select Code,Desc1 from Item ");
-        var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-        foreach (System.Data.DataRow row in itemDescs.Rows)
-        {
-            var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
-            if (plans != null && plans.Count() > 0)
-            {
-                foreach (var plan in plans)
-                {
-                    plan.ItemDescription = row[1].ToString();
-                }
-            }
-        }
-        int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
-        IList<ProcurementPlan> procurementPlanList = new List<ProcurementPlan>();
-        foreach (var flowItems in planByFlowItems)
-        {
-            var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
-            var finalQty = planInv.InvQty + planInv.RecQty;
-            foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
-            {
-                var outQty = firmPlan.OutQty;
-                finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
-                if (finalQty < planInv.SafeStock)
-                {
-                    outQty += planInv.SafeStock - finalQty;
-                    finalQty += planInv.SafeStock - finalQty;
-                }
+    //    DateTime startTime = DateTime.Today;
+    //    //if (this.tbStartDate.Text.Trim() != string.Empty)
+    //    //{
+    //    //    DateTime.TryParse(this.tbStartDate.Text.Trim(), out startTime);
+    //    //}
+    //    if (startTime < DateTime.Today)
+    //    {
+    //        ShowWarningMessage("时间不能小于今天");
+    //        return;
+    //    }
+    //    string dateIndex = startTime.ToString("yyyy-MM-dd");
+    //    string dateIndexTo = startTime.AddDays(13).ToString("yyyy-MM-dd");
+    //    var sqlParams = new SqlParameter[5];
+    //    sqlParams[0] = new SqlParameter("@FlowType", "Procurement");
+    //    sqlParams[1] = new SqlParameter("@Operation", null);
+    //    sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
+    //    sqlParams[3] = new SqlParameter("@DateFrom", startTime);
+    //    sqlParams[4] = new SqlParameter("@IsShow0", false);
+    //    var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
+    //    var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
+    //    var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
+    //    if (firmPlanList == null || firmPlanList.Count == 0)
+    //    {
+    //        this.list.InnerHtml = "没有运算采购需求。";
+    //    }
+    //    var planInvDic = planInvList
+    //       .GroupBy(p => p.ItemCode).Select(p => new PlanInv
+    //       {
+    //           InvQty = p.Sum(q => q.InvQty),
+    //           ItemCode = p.Key,
+    //           SafeStock = p.First().SafeStock,
+    //           MaxStock = p.First().MaxStock,
+    //           RecQty = p.Sum(q => q.RecQty)
+    //       }).ToDictionary(d => d.ItemCode, d => d);
+    //    var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
+    //        .ToDictionary(d=>d.Key,d=>d);
+    //    string searchSql = string.Format("select Code,Desc1 from Item ");
+    //    var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
+    //    foreach (System.Data.DataRow row in itemDescs.Rows)
+    //    {
+    //        var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
+    //        if (plans != null && plans.Count() > 0)
+    //        {
+    //            foreach (var plan in plans)
+    //            {
+    //                plan.ItemDescription = row[1].ToString();
+    //            }
+    //        }
+    //    }
+    //    int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
+    //    IList<ProcurementPlan> procurementPlanList = new List<ProcurementPlan>();
+    //    foreach (var flowItems in planByFlowItems)
+    //    {
+    //        var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
+    //        var finalQty = planInv.InvQty + planInv.RecQty;
+    //        foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
+    //        {
+    //            var outQty = firmPlan.OutQty;
+    //            finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
+    //            if (finalQty < planInv.SafeStock)
+    //            {
+    //                outQty += planInv.SafeStock - finalQty;
+    //                finalQty += planInv.SafeStock - finalQty;
+    //            }
                
-                ProcurementPlan prPlan = new ProcurementPlan
-                {
-                    PlanDate = firmPlan.PlanDate.Date,
-                    Flow = firmPlan.FlowCode,
-                    Item = firmPlan.ItemCode,
-                    ItemDescription = firmPlan.ItemDescription,
-                    Uom = firmPlan.UomCode,
-                    //UnitQty = firmPlan.uni,
-                    Location = firmPlan.LocationTo,
-                    SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
-                    MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
-                    InvQty = Convert.ToDecimal(planInv.InvQty),
-                    InQty = Convert.ToDecimal(firmPlan.InQty),
-                    OutQty = Convert.ToDecimal(outQty),
-                    FinalQty = Convert.ToDecimal(finalQty),
-                    Supplier = firmPlan.Supplier,
-                };
-                procurementPlanList.Add(prPlan);
-            }
-        }
-        TheMrpMgr.MrpCalculate(orderHeadList, this.CurrentUser.Code, procurementPlanList);
-    }
+    //            ProcurementPlan prPlan = new ProcurementPlan
+    //            {
+    //                PlanDate = firmPlan.PlanDate.Date,
+    //                Flow = firmPlan.FlowCode,
+    //                Item = firmPlan.ItemCode,
+    //                ItemDescription = firmPlan.ItemDescription,
+    //                Uom = firmPlan.UomCode,
+    //                //UnitQty = firmPlan.uni,
+    //                Location = firmPlan.LocationTo,
+    //                SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
+    //                MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
+    //                InvQty = Convert.ToDecimal(planInv.InvQty),
+    //                InQty = Convert.ToDecimal(firmPlan.InQty),
+    //                OutQty = Convert.ToDecimal(outQty),
+    //                FinalQty = Convert.ToDecimal(finalQty),
+    //                Supplier = firmPlan.Supplier,
+    //            };
+    //            procurementPlanList.Add(prPlan);
+    //        }
+    //    }
+    //    TheMrpMgr.MrpCalculate(orderHeadList, this.CurrentUser.Code, procurementPlanList);
+    //}
     #endregion
 
     #region    重新生成生成生产需求
 
     //private void CalculateProdPlan()
-    void CalculateProdPlan_Render(object sender, EventArgs e)
-    {
-        try
-        {
-            var sqlParams = new SqlParameter[5];
-            sqlParams[0] = new SqlParameter("@FlowType", "Production");
-            sqlParams[1] = new SqlParameter("@Operation", null);
-            sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
-            sqlParams[3] = new SqlParameter("@DateFrom", System.DateTime.Now.Date);
-            sqlParams[4] = new SqlParameter("@IsShow0", false);
-            var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
-            var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
-            var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
-            if (firmPlanList == null || firmPlanList.Count == 0)
-            {
-                this.list.InnerHtml = "没有生产需求。";
-            }
-            var planInvDic = planInvList
-          .GroupBy(p => p.ItemCode).Select(p => new PlanInv
-          {
-              InvQty = p.Sum(q => q.InvQty),
-              ItemCode = p.Key
-          }).ToDictionary(d => d.ItemCode, d => d);
+    //void CalculateProdPlan_Render(object sender, EventArgs e)
+    //{
+    //    try
+    //    {
+    //        var sqlParams = new SqlParameter[5];
+    //        sqlParams[0] = new SqlParameter("@FlowType", "Production");
+    //        sqlParams[1] = new SqlParameter("@Operation", null);
+    //        sqlParams[2] = new SqlParameter("@FlowCode", string.Empty);
+    //        sqlParams[3] = new SqlParameter("@DateFrom", System.DateTime.Now.Date);
+    //        sqlParams[4] = new SqlParameter("@IsShow0", false);
+    //        var ds = TheGenericMgr.GetDatasetByStoredProcedure("USP_Report_MRP_GetFirmPlan", sqlParams);
+    //        var firmPlanList = com.Sconit.Utility.IListHelper.DataTableToList<FirmPlan>(ds.Tables[0]);
+    //        var planInvList = com.Sconit.Utility.IListHelper.DataTableToList<PlanInv>(ds.Tables[1]);
+    //        if (firmPlanList == null || firmPlanList.Count == 0)
+    //        {
+    //            this.list.InnerHtml = "没有生产需求。";
+    //        }
+    //        var planInvDic = planInvList
+    //      .GroupBy(p => p.ItemCode).Select(p => new PlanInv
+    //      {
+    //          InvQty = p.Sum(q => q.InvQty),
+    //          ItemCode = p.Key
+    //      }).ToDictionary(d => d.ItemCode, d => d);
 
-            var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
-                .ToDictionary(d => d.Key, d => d);
-            string searchSql = string.Format("select Code,Desc1 from Item ");
-            var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-            foreach (System.Data.DataRow row in itemDescs.Rows)
-            {
-                var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
-                if (plans != null && plans.Count() > 0)
-                {
-                    foreach (var plan in plans)
-                    {
-                        plan.ItemDescription = row[1].ToString();
-                    }
-                }
-            }
-            int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProductionPlan");
-            IList<ProductionPlan> productionPlanList = new List<ProductionPlan>();
-            foreach (var flowItems in planByFlowItems)
-            {
-                var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
-                var finalQty = planInv.InvQty + planInv.RecQty;
-                foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
-                {
-                    var outQty = firmPlan.OutQty;
-                    //finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
-                    //if (finalQty < planInv.SafeStock)
-                    //{
-                    //    outQty += planInv.SafeStock - finalQty;
-                    //finalQty += planInv.SafeStock - finalQty;
-                    //}
+    //        var planByFlowItems = firmPlanList.OrderBy(p => p.FlowCode).GroupBy(p => new { p.FlowCode, p.ItemCode })
+    //            .ToDictionary(d => d.Key, d => d);
+    //        string searchSql = string.Format("select Code,Desc1 from Item ");
+    //        var itemDescs = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
+    //        foreach (System.Data.DataRow row in itemDescs.Rows)
+    //        {
+    //            var plans = firmPlanList.Where(f => f.ItemCode.ToUpper() == row[0].ToString().ToUpper());
+    //            if (plans != null && plans.Count() > 0)
+    //            {
+    //                foreach (var plan in plans)
+    //                {
+    //                    plan.ItemDescription = row[1].ToString();
+    //                }
+    //            }
+    //        }
+    //        int planVersion = TheNumberControlMgr.GenerateNumberNextSequence("ProductionPlan");
+    //        IList<ProductionPlan> productionPlanList = new List<ProductionPlan>();
+    //        foreach (var flowItems in planByFlowItems)
+    //        {
+    //            var planInv = planInvDic.Keys.Contains(flowItems.Value.First().ItemCode) ? planInvDic[flowItems.Value.First().ItemCode] : new PlanInv();
+    //            var finalQty = planInv.InvQty + planInv.RecQty;
+    //            foreach (var firmPlan in flowItems.Value.OrderBy(s => s.PlanDate))
+    //            {
+    //                var outQty = firmPlan.OutQty;
+    //                //finalQty = finalQty + firmPlan.InQty - firmPlan.OutQty;
+    //                //if (finalQty < planInv.SafeStock)
+    //                //{
+    //                //    outQty += planInv.SafeStock - finalQty;
+    //                //finalQty += planInv.SafeStock - finalQty;
+    //                //}
 
-                    ProductionPlan prPlan = new ProductionPlan
-                    {
-                        PlanDate = firmPlan.PlanDate.Date,
-                        Flow = firmPlan.FlowCode,
-                        Item = firmPlan.ItemCode,
-                        ItemDescription = firmPlan.ItemDescription,
-                        Uom = firmPlan.UomCode,
-                        //UnitQty = firmPlan.uni,
-                        SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
-                        MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
-                        InvQty = Convert.ToDecimal(planInv.InvQty),
-                        OutQty = Convert.ToDecimal(outQty),
-                        InProdQty = Convert.ToDecimal(firmPlan.InProdQty),
-                        PlanVersion = planVersion,
-                    };
-                    productionPlanList.Add(prPlan);
-                }
-            }
+    //                ProductionPlan prPlan = new ProductionPlan
+    //                {
+    //                    PlanDate = firmPlan.PlanDate.Date,
+    //                    Flow = firmPlan.FlowCode,
+    //                    Item = firmPlan.ItemCode,
+    //                    ItemDescription = firmPlan.ItemDescription,
+    //                    Uom = firmPlan.UomCode,
+    //                    //UnitQty = firmPlan.uni,
+    //                    SafeStock = Convert.ToDecimal(firmPlan.SafeStock),
+    //                    MaxStock = Convert.ToDecimal(firmPlan.MaxStock),
+    //                    InvQty = Convert.ToDecimal(planInv.InvQty),
+    //                    OutQty = Convert.ToDecimal(outQty),
+    //                    InProdQty = Convert.ToDecimal(firmPlan.InProdQty),
+    //                    PlanVersion = planVersion,
+    //                };
+    //                productionPlanList.Add(prPlan);
+    //            }
+    //        }
 
-            var dateTimeNow = DateTime.Now;
-            if (productionPlanList != null && productionPlanList.Count > 0)
-            {
-                //string sql = string.Format(" from ProductionPlan as c where  c.DateType = '{0}' and c.DateIndexTo in('{1}') and c.Flow in ('{2}')",
-                //   (int)dateType, string.Join("','", customerPlanList.Select(p => p.DateIndexTo).Distinct().ToArray()),
-                //   string.Join("','", customerPlanList.Select(p => p.Flow).Distinct().ToArray()));
+    //        var dateTimeNow = DateTime.Now;
+    //        if (productionPlanList != null && productionPlanList.Count > 0)
+    //        {
+    //            //string sql = string.Format(" from ProductionPlan as c where  c.DateType = '{0}' and c.DateIndexTo in('{1}') and c.Flow in ('{2}')",
+    //            //   (int)dateType, string.Join("','", customerPlanList.Select(p => p.DateIndexTo).Distinct().ToArray()),
+    //            //   string.Join("','", customerPlanList.Select(p => p.Flow).Distinct().ToArray()));
 
-                //this.genericMgr.Delete(sql);
-                //int planVersion = this.iNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
-                this.TheGenericMgr.Delete(" from ProductionPlan as c ");
-                foreach (var prPlan in productionPlanList)
-                {
-                    prPlan.LastModifyDate = dateTimeNow;
-                    prPlan.LastModifyUser = this.CurrentUser.Code;
-                    TheGenericMgr.Create(prPlan);
+    //            //this.genericMgr.Delete(sql);
+    //            //int planVersion = this.iNumberControlMgr.GenerateNumberNextSequence("ProcurementPlan");
+    //            this.TheGenericMgr.Delete(" from ProductionPlan as c ");
+    //            foreach (var prPlan in productionPlanList)
+    //            {
+    //                prPlan.LastModifyDate = dateTimeNow;
+    //                prPlan.LastModifyUser = this.CurrentUser.Code;
+    //                TheGenericMgr.Create(prPlan);
 
-                    ProductionPlanLog pPlanLog = new ProductionPlanLog
-                    {
-                        PlanId = prPlan.Id,
-                        PlanDate = prPlan.PlanDate.Date,
-                        Flow = prPlan.Flow,
-                        Item = prPlan.Item,
-                        ItemDescription = prPlan.ItemDescription,
-                        Uom = prPlan.Uom,
-                        UnitQty = prPlan.UnitQty,
-                        SafeStock = prPlan.SafeStock,
-                        MaxStock = prPlan.MaxStock,
-                        InvQty = prPlan.InvQty,
-                        OutQty = prPlan.OutQty,
-                        InProdQty = prPlan.InProdQty,
-                        LastModifyDate = dateTimeNow,
-                        LastModifyUser = prPlan.LastModifyUser,
-                        PlanVersion = prPlan.PlanVersion,
-                    };
-                    TheGenericMgr.Create(pPlanLog);
-                }
-            }
-        }
-        catch (BusinessErrorException ex)
-        {
-            ShowErrorMessage(ex);
-        }
-    }
+    //                ProductionPlanLog pPlanLog = new ProductionPlanLog
+    //                {
+    //                    PlanId = prPlan.Id,
+    //                    PlanDate = prPlan.PlanDate.Date,
+    //                    Flow = prPlan.Flow,
+    //                    Item = prPlan.Item,
+    //                    ItemDescription = prPlan.ItemDescription,
+    //                    Uom = prPlan.Uom,
+    //                    UnitQty = prPlan.UnitQty,
+    //                    SafeStock = prPlan.SafeStock,
+    //                    MaxStock = prPlan.MaxStock,
+    //                    InvQty = prPlan.InvQty,
+    //                    OutQty = prPlan.OutQty,
+    //                    InProdQty = prPlan.InProdQty,
+    //                    LastModifyDate = dateTimeNow,
+    //                    LastModifyUser = prPlan.LastModifyUser,
+    //                    PlanVersion = prPlan.PlanVersion,
+    //                };
+    //                TheGenericMgr.Create(pPlanLog);
+    //            }
+    //        }
+    //    }
+    //    catch (BusinessErrorException ex)
+    //    {
+    //        ShowErrorMessage(ex);
+    //    }
+    //}
 
     #endregion
 

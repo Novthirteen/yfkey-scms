@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+	<class name="com.Sconit.Entity.MRP.ShiftPlanMstr, com.Sconit.Entity" table="MRP_ShiftPlanMstr" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+			<generator class="identity" />
+		</id>
+    <!--Id, RefPlanNo, ProdLine, Status, CreateDate, CreateUser, ReleaseDate, ReleaseUser, LastModifyDate, LastModifyUser, Version-->
+    <property name="RefPlanNo" column="RefPlanNo" type="Int32" />
+    <property name="ProdLine" column="ProdLine" type="Int32" />
+    <property name="Status" column="Status" type="String" length="50" />
+		<property name="CreateDate" column="CreateDate" type="DateTime"  />
+		<property name="CreateUser" column="CreateUser" type="String" length="50" />
+		<property name="ReleaseDate" column="ReleaseDate" type="DateTime"  />
+		<property name="ReleaseUser" column="ReleaseUser" type="String" length="50" />
+		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
+    <property name="Version" column="Version" type="Int32"  />
+  </class>
+</hibernate-mapping>

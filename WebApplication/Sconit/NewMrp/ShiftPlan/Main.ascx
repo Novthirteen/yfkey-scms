@@ -25,19 +25,11 @@
     <hr />
     <table class="mtable" runat="server" id="tblSearch">
         <tr>
-            <%--<td class="td01">工序:</td>
-            <td class="td02">
-                <cc1:CodeMstrDropDownList ID="ddlOperation" Code="MrpOpt" runat="server" IncludeBlankOption="true" DefaultSelectedValue="">
-                </cc1:CodeMstrDropDownList>
-            </td>--%>
             <td class="td01">
                 生产线:
             </td>
             <td class="td02">
                 <textarea id="tbFlow" rows="2" runat="server"  style="width:200" />
-                <%-- <uc3:textbox ID="tbFlow" runat="server" DescField="Description" ValueField="Code"
-                    ServicePath="FlowMgr.service" MustMatch="true" Width="250"
-                    ServiceMethod="GetFlowList" />--%>
             </td>
             <td class="td01">
                 开始时间:
@@ -48,7 +40,6 @@
             </td>
         </tr>
         <tr>
-            
             <td class="td01">
                 版本号:
             </td>
@@ -59,17 +50,6 @@
             <td class="td02">
             </td>
         </tr>
-        <%--<tr>
-            <td>
-            </td>
-            <td class="td02">
-                <asp:CheckBox ID="cbIsShow0" runat="server" Text="显示无需求明细" />
-            </td>
-            <td>
-            </td>
-            <td>
-            </td>
-        </tr>--%>
         <tr>
             <td class="td01">
             </td>
@@ -81,7 +61,7 @@
             <td class="td02">
                 <asp:Button ID="btnSave" runat="server" Text="查询" OnClick="btnSearch_Click" />
                 <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" OnClick="btnExport_Click" />
-                <asp:Button ID="btnMrpCalculate" runat="server" Text="Mrp运算" OnClick="btnMrpCalculate_Click" />
+                <%--<asp:Button ID="btnMrpCalculate" runat="server" Text="Mrp运算" OnClick="btnMrpCalculate_Click" />--%>
             </td>
         </tr>
     </table>

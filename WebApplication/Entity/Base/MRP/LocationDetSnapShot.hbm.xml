@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+	<class name="com.Sconit.Entity.MRP.LocationDetSnapShot, com.Sconit.Entity" table="MRP_LocationDetSnapShot" lazy="false">
+    <composite-id>
+      <key-property name="Item" column="Item" type="String"  />
+      <key-property name="Location" column="Location" type="String"  />
+    </composite-id>
+    <property name="Plant" column="Plant" type="String" length="50"  />
+    <property name="Qty" column="Qty" type="Decimal"  />
+    <property name="InTransitQty" column="InTransitQty" type="Decimal"  />
+    <property name="InspectQty" column="InspectQty" type="Decimal"  />
+    <property name="Effdate" column="Effdate" type="DateTime"  />
+  </class>
+</hibernate-mapping>
