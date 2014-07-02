@@ -5,8 +5,8 @@
 			<generator class="identity" />
 		</id>
     <!--Id, RefPlanNo, ProdLine, Status, CreateDate, CreateUser, ReleaseDate, ReleaseUser, LastModifyDate, LastModifyUser, Version-->
-    <property name="RefPlanNo" column="RefPlanNo" type="Int32" />
-    <property name="ProdLine" column="ProdLine" type="Int32" />
+    <property name="RefPlanNo" column="RefPlanNo" type="String" length="50" />
+    <property name="ProdLine" column="ProdLine" type="String" length="50" />
     <property name="Status" column="Status" type="String" length="50" />
 		<property name="CreateDate" column="CreateDate" type="DateTime"  />
 		<property name="CreateUser" column="CreateUser" type="String" length="50" />
