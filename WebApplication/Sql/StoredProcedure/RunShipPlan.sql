@@ -131,6 +131,10 @@ BEGIN
 		--update det set ShipQty = p.CurrenCumQty
 		--from CustScheduleDet as det inner join EDI_FordPlan as p on det.FordPlanId = p.Id
 
+		--更新客户日程开始时间
+		update CustScheduleDet set StartTime = DATEADD(day, -ISNULL(mstr.MRPLeadTime, 0), det.DateFrom)
+		from CustScheduleDet as det inner join FlowMstr as mstr on det.Flow = mstr.Code
+		where det.DateFrom >= @DateNow 
 
 
 		-----------------------------↓获取客户日程-----------------------------
@@ -287,7 +291,7 @@ BEGIN
 		from #tempShipFlowDet as d left join #tempShipPlanDet as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
 		where d.ActiveQty < 0 and p.Flow is null
 
-		--根据开始时间依次扣减库存（含在途库存，不考虑在途库存的到货时间）
+		--根据开始时间依次扣减库存（不含在途库存）
 		set @RowId = null
 		set @MaxRowId = null
 		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempShipFlowDet
@@ -348,7 +352,8 @@ BEGIN
 	begin catch
 		set @Msg = N'运行发运计划异常：' + Error_Message()
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
-		RAISERROR(@Msg, 16, 1) 
+		RAISERROR(@Msg, 16, 1)
+		return
 	end catch 
 
 	begin try
@@ -377,6 +382,9 @@ BEGIN
 		--新增发运计划期初库存
 		insert into MRP_ShipPlanInitLocationDet(ShipPlanId, Location, Item, InitStock, SafeStock, InTransitQty, CreateDate, CreateUser)
 		select @ShipPlanId, LocTo, Item, LocQty, SafeStock, InTransitQty, @DateTimeNow, @RunUser from #tempShipFlowDet
+
+		--发货数按包装圆整
+		update #tempShipPlanDet set ShipQty = ceiling(ShipQty / UC) * UC where ShipQty > 0 and UC > 0
 
 		--新增发运计划明细
 		insert into MRP_ShipPlanDet(ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 

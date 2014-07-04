@@ -63,7 +63,7 @@ BEGIN
 
 		create table #tempEffShiftPlan
 		(
-			RowId int Primary Key,
+			RowId int identity(1, 1) Primary Key,
 			DetId int,
 			MstrId int,
 			RefPlanNo varchar(50),
@@ -129,7 +129,8 @@ BEGIN
 
 		create table #tempPurchasePlanDet
 		(
-			UUID varchar(50) primary key,
+			RowId int identity(1, 1) primary key,
+			UUID varchar(50), 
 			PurchaseFlow varchar(50),
 			Item varchar(50),
 			ItemDesc varchar(100),
@@ -148,7 +149,8 @@ BEGIN
 
 		create table #tempMaterialPlanDetTrace
 		(
-			UUID varchar(50) primary key, 
+			RowId int identity(1, 1) primary key,
+			UUID varchar(50), 
 			DetId int,
 			MstrId int,
 			RefPlanNo varchar(50),
@@ -330,16 +332,15 @@ BEGIN
 
 		-----------------------------↓获取可用库存-----------------------------
 		insert into #tempLocatoinDet(Item, SafeStock, Qty, InTransitQty, InSpectQty, ActiveQty)
-		select Item, i.SafeStock, Qty, InTransitQty, InSpectQty, SUM(Qty + InspectQty) - MAX(ISNULL(i.SafeStock, 0))
+		select Item, ISNULL(i.SafeStock, 0), Qty, PurchaseInTransitQty, InSpectQty, Qty + InspectQty + InTransitQty - ISNULL(i.SafeStock, 0)
 		from 
 		(
-		select loc.Item, SUM(loc.Qty) as Qty, SUM(loc.InTransitQty) as InTransitQty, SUM(loc.InspectQty) as InspectQty
+		select loc.Item, SUM(loc.Qty) as Qty, SUM(loc.InTransitQty) as InTransitQty, SUM(loc.PurchaseInTransitQty) as PurchaseInTransitQty, SUM(loc.InspectQty) as InspectQty
 		from MRP_LocationDetSnapShot as loc
 		inner join (select distinct Item from #tempMaterialPlanDet) as p on loc.Item = p.Item
 		where loc.Plant = @Plant
 		group by loc.Item
 		) as a inner join Item as i on a.Item = i.Code 
-		group by Item
 		-----------------------------↑获取可用库存-----------------------------
 
 
@@ -428,12 +429,12 @@ BEGIN
 
 		-----------------------------↓查找采购路线-----------------------------
 		insert into #tempPurchasePlanDet(UUID, PurchaseFlow, Item, ItemDesc, RefItemCode, BaseReqQty, BasePurchaseQty, Uom, BaseUom, UC, StartTime, WindowTime)
-		select t.UUID, d.Flow, t.Item, t.ItemDesc, d.RefItemCode, t.BaseReqQty, t.BasePurchaseQty, d.Uom, t.BaseUom, d.UC, t.StartTime, t.WindowTime
+		select t.UUID, d.Flow, t.Item, t.ItemDesc, d.RefItemCode, t.BaseReqQty, t.BasePurchaseQty, d.Uom, t.BaseUom, d.UC, CASE WHEN ISNULL(m.LeadTime, 0) > 0 THEN DATEADD(day, -ISNULL(m.LeadTime, 0), t.WindowTime) ELSE StartTime END, t.WindowTime
 		from #tempMergeMaterialPlanDet as t
 		inner join FlowDet as d on t.Item = d.Item
 		inner join FlowMstr as m on d.Flow = m.Code
-		inner join Region as r on m.PartyFrom = r.Code
-		where r.Plant = @Plant
+		inner join Region as r on m.PartyTo = r.Code
+		where r.Plant = @Plant and m.[Type] = 'Procurement'
 
 		--记录日志没有找到采购路线
 		insert into #tempMsg(Lvl, Item, Qty, Uom, PlanDate, Msg) 
@@ -474,6 +475,7 @@ BEGIN
 		set @Msg = N'运行物料需求计划异常：' + Error_Message()
 		insert into MRP_RunPurchasePlanLog(BatchNo, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, 'Error', @Msg, @DateTimeNow, @RunUser)
 		RAISERROR(@Msg, 16, 1) 
+		return
 	end catch 
 
 	begin try	

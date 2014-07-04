@@ -119,7 +119,7 @@ BEGIN
 
 		if (@ShipPlanReleaseNo is null)
 		begin
-			set @Msg = N'没有找到释放的发运计划' + Error_Message()
+			set @Msg = N'没有找到释放的发运计划'
 			--insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
 			RAISERROR(@Msg, 16, 1) 
 		end
@@ -154,7 +154,7 @@ BEGIN
 			select Item, SUM(Qty) - MAX(ISNULL(i.SafeStock, 0)) as ActiveQty
 			from 
 			(
-			select loc.Item, (loc.Qty + loc.InspectQty + loc.InTransitQty - loc.PurchaseInTransitQty) as Qty  
+			select loc.Item, (loc.Qty + loc.InspectQty + loc.InTransitQty) as Qty  
 			from MRP_LocationDetSnapShot as loc
 			inner join (select distinct Item from #tempCurrentLevlProductPlan) as p on loc.Item = p.Item
 			where loc.Plant = @Plant
@@ -296,7 +296,8 @@ BEGIN
 	begin catch
 		set @Msg = N'运行主生产计划异常：' + Error_Message()
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
-		RAISERROR(@Msg, 16, 1) 
+		RAISERROR(@Msg, 16, 1)
+		return
 	end catch 
 
 	begin try
