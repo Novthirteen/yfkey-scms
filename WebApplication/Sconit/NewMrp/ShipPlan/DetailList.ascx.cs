@@ -159,7 +159,7 @@ from  MRP_ShipPlanDet as det
         IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
         traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
 
-        if (traceList.Count > 0)
+        if (traceList!=null && traceList.Count > 0)
         {
             foreach (var sd in shipPlanDetList)
             {
@@ -182,7 +182,7 @@ from  MRP_ShipPlanDet as det
         #region  orderQty
         IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
         shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
-        if (shipPlanOpenOrderList.Count > 0)
+        if (shipPlanOpenOrderList!=null && shipPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in shipPlanDetList)
             {

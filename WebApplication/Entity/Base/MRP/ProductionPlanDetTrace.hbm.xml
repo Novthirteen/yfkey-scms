@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+	<class name="com.Sconit.Entity.MRP.ProductionPlanDetTrace, com.Sconit.Entity" table="MRP_ProductionPlanDetTrace" lazy="false">
+		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
+			<generator class="identity" />
+		</id>
+    <!--Id, ProductionPlanId, UUID, Flow, Item, Bom, ReqDate, ReqQty, RateQty, ScrapPct, Uom, UnitQty, CreateDate, CreateUser-->
+    <property name="ProductionPlanId" column="ProductionPlanId" type="Int32"  />
+    <property name="UUID" column="UUID" type="String" length="50" />
+		<property name="Flow" column="Flow" type="String" length="50" />
+    <property name="Item" column="Item" type="String" length="50" />
+    <property name="Bom" column="Bom" type="String" length="50" />
+    <property name="ReqDate" column="ReqDate" type="DateTime"  />
+    <property name="ReqQty" column="ReqQty" type="Decimal"  />
+    <property name="RateQty" column="RateQty" type="Decimal"  />
+    <property name="ScrapPct" column="ScrapPct" type="Decimal"  />
+    <property name="Uom" column="Uom" type="String" length="50" />
+    <property name="UnitQty" column="UnitQty" type="Decimal"  />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="CreateUser" column="CreateUser" type="String" length="50" />
+  </class>
+</hibernate-mapping>

@@ -71,13 +71,13 @@ public partial class NewMrp_ShipPlan_Search : SearchModuleBase
                 }
                 if (startDate != null)
                 {
-                    selectCriteria.Add(Expression.Ge("LastModifyDate", startDate));
-                    selectCountCriteria.Add(Expression.Ge("LastModifyDate", startDate));
+                    selectCriteria.Add(Expression.Ge("CreateDate", startDate));
+                    selectCountCriteria.Add(Expression.Ge("CreateDate", startDate));
                 }
                 if (endDate != null)
                 {
-                    selectCriteria.Add(Expression.Le("LastModifyDate", endDate));
-                    selectCountCriteria.Add(Expression.Le("LastModifyDate", endDate));
+                    selectCriteria.Add(Expression.Le("CreateDate", endDate));
+                    selectCountCriteria.Add(Expression.Le("CreateDate", endDate));
                 }
                 SearchEvent((new object[] { selectCriteria, selectCountCriteria }), null);
             #endregion

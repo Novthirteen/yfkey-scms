@@ -4,14 +4,18 @@
 		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
 			<generator class="identity" />
 		</id>
-    <!--Id, ProductionPlanId, Item, ItemDesc, RefItemCode, OrgQty, Qty, Uom,
-    StartTime, WindowTime, CreateDate, CreateUser, LastModifyUser, LastModifyDate, Version-->
+    <!--Id, ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, OrgQty, Qty, OrderQty,
+        //Uom, StartTime, WindowTime, CreateDate, CreateUser, LastModifyUser, LastModifyDate, Version-->
     <property name="ProductionPlanId" column="ProductionPlanId" type="Int32"  />
+    <property name="UUID" column="UUID" type="String" length="50" />
     <property name="Item" column="Item" type="String" length="50" />
 		<property name="ItemDesc" column="ItemDesc" type="String" length="510" />
 		<property name="RefItemCode" column="RefItemCode" type="String" length="50" />
     <property name="OrgQty" column="OrgQty" type="Decimal"  />
     <property name="Qty" column="Qty" type="Decimal"  />
+    <property name="ReqQty" column="ReqQty" type="Decimal"  />
+    <property name="OrderQty" column="OrderQty" type="Decimal"  />
+    <property name="Uom" column="Uom" type="String" length="50" />
     <property name="StartTime" column="StartTime" type="DateTime"  />
     <property name="WindowTime" column="WindowTime" type="DateTime"  />
     <property name="CreateDate" column="CreateDate" type="DateTime"  />

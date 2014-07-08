@@ -54,7 +54,7 @@ public partial class NewMrp_ShipPlan_List : ListModuleBase
             }
             if (m.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT)
             {
-                string searchSql = "select  max(releaseno) from MRP_ShipPlanMstr ";
+                string searchSql = "select  max(releaseno) from MRP_ShipPlanMstr where Status='Submit' ";
                 var maxReleaseNos = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
                 int releaseNo = 0;
                 foreach (System.Data.DataRow row in maxReleaseNos.Rows)

@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="List.ascx.cs" Inherits="NewMrp_ShipPlan_List" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="List.ascx.cs" Inherits="NewMrp_ProductionPlan_List" %>
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="cc1" %>
 <%@ Register Src="ShowErrorMsg.ascx"   TagName="ShowErrorMsg"   TagPrefix="uc2" %>
 <fieldset>
@@ -11,13 +11,8 @@
             <Columns>
                 <asp:BoundField DataField="ReleaseNo" HeaderText="版本号" SortExpression="ReleaseNo" />
                 <asp:BoundField DataField="EffDate" HeaderText="生效日期" SortExpression="EffDate" />
-                <asp:BoundField DataField="Status" HeaderText="状态" SortExpression="Status" />
                 <asp:BoundField DataField="CreateDate" HeaderText="创建用户" SortExpression="CreateDate" />
                 <asp:BoundField DataField="CreateUser" HeaderText="创建时间" SortExpression="CreateUser" />
-                <asp:BoundField DataField="LastModifyUser" HeaderText="最后修改用户" SortExpression="LastModifyUser" />
-                <asp:BoundField DataField="LastModifyDate" HeaderText="最后修改时间" SortExpression="LastModifyDate" />
-                <asp:BoundField DataField="ReleaseUser" HeaderText="释放用户" SortExpression="LastModifyUser" />
-                <asp:BoundField DataField="ReleaseDate" HeaderText="释放时间" SortExpression="LastModifyDate" />
                 <asp:TemplateField HeaderText="${Common.GridView.Action}">
                     <ItemTemplate>
                         <asp:LinkButton ID="lbtnEdit" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "ReleaseNo") %>'
@@ -28,12 +23,8 @@
                             Text="错误日志" OnClick="lbtnShowErrorMsg_Click">
                        </asp:LinkButton>
                        &nbsp&nbsp
-                       <asp:LinkButton ID="lbtSubmit" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "ReleaseNo") %>'
-                            Text="释放" OnClick="btnSubmit_Click" OnClientClick="return confirm('确定要释放？')">
-                       </asp:LinkButton>
-                       &nbsp&nbsp
                        <asp:LinkButton ID="lbtRunProdPlan" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "ReleaseNo") %>'
-                            Text="生成主生产计划" OnClick="btnRunProdPlan_Click" OnClientClick="return confirm('确定要生成主生产计划？')">
+                            Text="生成采购计划" OnClick="btnRunPurchasePlan_Click" OnClientClick="return confirm('生成采购计划？')">
                        </asp:LinkButton>
                        
                     </ItemTemplate>

@@ -14,6 +14,7 @@ namespace com.Sconit.Entity.MRP
         public Int32 Id { get; set; }
         public Int32 ReleaseNo { get; set; }
         public Int32 BatchNo { get; set; }
+        public DateTime EffDate { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
         #endregion

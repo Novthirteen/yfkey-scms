@@ -7,7 +7,8 @@
     <!--Id, ReleaseNo, BatchNo, CreateDate, CreateUser-->
     <property name="ReleaseNo" column="ReleaseNo" type="Int32" />
     <property name="BatchNo" column="BatchNo" type="Int32" />
-		<property name="CreateDate" column="CreateDate" type="DateTime"  />
+    <property name="EffDate" column="EffDate" type="DateTime"  />
+    <property name="CreateDate" column="CreateDate" type="DateTime"  />
 		<property name="CreateUser" column="CreateUser" type="String" length="50" />
   </class>
 </hibernate-mapping>

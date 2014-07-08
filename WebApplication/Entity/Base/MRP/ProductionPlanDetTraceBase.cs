@@ -7,29 +7,24 @@ using System.Collections.Generic;
 namespace com.Sconit.Entity.MRP
 {
     [Serializable]
-    public abstract class ProductionPlanDetBase : EntityBase
+    public abstract class ProductionPlanDetTraceBase : EntityBase
     {
-        //Id, ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, OrgQty, Qty, OrderQty,
-        //Uom, StartTime, WindowTime, CreateDate, CreateUser, LastModifyUser, LastModifyDate, Version
+        //Id, ProductionPlanId, UUID, Flow, Item, Bom, ReqDate, ReqQty, RateQty, 
+        //ScrapPct, Uom, UnitQty, CreateDate, CreateUser
         public Int32 Id { get; set; }
         public Int32 ProductionPlanId { get; set; }
         public string UUID { get; set; }
+        public string Flow { get; set; }
         public string Item { get; set; }
-        public string ItemDesc { get; set; }
-        public string RefItemCode { get; set; }
-        public decimal OrgQty { get; set; }
-        public decimal Qty { get; set; }
-        public decimal ReqQty { get; set; }  
-        public decimal OrderQty { get; set; }
+        public string Bom { get; set; }
+        public DateTime ReqDate { get; set; }
+        public decimal ReqQty { get; set; }
+        public decimal RateQty { get; set; }
+        public decimal ScrapPct { get; set; }
         public string Uom { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime WindowTime { get; set; }
+        public decimal UnitQty { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
-        public DateTime LastModifyDate { get; set; }
-        public string LastModifyUser { get; set; }
-        public Int32 Version { get; set; }
-        
         
 
 		public override int GetHashCode()
@@ -46,7 +41,7 @@ namespace com.Sconit.Entity.MRP
 
         public override bool Equals(object obj)
         {
-            ShipPlanDetBase another = obj as ShipPlanDetBase;
+            ProductionPlanDetTraceBase another = obj as ProductionPlanDetTraceBase;
 
             if (another == null)
             {
