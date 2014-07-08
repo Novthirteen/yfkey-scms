@@ -14,5 +14,6 @@
     <property name="IsSettleConsignment" column="IsSetCS" type="Boolean" />
     <property name="IsMRP" column="IsMRP" type="Boolean"  />
     <property name="IsAutoConfirm" column="IsAutoConfirm" type="Boolean"  />
+    <property name="IsFG" column="IsFG" type="Boolean"  />
   </class>
 </hibernate-mapping>

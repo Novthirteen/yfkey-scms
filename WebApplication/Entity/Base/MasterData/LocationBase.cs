@@ -124,6 +124,7 @@ namespace com.Sconit.Entity.MasterData
         }
         public Boolean IsMRP { get; set; }
         public Boolean IsAutoConfirm { get; set; }
+        public Boolean IsFG { get; set; }
         #endregion
 
 		public override int GetHashCode()

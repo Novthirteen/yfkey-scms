@@ -130,6 +130,24 @@
                         </td>
                     </tr>
                       <tr>
+                        
+                        <td class="td02">
+                            <asp:TextBox ID="tbSafeStock" runat="server" Text='<%# Bind("SafeStock") %>'></asp:TextBox>
+                            <asp:RangeValidator ID="rvSafeStock" ControlToValidate="tbSafeStock" runat="server"
+                                Display="Dynamic" ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="1000000"
+                                MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
+                        </td>
+                         <td class="td01">
+                            <asp:Literal ID="ltlMaxStock" runat="server" Text="最大库存" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbMaxStock" runat="server" Text='<%# Bind("MaxStock") %>'></asp:TextBox>
+                            <asp:RangeValidator ID="rvMaxStock" ControlToValidate="tbMaxStock" runat="server"
+                                Display="Dynamic" ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="1000000"
+                                MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
+                        </td>
+                    </tr>
+                      <tr>
                         <td class="td01">
                             <asp:Literal ID="ltlLeadTime" runat="server" Text="${MasterData.Item.LeadTime}:" />
                         </td>
@@ -140,13 +158,10 @@
                                 MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
                         <td class="td01">
-                            <asp:Literal ID="ltlSafeStock" runat="server" Text="${MasterData.Item.SafeStock}:" />
+                            <asp:Literal ID="ltlIsMRP" runat="server" Text="是否参与MRP运算" />
                         </td>
                         <td class="td02">
-                            <asp:TextBox ID="tbSafeStock" runat="server" Text='<%# Bind("SafeStock") %>'></asp:TextBox>
-                            <asp:RangeValidator ID="rvSafeStock" ControlToValidate="tbSafeStock" runat="server"
-                                Display="Dynamic" ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="1000000"
-                                MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
+                            <asp:CheckBox ID="cbIsMRP" runat="server" Checked='<%#Bind("IsMRP") %>' />
                         </td>
                     </tr>
                     <tr>
