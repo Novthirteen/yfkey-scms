@@ -60,6 +60,8 @@
     </div>
     <div id="ShowTraceDiv" style="position:absolute; ">
     </div>
+    <div id="ShowDetsDiv" style="position:absolute; ">
+    </div>
 </div>
 <script type="text/javascript">
     function doTdClick(e) {
@@ -79,6 +81,22 @@
 
     function hideClick() {
         $("#ShowTraceDiv").hide()
+        $("#ShowDetsDiv").hide()
+    }
+
+    function doShowDetsClick(e) {
+        var htmlt = $(e).attr("tital");
+        htmlt = htmlt.replace("<table>", "<table class='GV' style=' border:1 solid black;background-color:White'>");
+        //        htmlt = htmlt.replace("<td>", "<td style='border:1px' >");
+        htmlt = htmlt.replace(/<td>/g, "<td style='border:1px solid black' >");
+        //        a.replace(/,/g, ".");   
+        htmlt = htmlt.replace("<thead><tr>", "<thead><tr class='GVHeader' onclick='hideClick()'>");
+        htmlt = htmlt.replace(/<tr>/g, "<tr style='border:1px solid black' >");
+        $("#ShowTraceDiv").html(htmlt);
+        var obj = document.getElementById("ShowDetsDiv");
+        obj.style.left = event.x + document.documentElement.scrollLeft + 10;
+        obj.style.top = event.y + document.documentElement.scrollTop + 10;
+        $(obj).show();
     }
 
 

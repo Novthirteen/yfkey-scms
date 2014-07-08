@@ -116,7 +116,9 @@
                         </td>
                     </tr>
                      <tr>
-                        
+                        <td class="td01">
+                            <asp:Literal ID="Literal1" runat="server" Text="安全库存" />
+                        </td>
                         <td class="td02">
                             <asp:TextBox ID="tbSafeStock" runat="server" Text='<%# Bind("SafeStock") %>'></asp:TextBox>
                             <asp:RangeValidator ID="rvSafeStock" ControlToValidate="tbSafeStock" runat="server"
@@ -151,6 +153,9 @@
                         </td>
                     </tr>
                     <tr>
+                    <td class="td01" style="width: 150px">
+                            &nbsp;
+                        </td>
                         <td class="td01">
                             <asp:Literal ID="lblPlant" runat="server" Text="${MasterData.Item.Plant}:" />
                         </td>

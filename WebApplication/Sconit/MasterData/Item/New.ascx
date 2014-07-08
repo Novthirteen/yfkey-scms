@@ -105,7 +105,8 @@
                             <asp:Literal ID="lblItemCategory" runat="server" Text="${MasterData.Item.Category}:" />
                         </td>
                         <td class="td02">
-                            <cc2:CodeMstrDropDownList ID="ddlItemCategory" Code="ItemCategory" runat="server" IncludeBlankOption="true">
+                            <cc2:CodeMstrDropDownList ID="ddlItemCategory" Code="ItemCategory" runat="server"
+                                IncludeBlankOption="true">
                             </cc2:CodeMstrDropDownList>
                         </td>
                         <td class="td01">
@@ -122,22 +123,24 @@
                         <td class="td02">
                             <asp:TextBox ID="tbMemo" runat="server" Text='<%# Bind("Memo") %>'></asp:TextBox>
                         </td>
-                         <td class="td01">
+                        <td class="td01">
                             <asp:Literal ID="ltlIsMes" runat="server" Text="${MasterData.Item.IsMes}:" />
                         </td>
                         <td class="td02">
                             <asp:CheckBox ID="cbIsMes" runat="server" Checked='<%#Bind("IsMes") %>' />
                         </td>
                     </tr>
-                      <tr>
-                        
+                    <tr>
+                        <td class="td01">
+                            <asp:Literal ID="Literal1" runat="server" Text="安全库存" />
+                        </td>
                         <td class="td02">
                             <asp:TextBox ID="tbSafeStock" runat="server" Text='<%# Bind("SafeStock") %>'></asp:TextBox>
                             <asp:RangeValidator ID="rvSafeStock" ControlToValidate="tbSafeStock" runat="server"
                                 Display="Dynamic" ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="1000000"
                                 MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
-                         <td class="td01">
+                        <td class="td01">
                             <asp:Literal ID="ltlMaxStock" runat="server" Text="最大库存" />
                         </td>
                         <td class="td02">
@@ -147,7 +150,7 @@
                                 MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
                     </tr>
-                      <tr>
+                    <tr>
                         <td class="td01">
                             <asp:Literal ID="ltlLeadTime" runat="server" Text="${MasterData.Item.LeadTime}:" />
                         </td>
