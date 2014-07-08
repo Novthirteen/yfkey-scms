@@ -94,6 +94,19 @@
                             <asp:CheckBox ID="cbIsAutoConfirm" runat="server" Checked='<%#Bind("IsAutoConfirm") %>' />
                         </td>
                         <td class="td01">
+                            <asp:Literal ID="IsFG" runat="server" Text="是否成品库存" />
+                        </td>
+                        <td class="td02">
+                            <asp:CheckBox ID="cbIsFG" runat="server" Checked='<%#Bind("IsFG") %>' />
+                        </td>
+                        
+                    </tr>
+                     <tr>
+                        <td class="td01">
+                        </td>
+                        <td class="td02">
+                        </td>
+                        <td class="td01">
                         </td>
                         <td class="td02">
                             <div class="buttons">

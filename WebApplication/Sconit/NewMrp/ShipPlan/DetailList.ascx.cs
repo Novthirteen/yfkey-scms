@@ -155,6 +155,7 @@ from  MRP_ShipPlanDet as det
             return;
         }
 
+        #region   trace
         IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
         traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
 
@@ -176,6 +177,30 @@ from  MRP_ShipPlanDet as det
                 sd.Logs = showText;
             }
         }
+        #endregion
+
+        #region  orderQty
+        IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
+        shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        if (shipPlanOpenOrderList.Count > 0)
+        {
+            foreach (var sd in shipPlanDetList)
+            {
+                var currentOrders = shipPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
+                var showText = string.Empty;
+                if (currentOrders != null && currentOrders.Count > 0)
+                {
+                    showText = "<table><thead><tr><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentOrders)
+                    {
+                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.OrderDets = showText;
+            }
+        }
+        #endregion
 
         var planByDateIndexs = shipPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
         var planByFlowItems = shipPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item, p.LocFrom, p.LocTo });
@@ -287,7 +312,7 @@ from  MRP_ShipPlanDet as det
                 str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", shipPlanDet.Logs));
                 str.Append(shipPlanDet.ReqQty.ToString("0.##"));
                 str.Append("</td>");
-                str.Append("<td>");
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowDetsClick(this)'>", shipPlanDet.OrderDets));
                 str.Append(shipPlanDet.OrderQty.ToString("0.##"));
                 str.Append("</td>");
                 if (firstPlan.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)

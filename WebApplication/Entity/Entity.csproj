@@ -204,6 +204,7 @@
     <Compile Include="Base\Mes\ProductLineUserBase.cs" />
     <Compile Include="Base\Mes\ShelfBase.cs" />
     <Compile Include="Base\Mes\ShelfItemBase.cs" />
+    <Compile Include="Base\MRP\ShipPlanOpenOrderBase.cs" />
     <Compile Include="Base\MRP\PurchasePlanDetBase.cs" />
     <Compile Include="Base\MRP\PurchasePlanDetTraceBase.cs" />
     <Compile Include="Base\MRP\PurchasePlanMstrBase.cs" />
@@ -397,6 +398,7 @@
     <Compile Include="Mes\ProductLineUser.cs" />
     <Compile Include="Mes\Shelf.cs" />
     <Compile Include="Mes\ShelfItem.cs" />
+    <Compile Include="MRP\ShipPlanOpenOrder.cs" />
     <Compile Include="MRP\PurchasePlanMstr.cs" />
     <Compile Include="MRP\PurchasePlanDetTrace.cs" />
     <Compile Include="MRP\PurchasePlanDet.cs" />
@@ -758,6 +760,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Base\MRP\PurchasePlanMstr.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\ShipPlanOpenOrder.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -29,11 +29,11 @@
                        </asp:LinkButton>
                        &nbsp&nbsp
                        <asp:LinkButton ID="lbtSubmit" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "ReleaseNo") %>'
-                            Text="释放" OnClick="btnSubmit_Click">
+                            Text="释放" OnClick="btnSubmit_Click" OnClientClick="return confirm('释放？')>
                        </asp:LinkButton>
                        &nbsp&nbsp
                        <asp:LinkButton ID="lbtRunProdPlan" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "ReleaseNo") %>'
-                            Text="生成主生产计划" OnClick="btnRunProdPlan_Click">
+                            Text="生成主生产计划" OnClick="btnRunProdPlan_Click" OnClientClick="return confirm('生成主生产计划？')>
                        </asp:LinkButton>
                        
                     </ItemTemplate>
