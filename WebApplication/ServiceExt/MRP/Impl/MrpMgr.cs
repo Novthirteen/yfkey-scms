@@ -676,9 +676,18 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
 
+        private static object RunPurchasePlanLock = new object();
         [Transaction(TransactionMode.Requires)]
         public void RunMrp(User user)
         {
+            lock (RunPurchasePlanLock)
+            {
+                SqlParameter[] sqlParameterArr = new SqlParameter[1];
+                sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
+                sqlParameterArr[0].Value = user.Code;
+                this.genericMgr.GetDatasetByStoredProcedure("RunPurchasePlan", sqlParameterArr);
+
+            }
         }
 
         public void RunMrp(DateTime effectiveDate, User user)
