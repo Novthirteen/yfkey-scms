@@ -22,12 +22,15 @@ BEGIN
 	set nocount on
 	declare @DateNow datetime
 	declare @Msg nvarchar(MAX)
+	declare @MaxPlanDate datetime
 	declare @RowId int
 	declare @MaxRowId int
 	declare @ProdItem varchar(50)
 	declare @Bom varchar(50)
 	declare @EffDate datetime
 	declare @BomQty decimal(18, 8)
+	declare @ReleaseNo varchar(50)
+	declare @PurchasePlanId int
 
 	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
 	set @Msg = ''
@@ -35,23 +38,23 @@ BEGIN
 	begin try
 		create table #tempMsg
 		(
-			Lvl varchar(50),
-			Phase varchar(50),
-			Flow varchar(50),
-			Item varchar(50),
-			Msg varchar(500)
+			Lvl varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Phase varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Msg varchar(500) COLLATE  Chinese_PRC_CI_AS
 		)
 
 		create table #tempProductionPlan
 		(
 			RowId int identity(1, 1) Primary Key,
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
-			Bom varchar(50),
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			PlanDate datetime
 		)
@@ -59,73 +62,88 @@ BEGIN
 		create table #tempBomDetail
 		(
 			RowId int identity(1, 1) primary key,
-			Bom varchar(50),
-			Item varchar(50),
-			StruType varchar(50),
-			Uom varchar(5),
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			StruType varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
-			BackFlushMethod varchar(50),
+			BackFlushMethod varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		)
 
 		create table #tempCurrentMaterialPlanDet
 		(
-			UUID varchar(50) primary key,
-			Item varchar(50),
-			ItemDesc varchar(100),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			ReqQty decimal(18, 8),
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			ReqTime datetime
 		)
 
 		create table #tempMaterialPlanDet
 		(
-			UUID varchar(50) primary key,
-			Item varchar(50),
-			ItemDesc varchar(100),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			ReqQty decimal(18, 8),
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			ReqTime datetime
 		)
 
 		create table #tempMergeMaterialPlanDet
 		(
-			UUID varchar(50) primary key,
-			Item varchar(50),
-			ItemDesc varchar(100),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			BaseReqQty decimal(18, 8),
 			BasePurchaseQty decimal(18, 8),
-			BaseUom varchar(5),
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			ReqTime datetime
 		)
 
 		create table #tempPurchasePlanDet
 		(
 			RowId int identity(1, 1) primary key,
-			UUID varchar(50), 
-			PurchaseFlow varchar(50),
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			PurchaseFlow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			BaseReqQty decimal(18, 8),
 			BasePurchaseQty decimal(18, 8),
 			ReqQty decimal(18, 8),
 			PurchaseQty decimal(18, 8),
 			OrderQty decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			UC decimal(18, 8),
 			StartTime datetime,
 			WindowTime datetime
+		)
+
+		create table #tempOpenOrder
+		(
+			RowId int identity(1, 1)  primary key,
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			OrderNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			StartTime datetime,
+			WindowTime datetime,
+			EffDate datetime,
+			OrderQty decimal(18, 8),
+			ShipQty decimal(18, 8),
+			RecQty decimal(18, 8),
 		)
 
 		-----------------------------↓获取生产计划-----------------------------
@@ -148,10 +166,11 @@ BEGIN
 		update #tempProductionPlan set PlanDate = DATEADD(DAY, -DATEPART(WEEKDAY, PlanDate), PlanDate)
 
 		--删除排产日期和班产计划重复的
-		delete from #tempProductionPlan where PlanDate <= (select MAX(PlanDate) from MRP_ShiftPlanDet 
-															where PlanId in (select Max(mstr.Id) from MRP_ShiftPlanDet as det
-															inner join MRP_ShiftPlanMstr as mstr on det.PlanId = mstr.Id
-															where mstr.[Status] = 'Submit'))
+		select @MaxPlanDate = MAX(PlanDate) from MRP_ShiftPlanDet 
+		where PlanId in (select Max(mstr.Id) from MRP_ShiftPlanDet as det
+		inner join MRP_ShiftPlanMstr as mstr on det.PlanId = mstr.Id
+		where mstr.[Status] = 'Submit')
+		delete from #tempProductionPlan where PlanDate <= @MaxPlanDate
 
 		--计算单位换算
 		update #tempProductionPlan set UnitQty = 1 where Uom = BaseUom
@@ -266,7 +285,6 @@ BEGIN
 		select UUID, Item, ItemDesc, ReqQty * UnitQty, ReqQty * UnitQty, BaseUom, ReqTime from #tempMaterialPlanDet
 
 		--需求全部转换为周1开始
-		set datefirst 1 --设置周1为1周开始时间
 		update #tempMergeMaterialPlanDet set ReqTime = DATEADD(DAY, -DATEPART(WEEKDAY, ReqTime), ReqTime)
 
 		--合并毛需求至一行（最小UUID)
@@ -329,18 +347,19 @@ BEGIN
 		-----------------------------↓更新订单数-----------------------------
 		--查找订单数
 		insert into #tempOpenOrder(Flow, OrderNo, Item, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
-		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, CASE WHEN ord.WindowTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.WindowTime, 121)) END, ord.OrderQty, ord.ShipQty, ord.RecQty
+		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, DATEADD(DAY, -DATEPART(WEEKDAY, ord.WindowTime), ord.WindowTime), ord.OrderQty, ord.ShipQty, ord.RecQty
 		from MRP_OpenOrderSnapShot as ord
 		inner join (select distinct PurchaseFlow, Item from #tempPurchasePlanDet) as pl on ord.Flow = pl.PurchaseFlow and ord.Item = pl.Item
+		where ord.WindowTime > @MaxPlanDate
 
 		--更新订单数
 		update pl set OrderQty = ISNULL(ord.OrderQty, 0)
 		from #tempPurchasePlanDet as pl
-		left join (select Flow, Item, EffDate, SUM(ISNULL(OrderQty, 0) - ISNULL(ShipQty, 0)) as OrderQty from #tempOpenOrder group by Flow, Item, EffDate) as ord 
+		left join (select Flow, Item, EffDate, SUM(ISNULL(OrderQty, 0)) as OrderQty from #tempOpenOrder group by Flow, Item, EffDate) as ord 
 		on pl.PurchaseFlow = ord.Flow and pl.Item = ord.Item and pl.WindowTime = ord.EffDate
 		insert into #tempPurchasePlanDet(UUID, PurchaseFlow, Item, ItemDesc, RefItemCode, BaseReqQty, BasePurchaseQty, ReqQty, PurchaseQty, OrderQty, Uom, BaseUom, UC, StartTime, WindowTime)
 		select NEWID(), d.Flow, ord.Item, i.Desc1, d.RefItemCode, 0, 0, 0, 0, ord.OrderQty, d.Uom, i.Uom, d.UC, DATEADD(day, -ISNULL(m.LeadTime, 0), @DateNow), @DateNow
-		from (select Flow, Item, EffDate, SUM(ISNULL(OrderQty, 0) - ISNULL(ShipQty, 0)) as OrderQty from #tempOpenOrder group by Flow, Item, EffDate) as ord
+		from (select Flow, Item, EffDate, SUM(ISNULL(OrderQty, 0)) as OrderQty from #tempOpenOrder group by Flow, Item, EffDate) as ord
 		inner join Item as i on ord.Item = i.Code
 		inner join FlowDet as d on ord.Item = d.Item
 		inner join FlowMstr as m on d.Flow = m.Code
@@ -352,7 +371,54 @@ BEGIN
 		from #tempOpenOrder as ord inner join #tempPurchasePlanDet as pl on pl.PurchaseFlow = ord.Flow and pl.Item = ord.Item and pl.WindowTime = ord.EffDate
 		-----------------------------↑更新订单数-----------------------------
 
+
+
+		-----------------------------↓生成物料需求计划-----------------------------
+		--删除未释放的物料需求计划
+		delete from MRP_WeeklyPurchasePlanOpenOrder where PurchasePlanId in(select Id from MRP_WeeklyPurchasePlanMstr where Status = 'Create')
+		delete from MRP_WeeklyPurchasePlanDet where PurchasePlanId in(select Id from MRP_WeeklyPurchasePlanMstr where Status = 'Create')
+		delete from MRP_WeeklyPurchasePlanMstr where Status = 'Create'
+
+		--获取ReleaseNo
+		select @ReleaseNo = ISNULL(MAX(ReleaseNo), 0) + 1 from MRP_WeeklyPurchasePlanMstr
+
+		--新增物料需求计划头
+		insert into MRP_WeeklyPurchasePlanMstr(ReleaseNo, BatchNo, EffDate, [Status], CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
+		values(@ReleaseNo, @BatchNo, @DateNow, 'Create', @DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1)
+
+		--获取物料需求计划头Id
+		set @PurchasePlanId = @@Identity
+		
+		--发货数按包装圆整
+		update #tempPurchasePlanDet set PurchaseQty = ceiling(PurchaseQty / UC) * UC where PurchaseQty > 0 and UC > 0
+
+		--新增物料需求计划明细
+		insert into MRP_WeeklyPurchasePlanDet(PurchasePlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
+		ReqQty, OrgPurchaseQty, PurchaseQty, OrderQty, Uom, BaseUom, UnitQty, UC, StartTime, WindowTime, 
+		CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
+		select @PurchasePlanId, UUID, PurchaseFlow, Item, ItemDesc, RefItemCode, 
+		ReqQty, PurchaseQty, PurchaseQty, OrderQty, Uom, BaseUom, UnitQty, UC, StartTime, WindowTime, 
+		@DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
+		from #tempPurchasePlanDet
+
+		--新增Open Order追溯表
+		insert into MRP_WeeklyPurchasePlanOpenOrder(PurchasePlanId, UUID, Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
+		select @PurchasePlanId, UUID, Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, @DateTimeNow, @RunUser from #tempOpenOrder
+		-----------------------------↑生成物料需求计划-----------------------------
+
+		--记录日志
+		insert into MRP_RunWeeklyMRPLog(BatchNo, Lvl, Phase, Flow, Item, Msg, CreateDate, CreateUser)
+		select @BatchNo, Lvl, Phase, Flow, Item, Msg, @DateTimeNow, @RunUser from #tempMsg
+
+
 		drop table #tempMsg
+		drop table #tempProductionPlan
+		drop table #tempBomDetail
+		drop table #tempCurrentMaterialPlanDet
+		drop table #tempMaterialPlanDet
+		drop table #tempMergeMaterialPlanDet
+		drop table #tempPurchasePlanDet
+		drop table #tempOpenOrder
 	end try
 	begin catch
 		set @Msg = N'运行采购计划异常：' + Error_Message()

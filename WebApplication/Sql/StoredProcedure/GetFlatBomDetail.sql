@@ -30,13 +30,13 @@ BEGIN
 		create table #tempBomDetail
 		(
 			RowId int identity(1, 1) primary key,
-			Bom varchar(50),
-			Item varchar(50),
-			StruType varchar(50),
-			Uom varchar(5),
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			StruType varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
-			BackFlushMethod varchar(50)
+			BackFlushMethod varchar(50) COLLATE  Chinese_PRC_CI_AS
 		)
 
 		insert into #tempBomDetail(Bom, Item, StruType, Uom, RateQty, ScrapPct, BackFlushMethod)
@@ -65,6 +65,7 @@ BEGIN
 		end
 
 		select Bom, Item, StruType, Uom, RateQty, ScrapPct, BackFlushMethod from #tempBomDetail
+
 		drop table #tempBomDetail
 	end try
 	begin catch

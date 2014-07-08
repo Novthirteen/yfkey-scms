@@ -35,6 +35,7 @@ BEGIN
 
 		exec RunWeeklyShipPlan @BatchNo, @RunUser, @DateTimeNow
 		exec RunWeeklyProductionPlan @BatchNo, @RunUser, @DateTimeNow
+		exec RunWeeklyPurchasePlan @BatchNo, @RunUser, @DateTimeNow
 	end try
 	begin catch
 		set @Msg = N'运行周物料需求计划异常：' + Error_Message()

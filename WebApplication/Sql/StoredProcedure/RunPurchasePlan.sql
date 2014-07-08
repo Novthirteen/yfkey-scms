@@ -50,14 +50,14 @@ BEGIN
 	begin try
 		create table #tempMsg
 		(
-			Lvl varchar(50),
-			Flow varchar(50),
-			Item varchar(50),
-			Uom varchar(50),
+			Lvl varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
 			PlanDate datetime,
-			Bom varchar(50),
-			Msg varchar(500)
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Msg varchar(500) COLLATE  Chinese_PRC_CI_AS
 		)
 
 		create table #tempEffShiftPlan
@@ -65,15 +65,15 @@ BEGIN
 			RowId int identity(1, 1) Primary Key,
 			DetId int,
 			MstrId int,
-			RefPlanNo varchar(50),
-			ProdLine varchar(50),
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
-			Bom varchar(50),
+			RefPlanNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ProdLine varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			PlanDate datetime
 		)
@@ -81,57 +81,57 @@ BEGIN
 		create table #tempProdLine
 		(
 			RowId int Identity(1, 1),
-			ProdLine varchar(50),
+			ProdLine varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		)
 
 		create table #tempBomDetail
 		(
 			RowId int identity(1, 1) primary key,
-			Bom varchar(50),
-			Item varchar(50),
-			StruType varchar(50),
-			Uom varchar(5),
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			StruType varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
-			BackFlushMethod varchar(50),
+			BackFlushMethod varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		)
 
 		create table #tempCurrentMaterialPlanDet
 		(
-			UUID varchar(50) primary key,
-			Item varchar(50),
-			ItemDesc varchar(100),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			ReqQty decimal(18, 8),
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			ReqTime datetime
 		)
 
 		create table #tempMaterialPlanDet
 		(
-			UUID varchar(50) primary key,
-			Item varchar(50),
-			ItemDesc varchar(100),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			ReqQty decimal(18, 8),
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			ReqTime datetime
 		)
 
 		create table #tempMergeMaterialPlanDet
 		(
-			UUID varchar(50) primary key,
-			Item varchar(50),
-			ItemDesc varchar(100),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			BaseReqQty decimal(18, 8),
 			BasePurchaseQty decimal(18, 8),
-			BaseUom varchar(5),
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			ReqTime datetime
 		)
 
@@ -140,18 +140,18 @@ BEGIN
 		create table #tempPurchasePlanDet
 		(
 			RowId int identity(1, 1) primary key,
-			UUID varchar(50), 
-			PurchaseFlow varchar(50),
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			PurchaseFlow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			BaseReqQty decimal(18, 8),
 			BasePurchaseQty decimal(18, 8),
 			ReqQty decimal(18, 8),
 			PurchaseQty decimal(18, 8),
 			OrderQty decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			UC decimal(18, 8),
 			StartTime datetime,
@@ -161,26 +161,26 @@ BEGIN
 		create table #tempMaterialPlanDetTrace
 		(
 			RowId int identity(1, 1) primary key,
-			UUID varchar(50), 
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
 			DetId int,
 			MstrId int,
-			RefPlanNo varchar(50),
-			ProdLine varchar(50),
-			ProdItem varchar(50),
+			RefPlanNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ProdLine varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ProdItem varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			ProdQty decimal(18, 8),
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
 			BomUnitQty decimal(18, 8),
 			PurchaseUnitQty decimal(18, 8),
-			BomUom varchar(5),
-			PurchaseUom varchar(5),
+			BomUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			PurchaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			PlanDate datetime
 		)
 
 		create table #tempLocatoinDet
 		(
 			RowId int identity(1, 1) primary key,
-			Item varchar(50),
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			SafeStock decimal(18, 8),
 			MaxStock decimal(18, 8),
 			Qty decimal(18, 8),
@@ -192,10 +192,10 @@ BEGIN
 		create table #tempOpenOrder
 		(
 			RowId int identity(1, 1)  primary key,
-			UUID varchar(50), 
-			Flow varchar(50),
-			OrderNo varchar(50),
-			Item varchar(50),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			OrderNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			StartTime datetime,
 			WindowTime datetime,
 			EffDate datetime,

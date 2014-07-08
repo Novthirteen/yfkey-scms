@@ -38,33 +38,33 @@ BEGIN
 	begin try
 		create table #tempMsg
 		(
-			Lvl varchar(50),
-			Flow varchar(50),
-			Item varchar(50),
+			Lvl varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
-			Uom varchar(5),
-			LocFrom varchar(50),
-			LocTo varchar(50),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			LocFrom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			LocTo varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			StartTime datetime,
 			WindowTime datetime,
-			Msg varchar(500)
+			Msg varchar(500) COLLATE  Chinese_PRC_CI_AS
 		)
 
 		create table #tempEffCustScheduleDet
 		(
 			Id int Primary Key,
 			MstrId int,
-			Flow varchar(50),
-			ShipFlow varchar(50),
-			Item varchar(50),
-			ItemDesc varchar(100),
-			ItemRef varchar(50),
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ShipFlow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			ItemRef varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			UC decimal(18, 8),
-			Location varchar(50),
+			Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			StartTime datetime,
 			WindowTime datetime
 		)
@@ -72,23 +72,23 @@ BEGIN
 		create table #tempDistributionFlow
 		(
 			RowId int Identity(1, 1),
-			Flow varchar(50),
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		)
 
 		create table #tempShipFlowDet
 		(
 			RowId int Identity(1, 1),
-			Flow varchar(50),
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			LeadTime decimal(18 ,8),
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),
 			UC decimal(18, 8),
-			LocFrom varchar(50),
-			LocTo varchar(50),
+			LocFrom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			LocTo varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			LocQty decimal(18, 8),
 			InTransitQty decimal(18, 8),
 			SafeStock decimal(18, 8),
@@ -98,21 +98,21 @@ BEGIN
 		
 		create table #tempShipPlanDet
 		(
-			UUID varchar(50) primary key, 
-			DistributionFlow varchar(50),
-			Flow varchar(50),
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key, 
+			DistributionFlow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			ReqQty decimal(18, 8),
 			ShipQty decimal(18, 8),
 			OrderQty decimal(18, 8),
-			Uom varchar(5),
-			BaseUom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8),   --Qty * UnitQty = 基本单位数量
 			UC decimal(18, 8),
-			LocFrom varchar(50),
-			LocTo varchar(50),
+			LocFrom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			LocTo varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			StartTime datetime,
 			WindowTime datetime
 		)
@@ -122,9 +122,9 @@ BEGIN
 		create table #tempShipPlanDetTrace
 		(
 			RowId int identity(1, 1)  primary key,
-			UUID varchar(50), 
-			DistributionFlow varchar(50),
-			Item varchar(50),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			DistributionFlow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			ReqDate datetime,
 			ReqQty decimal(18, 8)
 		)
@@ -132,10 +132,10 @@ BEGIN
 		create table #tempOpenOrder
 		(
 			RowId int identity(1, 1)  primary key,
-			UUID varchar(50), 
-			Flow varchar(50),
-			OrderNo varchar(50),
-			Item varchar(50),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			OrderNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			StartTime datetime,
 			WindowTime datetime,
 			EffDate datetime,

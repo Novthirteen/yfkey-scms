@@ -47,24 +47,24 @@ BEGIN
 	begin try
 		create table #tempMsg
 		(
-			Lvl varchar(50),
-			Item varchar(50),
-			Bom varchar(50),
+			Lvl varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			EffDate datetime,
-			Msg varchar(500)
+			Msg varchar(500) COLLATE  Chinese_PRC_CI_AS
 		)
 
 		create table #tempCurrentLevlProductPlan
 		(
-			UUID varchar(50) primary key,
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
 			GroupId int,
 			GroupSeq int,
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
-			Uom varchar(5),
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
-			Bom varchar(50),
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			StartTime datetime,
 			WindowTime datetime
 		)
@@ -73,27 +73,27 @@ BEGIN
 
 		create table #tempProductPlanDetTrace
 		(
-			UUID varchar(50),
-			Flow varchar(50),
-			Item varchar(50),
-			Bom varchar(50),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			ReqDate datetime,
 			ReqQty decimal(18, 8),
 			RateQty decimal(18, 8), 
 			ScrapPct decimal(18, 8),
-			Uom varchar(5),
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8)
 		)
 
 		create table #tempNextLevlProductPlan
 		(
-			UUID varchar(50) primary key,
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
-			Uom varchar(5),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
-			Bom varchar(50),
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			RateQty decimal(18, 8), 
 			ScrapPct decimal(18, 8),
 			StartTime datetime,
@@ -102,13 +102,13 @@ BEGIN
 
 		create table #tempProductPlanDet
 		(
-			UUID varchar(50) primary key,
-			Item varchar(50),
-			ItemDesc varchar(100),
-			RefItemCode varchar(50),
-			Uom varchar(5),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
-			Bom varchar(50),
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			OrderQty decimal(18, 8),
 			StartTime datetime,
 			WindowTime datetime
@@ -117,7 +117,7 @@ BEGIN
 		create table #tempLocatoinDet
 		(
 			RowId int identity(1, 1) primary key,
-			Item varchar(50),
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
 			InspectQty decimal(18, 8), 
 			InTransitQty decimal(18, 8), 
@@ -129,22 +129,22 @@ BEGIN
 		create table #tempBomDetail
 		(
 			RowId int identity(1, 1) primary key,
-			Bom varchar(50),
-			Item varchar(50),
-			StruType varchar(50),
-			Uom varchar(5),
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			StruType varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
-			BackFlushMethod varchar(50),
+			BackFlushMethod varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		)
 
 		create table #tempOpenOrder
 		(
 			RowId int identity(1, 1)  primary key,
-			UUID varchar(50), 
-			Flow varchar(50),
-			OrderNo varchar(50),
-			Item varchar(50),
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			OrderNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			StartTime datetime,
 			WindowTime datetime,
 			EffDate datetime,
