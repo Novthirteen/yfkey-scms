@@ -42,7 +42,7 @@ public partial class NewMrp_ShipPlan_List : ListModuleBase
         {
             ShipPlanMstr m = (ShipPlanMstr)e.Row.DataItem;
             var runShipPlanLogs = TheGenericMgr.FindAllWithCustomQuery<RunShipPlanLog>("select r from RunShipPlanLog as r where r.BatchNo=?", m.BatchNo);
-            if (runShipPlanLogs == null && runShipPlanLogs.Count == 0)
+            if (runShipPlanLogs == null || runShipPlanLogs.Count == 0)
             {
                 System.Web.UI.WebControls.LinkButton lbtnShowErrorMsg = e.Row.FindControl("lbtnShowErrorMsg") as System.Web.UI.WebControls.LinkButton;
                 lbtnShowErrorMsg.Visible = false;
