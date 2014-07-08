@@ -174,7 +174,8 @@ public partial class NewMrp_CustomerSchedule_Main : MainModuleBase
         //str.Append(CopyString());
         //head
         var flowCode = this.tbFlow.Text.Trim();
-        string headStr = CopyString();
+        string headStr = string.Empty;
+            //CopyString();
         str.Append("<thead><tr class='GVHeader'><th>行数</th><th>路线</th><th>客户版本号</th><th>物料号</th><th>物料描述</th><th>客户零件号</th><th>版本号</th><th>本次导入时间</th><th>上次导入时间</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)

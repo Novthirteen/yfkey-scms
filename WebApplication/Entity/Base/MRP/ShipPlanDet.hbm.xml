@@ -28,5 +28,6 @@
     <property name="Version" column="Version" type="Int32"  />
     <property name="OrgShipQty" column="OrgShipQty" type="Decimal"  />
     <property name="ReqQty" column="ReqQty" type="Decimal"  />
+    <property name="OrderQty" column="OrderQty" type="Decimal"  />
   </class>
 </hibernate-mapping>

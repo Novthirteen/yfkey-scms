@@ -34,6 +34,7 @@ namespace com.Sconit.Entity.MRP
         public decimal OrgShipQty { get; set; }
         public decimal ReqQty { get; set; }
         public string UUID { get; set; }
+        public decimal OrderQty { get; set; }
         
         
 

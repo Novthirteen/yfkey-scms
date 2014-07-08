@@ -18,6 +18,5 @@
       <property name="Msg" column="Msg" type="String" length="500" />
       <property name="CreateDate" column="CreateDate" type="DateTime"  />
       <property name="CreateUser" column="CreateUser" type="String" length="50" />
-      <property name="Version" column="Version" type="Int32"  />
     </class>
 </hibernate-mapping>

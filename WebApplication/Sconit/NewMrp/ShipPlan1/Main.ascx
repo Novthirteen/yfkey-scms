@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Main.ascx.cs" Inherits="NewMrp_PurchasePlan_Main" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Main.ascx.cs" Inherits="NewMrp_ShipPlan_Main" %>
 <%@ Register Src="~/Controls/TextBox.ascx" TagName="textbox" TagPrefix="uc3" %>
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="cc1" %>
 <script language="javascript" type="text/javascript" src="Js/DatePicker/WdatePicker.js"></script>
@@ -40,7 +40,7 @@
         </tr>
         <tr>
             <td class="td01">
-                采购日期 从
+                发运日期 从
             </td>
             <td class="td02">
                 <asp:TextBox ID="tbStartDate" runat="server" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowWeek:true})"
@@ -56,7 +56,7 @@
         </tr>
         <tr>
             <td class="ttd01">
-                采购计划版本号
+                发运计划版本号
             </td>
             <td class="ttd02">
                 <asp:TextBox ID="tbReleaseNo" runat="server" />
@@ -69,6 +69,7 @@
                 <%--<asp:Button ID="btReplace" Text="" runat="server"   OnClick="btnReplace_Click"   Style="display: none" />--%>
                 <input type="hidden" id="btSeqHidden" runat="server" />
                 <input type="hidden" id="btQtyHidden" runat="server" />
+                <asp:Button ID="btnRunProdPlan" runat="server" Text="生成主生产需求" OnClick="btnRunProdPlan_Click" />
             </td>
         </tr>
     </table>

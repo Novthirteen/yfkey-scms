@@ -26,7 +26,6 @@ namespace com.Sconit.Entity.MRP
         public string Msg { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
-        public Int32 Version { get; set; }
         #endregion
 
         public override int GetHashCode()
