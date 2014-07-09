@@ -37,6 +37,7 @@ BEGIN
 	declare @Effdate datetime
 	declare @BomQty decimal(18, 8)
 	declare @ProductionPlanId int
+	declare @StartTime datetime
 
 	set @DateTimeNow = GetDate()
 	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
@@ -115,6 +116,8 @@ BEGIN
 			WindowTime datetime
 		)
 
+		create index IX_StartTime on #tempProductPlanDet(StartTime asc)
+
 		create table #tempLocatoinDet
 		(
 			RowId int identity(1, 1) primary key,
@@ -165,17 +168,17 @@ BEGIN
 			RAISERROR(N'没有找到成品库位。', 16, 1) 
 		end
 
-
 		-----------------------------↓获取顶层毛需求-----------------------------
 		insert into #tempCurrentLevlProductPlan(UUID, GroupId, GroupSeq, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, StartTime, WindowTime)
 		select NEWID(), DENSE_RANK() over(Order by det.Item), DENSE_RANK() over(Partition by Item order by det.StartTime),
-		det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, SUM(ISNULL(det.ShipQty, 0) * (1 + ISNULL(i.ScrapPct, 0) / 100) * ISNULL(det.UnitQty, 0)) as Qty, ISNULL(i.Bom, det.Item),
+		det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, SUM((ISNULL(det.ShipQty, 0) + ISNULL(det.OrderQty, 0)) * (1 + ISNULL(i.ScrapPct, 0) / 100) * ISNULL(det.UnitQty, 0)) as Qty, ISNULL(i.Bom, det.Item),
 		DATEADD(day, -ISNULL(i.LeadTime, 0), det.StartTime) as StartTime, det.StartTime as WindowTime
 		from MRP_ShipPlanDet as det 
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
 		inner join Item as i on det.Item = i.Code
 		where mstr.ReleaseNo = @ShipPlanReleaseNo
 		group by det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, det.StartTime, i.Bom, i.LeadTime
+
 
 		--删除开始日期小于今天的需求
 		delete from #tempCurrentLevlProductPlan where StartTime < @DateNow
@@ -398,6 +401,29 @@ BEGIN
 		--更新订单表关联关系
 		update ord set UUID = pl.UUID
 		from #tempOpenOrder as ord inner join #tempProductPlanDet as pl on pl.Item = ord.Item and pl.StartTime = ord.EffDate
+
+		--根据开始时间依次扣减订单数
+		set @RowId = null
+		set @MaxRowId = null
+		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempOpenOrder
+		while (@RowId <= @MaxRowId)
+		begin
+			set @ActiveQty = 0
+			set @LastActiveQty = 0
+			set @Item = null
+			set @StartTime = null
+
+			select @ActiveQty = (OrderQty - RecQty), @Item = Item, @StartTime = StartTime from #tempOpenOrder where RowId = @RowId
+			if (@ActiveQty > 0)
+			begin
+				update det set Qty = CASE WHEN @ActiveQty >= Qty THEN 0 WHEN @ActiveQty < Qty and @ActiveQty>0 THEN Qty - @ActiveQty ELSE Qty END,
+				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = Qty
+				from #tempProductPlanDet as det with(INDEX(IX_StartTime))
+				where det.Item = @Item and det.StartTime >= @StartTime
+			end
+
+			set @RowId = @RowId + 1
+		end
 		-----------------------------↑更新订单数-----------------------------
 
 		--汇总生产需求

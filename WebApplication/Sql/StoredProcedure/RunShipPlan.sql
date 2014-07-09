@@ -28,6 +28,11 @@ BEGIN
 	declare @MaxRowId int
 	declare @DistributionFlow varchar(50)
 	declare @ShipPlanId int
+	declare @ActiveQty decimal(18, 8)
+	declare @LastActiveQty decimal(18, 8)
+	declare @Flow varchar(50)
+	declare @Item varchar(50)
+	declare @StartTime datetime
 
 	set @DateTimeNow = GetDate()
 	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
@@ -95,6 +100,18 @@ BEGIN
 			MaxStock decimal(18, 8),
 			ActiveQty decimal(18, 8)
 		)
+
+		create table #tempIpDet
+		(
+			RowId int identity(1, 1)  primary key,
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			IpNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			StartTime datetime,
+			WindowTime datetime,
+			Qty decimal(18, 8),
+		)
 		
 		create table #tempShipPlanDet
 		(
@@ -117,7 +134,7 @@ BEGIN
 			WindowTime datetime
 		)
 
-		create index IX_WindowTime on #tempShipPlanDet(WindowTime asc)
+		create index IX_StartTime on #tempShipPlanDet(StartTime asc)
 
 		create table #tempShipPlanDetTrace
 		(
@@ -136,6 +153,8 @@ BEGIN
 			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			OrderNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			OrgStartTime datetime,
+			OrgWindowTime datetime,
 			StartTime datetime,
 			WindowTime datetime,
 			EffDate datetime,
@@ -271,19 +290,38 @@ BEGIN
 
 		-----------------------------↓缓存Open Order-----------------------------
 		--插入发运路线的Open Order
-		insert into #tempOpenOrder(Flow, OrderNo, Item, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
-		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, ord.OrderQty, ord.ShipQty, ord.RecQty
+		insert into #tempOpenOrder(Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
+		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, DATEADD(day, fDet.LeadTime, ord.WindowTime), 
+		CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, 
+		CASE WHEN ord.StartTime < @DateNow THEN DATEADD(day, fdet.LeadTime, @DateNow) ELSE DATEADD(day, fdet.LeadTime, CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121))) END, 
+		CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, 
+		ord.OrderQty, ord.ShipQty, ord.RecQty
 		from MRP_OpenOrderSnapShot as ord
 		inner join #tempShipFlowDet as fDet on ord.Flow = fDet.Flow and ord.Item = fDet.Item
 
 		--插入销售路线的Order Order
-		insert into #tempOpenOrder(Flow, OrderNo, Item, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
-		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, ord.OrderQty, ord.ShipQty, ord.RecQty
+		insert into #tempOpenOrder(Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
+		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, 
+		CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, 
+		CASE WHEN ord.StartTime < @DateNow THEN DATEADD(day, ISNULL(fMstr.LeadTime, 0), @DateNow) ELSE DATEADD(day, ISNULL(fMstr.LeadTime, 0), CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121))) END, 
+		CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, 
+		ord.OrderQty, ord.ShipQty, ord.RecQty
 		from MRP_OpenOrderSnapShot as ord 
 		inner join (select distinct Flow, Item from #tempEffCustScheduleDet where ShipFlow is null) as dFlow on ord.Flow = dFlow.Flow and ord.Item = dFlow.Item
+		inner join FlowMstr as fMstr on ord.Flow = fMstr.Code
 		-----------------------------↑缓存Open Order-----------------------------
 
-		
+
+
+		-----------------------------↓缓存在途ASN-----------------------------
+		insert into #tempIpDet(IpNo, Flow, Item, StartTime, WindowTime, Qty)
+		select det.IpNo, det.Flow, det.Item, det.StartTime, DATEADD(day, mstr.LeadTime, det.WindowTime), SUM(det.Qty) as Qty
+		from MRP_IpDetSnapShot as det inner join (select distinct Flow, LeadTime from #tempShipFlowDet) as mstr on det.Flow = mstr.Flow
+		group by det.IpNo, det.Flow, det.Item, det.StartTime, mstr.LeadTime, det.WindowTime
+		-----------------------------↑缓存在途-----------------------------
+
+
+
 
 		-----------------------------↓计算发运计划-----------------------------
 		--转有发运路线的（毛需求）
@@ -322,26 +360,24 @@ BEGIN
 		(select MIN(UUID) as MinUUID, Flow, Item, StartTime from #tempShipPlanDet group by Flow, Item, StartTime having count(1) > 1) as t
 		on p.Flow = t.Flow and p.Item = t.Item and p.StartTime = t.StartTime
 		where p.UUID <> MinUUID
-
+select * from #tempShipPlanDet where Item = '3861001023148' order by StartTime
 		--低于安全库存的转为当天的发运计划
 		update p set ShipQty = ShipQty - d.ActiveQty
-		from #tempShipPlanDet as p inner join #tempShipFlowDet as d on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
+		from #tempShipPlanDet as p 
+		inner join #tempShipFlowDet as d on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
 		where d.ActiveQty < 0
 		insert into #tempShipPlanDet(UUID, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
 		select NEWID(), d.Flow, d.Item, d.ItemDesc, d.RefItemCode, -d.ActiveQty, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, @DateNow, DATEADD(day, d.LeadTime, @DateNow) 
-		from #tempShipFlowDet as d left join #tempShipPlanDet as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
+		from #tempShipFlowDet as d 
+		left join #tempShipPlanDet as p on p.Flow = d.Flow and p.Item = d.Item and p.StartTime = @DateNow
 		where d.ActiveQty < 0 and p.Flow is null
 
-		--根据开始时间依次扣减库存（不含在途库存）
+		--根据依次扣减库存（不含在途库存）
 		set @RowId = null
 		set @MaxRowId = null
 		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempShipFlowDet
 		while (@RowId <= @MaxRowId)
 		begin
-			declare @ActiveQty decimal(18, 8)
-			declare @LastActiveQty decimal(18, 8)
-			declare @Flow varchar(50)
-			declare @Item varchar(50)
 			set @ActiveQty = 0
 			set @LastActiveQty = 0
 			set @Flow = null
@@ -352,12 +388,37 @@ BEGIN
 			begin
 				update det set ShipQty = CASE WHEN @ActiveQty >= ShipQty THEN 0 WHEN @ActiveQty < ShipQty and @ActiveQty>0 THEN ShipQty - @ActiveQty ELSE ShipQty END,
 				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = ShipQty
-				from #tempShipPlanDet as det with(INDEX(IX_WindowTime))
+				from #tempShipPlanDet as det with(INDEX(IX_StartTime))
 				where det.Flow = @Flow and det.Item = @Item
 			end
 
 			set @RowId = @RowId + 1
 		end
+select * from #tempShipPlanDet where Item = '3861001023148' order by StartTime
+
+		----根据开始时间依次扣减在途库存
+		--set @RowId = null
+		--set @MaxRowId = null
+		--select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempIpDet
+		--while (@RowId <= @MaxRowId)
+		--begin
+		--	set @ActiveQty = 0
+		--	set @LastActiveQty = 0
+		--	set @Flow = null
+		--	set @Item = null
+		--	set @WindowTime = null
+
+		--	select @ActiveQty = Qty, @Flow = Flow, @Item = Item, @WindowTime = WindowTime from #tempIpDet where RowId = @RowId
+		--	if (@ActiveQty > 0)
+		--	begin
+		--		update det set ShipQty = CASE WHEN @ActiveQty >= ShipQty THEN 0 WHEN @ActiveQty < ShipQty and @ActiveQty>0 THEN ShipQty - @ActiveQty ELSE ShipQty END,
+		--		@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = ShipQty
+		--		from #tempShipPlanDet as det with(INDEX(IX_StartTime))
+		--		where det.Flow = @Flow and det.Item = @Item and det.StartTime >= @WindowTime
+		--	end
+
+		--	set @RowId = @RowId + 1
+		--end
 
 		--更新订单数
 		update pd set OrderQty = ord.OrderQty
@@ -374,10 +435,35 @@ BEGIN
 		update ord set UUID = pl.UUID
 		from #tempOpenOrder as ord inner join #tempShipPlanDet as pl on pl.Flow = ord.Flow and pl.Item = ord.Item and pl.StartTime = ord.EffDate
 
+		--根据开始时间依次扣减订单数
+		set @RowId = null
+		set @MaxRowId = null
+		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempOpenOrder
+		while (@RowId <= @MaxRowId)
+		begin
+			set @ActiveQty = 0
+			set @LastActiveQty = 0
+			set @Flow = null
+			set @Item = null
+			set @StartTime = null
+
+			select @ActiveQty = (OrderQty - ShipQty), @Flow = Flow, @Item = Item, @StartTime = StartTime from #tempOpenOrder where RowId = @RowId
+			if (@ActiveQty > 0)
+			begin
+				update det set ShipQty = CASE WHEN @ActiveQty >= ShipQty THEN 0 WHEN @ActiveQty < ShipQty and @ActiveQty>0 THEN ShipQty - @ActiveQty ELSE ShipQty END,
+				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = ShipQty
+				from #tempShipPlanDet as det with(INDEX(IX_StartTime))
+				where det.Flow = @Flow and det.Item = @Item and det.StartTime >= @StartTime
+			end
+
+			set @RowId = @RowId + 1
+		end
+
 		--汇总发运需求
 		update d set ReqQty = ISNULL(dt.ReqQty, 0) from #tempShipPlanDet as d 
 		left join (select UUID, SUM(ISNULL(ReqQty, 0)) as ReqQty from #tempShipPlanDetTrace group by UUID) as dt on d.UUID = dt.UUID
 		-----------------------------↑计算发运计划-----------------------------
+
 	end try
 	begin catch
 		set @Msg = N'运行发运计划异常：' + Error_Message()
@@ -393,6 +479,7 @@ BEGIN
 
 		-----------------------------↓生成发运计划-----------------------------
 		--删除未释放的发运计划
+		delete from MRP_ShipPlanIpDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
 		delete from MRP_ShipPlanOpenOrder where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
 		delete from MRP_ShipPlanInitLocationDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
 		delete from MRP_ShipPlanDetTrace where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
@@ -413,6 +500,10 @@ BEGIN
 		insert into MRP_ShipPlanInitLocationDet(ShipPlanId, Location, Item, InitStock, SafeStock, MaxStock, InTransitQty, CreateDate, CreateUser)
 		select @ShipPlanId, LocTo, Item, LocQty, SafeStock, MaxStock, InTransitQty, @DateTimeNow, @RunUser from #tempShipFlowDet
 
+		--新增发运计划在途库存
+		insert into MRP_ShipPlanIpDet(ShipPlanId, IpNo, Flow, Item, StartTime, WindowTime, Qty, CreateDate, CreateUser)
+		select @ShipPlanId, IpNo, Flow, Item, StartTime, WindowTime, Qty, @DateTimeNow, @RunUser from #tempIpDet
+
 		--发货数按包装圆整
 		update #tempShipPlanDet set ShipQty = ceiling(ShipQty / UC) * UC where ShipQty > 0 and UC > 0
 
@@ -430,8 +521,8 @@ BEGIN
 		select @ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, @DateTimeNow, @RunUser from #tempShipPlanDetTrace
 
 		--新增Open Order追溯表
-		insert into MRP_ShipPlanOpenOrder(ShipPlanId, UUID, Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
-		select @ShipPlanId, UUID, Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, @DateTimeNow, @RunUser from #tempOpenOrder
+		insert into MRP_ShipPlanOpenOrder(ShipPlanId, UUID, Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
+		select @ShipPlanId, UUID, Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, OrderQty, ShipQty, RecQty, @DateTimeNow, @RunUser from #tempOpenOrder
 		-----------------------------↑生成发运计划-----------------------------
 
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Flow, Item, Qty, Uom, LocFrom, LocTo, StartTime, WindowTime, Msg, CreateDate, CreateUser) 

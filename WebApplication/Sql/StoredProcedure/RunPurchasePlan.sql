@@ -499,10 +499,13 @@ BEGIN
 
 		-----------------------------↓更新订单数-----------------------------
 		--查找订单数
-		insert into #tempOpenOrder(Flow, OrderNo, Item, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
-		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, CASE WHEN ord.WindowTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.WindowTime, 121)) END, ord.OrderQty, ord.ShipQty, ord.RecQty
+		insert into #tempOpenOrder(Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty)
+		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, DATEADD(day, pl.LeadTime, ord.WindowTime), ord.OrderQty, ord.ShipQty, ord.RecQty
 		from MRP_OpenOrderSnapShot as ord
-		inner join (select distinct PurchaseFlow, Item from #tempPurchasePlanDet) as pl on ord.Flow = pl.PurchaseFlow and ord.Item = pl.Item
+		inner join (select distinct PurchaseFlow, Item, LeadTime from #tempPurchasePlanDet) as pl on ord.Flow = pl.PurchaseFlow and ord.Item = pl.Item
+
+		--更新生效日期
+		update #tempOpenOrder set EffDate = CASE WHEN WindowTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), WindowTime, 121)) END
 
 		--更新订单数
 		update pl set OrderQty = ISNULL(ord.OrderQty, 0)
