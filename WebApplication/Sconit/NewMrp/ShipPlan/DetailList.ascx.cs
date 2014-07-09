@@ -211,7 +211,7 @@ from  MRP_ShipPlanDet as det
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>3PL期初</th><th rowspan='2'>在途</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -291,7 +291,7 @@ from  MRP_ShipPlanDet as det
             var InitStockQty = firstPlan.InitStock;
             if (InitStockQty < firstPlan.SafeStock)
             {
-                str.Append("<td style='background:red'>");
+                str.Append("<td style='background:red;color:white'>");
             }
             else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
             {
@@ -299,7 +299,7 @@ from  MRP_ShipPlanDet as det
             }
             else if (InitStockQty > firstPlan.MaxStock)
             {
-                str.Append("<td style='background:orange'>");
+                str.Append("<td style='background:orange;'>");
             }
             str.Append((InitStockQty).ToString("0.##"));
             str.Append("</td>");
@@ -332,10 +332,10 @@ from  MRP_ShipPlanDet as det
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty ;
+                InitStockQty = InitStockQty - shipPlanDet.ReqQty + shipPlanDet.ShipQty + shipPlanDet.OrderQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
-                    str.Append("<td style='background:red'>");
+                    str.Append("<td style='background:red;color:white'>");
                 }
                 else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
                 {
@@ -343,7 +343,7 @@ from  MRP_ShipPlanDet as det
                 }
                 else if (InitStockQty > firstPlan.MaxStock)
                 {
-                    str.Append("<td style='background:orange'>");
+                    str.Append("<td style='background:orange;'>");
                 }
                 str.Append(InitStockQty.ToString("0.##"));
                 str.Append("</td>");
