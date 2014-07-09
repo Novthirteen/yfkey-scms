@@ -11,6 +11,8 @@
 		<property name="Item" column="Item" type="String" length="50" />
     <property name="StartTime" column="StartTime" type="DateTime"  />
     <property name="WindowTime" column="WindowTime" type="DateTime"  />
+    <property name="OrgStartTime" column="OrgStartTime" type="DateTime"  />
+    <property name="OrgWindowTime" column="OrgWindowTime" type="DateTime"  />
     <property name="OrderQty" column="OrderQty" type="Decimal"  />
     <property name="ShipQty" column="ShipQty" type="Decimal"  />
     <property name="RecQty" column="RecQty" type="Decimal"  />

@@ -201,7 +201,9 @@ from  MRP_ShipPlanDet as det
                     showText = "<table><thead><tr><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
                     foreach (var c in currentOrders)
                     {
-                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                        string sTime = c.StartTime != c.OrgStartTime ? c.StartTime.ToShortDateString() + "(" + c.OrgStartTime.ToShortDateString() + ")" : c.StartTime.ToShortDateString();
+                        string sWime = c.WindowTime != c.OrgWindowTime ? c.WindowTime.ToShortDateString() + "(" + c.OrgWindowTime.ToShortDateString() + ")" : c.WindowTime.ToShortDateString();
+                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + sTime + "</td><td>" + sWime + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
