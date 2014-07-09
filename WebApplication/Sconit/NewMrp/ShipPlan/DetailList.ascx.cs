@@ -211,7 +211,7 @@ from  MRP_ShipPlanDet as det
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>单包装</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -280,7 +280,7 @@ from  MRP_ShipPlanDet as det
             str.Append(firstPlan.RefItemCode);
             str.Append("</td>");
             str.Append("<td>");
-            str.Append(firstPlan.UnitCount);
+            str.Append(firstPlan.UnitCount.ToString("0.##"));
             str.Append("</td>");
             str.Append("<td>");
             str.Append(firstPlan.SafeStock.ToString("0.##"));
@@ -332,7 +332,7 @@ from  MRP_ShipPlanDet as det
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty + shipPlanDet.OrderQty;
+                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty ;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
                     str.Append("<td style='background:red'>");
@@ -347,7 +347,7 @@ from  MRP_ShipPlanDet as det
                 }
                 str.Append(InitStockQty.ToString("0.##"));
                 str.Append("</td>");
-                InitStockQty = InitStockQty - shipPlanDet.OrderQty;
+                //InitStockQty = InitStockQty + shipPlanDet.OrderQty;
             }
             str.Append("</tr>");
         }
