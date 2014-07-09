@@ -332,7 +332,7 @@ from  MRP_ShipPlanDet as det
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty;
+                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty + shipPlanDet.OrderQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
                     str.Append("<td style='background:red'>");
