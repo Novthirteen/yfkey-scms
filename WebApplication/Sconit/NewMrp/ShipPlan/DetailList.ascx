@@ -58,9 +58,9 @@
     <asp:Literal ID="ltlPlanVersion" runat="server" />
     <div id="mstrList" runat="server">
     </div>
-    <div id="ShowTraceDiv" style="position:absolute; ">
+    <div id="ShowTraceDiv" style="position:absolute;width:500px; ">
     </div>
-    <div id="ShowDetsDiv" style="position:absolute; ">
+    <div id="ShowDetsDiv" style="position:absolute; width:500px;">
     </div>
 </div>
 <script type="text/javascript">
@@ -77,6 +77,7 @@
         obj.style.left = event.x + document.documentElement.scrollLeft + 10;
         obj.style.top = event.y + document.documentElement.scrollTop + 10;
         $(obj).show();
+        $("#ShowDetsDiv").hide()
     }
 
     function hideClick() {
@@ -92,11 +93,12 @@
         //        a.replace(/,/g, ".");   
         htmlt = htmlt.replace("<thead><tr>", "<thead><tr class='GVHeader' onclick='hideClick()'>");
         htmlt = htmlt.replace(/<tr>/g, "<tr style='border:1px solid black' >");
-        $("#ShowTraceDiv").html(htmlt);
+        $("#ShowDetsDiv").html(htmlt);
         var obj = document.getElementById("ShowDetsDiv");
         obj.style.left = event.x + document.documentElement.scrollLeft + 10;
         obj.style.top = event.y + document.documentElement.scrollTop + 10;
         $(obj).show();
+        $("#ShowTraceDiv").hide()
     }
 
 
