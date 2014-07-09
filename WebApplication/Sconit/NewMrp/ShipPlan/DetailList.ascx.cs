@@ -302,7 +302,7 @@ from  MRP_ShipPlanDet as det
             str.Append("<td>");
             str.Append((firstPlan.InTransitQty).ToString("0.##"));
             str.Append("</td>");
-
+            InitStockQty = InitStockQty + firstPlan.InTransitQty;
             foreach (var planByDateIndex in planByDateIndexs)
             {
                 //str.Append("<th >需求数</th><th >发货数</th><th >期末</th>");
@@ -328,7 +328,7 @@ from  MRP_ShipPlanDet as det
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty = InitStockQty + firstPlan.InTransitQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty;
+                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
                     str.Append("<td style='background:red'>");
