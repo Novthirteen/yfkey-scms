@@ -34,12 +34,15 @@
 
     <!--计划管理-->
     <siteMapNode url="" title="$Resources:Language,Planning" description="Planning">
-      <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
-        <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.ProductionSchedule" title="$Resources:Language, ProductionSchedule" description="ProductionSchedule"/>
-        <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.DemandSchedule" title="$Resources:Language, DemandSchedule" description="DemandSchedule"/>
+      <siteMapNode url="" title="福特EDI" description="福特EDI">
         <siteMapNode url="~/Main.aspx?mid=EDI.FordPlan" title="$Resources:Language, FordPlan" description="FordPlan"/>
         <siteMapNode url="~/Main.aspx?mid=EDI.FordPlanShip" title="$Resources:Language, FordPlanShip" description="FordPlanShip"/>
         <siteMapNode url="~/Main.aspx?mid=EDI.FordPlanShip__act--NewAction" title="$Resources:Language, FordNoPlanShip" description="FordNoPlanShip"/>
+      </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Transaction" description="Transaction">
+        <!--<siteMapNode url="~/Main.aspx?mid=MRP.Schedule.ProductionSchedule" title="$Resources:Language, ProductionSchedule" description="ProductionSchedule"/>
+        <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.DemandSchedule" title="$Resources:Language, DemandSchedule" description="DemandSchedule"/>-->
+        
         <!--<siteMapNode url="" title="$Resources:Language,Scheduling"  description="Scheduling" >-->
         <siteMapNode url="~/Main.aspx?mid=NewMrp.CustomerSchedule" title="$Resources:Language,CustomerPlan"  description="CustomerPlan" />
         <siteMapNode url="~/Main.aspx?mid=NewMrp.ShipPlan" title="$Resources:Language,ShipPlan"  description="ShipPlan" />

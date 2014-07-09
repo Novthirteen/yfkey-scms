@@ -90,7 +90,7 @@ public partial class NewMrp_ShipPlan_Search : SearchModuleBase
 
     protected void btnExport_Click(object sender, EventArgs e)
     {
-        ////flowDetail.PackagingCode = ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbPackagingCode")).Value;
+        //flowDetail.PackagingCode = ((System.Web.UI.HtmlControls.HtmlSelect)this.FV_FlowDetail.FindControl("tbPackagingCode")).Value;
         //string controlNums = this.btControl_Num.Value;
         //if (!string.IsNullOrEmpty(controlNums))
         //{
@@ -103,8 +103,6 @@ public partial class NewMrp_ShipPlan_Search : SearchModuleBase
         //}
 
     }
-
-   
 
     //protected void ExportExcel(IList<EDIFordPlan> exportList)
     //{
