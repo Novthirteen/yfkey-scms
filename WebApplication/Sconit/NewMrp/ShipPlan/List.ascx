@@ -9,6 +9,19 @@
             CellMaxLength="10" TypeName="com.Sconit.Web.CriteriaMgrProxy" SelectMethod="FindAll"
             SelectCountMethod="FindCount" OnRowDataBound="GV_List_RowDataBound">
             <Columns>
+               <%--<asp:TemplateField>
+                    <HeaderTemplate>
+                        <div onclick="GVCheckClick()">
+                            <asp:CheckBox ID="CheckAll" runat="server" />
+                        </div>
+                    </HeaderTemplate>
+                    <ItemTemplate>
+                      <div onclick="doCheckClick()" >
+                        <asp:HiddenField ID="hfId" runat="server" Value='<%# Bind("Id") %>' />
+                        <asp:CheckBox ID="CheckBoxGroup" name="CheckBoxGroup" runat="server" />
+                        </div>
+                    </ItemTemplate>
+                </asp:TemplateField>--%>
                 <asp:BoundField DataField="ReleaseNo" HeaderText="版本号" SortExpression="ReleaseNo" />
                 <asp:BoundField DataField="EffDate" HeaderText="生效日期" SortExpression="EffDate" />
                 <asp:BoundField DataField="Status" HeaderText="状态" SortExpression="Status" />
@@ -49,3 +62,39 @@
 <div id="floatdiv">
     <uc2:ShowErrorMsg ID="ucShowErrorMsg" runat="server" Visible="false"  />
 </div>
+
+<script language="javascript" type="text/javascript">
+    function GVCheckClick() {
+        if ($(".GVHeader input:checkbox").attr("checked") == true) {
+            $(".GVRow input:checkbox").attr("checked", true);
+//            $(".GVAlternatingRow input:checkbox").attr("checked", true);
+        }
+        else {
+            $(".GVRow input:checkbox").attr("checked", false);
+//            $(".GVAlternatingRow input:checkbox").attr("checked", false);
+        }
+        doCheckClick();
+    }
+
+    function doCheckClick() {
+        var $checkRecords = $(".GVRow input:checkbox");
+        $(".GVHeader input:checkbox").attr("checked", $checkRecords.length == $(".GVRow input[type=checkbox][checked]").length);
+        if ($(".GVRow input[type=checkbox][checked]").length > 0) {
+            $("#ctl01_ucSearch_btnExport").show();
+        } else {
+            $("#ctl01_ucSearch_btnExport").hide();
+        }
+        getCheckedExportId();
+    }
+
+    function getCheckedExportId() {
+        var $checkRecords = $(".GVRow input:checkbox");
+        var msids = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            if ($checkRecords[i].checked) {
+                msids += $($checkRecords[i]).prev().val() + ",";
+            }
+        }
+        $("#ctl01_ucSearch_btMstrIds").val(msids);
+    }
+</script>

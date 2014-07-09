@@ -62,7 +62,7 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         //,ip.StartTime as ipStartTime,ip.WindowTime as ipWindowTime,isnull(ip.Qty,0)
-        var searchSql = @" select det.Flow,det.Item,det.ItemDesc,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0) ,det.uc,isnull(f.MrpLeadTime,0)
+        var searchSql = @" select det.Flow,det.Item,det.ItemDesc,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0) ,det.uc,isnull(f.MrpLeadTime,0),m.Id
 from  MRP_ShipPlanDet as det 
  inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
  inner join FlowMstr as f on det.Flow=f.Code
@@ -146,6 +146,7 @@ from  MRP_ShipPlanDet as det
                 MaxStock = Convert.ToDecimal(row[22]),
                 UnitCount = Convert.ToDecimal(row[23]),
                 MrpLeadTime = Convert.ToDecimal(row[24]),
+                ShipPlanId = Convert.ToInt32(row[25]),
                 //IpStartTime =(object)row[25]!=null? (DateTime?)Convert.ToDateTime(row[25]):null,
                 //IpWindowTime = (object)row[26] != null ? (DateTime?)Convert.ToDateTime(row[26]) : null,
                 //IpQty = (object)row[27] != null ? (decimal?)Convert.ToDecimal(row[27]) : null,
@@ -347,7 +348,7 @@ from  MRP_ShipPlanDet as det
                     str.Append("</td>");
                 }
                 var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0?ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty):0;
-                var orderQtySum =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.OrderQty):0;
+                var orderQtySum =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty):0;
                 var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.ShipQty);
                 var reqQtySum =planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Count()>0? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty):0;
 
@@ -370,7 +371,7 @@ from  MRP_ShipPlanDet as det
 
                 var inTransitQty = firstPlan.InTransitQty;
                 var ipQty2 =  ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0?ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty):0;
-                var orderQtySum2 =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.OrderQty):0;
+                var orderQtySum2 =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Sum(i => i.OrderQty-i.ShipQty):0;
                 var shipQtySum2 =planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count()>0? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.ShipQty):0;
                 //var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty);
                 inTransitQty = inTransitQty - ipQty2 + orderQtySum2 + shipQtySum2;

@@ -44,10 +44,10 @@
             <td class="td02">
                 <div class="buttons">
                     <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" OnClick="btnSearch_Click" />
-                    <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" style="display:none" OnClick="btnExport_Click" />
+                    <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" Style="display: none" OnClick="btnExport_Click" />
                     <%--<asp:Button ID="btReplace" Text="" runat="server"   OnClick="btnReplace_Click"   Style="display: none" />--%>
                 <%--<asp:Button ID="btmSubmit" runat="server" Text="释放" OnClick="btnSubmit_Click" />--%>
-                    <input type="hidden" id="btControl_Num" runat="server" Style="display: none"  />
+                    <input type="hidden" id="btMstrIds" runat="server" Style="display: none"  />
                 </div>
             </td>
         </tr>
