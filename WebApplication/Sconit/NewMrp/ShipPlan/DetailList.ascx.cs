@@ -61,7 +61,7 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"select det.Flow,det.Item,i.Desc1,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0)
+        var searchSql = @"select det.Flow,det.Item,i.Desc1,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0) ,det.uc
 from  MRP_ShipPlanDet as det 
  inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
  inner join Item as i on i.Code=det.Item 
@@ -142,6 +142,7 @@ from  MRP_ShipPlanDet as det
                 StartTime = Convert.ToDateTime(row[20]),
                 OrderQty= Convert.ToDecimal(row[21]),
                 MaxStock = Convert.ToDecimal(row[22]),
+                UnitCount = Convert.ToDecimal(row[23]),
             });
         }
         ListTable(shipPlanDetList);
@@ -210,7 +211,7 @@ from  MRP_ShipPlanDet as det
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>单包装</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -279,6 +280,9 @@ from  MRP_ShipPlanDet as det
             str.Append(firstPlan.RefItemCode);
             str.Append("</td>");
             str.Append("<td>");
+            str.Append(firstPlan.UnitCount);
+            str.Append("</td>");
+            str.Append("<td>");
             str.Append(firstPlan.SafeStock.ToString("0.##"));
             str.Append("</td>");
             str.Append("<td>");
@@ -291,7 +295,7 @@ from  MRP_ShipPlanDet as det
             }
             else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
             {
-                str.Append("<td style='background:green' color='white'>");
+                str.Append("<td style='background:green;color:white' >");
             }
             else if (InitStockQty > firstPlan.MaxStock)
             {
@@ -328,14 +332,14 @@ from  MRP_ShipPlanDet as det
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty;
+                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty + shipPlanDet.OrderQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
                     str.Append("<td style='background:red'>");
                 }
                 else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
                 {
-                    str.Append("<td style='background:green'>");
+                    str.Append("<td style='background:green;color:white' >");
                 }
                 else if (InitStockQty > firstPlan.MaxStock)
                 {
