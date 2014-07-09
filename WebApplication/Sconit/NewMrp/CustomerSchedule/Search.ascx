@@ -62,6 +62,7 @@
             <td class="td02">
                 <div class="buttons">
                     <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" OnClick="btnSearch_Click" />
+                <asp:Button ID="btnRunShipPlan" runat="server" Text="生成发运计划" OnClick="btnRunShipPlan_Click" />
                 </div>
             </td>
         </tr>
