@@ -291,7 +291,7 @@ from  MRP_ShipPlanDet as det
             var InitStockQty = firstPlan.InitStock;
             if (InitStockQty < firstPlan.SafeStock)
             {
-                str.Append("<td style='background:red'>");
+                str.Append("<td style='background:red;color:white'>");
             }
             else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
             {
@@ -299,7 +299,7 @@ from  MRP_ShipPlanDet as det
             }
             else if (InitStockQty > firstPlan.MaxStock)
             {
-                str.Append("<td style='background:orange'>");
+                str.Append("<td style='background:orange;'>");
             }
             str.Append((InitStockQty).ToString("0.##"));
             str.Append("</td>");
@@ -332,10 +332,10 @@ from  MRP_ShipPlanDet as det
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty = InitStockQty + shipPlanDet.ShipQty - shipPlanDet.ReqQty ;
+                InitStockQty = InitStockQty - shipPlanDet.ReqQty + shipPlanDet.ShipQty + shipPlanDet.OrderQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
-                    str.Append("<td style='background:red'>");
+                    str.Append("<td style='background:red;color:white'>");
                 }
                 else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
                 {
@@ -343,7 +343,7 @@ from  MRP_ShipPlanDet as det
                 }
                 else if (InitStockQty > firstPlan.MaxStock)
                 {
-                    str.Append("<td style='background:orange'>");
+                    str.Append("<td style='background:orange;'>");
                 }
                 str.Append(InitStockQty.ToString("0.##"));
                 str.Append("</td>");
