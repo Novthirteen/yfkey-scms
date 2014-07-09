@@ -26,6 +26,8 @@ namespace com.Sconit.Entity.MRP
 
         public string OrderDets { get; set; }
 
+        public string IpDets { get; set; }
+
         public decimal MrpLeadTime { get; set; }
 
         public DateTime? IpStartTime { get; set; }

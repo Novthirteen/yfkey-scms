@@ -213,6 +213,24 @@ from  MRP_ShipPlanDet as det
         #region    在途
         IList<ShipPlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<ShipPlanIpDet>(" select s from  ShipPlanIpDet as s where s.ShipPlanId=? ", shipPlanDetList.First().ShipPlanId);
         ipDets = ipDets == null ? new List<ShipPlanIpDet>() : ipDets;
+        if (ipDets != null && ipDets.Count > 0)
+        {
+            foreach (var sd in shipPlanDetList)
+            {
+                var currentIpdets = ipDets.Where(d => d.Item == sd.Item).ToList();
+                var showText = string.Empty;
+                if (currentIpdets != null && currentIpdets.Count > 0)
+                {
+                    showText = "<table><thead><tr><th>ASN号</th><th>路线</th><th>物料</th><th>数量</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentIpdets)
+                    {
+                        showText += "<td>" + c.IpNo + "</td><td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Qty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.IpDets = showText;
+            }
+        }
         #endregion
 
         var planByDateIndexs = shipPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
@@ -318,7 +336,8 @@ from  MRP_ShipPlanDet as det
             }
             str.Append((InitStockQty).ToString("0.##"));
             str.Append("</td>");
-            str.Append("<td>");
+            //str.Append("<td>");
+            str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)'>", firstPlan.IpDets));
             str.Append((firstPlan.InTransitQty).ToString("0.##"));
             str.Append("</td>");
            // InitStockQty = InitStockQty + firstPlan.InTransitQty;
