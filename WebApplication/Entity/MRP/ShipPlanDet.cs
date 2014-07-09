@@ -28,6 +28,10 @@ namespace com.Sconit.Entity.MRP
 
         public decimal MrpLeadTime { get; set; }
 
+        public DateTime? IpStartTime { get; set; }
+        public DateTime? IpWindowTime { get; set; }
+        public decimal? IpQty { get; set; }
+
         #endregion
     }
 }

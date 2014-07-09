@@ -61,11 +61,13 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"select det.Flow,det.Item,det.ItemDesc,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0) ,det.uc,isnull(f.MrpLeadTime,0)
+        //,ip.StartTime as ipStartTime,ip.WindowTime as ipWindowTime,isnull(ip.Qty,0)
+        var searchSql = @" select det.Flow,det.Item,det.ItemDesc,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0) ,det.uc,isnull(f.MrpLeadTime,0)
 from  MRP_ShipPlanDet as det 
  inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
  inner join FlowMstr as f on det.Flow=f.Code
  left join MRP_ShipPlanInitLocationDet as l on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1 ";
+ //left join MRP_ShipPlanIpDet as ip on ip.ShipPlanId=m.Id and ip.Item=det.Item where 1=1  ";
         if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
         {
             searchSql += string.Format(" and det.Flow ='{0}' ", this.tbFlow.Text.Trim());
@@ -144,6 +146,9 @@ from  MRP_ShipPlanDet as det
                 MaxStock = Convert.ToDecimal(row[22]),
                 UnitCount = Convert.ToDecimal(row[23]),
                 MrpLeadTime = Convert.ToDecimal(row[24]),
+                //IpStartTime =(object)row[25]!=null? (DateTime?)Convert.ToDateTime(row[25]):null,
+                //IpWindowTime = (object)row[26] != null ? (DateTime?)Convert.ToDateTime(row[26]) : null,
+                //IpQty = (object)row[27] != null ? (decimal?)Convert.ToDecimal(row[27]) : null,
             });        
         }
         ListTable(shipPlanDetList);
@@ -172,7 +177,7 @@ from  MRP_ShipPlanDet as det
                     showText = "<table><thead><tr><th>销售路线</th><th>物料</th><th>需求日期</th><th>需求数</th></tr></thead><tbody><tr>";
                     foreach (var c in currentLogs)
                     {
-                        showText += "<td>" + c.DistributionFlow + "</td><td>" + c.Item + "</td><td>" + c.ReqDate + "</td><td>" + c.ReqQty.ToString("0.##") + "</td></tr><tr>";
+                        showText += "<td>" + c.DistributionFlow + "</td><td>" + c.Item + "</td><td>" + c.ReqDate.ToShortDateString() + "</td><td>" + c.ReqQty.ToString("0.##") + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
@@ -204,6 +209,11 @@ from  MRP_ShipPlanDet as det
         }
         #endregion
 
+        #region    在途
+        IList<ShipPlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<ShipPlanIpDet>(" select s from  ShipPlanIpDet as s where s.ShipPlanId=? ", shipPlanDetList.First().ShipPlanId);
+        ipDets = ipDets == null ? new List<ShipPlanIpDet>() : ipDets;
+        #endregion
+
         var planByDateIndexs = shipPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
         var planByFlowItems = shipPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item, p.LocFrom, p.LocTo });
 
@@ -217,14 +227,14 @@ from  MRP_ShipPlanDet as det
         foreach (var planByDateIndex in planByDateIndexs)
         {
             ii++;
-            str.Append("<th colspan='4'>");
+            str.Append("<th colspan='5'>");
             str.Append(planByDateIndex.Key.ToString("yyyy-MM-dd"));
             str.Append("</th>");
         }
         str.Append("</tr><tr class='GVHeader'>");
         foreach (var planByDateIndex in planByDateIndexs)
         {
-            str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th>");
+            str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th><th >期末在途</th>");
         }
         str.Append("</tr></thead>");
         str.Append("<tbody>");
@@ -233,19 +243,19 @@ from  MRP_ShipPlanDet as det
         string widths = "100%";
         if (ii > 14)
         {
-            widths = "270%";
+            widths = "290%";
         }
         else if (ii > 10)
         {
-            widths = "220%";
+            widths = "250%";
         }
         else if (ii > 6)
         {
-            widths = "190%";
+            widths = "210%";
         }
         else if (ii > 4)
         {
-            widths = "160%";
+            widths = "170%";
         }
 
         headStr += string.Format("<table id='tt' runat='server' border='1' class='GV' style='width:{0};border-collapse:collapse;'>", widths);
@@ -310,7 +320,7 @@ from  MRP_ShipPlanDet as det
             str.Append("<td>");
             str.Append((firstPlan.InTransitQty).ToString("0.##"));
             str.Append("</td>");
-            InitStockQty = InitStockQty + firstPlan.InTransitQty;
+           // InitStockQty = InitStockQty + firstPlan.InTransitQty;
             foreach (var planByDateIndex in planByDateIndexs)
             {
                 //str.Append("<th >需求数</th><th >发货数</th><th >期末</th>");
@@ -336,7 +346,12 @@ from  MRP_ShipPlanDet as det
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                InitStockQty = InitStockQty - shipPlanDet.ReqQty + shipPlanDet.ShipQty + shipPlanDet.OrderQty;
+                var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0?ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty):0;
+                var orderQtySum =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.OrderQty):0;
+                var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.ShipQty);
+                var reqQtySum =planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Count()>0? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty):0;
+
+                InitStockQty = firstPlan.InitStock + ipQty + orderQtySum + shipQtySum - reqQtySum;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
                     str.Append("<td style='background:red;color:white'>");
@@ -352,6 +367,16 @@ from  MRP_ShipPlanDet as det
                 str.Append(InitStockQty.ToString("0.##"));
                 str.Append("</td>");
                 //InitStockQty = InitStockQty + shipPlanDet.OrderQty;
+
+                var inTransitQty = firstPlan.InTransitQty;
+                var ipQty2 =  ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0?ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty):0;
+                var orderQtySum2 =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.OrderQty):0;
+                var shipQtySum2 =planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count()>0? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.ShipQty):0;
+                //var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty);
+                inTransitQty = inTransitQty - ipQty2 + orderQtySum2 + shipQtySum2;
+                str.Append("<td>");
+                str.Append(inTransitQty.ToString("0.##"));
+                str.Append("</td>");
             }
             str.Append("</tr>");
         }
