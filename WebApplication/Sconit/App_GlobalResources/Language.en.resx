@@ -936,4 +936,7 @@
   <data name="ShipPlan" xml:space="preserve">
     <value>ShipPlan</value>
   </data>
+  <data name="WeeklyPurchasePlan" xml:space="preserve">
+    <value>WeeklyPurchasePlan</value>
+  </data>
 </root>

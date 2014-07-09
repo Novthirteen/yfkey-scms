@@ -7,10 +7,11 @@ using System.Collections.Generic;
 namespace com.Sconit.Entity.MRP
 {
     [Serializable]
-    public abstract class PurchasePlanDetBase : EntityBase
+    public abstract class WeeklyPurchasePlanDetBase : EntityBase
     {
-        // <!--Id, PurchasePlanId, UUID, Flow, Item, ItemDesc, RefItemCode, ReqQty, OrgPurchaseQty, PurchaseQty, Uom, BaseUom, UnitQty,
-    //UC, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version-->
+        //    <!--
+//Id, PurchasePlanId, UUID, Flow, Item, ItemDesc, RefItemCode, ReqQty, OrgPurchaseQty, PurchaseQty, OrderQty, Uom,
+//BaseUom, UnitQty, UC, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version-->
         public Int32 Id { get; set; }
         public Int32 PurchasePlanId { get; set; }
         public string UUID { get; set; }
@@ -21,6 +22,7 @@ namespace com.Sconit.Entity.MRP
         public decimal ReqQty { get; set; }
         public decimal OrgPurchaseQty { get; set; }
         public decimal PurchaseQty { get; set; }
+        public decimal OrderQty { get; set; }
         public string Uom { get; set; }
         public string BaseUom { get; set; }
         public decimal UnitQty { get; set; }
@@ -32,7 +34,6 @@ namespace com.Sconit.Entity.MRP
         public DateTime LastModifyDate { get; set; }
         public string LastModifyUser { get; set; }
         public Int32 Version { get; set; }
-        public decimal OrderQty { get; set; }
         
         
 
@@ -50,7 +51,7 @@ namespace com.Sconit.Entity.MRP
 
         public override bool Equals(object obj)
         {
-            PurchasePlanDetBase another = obj as PurchasePlanDetBase;
+            WeeklyPurchasePlanDetBase another = obj as WeeklyPurchasePlanDetBase;
 
             if (another == null)
             {

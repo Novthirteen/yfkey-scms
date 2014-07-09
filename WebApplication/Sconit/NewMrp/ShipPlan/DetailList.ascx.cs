@@ -291,7 +291,7 @@ from  MRP_ShipPlanDet as det
             }
             else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
             {
-                str.Append("<td style='background:green'>");
+                str.Append("<td style='background:green' color='white'>");
             }
             else if (InitStockQty > firstPlan.MaxStock)
             {

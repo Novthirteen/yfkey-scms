@@ -1128,4 +1128,7 @@
   <data name="ShipPlan" xml:space="preserve">
     <value>发运计划</value>
   </data>
+  <data name="WeeklyPurchasePlan" xml:space="preserve">
+    <value>周采购计划</value>
+  </data>
 </root>
