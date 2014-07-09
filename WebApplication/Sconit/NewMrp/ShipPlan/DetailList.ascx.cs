@@ -232,19 +232,19 @@ from  MRP_ShipPlanDet as det
         string widths = "100%";
         if (ii > 14)
         {
-            widths = "260%";
+            widths = "270%";
         }
         else if (ii > 10)
         {
-            widths = "210%";
+            widths = "220%";
         }
         else if (ii > 6)
         {
-            widths = "160%";
+            widths = "190%";
         }
         else if (ii > 4)
         {
-            widths = "120%";
+            widths = "160%";
         }
 
         headStr += string.Format("<table id='tt' runat='server' border='1' class='GV' style='width:{0};border-collapse:collapse;'>", widths);
@@ -347,6 +347,7 @@ from  MRP_ShipPlanDet as det
                 }
                 str.Append(InitStockQty.ToString("0.##"));
                 str.Append("</td>");
+                InitStockQty = InitStockQty - shipPlanDet.OrderQty;
             }
             str.Append("</tr>");
         }
