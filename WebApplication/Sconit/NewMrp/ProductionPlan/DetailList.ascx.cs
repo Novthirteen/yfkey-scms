@@ -141,7 +141,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
                     showText = "<table><thead><tr><th>发运路线</th><th>物料</th><th>Bom</th><th>需求日期</th><th>需求数</th></tr></thead><tbody><tr>";
                     foreach (var c in currentLogs)
                     {
-                        showText += "<td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Bom + "</td><td>" + c.ReqDate + "</td><td>" + c.ReqQty.ToString("0.##") + "</td></tr><tr>";
+                        showText += "<td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Bom + "</td><td>" + c.ReqDate.ToShortDateString() + "</td><td>" + c.ReqQty.ToString("0.##") + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
@@ -152,7 +152,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
 
         #region  orderQty
         IList<ProductionPlanOpenOrder> productionPlanOpenOrderList = new List<ProductionPlanOpenOrder>();
-        productionPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", productionPlanOpenOrderList.Select(d => d.UUID).Distinct().ToArray())));
+        productionPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         if (productionPlanOpenOrderList != null && productionPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in productionPlanDetList)
@@ -180,7 +180,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         //str.Append(CopyString());
         //head
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th><th rowspan='2'>报验</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>报验</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -254,11 +254,11 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             var InitStockQty = firstPlan.InitStock;
             if (InitStockQty < firstPlan.SafeStock)
             {
-                str.Append("<td style='background:red'>");
+                str.Append("<td style='background:red;color:white'>");
             }
             else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
             {
-                str.Append("<td style='background:green'>");
+                str.Append("<td style='background:green;color:white'>");
             }
             else if (InitStockQty > firstPlan.MaxStock)
             {
@@ -266,13 +266,13 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             }
             str.Append((InitStockQty).ToString("0.##"));
             str.Append("</td>");
-            str.Append("<td>");
-            str.Append((firstPlan.InTransitQty).ToString("0.##"));
-            str.Append("</td>");
+            //str.Append("<td>");
+            //str.Append((firstPlan.InTransitQty).ToString("0.##"));
+            //str.Append("</td>");
             str.Append("<td>");
             str.Append((firstPlan.InspectQty).ToString("0.##"));
             str.Append("</td>");
-            InitStockQty = InitStockQty + firstPlan.InspectQty+firstPlan.InTransitQty;
+            InitStockQty = InitStockQty + firstPlan.InspectQty;
             foreach (var planByDateIndex in planByDateIndexs)
             {
                 var curenPlan = planByItem.Where(p => p.StartTime == planByDateIndex.Key);
@@ -287,14 +287,14 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
                 str.Append("<td>");
                 str.Append(pdPlan.Qty.ToString("0.##"));
                 str.Append("</td>");
-                InitStockQty = InitStockQty + pdPlan.Qty-pdPlan.ReqQty;
+                InitStockQty = InitStockQty + pdPlan.Qty-pdPlan.ReqQty+pdPlan.OrderQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
-                    str.Append("<td style='background:red'>");
+                    str.Append("<td style='background:red;color:white'>");
                 }
                 else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
                 {
-                    str.Append("<td style='background:green'>");
+                    str.Append("<td style='background:green;color:white'>");
                 }
                 else if (InitStockQty > firstPlan.MaxStock)
                 {
