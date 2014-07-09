@@ -201,7 +201,9 @@ from  MRP_ShipPlanDet as det
                     showText = "<table><thead><tr><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
                     foreach (var c in currentOrders)
                     {
-                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                        string sTime = c.StartTime != c.OrgStartTime ? c.StartTime.ToShortDateString() + "(" + c.OrgStartTime.ToShortDateString() + ")" : c.StartTime.ToShortDateString();
+                        string sWime = c.WindowTime != c.OrgWindowTime ? c.WindowTime.ToShortDateString() + "(" + c.OrgWindowTime.ToShortDateString() + ")" : c.WindowTime.ToShortDateString();
+                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + sTime + "</td><td>" + sWime + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
@@ -253,7 +255,7 @@ from  MRP_ShipPlanDet as det
         str.Append("</tr><tr class='GVHeader'>");
         foreach (var planByDateIndex in planByDateIndexs)
         {
-            str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th><th >期末在途</th>");
+            str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th><th >在途期末</th>");
         }
         str.Append("</tr></thead>");
         str.Append("<tbody>");
@@ -322,22 +324,36 @@ from  MRP_ShipPlanDet as det
             str.Append(firstPlan.MaxStock.ToString("0.##"));
             str.Append("</td>");
             var InitStockQty = firstPlan.InitStock;
-            if (InitStockQty < firstPlan.SafeStock)
+            var checkedColor = InitStockQty + firstPlan.InTransitQty;
+            string colorStr = "";
+            if (checkedColor < firstPlan.SafeStock)
             {
-                str.Append("<td style='background:red;color:white'>");
+                colorStr = "<td style='background:red;color:white'>";
             }
-            else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
+            else if (checkedColor >= firstPlan.SafeStock && checkedColor <= firstPlan.MaxStock)
             {
-                str.Append("<td style='background:green;color:white' >");
+                colorStr = "<td style='background:green;color:white' >";
             }
-            else if (InitStockQty > firstPlan.MaxStock)
+            else if (checkedColor > firstPlan.MaxStock)
             {
-                str.Append("<td style='background:orange;'>");
+                colorStr = "<td style='background:orange;'>";
             }
+            str.Append(colorStr);
             str.Append((InitStockQty).ToString("0.##"));
             str.Append("</td>");
             //str.Append("<td>");
-            str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)'>", firstPlan.IpDets));
+            if (checkedColor < firstPlan.SafeStock)
+            {
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:red;color:white' >", firstPlan.IpDets));
+            }
+            else if (checkedColor >= firstPlan.SafeStock && checkedColor <= firstPlan.MaxStock)
+            {
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:green;color:white' >", firstPlan.IpDets));
+            }
+            else if (checkedColor > firstPlan.MaxStock)
+            {
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:orange' >", firstPlan.IpDets));
+            }
             str.Append((firstPlan.InTransitQty).ToString("0.##"));
             str.Append("</td>");
            // InitStockQty = InitStockQty + firstPlan.InTransitQty;
@@ -367,34 +383,42 @@ from  MRP_ShipPlanDet as det
                     str.Append("</td>");
                 }
                 var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0?ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty):0;
-                var orderQtySum =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty):0;
+                var orderQtySum =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty-i.ShipQty):0;
                 var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.ShipQty);
                 var reqQtySum =planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Count()>0? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty):0;
 
                 InitStockQty = firstPlan.InitStock + ipQty + orderQtySum + shipQtySum - reqQtySum;
-                if (InitStockQty < firstPlan.SafeStock)
-                {
-                    str.Append("<td style='background:red;color:white'>");
-                }
-                else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
-                {
-                    str.Append("<td style='background:green;color:white' >");
-                }
-                else if (InitStockQty > firstPlan.MaxStock)
-                {
-                    str.Append("<td style='background:orange;'>");
-                }
-                str.Append(InitStockQty.ToString("0.##"));
-                str.Append("</td>");
-                //InitStockQty = InitStockQty + shipPlanDet.OrderQty;
 
                 var inTransitQty = firstPlan.InTransitQty;
+               
+
                 var ipQty2 =  ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count()>0?ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty):0;
                 var orderQtySum2 =shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Count()>0? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Sum(i => i.OrderQty-i.ShipQty):0;
                 var shipQtySum2 =planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count()>0? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.ShipQty):0;
                 //var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty);
+
                 inTransitQty = inTransitQty - ipQty2 + orderQtySum2 + shipQtySum2;
-                str.Append("<td>");
+                var redColor = InitStockQty + inTransitQty;
+                if (redColor < firstPlan.SafeStock)
+                {
+                    colorStr = "<td style='background:red;color:white'>";
+                }
+                else if (redColor >= firstPlan.SafeStock && redColor <= firstPlan.MaxStock)
+                {
+                    colorStr = "<td style='background:green;color:white' >";
+                }
+                else if (redColor > firstPlan.MaxStock)
+                {
+                    colorStr = "<td style='background:orange;'>";
+                }
+
+
+                str.Append(colorStr);
+                str.Append(InitStockQty.ToString("0.##"));
+                str.Append("</td>");
+                //InitStockQty = InitStockQty + shipPlanDet.OrderQty;
+
+                str.Append(colorStr);
                 str.Append(inTransitQty.ToString("0.##"));
                 str.Append("</td>");
             }

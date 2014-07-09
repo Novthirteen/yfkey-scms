@@ -60,7 +60,7 @@
     </div>
     <div id="ShowTraceDiv" style="position:absolute;width:500px; ">
     </div>
-    <div id="ShowDetsDiv" style="position:absolute; width:500px;">
+    <div id="ShowDetsDiv" style="position:absolute; width:650px;">
     </div>
     <div id="ShowIpdets" style="position:absolute; width:500px;">
     </div>

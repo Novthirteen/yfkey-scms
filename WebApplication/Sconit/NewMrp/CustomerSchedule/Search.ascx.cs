@@ -12,6 +12,7 @@ using com.Sconit.Entity.MRP;
 using NHibernate.Expression;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using System.Data.SqlClient;
 
 public partial class NewMrp_CustomerSchedule_Search : SearchModuleBase
 {
@@ -119,6 +120,23 @@ public partial class NewMrp_CustomerSchedule_Search : SearchModuleBase
         catch (Exception et)
         {
             ShowErrorMessage(et.Message);
+        }
+    }
+
+    protected void btnRunShipPlan_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            TheMrpMgr.RunShipPlan(this.CurrentUser);
+            ShowSuccessMessage("生成成功。");
+        }
+        catch (SqlException ex)
+        {
+            ShowErrorMessage(ex.Message);
+        }
+        catch (Exception ee)
+        {
+            ShowErrorMessage(ee.Message);
         }
     }
 

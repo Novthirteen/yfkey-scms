@@ -730,10 +730,10 @@ namespace com.Sconit.Service.MRP.Impl
 
                 var customerPlanList = new List<CustomerScheduleDetail>();
 
-                int colRefScheduleNo = 0;//路线
-                int colFlow = 1;//路线
-                int colItemCode = 2;//物料代码
-                int colRefItemCode = 4;//参考物料号
+                //int colRefScheduleNo = 0;//路线
+                int colFlow = 0;//路线
+                int colItemCode = 1;//物料代码
+                int colRefItemCode = 3;//参考物料号
 
                 List<string> errorMessages = new List<string>();
                 var flowDets = this.genericMgr.GetDatasetBySql(@"select d.Flow,d.Item,d.RefItemCode,i.Desc1,d.UC,d.Uom,m.LocFrom,isnull(m.MrpLeadTime,0)as MrpLeadTime,m.ShipFlow from FlowDet as d 
@@ -769,20 +769,20 @@ namespace com.Sconit.Service.MRP.Impl
                     }
                     string rowIndex = (row.RowNum + 1).ToString();
                     #region 客户版本号
-                    refScheduleNo = ImportHelper.GetCellStringValue(row.GetCell(colRefScheduleNo));
-                    if (string.IsNullOrEmpty(refScheduleNo))
-                    {
-                        errorMessages.Add(string.Format("客户版本号,第{0}行", rowIndex));
-                        continue;
-                    }
-                    else
-                    {
-                        if (refScheduleNoList.Contains(refScheduleNo))
-                        {
-                            errorMessages.Add(string.Format("客户版本号{0}已经存在,第{1}行", flowCode, rowIndex));
-                            continue;
-                        }
-                    }
+                    //refScheduleNo = ImportHelper.GetCellStringValue(row.GetCell(colRefScheduleNo));
+                    //if (string.IsNullOrEmpty(refScheduleNo))
+                    //{
+                    //    errorMessages.Add(string.Format("客户版本号,第{0}行", rowIndex));
+                    //    continue;
+                    //}
+                    //else
+                    //{
+                    //    if (refScheduleNoList.Contains(refScheduleNo))
+                    //    {
+                    //        errorMessages.Add(string.Format("客户版本号{0}已经存在,第{1}行", flowCode, rowIndex));
+                    //        continue;
+                    //    }
+                    //}
 
                     #endregion
 
@@ -942,7 +942,7 @@ namespace com.Sconit.Service.MRP.Impl
                             {
                                 //d.Flow,d.Item,d.RefItemCode,i.Desc1,d.UC,d.Uom,m.LocFrom
                                 CustomerScheduleDetail det = new CustomerScheduleDetail();
-                                det.ReferenceScheduleNo = refScheduleNo;
+                                //det.ReferenceScheduleNo = refScheduleNo;
                                 det.Item = itemCode;
                                 det.ItemDescription = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[3]);
                                 det.ItemReference = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[2]);
@@ -989,14 +989,14 @@ namespace com.Sconit.Service.MRP.Impl
                     planVersions.Add(allFlowCode, numberControlMgr.GenerateNumberNextSequence(string.Format("CustomerPlan_{0}_{1}",allFlowCode.ToString(), dateType.ToString() )));
                 }
 
-                var custmerPlnaGroup = customerPlanList.GroupBy(g => new { g.Flow,g.ReferenceScheduleNo }).ToDictionary(d=>d.Key,d=>d.ToList());
+                var custmerPlnaGroup = customerPlanList.GroupBy(g => new { g.Flow}).ToDictionary(d=>d.Key,d=>d.ToList());
 
                 foreach (var g in custmerPlnaGroup)
                 {
                     DateTime datetimeNow = System.DateTime.Now;
                     CustomerSchedule mstr = new CustomerSchedule
                      {
-                         ReferenceScheduleNo = g.Key.ReferenceScheduleNo,
+                         ReferenceScheduleNo = g.Key.Flow + "-" + dateType + "-" + planVersions[g.Key.Flow].ToString().PadLeft(3, '0'),
                          Flow = g.Key.Flow,
                          Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT,
                          Type = g.Value.First().Type,
@@ -1006,12 +1006,15 @@ namespace com.Sconit.Service.MRP.Impl
                          LastModifyUser = user.Code,
                          Version = planVersions[g.Key.Flow],
                          ShipFlow = g.Value.First().ShipFlow,
+                         ReleaseDate = datetimeNow,
+                         ReleaseUser = user.Code,
                      };
                     this.genericMgr.Create(mstr);
                     foreach (var r in g.Value)
                     {
                         r.Version = mstr.Version;
                         r.CustomerSchedule = mstr;
+                        r.ReferenceScheduleNo = mstr.ReferenceScheduleNo;
                         this.genericMgr.Create(r);
                     }
                 }

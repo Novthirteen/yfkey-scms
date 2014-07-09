@@ -17,6 +17,8 @@ namespace com.Sconit.Entity.MRP
         public string Item { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime WindowTime { get; set; }
+        public DateTime OrgStartTime { get; set; }
+        public DateTime OrgWindowTime { get; set; }
         public decimal OrderQty { get; set; }
         public decimal ShipQty { get; set; }
         public decimal RecQty { get; set; }
