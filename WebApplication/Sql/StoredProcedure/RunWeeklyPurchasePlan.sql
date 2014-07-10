@@ -163,7 +163,7 @@ BEGIN
 
 		--需求全部转换为周1开始
 		set datefirst 1 --设置周1为1周开始时间
-		update #tempProductionPlan set PlanDate = DATEADD(DAY, -DATEPART(WEEKDAY, PlanDate), PlanDate)
+		update #tempProductionPlan set PlanDate = DATEADD(DAY, -DATEPART(WEEKDAY, PlanDate) + 1, PlanDate)
 
 		--删除排产日期和班产计划重复的
 		select @MaxPlanDate = MAX(PlanDate) from MRP_ShiftPlanDet 
