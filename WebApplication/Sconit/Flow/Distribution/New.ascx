@@ -155,7 +155,28 @@
                         </td>
                         
                     </tr>
-                    <tr>
+                     <tr>
+                     <td class="td01">
+                            <asp:Literal ID="lblDateFst" runat="server" Text="${MasterData.Flow.DateFst}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbDateFst" runat="server" Text='<%# Bind("DateFst") %>' />
+                        </td>
+                        <td class="td01">
+                            <asp:Literal ID="lblWorkDatet" runat="server" Text="${MasterData.Flow.WorkDate}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbWorkDate" runat="server" Text='<%# Bind("WorkDate") %>' />
+                        </td>
+                        
+                    </tr>
+                     <tr>
+                     <td class="td01">
+                            <asp:Literal ID="lblMrpCode" runat="server" Text="${MasterData.Flow.MrpCode}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:TextBox ID="tbMrpCode" runat="server" Text='<%# Bind("MrpCode") %>' />
+                        </td>
                     <td class="td01">
                         发运路线
                         </td>

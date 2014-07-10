@@ -28,6 +28,11 @@ alter table Item add MaxStock int
 go
 alter table Item add IsMRP bit
 go
+alter table FlowMstr add MrpCode varchar(50) null
+go
+alter table FlowMstr add DateFst int null
+go
+alter table FlowMstr add WorkDate varchar(50) null
 /****** Object:  Table [dbo].[MRP_WeeklyShipPlan]    Script Date: 2014/6/24 17:47:05 ******/
 DROP TABLE [dbo].[MRP_WeeklyShipPlan]
 GO
@@ -185,6 +190,8 @@ CREATE TABLE [dbo].[MRP_ProductionPlanDet](
 	[Qty] [decimal](18, 8) NULL,
 	[OrderQty] [decimal](18, 8) NULL,
 	[Uom] [varchar](5) NULL,
+	[UC] [decimal](18, 8) NULL,
+	[MinLotSize] [decimal](18, 8) NULL,
 	[StartTime] [datetime] NULL,
 	[WindowTime] [datetime] NULL,
 	[CreateDate] [datetime] NULL,
@@ -192,6 +199,7 @@ CREATE TABLE [dbo].[MRP_ProductionPlanDet](
 	[LastModifyUser] [varchar](50) NULL,
 	[LastModifyDate] [datetime] NULL,
 	[Version] [int] NULL,
+	
  CONSTRAINT [PK_MRP_ProductionPlanDet] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -777,6 +785,8 @@ CREATE TABLE [dbo].[MRP_ShipPlanOpenOrder](
 	[Item] [varchar](50) NULL,
 	[StartTime] [datetime] NULL,
 	[WindowTime] [datetime] NULL,
+	[OrgStartTime] [datetime] NULL,
+	[OrgWindowTime] [datetime] NULL,
 	[OrderQty] [decimal](18, 8) NULL,
 	[ShipQty] [decimal](18, 8) NULL,
 	[RecQty] [decimal](18, 8) NULL,

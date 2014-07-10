@@ -923,7 +923,8 @@ namespace com.Sconit.Entity.MasterData
         public string ShipFlow { get; set; }
         public Decimal? MrpLeadTime { get; set; }
         public Int32? DateFst { get; set; }
-        public DateTime? WorkDate { get; set; }
+        public string WorkDate { get; set; }
+        public string MrpCode { get; set; }
         #endregion
 
         public override int GetHashCode()

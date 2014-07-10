@@ -939,4 +939,7 @@
   <data name="WeeklyPurchasePlan" xml:space="preserve">
     <value>WeeklyPurchasePlan</value>
   </data>
+  <data name="MrpParameterSetup" xml:space="preserve">
+    <value>MrpParameterSetup</value>
+  </data>
 </root>

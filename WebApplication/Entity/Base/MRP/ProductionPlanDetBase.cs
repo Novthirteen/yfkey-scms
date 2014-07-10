@@ -29,6 +29,8 @@ namespace com.Sconit.Entity.MRP
         public DateTime LastModifyDate { get; set; }
         public string LastModifyUser { get; set; }
         public Int32 Version { get; set; }
+        public decimal UnitCount { get; set; }
+        public decimal MinLotSize { get; set; }
         
         
 

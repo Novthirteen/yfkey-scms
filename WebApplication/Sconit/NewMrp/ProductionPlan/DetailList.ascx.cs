@@ -55,7 +55,7 @@ public partial class NewMrp_ProductionPlan_DetailList : MainModuleBase
 
     protected void btnSearch_Click(object sender, EventArgs e)
     {
-        var searchSql = @" select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0)
+        var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0)
  from  dbo.MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as m on det.ProductionPlanId=m.Id
 inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1 ";
 
@@ -112,6 +112,8 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
                 InTransitQty = Convert.ToDecimal(row[16]),
                 InspectQty = Convert.ToDecimal(row[17]),
                 ReqQty = Convert.ToDecimal(row[18]),
+                UnitCount = Convert.ToDecimal(row[19]),
+                MinLotSize = Convert.ToDecimal(row[20]),
             });
         }
 
@@ -125,6 +127,9 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             this.list.InnerHtml = "没有查到符合条件的记录";
             return;
         }
+
+        var minStartTime = productionPlanDetList.Min(s => s.StartTime).AddDays(14);
+        productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
         IList<ProductionPlanDetTrace> traceList = new List<ProductionPlanDetTrace>();
@@ -180,7 +185,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         //str.Append(CopyString());
         //head
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>报验</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>报验</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -244,6 +249,12 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             str.Append("</td>");
             str.Append("<td>");
             str.Append(firstPlan.RefItemCode);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.UnitCount);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.MinLotSize);
             str.Append("</td>");
             str.Append("<td>");
             str.Append(firstPlan.SafeStock.ToString("0.##"));
