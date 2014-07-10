@@ -56,6 +56,9 @@
       <siteMapNode url="" title="$Resources:Language,Information" description="Information">
         <siteMapNode url="~/Main.aspx?mid=MRP.Schedule.ProductionScheduleReport" title="$Resources:Language, ProductionScheduleReport" description="ProductionScheduleReport"/>
       </siteMapNode>
+      <siteMapNode url="" title="$Resources:Language,Setup" description="Setup">
+        <siteMapNode url="~/Main.aspx?mid=NewMrp.MrpParameterSetup" title="$Resources:Language,MrpParameterSetup"  description="MrpParameterSetup"  />
+      </siteMapNode>
     </siteMapNode>
 
     <!--供货管理-->

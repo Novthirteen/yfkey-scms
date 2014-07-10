@@ -161,16 +161,21 @@
                                 MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
                         <td class="td01">
-                            <asp:Literal ID="ltlIsMRP" runat="server" Text="是否参与MRP运算" />
+                            <asp:Literal ID="ltlMinLotSize" runat="server" Text="${MasterData.Item.MinLotSize}:" />
                         </td>
                         <td class="td02">
-                            <asp:CheckBox ID="cbIsMRP" runat="server" Checked='<%#Bind("IsMRP") %>' />
+                         <asp:TextBox ID="tbMinLotSize" runat="server" Text='<%# Bind("MinLotSize") %>'></asp:TextBox>
+                            <asp:RangeValidator ID="rvtbMinLotSize" ControlToValidate="tbMinLotSize" runat="server"
+                                Display="Dynamic" ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="1000000"
+                                MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
                     </tr>
                     <tr>
                         <td class="td01">
+                            <asp:Literal ID="ltlIsMRP" runat="server" Text="是否参与MRP运算" />
                         </td>
                         <td class="td02">
+                            <asp:CheckBox ID="cbIsMRP" runat="server" Checked='<%#Bind("IsMRP") %>' />
                         </td>
                         <td class="td01">
                         </td>

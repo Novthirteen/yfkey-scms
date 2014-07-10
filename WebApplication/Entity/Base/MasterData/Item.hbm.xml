@@ -27,5 +27,6 @@
     <property name="SafeStock" column="SafeStock" type="Int32"  />
     <property name="MaxStock" column="MaxStock" type="Int32"  />
     <property name="IsMRP" column="IsMRP" type="Boolean"  />
+    <property name="MinLotSize" column="MinLotSize" type="Int32"  />
   </class>
 </hibernate-mapping>
