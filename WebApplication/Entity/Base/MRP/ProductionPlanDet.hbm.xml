@@ -23,5 +23,7 @@
     <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
     <property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
     <property name="Version" column="Version" type="Int32"  />
+    <property name="UnitCount" column="UC" type="Decimal"  />
+    <property name="MinLotSize" column="MinLotSize" type="Decimal"  />
   </class>
 </hibernate-mapping>

@@ -93,7 +93,10 @@ public partial class MasterData_Flow_Edit : EditModuleBase
         "TransportPriceList",
         "CustomerCodes",
         "SupplierCodes",
-        "ShipFlow"
+        "ShipFlow" ,
+        "DateFst" ,
+        "WorkDate" ,
+        "MrpCode" ,
 
     };
 

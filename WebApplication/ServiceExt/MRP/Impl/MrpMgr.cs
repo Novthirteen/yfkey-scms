@@ -1537,16 +1537,20 @@ namespace com.Sconit.Service.MRP.Impl
                 IEnumerator rows = sheet.GetRowEnumerator();
                 ImportHelper.JumpRows(rows, 10);
 
-                #region 列定义 	销售路线	销售提前期	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量
+                #region 销售路线	销售提前期	MRP Code	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量
+
 
                 int colDisFlow = 0;//销售路线
                 int colDisLeadTime = 1;//销售提前期
-                int colShipFlow = 2;//发运路线
-                int colShipLeadTime = 3;//发运提前期
-                int colItem = 4;//物料代码
-                int colSafeStock = 5;//安全库存
-                int colMaxStock = 6;//最大库存
-                int colUnitCount = 7;//包装量
+                int colMrpCode = 2;//MRP Code
+                int colDateFst = 3;//周起始
+                int colWorkDate = 4;//周工作日
+                int colShipFlow = 5;//发运路线
+                int colShipLeadTime = 6;//发运提前期
+                int colItem = 7;//物料代码
+                int colSafeStock = 8;//安全库存
+                int colMaxStock = 9;//最大库存
+                int colUnitCount = 10;//包装量
                 #endregion
 
                 var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
@@ -1566,7 +1570,6 @@ namespace com.Sconit.Service.MRP.Impl
                 IList<object[]> allReadList = new List<object[]>();
                 while (rows.MoveNext())
                 {
-                    object[] objArr = new object[8];
                     rowCount++;
                     HSSFRow row = (HSSFRow)rows.Current;
                     if (!ImportHelper.CheckValidDataRow(row, 0, 3))
@@ -1576,12 +1579,16 @@ namespace com.Sconit.Service.MRP.Impl
 
                     string dFlowCode = string.Empty;
                     int dLeadTime = 0;
+                    string mrpCode = string.Empty;
+                    int? dateFst = null;
+                    string workDate = string.Empty;
                     string tFlowCode = string.Empty;
                     int tLeadTime = 0;
                     string itemCode = string.Empty;
                     decimal safeStock = 0;
                     decimal maxStock = 0;
                     decimal uc = 0;
+                    object[] objArr = new object[] { dFlowCode, dLeadTime, mrpCode, dateFst, workDate };
 
                     #region 读取销售路线
                     dFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colDisFlow));
@@ -1594,7 +1601,6 @@ namespace com.Sconit.Service.MRP.Impl
                     {
                         throw new BusinessErrorException(string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode));
                     }
-                    objArr[0] = dFlowCode;
                     #endregion
 
                     #region 读取销售提前期
@@ -1614,7 +1620,34 @@ namespace com.Sconit.Service.MRP.Impl
                             throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
                         }
                     }
-                    objArr[1] = dLeadTime;
+                    #endregion
+
+                    #region MrpCode
+                    mrpCode = ImportHelper.GetCellStringValue(row.GetCell(colMrpCode));
+                    #endregion
+
+                    #region 周起始
+                    string rDateFst = ImportHelper.GetCellStringValue(row.GetCell(colDateFst));
+                    if (string.IsNullOrEmpty(rDateFst))
+                    {
+                        dateFst = null;
+                    }
+                    else
+                    {
+                        int s;
+                        if (!int.TryParse(rDateFst, out s))
+                        {
+                            throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
+                        }
+                        if (s < 0 || s>7)
+                        {
+                            throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
+                        }
+                    }
+                    #endregion
+
+                    #region WorkDate
+                    workDate = ImportHelper.GetCellStringValue(row.GetCell(colWorkDate));
                     #endregion
 
                     #region 读取发运路线
@@ -1644,7 +1677,6 @@ namespace com.Sconit.Service.MRP.Impl
                                 throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
                             }
                         }
-                        objArr[3] = tLeadTime;
                         #endregion
 
                         #region 读取安全库存
@@ -1664,7 +1696,6 @@ namespace com.Sconit.Service.MRP.Impl
                                 throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
                             }
                         }
-                        objArr[4] = safeStock;
                         #endregion
 
                         #region 读取最大库存库存
@@ -1684,7 +1715,6 @@ namespace com.Sconit.Service.MRP.Impl
                                 throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
                             }
                         }
-                        objArr[5] = maxStock;
                         #endregion
 
                         #region 读取包装量
@@ -1704,7 +1734,6 @@ namespace com.Sconit.Service.MRP.Impl
                                 throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
                             }
                         }
-                        objArr[6] = uc;
                         #endregion
 
                     }
@@ -1730,7 +1759,6 @@ namespace com.Sconit.Service.MRP.Impl
                         }
                     }
 
-                    objArr[7] = itemCode;
                     #endregion
                     allReadList.Add(objArr);
                 }
@@ -1764,7 +1792,8 @@ namespace com.Sconit.Service.MRP.Impl
 
                     foreach (var l in byFlow.list)
                     {
-                        
+                        upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2} where Flow='{3}' and Item='{4}' ", l[5],l[4],l[6],l[2],l[7]);
+                        this.genericMgr.ExecuteSql(upSql);  
                     }
 
                 }

@@ -1131,4 +1131,7 @@
   <data name="WeeklyPurchasePlan" xml:space="preserve">
     <value>周采购计划</value>
   </data>
+  <data name="MrpParameterSetup" xml:space="preserve">
+    <value>Mrp参数设置</value>
+  </data>
 </root>
