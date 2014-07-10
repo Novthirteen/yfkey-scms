@@ -24,6 +24,7 @@ BEGIN
 	declare @BatchNo int
 	declare @MaxMstrId int
 	declare @MinWindowTime datetime
+	declare @MaxWindowTime datetime
 	declare @RowId int
 	declare @MaxRowId int
 	declare @DistributionFlow varchar(50)
@@ -33,6 +34,8 @@ BEGIN
 	declare @Flow varchar(50)
 	declare @Item varchar(50)
 	declare @StartTime datetime
+	declare @LastOverflowCount int
+	declare @CurrentOverflowCount int
 
 	set @DateTimeNow = GetDate()
 	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
@@ -57,7 +60,8 @@ BEGIN
 
 		create table #tempEffCustScheduleDet
 		(
-			Id int Primary Key,
+			RowId int identity(1, 1) Primary Key,
+			Id int,
 			MstrId int,
 			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			ShipFlow varchar(50) COLLATE  Chinese_PRC_CI_AS,
@@ -122,7 +126,9 @@ BEGIN
 			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			ReqQty decimal(18, 8),
+			OrgShipQty decimal(18, 8),
 			ShipQty decimal(18, 8),
+			OverflowQty decimal(18, 8),
 			OrderQty decimal(18, 8),
 			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
@@ -167,13 +173,12 @@ BEGIN
 		--update det set ShipQty = p.CurrenCumQty
 		--from CustScheduleDet as det inner join EDI_FordPlan as p on det.FordPlanId = p.Id
 
-		--更新客户日程开始时间
+		--更新客户日程开始时间(日计划）
 		update CustScheduleDet set StartTime = DATEADD(day, -ISNULL(fMstr.MRPLeadTime, 0), det.DateFrom)
 		from CustScheduleDet as det 
 		inner join CustScheduleMstr as mstr on det.ScheduleId = mstr.Id
 		inner join FlowMstr as fMstr on det.Flow = fMstr.Code
-		where  mstr.[Type] = 'Daily' and mstr.[Status] = 'Submit' and det.DateFrom >= @DateNow 
-
+		where mstr.[Type] = 'Daily' and mstr.[Status] = 'Submit' and det.DateFrom >= @DateNow 
 
 		-----------------------------↓获取客户日程-----------------------------
 		--选取开始日期大于等于当天的所有客户日程
@@ -184,13 +189,16 @@ BEGIN
 		from CustScheduleDet as det 
 		inner join CustScheduleMstr as mstr on det.ScheduleId = mstr.Id
 		inner join Item as i on det.Item = i.Code
-		where mstr.[Type] = 'Daily' and mstr.[Status] = 'Submit' and det.StartTime >= @DateNow 
+		where mstr.[Type] = 'Daily' and mstr.[Status] = 'Submit' and det.StartTime >= @DateNow
 		--and (det.Qty > det.ShipQty or (det.ShipQty is null and det.Qty > 0))
 
 		if not exists(select top 1 1 from #tempEffCustScheduleDet)
 		begin
 			RAISERROR(N'没有找到有效的客户日程。', 16, 1)
 		end
+
+		--缓存周计划拆分的日计划
+		exec SplitWeeklyCustSchedule
 
 		--取最新日程的所有明细，旧日程的明细要删除和最新日程重复的明细，依次循环得到有效日程
 		--原理：防止客户给出的日程没有包含最近几天的需求，最近几天的只能取旧日程上的明细，但是要保证和最新的日程不出现重复
@@ -201,7 +209,7 @@ BEGIN
 			select @DistributionFlow = Flow from #tempDistributionFlow where RowId = @RowId
 
 			select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow
-			select @MinWindowTime = MIN(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
+			select @MinWindowTime = MIN(WindowTime), @MaxWindowTime = MAX(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
 			while exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime)
 			begin
 				delete from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime
@@ -215,6 +223,12 @@ BEGIN
 					select @MinWindowTime = MIN(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
 				end
 			end
+
+			--添加周计划拆分的日计划
+			insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UC, Location, StartTime, WindowTime)
+			select det.DetId, det.MstrId, det.Flow, det.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty, det.Uom, i.Uom, det.UC, det.Location, det.StartTime, det.WindowTime 
+			from MRP_SplitWeeklyCustScheduleDet as det inner join Item as i on det.Item = i.Code
+			where det.WindowTime > @MaxWindowTime
 
 			set @RowId = @RowId + 1
 		end
@@ -298,6 +312,7 @@ BEGIN
 		ord.OrderQty, ord.ShipQty, ord.RecQty
 		from MRP_OpenOrderSnapShot as ord
 		inner join #tempShipFlowDet as fDet on ord.Flow = fDet.Flow and ord.Item = fDet.Item
+		where ord.OrderQty > ord.ShipQty
 
 		--插入销售路线的Order Order
 		insert into #tempOpenOrder(Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
@@ -360,7 +375,7 @@ BEGIN
 		(select MIN(UUID) as MinUUID, Flow, Item, StartTime from #tempShipPlanDet group by Flow, Item, StartTime having count(1) > 1) as t
 		on p.Flow = t.Flow and p.Item = t.Item and p.StartTime = t.StartTime
 		where p.UUID <> MinUUID
-select * from #tempShipPlanDet where Item = '3861001023148' order by StartTime
+
 		--低于安全库存的转为当天的发运计划
 		update p set ShipQty = ShipQty - d.ActiveQty
 		from #tempShipPlanDet as p 
@@ -394,31 +409,6 @@ select * from #tempShipPlanDet where Item = '3861001023148' order by StartTime
 
 			set @RowId = @RowId + 1
 		end
-select * from #tempShipPlanDet where Item = '3861001023148' order by StartTime
-
-		----根据开始时间依次扣减在途库存
-		--set @RowId = null
-		--set @MaxRowId = null
-		--select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempIpDet
-		--while (@RowId <= @MaxRowId)
-		--begin
-		--	set @ActiveQty = 0
-		--	set @LastActiveQty = 0
-		--	set @Flow = null
-		--	set @Item = null
-		--	set @WindowTime = null
-
-		--	select @ActiveQty = Qty, @Flow = Flow, @Item = Item, @WindowTime = WindowTime from #tempIpDet where RowId = @RowId
-		--	if (@ActiveQty > 0)
-		--	begin
-		--		update det set ShipQty = CASE WHEN @ActiveQty >= ShipQty THEN 0 WHEN @ActiveQty < ShipQty and @ActiveQty>0 THEN ShipQty - @ActiveQty ELSE ShipQty END,
-		--		@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = ShipQty
-		--		from #tempShipPlanDet as det with(INDEX(IX_StartTime))
-		--		where det.Flow = @Flow and det.Item = @Item and det.StartTime >= @WindowTime
-		--	end
-
-		--	set @RowId = @RowId + 1
-		--end
 
 		--更新订单数
 		update pd set OrderQty = ord.OrderQty
@@ -464,6 +454,34 @@ select * from #tempShipPlanDet where Item = '3861001023148' order by StartTime
 		left join (select UUID, SUM(ISNULL(ReqQty, 0)) as ReqQty from #tempShipPlanDetTrace group by UUID) as dt on d.UUID = dt.UUID
 		-----------------------------↑计算发运计划-----------------------------
 
+
+
+
+		-----------------------------↓发货数按包装圆整-----------------------------
+		update #tempShipPlanDet set ShipQty = ceiling(ShipQty / UC) * UC, OrgShipQty = ShipQty where ShipQty > 0 and UC > 0
+
+		update det set OverflowQty = tmp.OverflowQty
+		from #tempShipPlanDet as det inner join
+		(select det2.Flow, det2.Item, det2.StartTime, SUM(ISNULL(det1.ShipQty, 0) - ISNULL(det1.OrgShipQty, 0)) as OverflowQty
+		from #tempShipPlanDet as det1 inner join #tempShipPlanDet as det2 on det1.Flow = det2.Flow and det1.Item = det2.Item
+		where det1.StartTime <= det2.StartTime
+		group by det2.Flow, det2.Item, det2.StartTime) as tmp on det.Flow = tmp.Flow and det.Item = tmp.Item and det.StartTime = tmp.StartTime
+	
+		
+		set @LastOverflowCount = 0
+		select @CurrentOverflowCount = COUNT(1) from #tempShipPlanDet where OverflowQty >= UC and UC > 0 and ShipQty >= UC
+		while @LastOverflowCount <> @CurrentOverflowCount
+		begin
+			update det set ShipQty = ShipQty - CASE WHEN det.StartTime = tmp.StartTime THEN UC ELSE 0 END, OverflowQty = OverflowQty - UC
+			from #tempShipPlanDet as det inner join (select Flow, Item, MIN(StartTime) as StartTime from #tempShipPlanDet 
+													where OverflowQty >= UC and UC > 0 and ShipQty >= UC
+													group by Flow, Item) as tmp 
+													on det.Flow = tmp.Flow and det.Item = tmp.Item and det.StartTime >= tmp.StartTime
+
+			set @LastOverflowCount = @CurrentOverflowCount
+			select @CurrentOverflowCount = COUNT(1) from #tempShipPlanDet where OverflowQty >= UC and UC > 0 and ShipQty >= UC
+		end
+		-----------------------------↑发货数按包装圆整-----------------------------
 	end try
 	begin catch
 		set @Msg = N'运行发运计划异常：' + Error_Message()
@@ -504,8 +522,7 @@ select * from #tempShipPlanDet where Item = '3861001023148' order by StartTime
 		insert into MRP_ShipPlanIpDet(ShipPlanId, IpNo, Flow, Item, StartTime, WindowTime, Qty, CreateDate, CreateUser)
 		select @ShipPlanId, IpNo, Flow, Item, StartTime, WindowTime, Qty, @DateTimeNow, @RunUser from #tempIpDet
 
-		--发货数按包装圆整
-		update #tempShipPlanDet set ShipQty = ceiling(ShipQty / UC) * UC where ShipQty > 0 and UC > 0
+		
 
 		--新增发运计划明细
 		insert into MRP_ShipPlanDet(ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 

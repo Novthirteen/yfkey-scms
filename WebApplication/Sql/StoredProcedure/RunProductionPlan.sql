@@ -38,6 +38,8 @@ BEGIN
 	declare @BomQty decimal(18, 8)
 	declare @ProductionPlanId int
 	declare @StartTime datetime
+	declare @LastOverflowCount int
+	declare @CurrentOverflowCount int
 
 	set @DateTimeNow = GetDate()
 	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
@@ -86,6 +88,21 @@ BEGIN
 			UnitQty decimal(18, 8)
 		)
 
+		create table #tempTempNextLevlProductPlan
+		(
+			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			Qty decimal(18, 8),
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			RateQty decimal(18, 8), 
+			ScrapPct decimal(18, 8),
+			StartTime datetime,
+			WindowTime datetime
+		)
+
 		create table #tempNextLevlProductPlan
 		(
 			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
@@ -108,8 +125,12 @@ BEGIN
 			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+			UC decimal(18, 8),
+			MinLotSize decimal(18, 8),
 			ReqQty decimal(18, 8),
+			OrgQty decimal(18, 8),
 			Qty decimal(18, 8),
+			OverflowQty decimal(18, 8),
 			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			OrderQty decimal(18, 8),
 			StartTime datetime,
@@ -179,18 +200,24 @@ BEGIN
 		where mstr.ReleaseNo = @ShipPlanReleaseNo
 		group by det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, det.StartTime, i.Bom, i.LeadTime
 
-
 		--删除开始日期小于今天的需求
 		delete from #tempCurrentLevlProductPlan where StartTime < @DateNow
 
 		--记录物料追溯表
 		insert into #tempProductPlanDetTrace(UUID, Flow, Item, ReqDate, ReqQty, ScrapPct, Uom, UnitQty)
-		select t.UUID, det.Flow, det.Item, det.StartTime, det.ShipQty, i.ScrapPct, det.Uom, det.UnitQty
+		select t.UUID, det.Flow, det.Item, det.StartTime, ISNULL(det.ShipQty, 0), i.ScrapPct, det.Uom, det.UnitQty
 		from MRP_ShipPlanDet as det
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
 		inner join Item as i on det.Item = i.Code
 		inner join #tempCurrentLevlProductPlan as t on t.Item = det.Item and t.WindowTime = det.StartTime
-		where mstr.ReleaseNo = @ShipPlanReleaseNo
+		where mstr.ReleaseNo = @ShipPlanReleaseNo and ISNULL(det.ShipQty, 0) <> 0
+		insert into #tempProductPlanDetTrace(UUID, Flow, Item, ReqDate, ReqQty, ScrapPct, Uom, UnitQty)
+		select t.UUID, det.Flow, det.Item, det.StartTime, ISNULL(det.OrderQty, 0), i.ScrapPct, det.Uom, det.UnitQty
+		from MRP_ShipPlanDet as det
+		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
+		inner join Item as i on det.Item = i.Code
+		inner join #tempCurrentLevlProductPlan as t on t.Item = det.Item and t.WindowTime = det.StartTime
+		where mstr.ReleaseNo = @ShipPlanReleaseNo and ISNULL(det.OrderQty, 0) <> 0
 		-----------------------------↑获取顶层毛需求-----------------------------
 
 
@@ -287,8 +314,9 @@ BEGIN
 							continue
 						end
 
-						--如果下层是半成品，插入下层生产计划
-						insert into #tempNextLevlProductPlan(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, 
+						--如果下层是半成品，插入临时下层生产计划
+						truncate table #tempTempNextLevlProductPlan
+						insert into #tempTempNextLevlProductPlan(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, 
 						RateQty, ScrapPct, StartTime, WindowTime)
 						select NEWID(), bom.Item, i.Desc1, null, bom.Uom, @BomQty * bom.RateQty * (1 + bom.ScrapPct / 100), ISNULL(i.Bom, bom.Item),
 						bom.RateQty, bom.ScrapPct, DATEADD(day, -ISNULL(i.LeadTime, 0), @EffDate), @EffDate
@@ -298,11 +326,17 @@ BEGIN
 						where bm.IsActive = 1
 
 						--删除开始日期小于今天的需求
-						delete from #tempNextLevlProductPlan where StartTime < @DateNow
+						delete from #tempTempNextLevlProductPlan where StartTime < @DateNow
 
 						--插入物料追溯表
 						insert into #tempProductPlanDetTrace(UUID, Item, ReqDate, ReqQty, Bom, RateQty, ScrapPct, Uom)
-						select UUID, @Item, @Effdate, @BomQty, @Bom, RateQty, ScrapPct, Uom from #tempNextLevlProductPlan
+						select pl.UUID, @Item, DATEADD(day, -ISNULL(i.LeadTime, 0), @EffDate), @BomQty, @Bom, pl.RateQty, pl.ScrapPct, pl.Uom 
+						from #tempTempNextLevlProductPlan as pl
+						inner join Item as i on pl.Item = i.Code
+
+						--
+						insert into #tempNextLevlProductPlan(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, RateQty, ScrapPct, StartTime, WindowTime)
+						select UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, RateQty, ScrapPct, StartTime, WindowTime from #tempTempNextLevlProductPlan
 					end
 
 					set @GroupSeq = @GroupSeq + 1 
@@ -384,7 +418,7 @@ BEGIN
 		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, ord.OrderQty, ord.RecQty
 		from MRP_OpenOrderSnapShot as ord
 		inner join (select distinct Item from #tempProductPlanDet) as pl on ord.Item = pl.Item
-		where ord.OrderType = 'Production'
+		where ord.OrderType = 'Production' and ord.StartTime >= @DateNow
 
 		--更新订单数
 		update pl set OrderQty = ISNULL(ord.OrderQty, 0)
@@ -424,11 +458,50 @@ BEGIN
 
 			set @RowId = @RowId + 1
 		end
-		-----------------------------↑更新订单数-----------------------------
 
 		--汇总生产需求
 		update d set ReqQty = ISNULL(dt.ReqQty, 0) from #tempProductPlanDet as d
 		left join (select UUID, SUM(ISNULL(ReqQty, 0)) as ReqQty from #tempProductPlanDetTrace group by UUID) as dt on d.UUID = dt.UUID
+		-----------------------------↑更新订单数-----------------------------
+
+
+
+		-----------------------------↓生产数按包装圆整-----------------------------
+		--数量按包装圆整
+		update pl set Qty = ceiling(pl.Qty / i.UC) * i.UC, UC = i.UC, OrgQty = Qty
+		from #tempProductPlanDet as pl inner join Item as i on pl.Item = i.Code
+		where pl.Qty > 0 and i.UC > 0
+
+		--经济批量
+		update pl set Qty = CASE WHEN Qty < i.MinLotSize THEN i.MinLotSize ELSE Qty END , MinLotSize = i.MinLotSize
+		from #tempProductPlanDet as pl inner join Item as i on pl.Item = i.Code
+		where pl.Qty > 0 and i.MinLotSize > 0
+
+		update det set OverflowQty = tmp.OverflowQty
+		from #tempProductPlanDet as det inner join
+		(select det2.Item, det2.StartTime, SUM(ISNULL(det1.Qty, 0) - ISNULL(det1.OrgQty, 0)) as OverflowQty
+		from #tempProductPlanDet as det1 inner join #tempProductPlanDet as det2 on det1.Item = det2.Item
+		where det1.StartTime <= det2.StartTime
+		group by det2.Item, det2.StartTime) as tmp on det.Item = tmp.Item and det.StartTime = tmp.StartTime
+	
+		set @LastOverflowCount = 0
+		select @CurrentOverflowCount = COUNT(1) from #tempProductPlanDet 
+		where OverflowQty >= UC and UC > 0 and Qty >= UC and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null))
+		while @LastOverflowCount <> @CurrentOverflowCount
+		begin
+			update det set Qty = Qty - CASE WHEN det.StartTime = tmp.StartTime THEN UC ELSE 0 END, OverflowQty = OverflowQty - UC
+			from #tempProductPlanDet as det inner join (select Item, MIN(StartTime) as StartTime from #tempProductPlanDet 
+													where OverflowQty >= UC and UC > 0 and Qty >= UC
+													and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null)) 
+													group by Item) as tmp 
+													on det.Item = tmp.Item and det.StartTime >= tmp.StartTime
+
+			set @LastOverflowCount = @CurrentOverflowCount
+			select @CurrentOverflowCount = COUNT(1) from #tempProductPlanDet 
+			where OverflowQty >= UC and UC > 0 and Qty >= UC
+			and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null))
+		end
+		-----------------------------↑生产数按包装圆整-----------------------------
 
 	end try
 	begin catch
@@ -462,14 +535,9 @@ BEGIN
 		insert into MRP_ProductionPlanInitLocationDet(ProductionPlanId, Item, InitStock, SafeStock, MaxStock, InTransitQty, CreateDate, CreateUser)
 		select @ProductionPlanId, Item, Qty, SafeStock, MaxStock, InTransitQty, @DateTimeNow, @RunUser from #tempLocatoinDet
 
-		--数量按包装圆整
-		update pl set Qty = ceiling(pl.Qty / i.UC) * i.UC
-		from #tempProductPlanDet as pl inner join Item as i on pl.Item = i.Code
-		where pl.Qty > 0 and i.UC > 0
-
 		--新增主生产计划明细
-		insert into MRP_ProductionPlanDet(ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, ReqQty, OrgQty, Qty, OrderQty, Uom, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
-		select @ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, ISNULL(ReqQty, 0), ISNULL(Qty, 0), ISNULL(Qty, 0), ISNULL(OrderQty, 0), Uom, StartTime, WindowTime, @DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
+		insert into MRP_ProductionPlanDet(ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, ReqQty, OrgQty, Qty, OrderQty, Uom, UC, MinLotSize, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
+		select @ProductionPlanId, UUID, Item, ItemDesc, RefItemCode, ISNULL(ReqQty, 0), ISNULL(Qty, 0), ISNULL(Qty, 0), ISNULL(OrderQty, 0), Uom, UC, MinLotSize, StartTime, WindowTime, @DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
 		from #tempProductPlanDet
 
 		--新增主生产计划明细追溯
