@@ -162,8 +162,8 @@ from  MRP_ShipPlanDet as det
             this.list.InnerHtml = "没有查到符合条件的记录";
             return;
         }
-        var minStartTime= shipPlanDetList.Min(s=>s.StartTime).AddDays(14);
-        shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        //var minStartTime= shipPlanDetList.Min(s=>s.StartTime).AddDays(14);
+        //shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
         IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();

@@ -128,8 +128,8 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             return;
         }
 
-        var minStartTime = productionPlanDetList.Min(s => s.StartTime).AddDays(14);
-        productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        //var minStartTime = productionPlanDetList.Min(s => s.StartTime).AddDays(14);
+        //productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
         IList<ProductionPlanDetTrace> traceList = new List<ProductionPlanDetTrace>();
