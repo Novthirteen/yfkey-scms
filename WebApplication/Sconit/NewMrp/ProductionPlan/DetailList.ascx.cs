@@ -251,10 +251,10 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             str.Append(firstPlan.RefItemCode);
             str.Append("</td>");
             str.Append("<td>");
-            str.Append(firstPlan.UnitCount);
+            str.Append(firstPlan.UnitCount.ToString("0.##"));
             str.Append("</td>");
             str.Append("<td>");
-            str.Append(firstPlan.MinLotSize);
+            str.Append(firstPlan.MinLotSize.ToString("0.##"));
             str.Append("</td>");
             str.Append("<td>");
             str.Append(firstPlan.SafeStock.ToString("0.##"));
