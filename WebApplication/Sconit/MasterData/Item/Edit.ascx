@@ -183,8 +183,13 @@
                             <asp:TextBox ID="tbMemo" runat="server" Text='<%# Bind("Memo") %>'></asp:TextBox>
                         </td>
                         <td class="td01">
+                            <asp:Literal ID="ltlMinLotSize" runat="server" Text="${MasterData.Item.MinLotSize}:" />
                         </td>
                         <td class="td02">
+                        <asp:TextBox ID="tbMinLotSize" runat="server" Text='<%# Bind("MinLotSize") %>'></asp:TextBox>
+                            <asp:RangeValidator ID="rvtbMinLotSize" ControlToValidate="tbMinLotSize" runat="server"
+                                Display="Dynamic" ErrorMessage="${Common.Validator.Valid.Number}" MaximumValue="1000000"
+                                MinimumValue="0" Type="Double" ValidationGroup="vgSave" />
                         </td>
                     </tr>
                     <tr>

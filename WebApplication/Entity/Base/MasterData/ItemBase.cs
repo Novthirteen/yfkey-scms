@@ -247,6 +247,7 @@ namespace com.Sconit.Entity.MasterData
         public Int32 SafeStock { get; set; }
         public Int32 MaxStock { get; set; }
         public Boolean IsMRP { get; set; }
+        public Int32? MinLotSize { get; set; }
         #endregion
 
 		public override int GetHashCode()

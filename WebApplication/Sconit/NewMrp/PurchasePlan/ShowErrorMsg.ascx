@@ -6,7 +6,7 @@
             SkinID="GV" AllowMultiColumnSorting="false" AutoLoadStyle="false" SeqNo="0" SeqText="No."
             ShowSeqNo="true" AllowSorting="True" AllowPaging="True" PagerID="gp" Width="100%"
             CellMaxLength="10" TypeName="com.Sconit.Web.CriteriaMgrProxy" SelectMethod="FindAll"
-            SelectCountMethod="FindCount" OnRowDataBound="GV_List_RowDataBound">
+            SelectCountMethod="FindCount" OnRowDataBound="GV_List_RowDataBound" OnPageIndexChanging="GridView1_PageIndexChanging">
             <Columns>
                 <asp:BoundField DataField="Flow" HeaderText="路线" SortExpression="Flow" />
                 <asp:BoundField DataField="Item" HeaderText="物料" SortExpression="Item" />

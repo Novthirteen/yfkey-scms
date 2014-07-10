@@ -40,7 +40,8 @@ public partial class MasterData_Item_New : NewModuleBase
 
     public void PageCleanup()
     {
-       // ((TextBox)(this.FV_Item.FindControl("tbMaxStock"))).Text = string.Empty;
+        ((TextBox)(this.FV_Item.FindControl("tbMinLotSize"))).Text = string.Empty;
+        ((TextBox)(this.FV_Item.FindControl("tbMaxStock"))).Text = string.Empty;
         ((TextBox)(this.FV_Item.FindControl("tbLeadTime"))).Text = string.Empty;
         ((TextBox)(this.FV_Item.FindControl("tbSafeStock"))).Text = string.Empty;
         ((TextBox)(this.FV_Item.FindControl("tbCode"))).Text = string.Empty;

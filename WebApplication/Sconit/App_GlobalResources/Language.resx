@@ -1117,10 +1117,10 @@
     <value>班产计划</value>
   </data>
   <data name="ProductPlan" xml:space="preserve">
-    <value>生产需求</value>
+    <value>生产计划</value>
   </data>
   <data name="ProcurementPlan" xml:space="preserve">
-    <value>采购需求</value>
+    <value>采购计划</value>
   </data>
   <data name="TransferPlan" xml:space="preserve">
     <value>领料计划</value>

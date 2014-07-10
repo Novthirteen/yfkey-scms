@@ -162,6 +162,8 @@ from  MRP_ShipPlanDet as det
             this.list.InnerHtml = "没有查到符合条件的记录";
             return;
         }
+        var minStartTime= shipPlanDetList.Min(s=>s.StartTime).AddDays(14);
+        shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
         IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
@@ -190,6 +192,7 @@ from  MRP_ShipPlanDet as det
         #region  orderQty
         IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
         shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        shipPlanOpenOrderList = shipPlanOpenOrderList == null ? new List<ShipPlanOpenOrder>() : shipPlanOpenOrderList;
         if (shipPlanOpenOrderList!=null && shipPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in shipPlanDetList)

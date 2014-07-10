@@ -22,6 +22,7 @@ public partial class NewMrp_ProductionPlan_ShowErrorMsg : MainModuleBase
 {
     public EventHandler BackEvent;
 
+    public static IList<RunProductionPlanLog> tempPlanLogList;
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -34,7 +35,8 @@ public partial class NewMrp_ProductionPlan_ShowErrorMsg : MainModuleBase
 
     public void InitPageParameter(IList<RunProductionPlanLog> runProductionPlanLogs)
     {
-        this.GV_List.DataSource = runProductionPlanLogs.Where(r => r.Msg != null).ToList();
+        tempPlanLogList = runProductionPlanLogs;
+        this.GV_List.DataSource = tempPlanLogList.Where(r => r.Msg != null).ToList();
         this.GV_List.DataBind();
     }
 
@@ -44,5 +46,12 @@ public partial class NewMrp_ProductionPlan_ShowErrorMsg : MainModuleBase
         {
             BackEvent(sender, e);
         }
+    }
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        this.GV_List.PageIndex = e.NewPageIndex;
+        this.GV_List.DataSource = tempPlanLogList.Where(r => r.Msg != null).ToList();
+        this.GV_List.DataBind();
     }
 }

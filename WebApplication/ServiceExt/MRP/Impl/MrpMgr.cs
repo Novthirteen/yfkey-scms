@@ -1521,6 +1521,256 @@ namespace com.Sconit.Service.MRP.Impl
 
         #endregion
 
+        #region   发运计划参数导入
+        private static object ReadShipPlanParametersFromXlsLock = new object();
+        [Transaction(TransactionMode.Requires)]
+        public void ReadShipPlanParametersFromXls(Stream inputStream, User user)
+        {
+            lock (ReadShipPlanParametersFromXlsLock)
+            {
+                if (inputStream.Length == 0)
+                {
+                    throw new BusinessErrorException("Import.Stream.Empty");
+                }
+                HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+                Sheet sheet = workbook.GetSheetAt(0);
+                IEnumerator rows = sheet.GetRowEnumerator();
+                ImportHelper.JumpRows(rows, 10);
+
+                #region 列定义 	销售路线	销售提前期	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量
+
+                int colDisFlow = 0;//销售路线
+                int colDisLeadTime = 1;//销售提前期
+                int colShipFlow = 2;//发运路线
+                int colShipLeadTime = 3;//发运提前期
+                int colItem = 4;//物料代码
+                int colSafeStock = 5;//安全库存
+                int colMaxStock = 6;//最大库存
+                int colUnitCount = 7;//包装量
+                #endregion
+
+                var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
+                IList<object[]> allDFlowCodeList = new List<object[]>();
+                foreach (System.Data.DataRow flowRow in disFlowCodes.Rows)
+                {
+                    allDFlowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2] });
+                }
+
+                var traFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Transfer' and m.IsActive=1 ").Tables[0];
+                IList<object[]> allTFlowCodeList = new List<object[]>();
+                foreach (System.Data.DataRow flowRow in traFlowCodes.Rows)
+                {
+                    allTFlowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2].ToString() });
+                }
+                int rowCount = 10;
+                IList<object[]> allReadList = new List<object[]>();
+                while (rows.MoveNext())
+                {
+                    object[] objArr = new object[8];
+                    rowCount++;
+                    HSSFRow row = (HSSFRow)rows.Current;
+                    if (!ImportHelper.CheckValidDataRow(row, 0, 3))
+                    {
+                        break;//边界
+                    }
+
+                    string dFlowCode = string.Empty;
+                    int dLeadTime = 0;
+                    string tFlowCode = string.Empty;
+                    int tLeadTime = 0;
+                    string itemCode = string.Empty;
+                    decimal safeStock = 0;
+                    decimal maxStock = 0;
+                    decimal uc = 0;
+
+                    #region 读取销售路线
+                    dFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colDisFlow));
+                    if (string.IsNullOrEmpty(dFlowCode))
+                    {
+                        throw new BusinessErrorException(string.Format("第{0}行：销售路线不能为空。", rowCount));
+                    }
+
+                    if (allDFlowCodeList.Where(d => (d[0]).ToString() == dFlowCode).Count() == 0)
+                    {
+                        throw new BusinessErrorException(string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode));
+                    }
+                    objArr[0] = dFlowCode;
+                    #endregion
+
+                    #region 读取销售提前期
+                    string rdLeadTime = ImportHelper.GetCellStringValue(row.GetCell(colDisLeadTime));
+                    if (string.IsNullOrEmpty(rdLeadTime))
+                    {
+                        dLeadTime = 0;
+                    }
+                    else
+                    {
+                        if (!int.TryParse(rdLeadTime, out dLeadTime))
+                        {
+                            throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
+                        }
+                        if (dLeadTime < 0)
+                        {
+                            throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
+                        }
+                    }
+                    objArr[1] = dLeadTime;
+                    #endregion
+
+                    #region 读取发运路线
+                    tFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colShipFlow));
+                    if (!string.IsNullOrEmpty(tFlowCode))
+                    {
+                        if (allTFlowCodeList.Where(d => (d[0]).ToString() == tFlowCode).Count() == 0)
+                        {
+                            throw new BusinessErrorException(string.Format("第{0}行：发运路线{1}不存在。", rowCount, dFlowCode));
+                        }
+
+
+                        #region 读取发运路线提前期
+                        string rtLeadTime = ImportHelper.GetCellStringValue(row.GetCell(colShipLeadTime));
+                        if (string.IsNullOrEmpty(rtLeadTime))
+                        {
+                            tLeadTime = 0;
+                        }
+                        else
+                        {
+                            if (!int.TryParse(rtLeadTime, out tLeadTime))
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
+                            }
+                            if (tLeadTime < 0)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
+                            }
+                        }
+                        objArr[3] = tLeadTime;
+                        #endregion
+
+                        #region 读取安全库存
+                        string rSafeStock = ImportHelper.GetCellStringValue(row.GetCell(colSafeStock));
+                        if (string.IsNullOrEmpty(rSafeStock))
+                        {
+                            safeStock = 0;
+                        }
+                        else
+                        {
+                            if (!decimal.TryParse(rSafeStock, out safeStock))
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
+                            }
+                            if (safeStock < 0)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
+                            }
+                        }
+                        objArr[4] = safeStock;
+                        #endregion
+
+                        #region 读取最大库存库存
+                        string rMaxStock = ImportHelper.GetCellStringValue(row.GetCell(colMaxStock));
+                        if (string.IsNullOrEmpty(rMaxStock))
+                        {
+                            maxStock = 0;
+                        }
+                        else
+                        {
+                            if (!decimal.TryParse(rMaxStock, out maxStock))
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
+                            }
+                            if (maxStock < 0)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
+                            }
+                        }
+                        objArr[5] = maxStock;
+                        #endregion
+
+                        #region 读取包装量
+                        string rUnitCount = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
+                        if (string.IsNullOrEmpty(rUnitCount))
+                        {
+                            uc = 0;
+                        }
+                        else
+                        {
+                            if (!decimal.TryParse(rUnitCount, out uc))
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
+                            }
+                            if (uc < 0)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
+                            }
+                        }
+                        objArr[6] = uc;
+                        #endregion
+
+                    }
+
+                    #endregion
+
+                    #region 读取物料代码
+
+                    itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
+                    if (string.IsNullOrEmpty(itemCode))
+                    {
+                        throw new BusinessErrorException(string.Format("第{0}行：物料代码不能为空。", rowCount));
+                    }
+                    if (allDFlowCodeList.Where(f => f[0] == dFlowCode && f[1] == itemCode).Count() == 0)
+                    {
+                        throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在销售路线{2}中，请维护。", rowCount, itemCode, dFlowCode));
+                    }
+                    if (!string.IsNullOrEmpty(tFlowCode))
+                    {
+                        if (allTFlowCodeList.Where(f => f[0] == tFlowCode && f[1] == itemCode).Count() == 0)
+                        {
+                            throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在发运路线{2}中,请维护。", rowCount, itemCode, tFlowCode));
+                        }
+                    }
+
+                    objArr[7] = itemCode;
+                    #endregion
+                    allReadList.Add(objArr);
+                }
+                if (allReadList.Count == 0)
+                {
+                    throw new BusinessErrorException("导入的有效数据为空。");
+                }
+                var groupByFlows = (from tak in allReadList
+                                    group tak by new
+                                    {
+                                        disFlowCode = tak[0],
+                                        dLeadTime = tak[1],
+                                        trFlowCode = tak[2],
+                                        tLeadTime = tak[3],
+                                    } into result
+                                    select new
+                                    {
+                                        dFlowCode = result.Key.disFlowCode,
+                                        dLeadTime = result.Key.dLeadTime,
+                                        trFlowCode = result.Key.trFlowCode,
+                                        tLeadTime = result.Key.tLeadTime,
+                                        list = result.ToList()
+                                    }).ToList();
+                foreach (var byFlow in groupByFlows)
+                {
+                    string upSql = string.Format(" update FlowMstr set MrLeadTime={0} ,ShipFlow='{1}' where Code='{2}' ", byFlow.dLeadTime, byFlow.trFlowCode, byFlow.dFlowCode);
+                    this.genericMgr.ExecuteSql(upSql);
+
+                    upSql = string.Format(" update FlowMstr set MrLeadTime={0} where Code='{1}' ", byFlow.tLeadTime, byFlow.trFlowCode);
+                    this.genericMgr.ExecuteSql(upSql);
+
+                    foreach (var l in byFlow.list)
+                    {
+                        
+                    }
+
+                }
+            }
+        }
+        #endregion
 
         #region Private Methods
         private void ProcessEffectiveInventoryBalance(ref IList<MrpLocationLotDetail> inventoryBalanceList, object[] invLoc, IList<SafeInventory> safeQtyList, DateTime effectiveDate, DateTime dateTimeNow, User user)
