@@ -190,6 +190,7 @@ from  MRP_ShipPlanDet as det
         #region  orderQty
         IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
         shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        shipPlanOpenOrderList = shipPlanOpenOrderList == null ? new List<ShipPlanOpenOrder>() : shipPlanOpenOrderList;
         if (shipPlanOpenOrderList!=null && shipPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in shipPlanDetList)
