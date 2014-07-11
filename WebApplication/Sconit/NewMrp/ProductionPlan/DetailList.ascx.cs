@@ -139,14 +139,22 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         //productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
-        IList<ProductionPlanDetTrace> traceList = new List<ProductionPlanDetTrace>();
-        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanDetTrace>(string.Format(" select l from ProductionPlanDetTrace as l where l.Type='{0}' and l.UUID in ('{1}') ",this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
-
+        List<ProductionPlanDetTrace> traceList = new List<ProductionPlanDetTrace>();
+        int len = 0;
+        int j = productionPlanDetList.Count % 2000 == 0 ? productionPlanDetList.Count / 2000 : productionPlanDetList.Count / 2000 + 1;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanDetTrace>(string.Format(" select l from ProductionPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+        traceList = traceList == null ? new List<ProductionPlanDetTrace>() : traceList;
         if (traceList != null && traceList.Count > 0)
         {
             foreach (var sd in productionPlanDetList)
             {
-                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).OrderBy(d => d.ReqDate).ToList();
                 var showText = string.Empty;
                 if (currentLogs != null && currentLogs.Count > 0)
                 {
@@ -163,13 +171,22 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         #endregion
 
         #region  orderQty
-        IList<ProductionPlanOpenOrder> productionPlanOpenOrderList = new List<ProductionPlanOpenOrder>();
-        productionPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.Type='{0}' and l.UUID in ('{1}') ",this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<ProductionPlanOpenOrder> productionPlanOpenOrderList = new List<ProductionPlanOpenOrder>();
+        len = 0;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { productionPlanOpenOrderList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+        // productionPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        productionPlanOpenOrderList = productionPlanOpenOrderList == null ? new List<ProductionPlanOpenOrder>() : productionPlanOpenOrderList;
         if (productionPlanOpenOrderList != null && productionPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in productionPlanDetList)
             {
-                var currentOrders = productionPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentOrders = productionPlanOpenOrderList.Where(d => d.UUID == sd.UUID).OrderBy(d=>d.WindowTime).ToList();
                 var showText = string.Empty;
                 if (currentOrders != null && currentOrders.Count > 0)
                 {
@@ -339,13 +356,22 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         //productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
-        IList<ProductionPlanDetTrace> traceList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanDetTrace>(string.Format(" select l from ProductionPlanDetTrace as l where l.Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<ProductionPlanDetTrace> traceList = new List<ProductionPlanDetTrace>();
+        int len = 0;
+        int j = productionPlanDetList.Count % 2000 == 0 ? productionPlanDetList.Count / 2000 : productionPlanDetList.Count / 2000 + 1;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanDetTrace>(string.Format(" select l from ProductionPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
         traceList = traceList == null ? new List<ProductionPlanDetTrace>() : traceList;
         if (traceList != null && traceList.Count > 0)
         {
             foreach (var sd in productionPlanDetList)
             {
-                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).OrderBy(d => d.ReqDate).ToList();
                 var showText = string.Empty;
                 if (currentLogs != null && currentLogs.Count > 0)
                 {
@@ -362,13 +388,22 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         #endregion
 
         #region  orderQty
-        IList<ProductionPlanOpenOrder> productionPlanOpenOrderList = new List<ProductionPlanOpenOrder>();
-        productionPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<ProductionPlanOpenOrder> productionPlanOpenOrderList = new List<ProductionPlanOpenOrder>();
+        len = 0;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { productionPlanOpenOrderList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+        // productionPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        productionPlanOpenOrderList = productionPlanOpenOrderList == null ? new List<ProductionPlanOpenOrder>() : productionPlanOpenOrderList;
         if (productionPlanOpenOrderList != null && productionPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in productionPlanDetList)
             {
-                var currentOrders = productionPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentOrders = productionPlanOpenOrderList.Where(d => d.UUID == sd.UUID).OrderBy(d => d.WindowTime).ToList();
                 var showText = string.Empty;
                 if (currentOrders != null && currentOrders.Count > 0)
                 {

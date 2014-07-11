@@ -144,10 +144,20 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         //pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
-        IList<PurchasePlanDetTrace> traceList =this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ",this.rbType.SelectedValue ,string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<PurchasePlanDetTrace> traceList = new List<PurchasePlanDetTrace>();
+        int len = 0;
+        int j = pPlanDetList.Count % 2000 == 0 ? pPlanDetList.Count / 2000 : pPlanDetList.Count / 2000 + 1;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+        //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         traceList = traceList == null ? new List<PurchasePlanDetTrace>() : traceList;
 
-        if (traceList!=null && traceList.Count > 0)
+        if (traceList != null && traceList.Count > 0)
         {
             foreach (var sd in pPlanDetList)
             {
@@ -168,7 +178,16 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         #endregion
 
         #region  orderQty
-        IList<PurchasePlanOpenOrder> pPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ",this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<PurchasePlanOpenOrder> pPlanOpenOrderList = new List<PurchasePlanOpenOrder>();
+        //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        len = 0;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { pPlanOpenOrderList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
         pPlanOpenOrderList = pPlanOpenOrderList == null ? new List<PurchasePlanOpenOrder>() : pPlanOpenOrderList;
         if (pPlanOpenOrderList != null && pPlanOpenOrderList.Count > 0)
         {
@@ -427,7 +446,17 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         //pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
-        IList<PurchasePlanDetTrace> traceList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<PurchasePlanDetTrace> traceList = new List<PurchasePlanDetTrace>();
+        int len=0;
+        int j = pPlanDetList.Count % 2000 == 0 ? pPlanDetList.Count / 2000 : pPlanDetList.Count / 2000 + 1;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+            //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         traceList = traceList == null ? new List<PurchasePlanDetTrace>() : traceList;
 
         if (traceList != null && traceList.Count > 0)
@@ -451,7 +480,16 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         #endregion
 
         #region  orderQty
-        IList<PurchasePlanOpenOrder> pPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<PurchasePlanOpenOrder> pPlanOpenOrderList = new List<PurchasePlanOpenOrder>();
+            //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        len = 0;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { pPlanOpenOrderList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
         pPlanOpenOrderList = pPlanOpenOrderList == null ? new List<PurchasePlanOpenOrder>() : pPlanOpenOrderList;
         if (pPlanOpenOrderList != null && pPlanOpenOrderList.Count > 0)
         {

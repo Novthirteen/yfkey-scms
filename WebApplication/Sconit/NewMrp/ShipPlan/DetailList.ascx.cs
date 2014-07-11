@@ -171,26 +171,27 @@ from  MRP_ShipPlanDet as det
             this.list.InnerHtml = "没有查到符合条件的记录";
             return;
         }
-        //var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(14);
-        //shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(14);
+        shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
-        IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
-        //for (int i = 0; i < shipPlanDetList; i++)
-        //{
-            
-        //}
-        // var ctraceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
-        // if (ctraceList != null && ctraceList.Count > 0)
-        // {
-        //     traceList.AddRange(ctraceList);
-        // }
-        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
+        int len = 0;
+        int j = shipPlanDetList.Count % 2000 == 0 ? shipPlanDetList.Count / 2000 : shipPlanDetList.Count / 2000 + 1;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Skip(len * 2000).Take((len + 1) * 200).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+       // traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        
         if (traceList!=null && traceList.Count > 0)
         {
             foreach (var sd in shipPlanDetList)
             {
-                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).OrderBy(d=>d.ReqDate).ToList();
                 var showText = string.Empty;
                 if (currentLogs != null && currentLogs.Count > 0)
                 {
@@ -207,14 +208,22 @@ from  MRP_ShipPlanDet as det
         #endregion
 
         #region  orderQty
-        IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
-        shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
-        shipPlanOpenOrderList = shipPlanOpenOrderList == null ? new List<ShipPlanOpenOrder>() : shipPlanOpenOrderList;
+        List<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
+        len = 0;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { shipPlanOpenOrderList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+        //shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        //shipPlanOpenOrderList = shipPlanOpenOrderList == null ? new List<ShipPlanOpenOrder>() : shipPlanOpenOrderList;    
         if (shipPlanOpenOrderList!=null && shipPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in shipPlanDetList)
             {
-                var currentOrders = shipPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentOrders = shipPlanOpenOrderList.Where(d => d.UUID == sd.UUID).OrderBy(d=>d.WindowTime).ToList();
                 var showText = string.Empty;
                 if (currentOrders != null && currentOrders.Count > 0)
                 {
@@ -455,18 +464,27 @@ from  MRP_ShipPlanDet as det
             this.list.InnerHtml = "没有查到符合条件的记录";
             return;
         }
-        //var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(14);
-        //shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(14);
+        shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
-        IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
-        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        List<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
+        int len = 0;
+        int j = shipPlanDetList.Count % 200 == 0 ? shipPlanDetList.Count / 200 : shipPlanDetList.Count / 200 + 1;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Skip(len * 200).Take((len + 1) * 200).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+        // traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
 
         if (traceList != null && traceList.Count > 0)
         {
             foreach (var sd in shipPlanDetList)
             {
-                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).OrderBy(d => d.ReqDate).ToList();
                 var showText = string.Empty;
                 if (currentLogs != null && currentLogs.Count > 0)
                 {
@@ -483,14 +501,22 @@ from  MRP_ShipPlanDet as det
         #endregion
 
         #region  orderQty
-        IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
-        shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
-        shipPlanOpenOrderList = shipPlanOpenOrderList == null ? new List<ShipPlanOpenOrder>() : shipPlanOpenOrderList;
+        List<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
+        len = 0;
+        while (true)
+        {
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Skip(len * 200).Take((len + 1) * 200).Select(d => d.UUID).Distinct().ToArray())));
+            if (cList != null && cList.Count > 0) { shipPlanOpenOrderList.AddRange(cList); }
+            len++;
+            if (len == j) break;
+        }
+        //shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        //shipPlanOpenOrderList = shipPlanOpenOrderList == null ? new List<ShipPlanOpenOrder>() : shipPlanOpenOrderList;    
         if (shipPlanOpenOrderList != null && shipPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in shipPlanDetList)
             {
-                var currentOrders = shipPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
+                var currentOrders = shipPlanOpenOrderList.Where(d => d.UUID == sd.UUID).OrderBy(d => d.WindowTime).ToList();
                 var showText = string.Empty;
                 if (currentOrders != null && currentOrders.Count > 0)
                 {
