@@ -13,7 +13,7 @@ namespace com.Sconit.Entity.MRP
 
         public string Item { get; set; }
         public string Bom { get; set; }
-        public DateTime? EffDate { get; set; }
+        public string EffDateFormat { get { return this.EffDate.ToShortDateString(); } }
         public string Msg { get; set; }
 
         #endregion

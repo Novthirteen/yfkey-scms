@@ -204,6 +204,7 @@
     <Compile Include="Base\Mes\ProductLineUserBase.cs" />
     <Compile Include="Base\Mes\ShelfBase.cs" />
     <Compile Include="Base\Mes\ShelfItemBase.cs" />
+    <Compile Include="Base\MRP\PurchasePlanIpDetBase.cs" />
     <Compile Include="Base\MRP\ShipPlanIpDetBase.cs" />
     <Compile Include="Base\MRP\RunWeeklyMRPLogBase.cs" />
     <Compile Include="Base\MRP\WeeklyPurchasePlanDetBase.cs" />
@@ -407,6 +408,7 @@
     <Compile Include="Mes\ProductLineUser.cs" />
     <Compile Include="Mes\Shelf.cs" />
     <Compile Include="Mes\ShelfItem.cs" />
+    <Compile Include="MRP\PurchasePlanIpDet.cs" />
     <Compile Include="MRP\ShipPlanIpDet.cs" />
     <Compile Include="MRP\RunWeeklyMRPLog.cs" />
     <Compile Include="MRP\WeeklyPurchasePlanOpenOrder.cs" />
@@ -428,9 +430,9 @@
     <Compile Include="MRP\ProductionPlanDet.cs" />
     <Compile Include="MRP\ShipPlanDetTrace.cs" />
     <Compile Include="MRP\ShipPlanDet.cs" />
-    <Compile Include="MRP\ShipPlanMstr.cs" />
-    <Compile Include="MRP\CustomerSchedule.cs" />
     <Compile Include="MRP\CustomerScheduleDetail.cs" />
+    <Compile Include="MRP\CustomerSchedule.cs" />
+    <Compile Include="MRP\ShipPlanMstr.cs" />
     <Compile Include="MRP\ExpectTransitInventory.cs" />
     <Compile Include="MRP\ExpectTransitInventoryView.cs" />
     <Compile Include="MRP\ForcastPlan.cs" />
@@ -812,6 +814,9 @@
     <EmbeddedResource Include="Base\MRP\ShipPlanIpDet.hbm.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Base\MRP\PurchasePlanIpDet.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

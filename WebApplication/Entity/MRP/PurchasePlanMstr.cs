@@ -15,6 +15,7 @@ namespace com.Sconit.Entity.MRP
         public string PlanDate { get; set; }
         public string Bom { get; set; }
         public decimal? Qty { get; set; }
+        public string EffDateFormat { get { return this.EffDate.ToShortDateString(); } }
         #endregion
     }
 }

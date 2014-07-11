@@ -1540,17 +1540,17 @@ namespace com.Sconit.Service.MRP.Impl
                 #region 销售路线	销售提前期	MRP Code	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量
 
 
-                int colDisFlow = 0;//销售路线
-                int colDisLeadTime = 1;//销售提前期
-                int colMrpCode = 2;//MRP Code
-                int colDateFst = 3;//周起始
-                int colWorkDate = 4;//周工作日
-                int colShipFlow = 5;//发运路线
-                int colShipLeadTime = 6;//发运提前期
-                int colItem = 7;//物料代码
-                int colSafeStock = 8;//安全库存
-                int colMaxStock = 9;//最大库存
-                int colUnitCount = 10;//包装量
+                int colDisFlow = 1;//销售路线
+                int colDisLeadTime = 2;//销售提前期
+                int colMrpCode = 3;//MRP Code
+                int colDateFst = 4;//周起始
+                int colWorkDate = 5;//周工作日
+                int colShipFlow = 6;//发运路线
+                int colShipLeadTime = 7;//发运提前期
+                int colItem = 8;//物料代码
+                int colSafeStock = 9;//安全库存
+                int colMaxStock = 10;//最大库存
+                int colUnitCount = 11;//包装量
                 #endregion
 
                 var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
@@ -1588,7 +1588,6 @@ namespace com.Sconit.Service.MRP.Impl
                     decimal safeStock = 0;
                     decimal maxStock = 0;
                     decimal uc = 0;
-                    object[] objArr = new object[] { dFlowCode, dLeadTime, mrpCode, dateFst, workDate };
 
                     #region 读取销售路线
                     dFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colDisFlow));
@@ -1639,10 +1638,11 @@ namespace com.Sconit.Service.MRP.Impl
                         {
                             throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
                         }
-                        if (s < 0 || s>7)
+                        if (s < 0 || s > 7)
                         {
                             throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
                         }
+                        dateFst = s;
                     }
                     #endregion
 
@@ -1747,19 +1747,22 @@ namespace com.Sconit.Service.MRP.Impl
                     {
                         throw new BusinessErrorException(string.Format("第{0}行：物料代码不能为空。", rowCount));
                     }
-                    if (allDFlowCodeList.Where(f => f[0] == dFlowCode && f[1] == itemCode).Count() == 0)
+                    if (allDFlowCodeList.Where(f => f[0].ToString() == dFlowCode && f[1].ToString() == itemCode).Count() == 0)
                     {
                         throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在销售路线{2}中，请维护。", rowCount, itemCode, dFlowCode));
                     }
                     if (!string.IsNullOrEmpty(tFlowCode))
                     {
-                        if (allTFlowCodeList.Where(f => f[0] == tFlowCode && f[1] == itemCode).Count() == 0)
+                        if (allTFlowCodeList.Where(f => f[0].ToString() == tFlowCode && f[1].ToString() == itemCode).Count() == 0)
                         {
                             throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在发运路线{2}中,请维护。", rowCount, itemCode, tFlowCode));
                         }
                     }
 
                     #endregion
+                    //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
+
+                    object[] objArr = new object[] { dFlowCode, dLeadTime, mrpCode, dateFst, workDate, tFlowCode, tLeadTime, itemCode, safeStock, maxStock, uc };
                     allReadList.Add(objArr);
                 }
                 if (allReadList.Count == 0)
@@ -1769,30 +1772,53 @@ namespace com.Sconit.Service.MRP.Impl
                 var groupByFlows = (from tak in allReadList
                                     group tak by new
                                     {
-                                        disFlowCode = tak[0],
+                                        dFlowCode = tak[0],
                                         dLeadTime = tak[1],
-                                        trFlowCode = tak[2],
-                                        tLeadTime = tak[3],
+                                        mrpCode = tak[2],
+                                        dateFst = tak[3],
+                                        workDate = tak[4],
+                                        tFlowCode = tak[5],
+                                        tLeadTime = tak[6],
                                     } into result
                                     select new
                                     {
-                                        dFlowCode = result.Key.disFlowCode,
+                                        dFlowCode = result.Key.dFlowCode,
                                         dLeadTime = result.Key.dLeadTime,
-                                        trFlowCode = result.Key.trFlowCode,
+                                        mrpCode = result.Key.mrpCode,
+                                        dateFst = result.Key.dateFst,
+                                        workDate = result.Key.workDate,
+                                        tFlowCode = result.Key.tFlowCode,
                                         tLeadTime = result.Key.tLeadTime,
                                         list = result.ToList()
                                     }).ToList();
                 foreach (var byFlow in groupByFlows)
                 {
-                    string upSql = string.Format(" update FlowMstr set MrLeadTime={0} ,ShipFlow='{1}' where Code='{2}' ", byFlow.dLeadTime, byFlow.trFlowCode, byFlow.dFlowCode);
+                    string upSql = "update FlowMstr set 1=1 ";
+                    if (byFlow.dLeadTime != null)
+                    {
+                        upSql += string.Format(",MrLeadTime={0}",byFlow.dLeadTime);
+                    }
+                    if (!string.IsNullOrEmpty(byFlow.mrpCode.ToString()))
+                    {
+                        upSql += string.Format(",MrpCode={0}", byFlow.mrpCode);
+                    }
+                    if (byFlow.dateFst != null) {
+                        upSql +=string.Format( " ,DateFst={0} ",byFlow.dateFst);
+                    }
+                    if (!string.IsNullOrEmpty(byFlow.workDate.ToString()))
+                    {
+                        upSql += string.Format(",WorkDate='{0}'",byFlow.workDate);
+                    }
+                    upSql += string.Format(" where code='{0}' ",byFlow.dFlowCode);
                     this.genericMgr.ExecuteSql(upSql);
 
-                    upSql = string.Format(" update FlowMstr set MrLeadTime={0} where Code='{1}' ", byFlow.tLeadTime, byFlow.trFlowCode);
+                    upSql = string.Format(" update FlowMstr set MrLeadTime={0} where Code='{1}' ", byFlow.tLeadTime, byFlow.tFlowCode);
                     this.genericMgr.ExecuteSql(upSql);
 
                     foreach (var l in byFlow.list)
                     {
-                        upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2} where Flow='{3}' and Item='{4}' ", l[5],l[4],l[6],l[2],l[7]);
+                        //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
+                        upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2} where Flow='{3}' and Item='{4}' ", l[9], l[8], l[10], l[5], l[7]);
                         this.genericMgr.ExecuteSql(upSql);  
                     }
 

@@ -23,7 +23,7 @@
                     </ItemTemplate>
                 </asp:TemplateField>--%>
                 <asp:BoundField DataField="ReleaseNo" HeaderText="版本号" SortExpression="ReleaseNo" />
-                <asp:BoundField DataField="EffDate" HeaderText="生效日期" SortExpression="EffDate" />
+                <asp:BoundField DataField="EffDateFormat" HeaderText="生效日期" SortExpression="EffDateFormat" />
                 <asp:BoundField DataField="Status" HeaderText="状态" SortExpression="Status" />
                 <asp:BoundField DataField="CreateDate" HeaderText="创建用户" SortExpression="CreateDate" />
                 <asp:BoundField DataField="CreateUser" HeaderText="创建时间" SortExpression="CreateUser" />

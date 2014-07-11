@@ -28,7 +28,7 @@ public partial class NewMrp_MrpParameterSetup_Main : MainModuleBase
             var dateType = this.rblDateType.SelectedValue;
             if (dateType == "ShipPlan")
             {
-                var customerPlanList = TheMrpMgr.ReadCustomerPlanFromXls(fileUpload.PostedFile.InputStream, dateType, this.CurrentUser);
+               TheMrpMgr.ReadShipPlanParametersFromXls(fileUpload.PostedFile.InputStream,this.CurrentUser);
             }
             else if (dateType == "ProductionPlan")
             {

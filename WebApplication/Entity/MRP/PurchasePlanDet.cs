@@ -25,6 +25,8 @@ namespace com.Sconit.Entity.MRP
         public decimal MaxStock { get; set; }
         public string OrderDets { get; set; }
 
+        public string IpDets { get; set; }
+        public decimal MrpLeadTime { get; set; }
         #endregion
     }
 }
