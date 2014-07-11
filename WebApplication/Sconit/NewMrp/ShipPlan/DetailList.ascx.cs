@@ -67,7 +67,7 @@ from  MRP_ShipPlanDet as det
  inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
  inner join FlowMstr as f on det.Flow=f.Code
  left join MRP_ShipPlanInitLocationDet as l on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1  ";
- //left join MRP_ShipPlanIpDet as ip on ip.ShipPlanId=m.Id and ip.Item=det.Item where 1=1  ";
+        //left join MRP_ShipPlanIpDet as ip on ip.ShipPlanId=m.Id and ip.Item=det.Item where 1=1  ";
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
         if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
@@ -144,7 +144,7 @@ from  MRP_ShipPlanDet as det
                 InTransitQty = Convert.ToDecimal(row[18]),
                 UUID = row[19].ToString(),
                 StartTime = Convert.ToDateTime(row[20]),
-                OrderQty= Convert.ToDecimal(row[21]),
+                OrderQty = Convert.ToDecimal(row[21]),
                 MaxStock = Convert.ToDecimal(row[22]),
                 UnitCount = Convert.ToDecimal(row[23]),
                 MrpLeadTime = Convert.ToDecimal(row[24]),
@@ -152,9 +152,16 @@ from  MRP_ShipPlanDet as det
                 //IpStartTime =(object)row[25]!=null? (DateTime?)Convert.ToDateTime(row[25]):null,
                 //IpWindowTime = (object)row[26] != null ? (DateTime?)Convert.ToDateTime(row[26]) : null,
                 //IpQty = (object)row[27] != null ? (decimal?)Convert.ToDecimal(row[27]) : null,
-            });        
+            });
         }
-        ListTable(shipPlanDetList);
+        if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
+        {
+            ListTable(shipPlanDetList);
+        }
+        else
+        {
+            WeeklyListTable(shipPlanDetList);
+        }
     }
 
     private void ListTable(IList<ShipPlanDet> shipPlanDetList)
@@ -433,6 +440,187 @@ from  MRP_ShipPlanDet as det
         this.list.InnerHtml = headStr + str.ToString();
     }
 
+    private void WeeklyListTable(IList<ShipPlanDet> shipPlanDetList)
+    {
+        if (shipPlanDetList == null || shipPlanDetList.Count == 0)
+        {
+            this.list.InnerHtml = "没有查到符合条件的记录";
+            return;
+        }
+        //var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(14);
+        //shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+
+        #region   trace
+        IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
+        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+
+        if (traceList != null && traceList.Count > 0)
+        {
+            foreach (var sd in shipPlanDetList)
+            {
+                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).ToList();
+                var showText = string.Empty;
+                if (currentLogs != null && currentLogs.Count > 0)
+                {
+                    showText = "<table><thead><tr><th>销售路线</th><th>物料</th><th>需求日期</th><th>需求数</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentLogs)
+                    {
+                        showText += "<td>" + c.DistributionFlow + "</td><td>" + c.Item + "</td><td>" + c.ReqDate.ToShortDateString() + "</td><td>" + c.ReqQty.ToString("0.##") + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.Logs = showText;
+            }
+        }
+        #endregion
+
+        #region  orderQty
+        IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
+        shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where Type='{0}'  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        shipPlanOpenOrderList = shipPlanOpenOrderList == null ? new List<ShipPlanOpenOrder>() : shipPlanOpenOrderList;
+        if (shipPlanOpenOrderList != null && shipPlanOpenOrderList.Count > 0)
+        {
+            foreach (var sd in shipPlanDetList)
+            {
+                var currentOrders = shipPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
+                var showText = string.Empty;
+                if (currentOrders != null && currentOrders.Count > 0)
+                {
+                    showText = "<table><thead><tr><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentOrders)
+                    {
+                        string sTime = c.StartTime != c.OrgStartTime ? c.StartTime.ToShortDateString() + "(" + c.OrgStartTime.ToShortDateString() + ")" : c.StartTime.ToShortDateString();
+                        string sWime = c.WindowTime != c.OrgWindowTime ? c.WindowTime.ToShortDateString() + "(" + c.OrgWindowTime.ToShortDateString() + ")" : c.WindowTime.ToShortDateString();
+                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + sTime + "</td><td>" + sWime + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.OrderDets = showText;
+            }
+        }
+        #endregion
+
+
+        var planByDateIndexs = shipPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
+        var planByFlowItems = shipPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item, p.LocFrom, p.LocTo });
+
+        StringBuilder str = new StringBuilder();
+        //str.Append(CopyString());
+        //head
+        var flowCode = this.tbFlow.Text.Trim();
+        string headStr = string.Empty;
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>提前期</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th>");
+        int ii = 0;
+        foreach (var planByDateIndex in planByDateIndexs)
+        {
+            ii++;
+            str.Append("<th colspan='3'>");
+            str.Append(planByDateIndex.Key.ToString("yyyy-MM-dd"));
+            str.Append("</th>");
+        }
+        str.Append("</tr><tr class='GVHeader'>");
+        foreach (var planByDateIndex in planByDateIndexs)
+        {
+            str.Append("<th >需求数</th><th >订单数</th><th >发货数</th>");
+        }
+        str.Append("</tr></thead>");
+        str.Append("<tbody>");
+
+        #region  通过长度控制table的宽度
+        string widths = "100%";
+        if (ii > 14)
+        {
+            widths = "240%";
+        }
+        else if (ii > 10)
+        {
+            widths = "200%";
+        }
+        else if (ii > 6)
+        {
+            widths = "250%";
+        }
+        else if (ii > 4)
+        {
+            widths = "130%";
+        }
+
+        headStr += string.Format("<table id='tt' runat='server' border='1' class='GV' style='width:{0};border-collapse:collapse;'>", widths);
+        #endregion
+        int l = 0;
+        int seq = 0;
+        foreach (var planByFlowItem in planByFlowItems)
+        {
+            var firstPlan = planByFlowItem.First();
+            var planDic = planByFlowItem.GroupBy(d => d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q => q.ShipQty));
+            l++;
+            if (l % 2 == 0)
+            {
+                str.Append("<tr class='GVAlternatingRow'>");
+            }
+            else
+            {
+                str.Append("<tr class='GVRow'>");
+            }
+            str.Append("<td>");
+            str.Append(l);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(planByFlowItem.Key.Flow);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.MrpLeadTime.ToString("0.##"));
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(planByFlowItem.Key.Item);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.ItemDesc);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.RefItemCode);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.UnitCount.ToString("0.##"));
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.SafeStock.ToString("0.##"));
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.MaxStock.ToString("0.##"));
+            str.Append("</td>");
+           
+            foreach (var planByDateIndex in planByDateIndexs)
+            {
+                //            str.Append("<th >需求数</th><th >订单数</th><th >发货数</th>");
+
+                var curenPlan = planByFlowItem.Where(p => p.StartTime == planByDateIndex.Key);
+                var shipPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new ShipPlanDet();
+                str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", shipPlanDet.Logs));
+                str.Append(shipPlanDet.ReqQty.ToString("0.##"));
+                str.Append("</td>");
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowDetsClick(this)'>", shipPlanDet.OrderDets));
+                str.Append(shipPlanDet.OrderQty.ToString("0.##"));
+                str.Append("</td>");
+                if (firstPlan.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)
+                {
+                    seq++;
+                    str.Append("<td width='30px'>");
+                    str.Append("<input  type='text' flow='" + firstPlan.Flow + "' item='" + firstPlan.Item + "'  name='UpQty' id='" + shipPlanDet.Id + "'value='" + shipPlanDet.ShipQty.ToString("0.##") + "' releaseNo='" + firstPlan.ReleaseNo + "'  dateFrom='" + planByDateIndex.Key + "' style='width:70px' onblur='doFocusClick(this)' seq='" + seq + "' />");
+                    str.Append("</td>");
+                }
+                else
+                {
+                    str.Append("<td>");
+                    str.Append(shipPlanDet.ShipQty.ToString("0.##"));
+                    str.Append("</td>");
+                }
+            }
+            str.Append("</tr>");
+        }
+        str.Append("</tbody></table>");
+        this.list.InnerHtml = headStr + str.ToString();
+    }
     #endregion
 
 
@@ -561,7 +749,7 @@ from  MRP_ShipPlanDet as det
             {
                 ShowErrorMessage("没有要修改的计划。");
             }
-            TheMrpMgr.UpdateShipPlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser);
+            TheMrpMgr.UpdateShipPlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser,this.rbType.SelectedValue);
             ShowSuccessMessage("修改成功。");
             this.btnSearch_Click(null, null);
         }

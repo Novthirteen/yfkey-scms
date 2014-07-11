@@ -50,7 +50,9 @@
     </div>
     <div id="ShowTraceDiv" style="position:absolute;width:500px; ">
     </div>
-    <div id="ShowDetsDiv" style="position:absolute;width:500px; ">
+    <div id="ShowDetsDiv" style="position:absolute;width:600px; ">
+    </div>
+    <div id="ShowIpdets" style="position:absolute; width:500px;">
     </div>
 </div>
 <script type="text/javascript">
@@ -67,12 +69,14 @@
         obj.style.left = event.x + document.documentElement.scrollLeft + 10;
         obj.style.top = event.y + document.documentElement.scrollTop + 10;
         $(obj).show();
-        $("#ShowDetsDiv").hide()
+        $("#ShowDetsDiv").hide();
+        $("#ShowIpdets").hide();
     }
 
     function hideClick() {
-        $("#ShowTraceDiv").hide()
-        $("#ShowDetsDiv").hide()
+        $("#ShowTraceDiv").hide();
+        $("#ShowDetsDiv").hide();
+        $("#ShowIpdets").hide();
     }
 
     function doShowDetsClick(e) {
@@ -88,7 +92,25 @@
         obj.style.left = event.x + document.documentElement.scrollLeft + 10;
         obj.style.top = event.y + document.documentElement.scrollTop + 10;
         $(obj).show();
-        $("#ShowTraceDiv").hide()
+        $("#ShowTraceDiv").hide();
+        $("#ShowIpdets").hide();
+    }
+
+    function doShowIpdets(e) {
+        var htmlt = $(e).attr("tital");
+        htmlt = htmlt.replace("<table>", "<table class='GV' style=' border:1 solid black;background-color:White'>");
+        //        htmlt = htmlt.replace("<td>", "<td style='border:1px' >");
+        htmlt = htmlt.replace(/<td>/g, "<td style='border:1px solid black' >");
+        //        a.replace(/,/g, ".");   
+        htmlt = htmlt.replace("<thead><tr>", "<thead><tr class='GVHeader' onclick='hideClick()'>");
+        htmlt = htmlt.replace(/<tr>/g, "<tr style='border:1px solid black' >");
+        $("#ShowIpdets").html(htmlt);
+        var obj = document.getElementById("ShowIpdets");
+        obj.style.left = event.x + document.documentElement.scrollLeft + 10;
+        obj.style.top = event.y + document.documentElement.scrollTop + 10;
+        $(obj).show();
+        $("#ShowTraceDiv").hide();
+        $("#ShowDetsDiv").hide();
     }
 
     function doFocusClick(e) {
