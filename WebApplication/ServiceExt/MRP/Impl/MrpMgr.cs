@@ -1145,7 +1145,7 @@ namespace com.Sconit.Service.MRP.Impl
 
         #region    修改发货计划
         [Transaction(TransactionMode.Requires)]
-        public void UpdateShipPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList,IList<string> dateFrom,User user)
+        public void UpdateShipPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList,IList<string> dateFrom,User user,string type)
         {
             var dateTimeNow=System.DateTime.Now;
             for (int i = 0; i < idList.Count; i++)
@@ -1180,6 +1180,7 @@ namespace com.Sconit.Service.MRP.Impl
                         newShipPlanDet.LastModifyUser = user.Code;
                         newShipPlanDet.Version = 1;
                         newShipPlanDet.Id = 0;
+                        newShipPlanDet.Type=type;
                         this.genericMgr.Create(newShipPlanDet);
                     }
                 }
