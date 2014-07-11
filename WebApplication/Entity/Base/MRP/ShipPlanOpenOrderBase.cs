@@ -24,6 +24,7 @@ namespace com.Sconit.Entity.MRP
         public decimal RecQty { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
+        public string Type { get; set; }
         
 
 		public override int GetHashCode()

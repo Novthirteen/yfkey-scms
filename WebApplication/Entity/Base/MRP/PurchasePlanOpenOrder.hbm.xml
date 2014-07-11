@@ -18,5 +18,6 @@ Id, PurchasePlanId, UUID, Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, 
     <property name="RecQty" column="RecQty" type="Decimal"  />
     <property name="CreateDate" column="CreateDate" type="DateTime"  />
     <property name="CreateUser" column="CreateUser" type="String" length="50" />
+    <property name="Type" column="Type" type="String" length="50" />
   </class>
 </hibernate-mapping>

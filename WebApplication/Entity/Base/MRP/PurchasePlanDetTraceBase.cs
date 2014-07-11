@@ -29,6 +29,7 @@ namespace com.Sconit.Entity.MRP
         public DateTime PlanDate { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
+        public string Type { get; set; }
         
 
 		public override int GetHashCode()

@@ -57,7 +57,7 @@ public partial class NewMrp_ProductionPlan_DetailList : MainModuleBase
     {
         var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0)
  from  dbo.MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as m on det.ProductionPlanId=m.Id
-inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1 ";
+inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
 
         //if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
         //{
@@ -70,6 +70,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         //    return;
         //}
 
+        searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
         if (!string.IsNullOrEmpty(this.tbItemCode.Text.Trim()))
         {
             searchSql += string.Format(" and det.Item ='{0}' ", this.tbItemCode.Text.Trim());
@@ -128,12 +129,12 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             return;
         }
 
-        var minStartTime = productionPlanDetList.Min(s => s.StartTime).AddDays(14);
-        productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        //var minStartTime = productionPlanDetList.Min(s => s.StartTime).AddDays(14);
+        //productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
         IList<ProductionPlanDetTrace> traceList = new List<ProductionPlanDetTrace>();
-        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanDetTrace>(string.Format(" select l from ProductionPlanDetTrace as l where l.UUID in ('{0}') ", string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanDetTrace>(string.Format(" select l from ProductionPlanDetTrace as l where l.Type='{0}' and l.UUID in ('{1}') ",this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
 
         if (traceList != null && traceList.Count > 0)
         {
@@ -157,7 +158,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
 
         #region  orderQty
         IList<ProductionPlanOpenOrder> productionPlanOpenOrderList = new List<ProductionPlanOpenOrder>();
-        productionPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        productionPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ProductionPlanOpenOrder>(string.Format(" select l from ProductionPlanOpenOrder as l where l.Type='{0}' and l.UUID in ('{1}') ",this.rbType.SelectedValue, string.Join("','", productionPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         if (productionPlanOpenOrderList != null && productionPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in productionPlanDetList)

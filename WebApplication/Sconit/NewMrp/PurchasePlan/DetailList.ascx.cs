@@ -63,7 +63,10 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
  from MRP_PurchasePlanDet as det 
 inner join MRP_PurchasePlanMstr as m on m.Id=det.PurchasePlanId
  inner join FlowMstr as f on det.Flow=f.Code
-left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1 ";
+left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
+
+        searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
+
         if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
         {
             searchSql += string.Format(" and det.Flow ='{0}' ", this.tbFlow.Text.Trim());
@@ -130,11 +133,11 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             return;
         }
 
-        var minStartTime = pPlanDetList.Min(s => s.StartTime).AddDays(14);
-        pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        //var minStartTime = pPlanDetList.Min(s => s.StartTime).AddDays(14);
+        //pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
-        IList<PurchasePlanDetTrace> traceList =this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.UUID in ('{0}') ", string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        IList<PurchasePlanDetTrace> traceList =this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ",this.rbType.SelectedValue ,string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         traceList = traceList == null ? new List<PurchasePlanDetTrace>() : traceList;
 
         if (traceList!=null && traceList.Count > 0)
@@ -158,7 +161,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         #endregion
 
         #region  orderQty
-        IList<PurchasePlanOpenOrder> pPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        IList<PurchasePlanOpenOrder> pPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ",this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         pPlanOpenOrderList = pPlanOpenOrderList == null ? new List<PurchasePlanOpenOrder>() : pPlanOpenOrderList;
         if (pPlanOpenOrderList != null && pPlanOpenOrderList.Count > 0)
         {
@@ -181,7 +184,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         #endregion
 
         #region    在途
-        IList<PurchasePlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanIpDet>(" select s from  PurchasePlanIpDet as s where s.PurchasePlanId=? ", pPlanDetList.First().PurchasePlanId);
+        IList<PurchasePlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanIpDet>(" select s from  PurchasePlanIpDet as s where s.PurchasePlanId=? and s.Type='" + this.rbType.SelectedValue + "'  ", pPlanDetList.First().PurchasePlanId);    //
         ipDets = ipDets == null ? new List<PurchasePlanIpDet>() : ipDets;
         if (ipDets != null && ipDets.Count > 0)
         {
@@ -211,7 +214,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th><th rowspan='2'>报验</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th><th rowspan='2'>报验</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {

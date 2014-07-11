@@ -66,8 +66,10 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
 from  MRP_ShipPlanDet as det 
  inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
  inner join FlowMstr as f on det.Flow=f.Code
- left join MRP_ShipPlanInitLocationDet as l on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1 ";
+ left join MRP_ShipPlanInitLocationDet as l on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1  ";
  //left join MRP_ShipPlanIpDet as ip on ip.ShipPlanId=m.Id and ip.Item=det.Item where 1=1  ";
+        searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
+
         if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
         {
             searchSql += string.Format(" and det.Flow ='{0}' ", this.tbFlow.Text.Trim());
@@ -162,12 +164,12 @@ from  MRP_ShipPlanDet as det
             this.list.InnerHtml = "没有查到符合条件的记录";
             return;
         }
-        var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(14);
-        shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        //var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(14);
+        //shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
         IList<ShipPlanDetTrace> traceList = new List<ShipPlanDetTrace>();
-        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        traceList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
 
         if (traceList!=null && traceList.Count > 0)
         {
@@ -191,7 +193,7 @@ from  MRP_ShipPlanDet as det
 
         #region  orderQty
         IList<ShipPlanOpenOrder> shipPlanOpenOrderList = new List<ShipPlanOpenOrder>();
-        shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where l.UUID in ('{0}') ", string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        shipPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanOpenOrder>(string.Format(" select l from ShipPlanOpenOrder as l where Type='{0}'  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         shipPlanOpenOrderList = shipPlanOpenOrderList == null ? new List<ShipPlanOpenOrder>() : shipPlanOpenOrderList;
         if (shipPlanOpenOrderList!=null && shipPlanOpenOrderList.Count > 0)
         {
@@ -216,7 +218,7 @@ from  MRP_ShipPlanDet as det
         #endregion
 
         #region    在途
-        IList<ShipPlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<ShipPlanIpDet>(" select s from  ShipPlanIpDet as s where s.ShipPlanId=? ", shipPlanDetList.First().ShipPlanId);
+        IList<ShipPlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<ShipPlanIpDet>(" select s from  ShipPlanIpDet as s where s.ShipPlanId=? and s.Type=? ",new object[]{ shipPlanDetList.First().ShipPlanId,this.rbType.SelectedValue});
         ipDets = ipDets == null ? new List<ShipPlanIpDet>() : ipDets;
         if (ipDets != null && ipDets.Count > 0)
         {

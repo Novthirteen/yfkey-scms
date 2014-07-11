@@ -35,6 +35,7 @@ namespace com.Sconit.Entity.MRP
         public decimal ReqQty { get; set; }
         public string UUID { get; set; }
         public decimal OrderQty { get; set; }
+        public string Type { get; set; }
         
         
 

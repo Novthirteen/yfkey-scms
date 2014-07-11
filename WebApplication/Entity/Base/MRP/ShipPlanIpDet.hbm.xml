@@ -13,5 +13,6 @@
     <property name="WindowTime" column="WindowTime" type="DateTime"  />
     <property name="Plant" column="Plant" type="String" length="50" />
     <property name="Qty" column="Qty" type="Decimal"  />
+    <property name="Type" column="Type" type="String" length="50" />
   </class>
 </hibernate-mapping>

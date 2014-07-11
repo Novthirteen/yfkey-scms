@@ -21,9 +21,15 @@
             </td>
         </tr>
         <tr>
-            <td class="ttd01">
+            <td class="td01">
+            计划类型
             </td>
-            <td class="ttd02">
+            <td class="td02">
+                <asp:RadioButtonList ID="rbType" runat="server" RepeatDirection="Horizontal" 
+                    >
+                    <asp:ListItem Text="天" Value="Daily" Selected="True" />
+                    <asp:ListItem Text="周" Value="Weekly" />
+                </asp:RadioButtonList>
             </td>
             <td>
             </td>

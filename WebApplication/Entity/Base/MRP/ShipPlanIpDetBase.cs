@@ -19,6 +19,7 @@ namespace com.Sconit.Entity.MRP
         public DateTime WindowTime { get; set; }
         public string Plant { get; set; }
         public decimal Qty { get; set; }
+        public string Type { get; set; }
         
         
 

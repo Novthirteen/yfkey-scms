@@ -33,6 +33,7 @@ namespace com.Sconit.Entity.MRP
         public string LastModifyUser { get; set; }
         public Int32 Version { get; set; }
         public decimal OrderQty { get; set; }
+        public string Type { get; set; }
         
         
 

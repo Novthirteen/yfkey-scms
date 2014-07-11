@@ -25,5 +25,6 @@
     <property name="Version" column="Version" type="Int32"  />
     <property name="UnitCount" column="UC" type="Decimal"  />
     <property name="MinLotSize" column="MinLotSize" type="Decimal"  />
+    <property name="Type" column="Type" type="String" length="50" />
   </class>
 </hibernate-mapping>

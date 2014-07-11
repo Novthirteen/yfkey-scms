@@ -12,7 +12,22 @@
                 <uc3:textbox ID="tbItemCode" runat="server" Visible="true" Width="250" MustMatch="true"
                     DescField="Description" ValueField="Code" ServicePath="ItemMgr.service" ServiceMethod="GetCacheAllItem" />
             </td>
-            <td>
+             <td class="td01">
+            计划类型
+            </td>
+            <td class="td02">
+                <asp:RadioButtonList ID="rbType" runat="server" RepeatDirection="Horizontal" 
+                    >
+                    <asp:ListItem Text="天" Value="Daily" Selected="True" />
+                    <asp:ListItem Text="周" Value="Weekly" />
+                </asp:RadioButtonList>
+            </td>
+            
+        </tr>
+        <tr>
+        <td>
+            </td><td>
+            </td><td>
             </td>
             <td class="td02">
                 <asp:Button ID="btnSearch" runat="server" Text="查询" OnClick="btnSearch_Click" />

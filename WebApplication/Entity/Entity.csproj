@@ -771,7 +771,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Base\MRP\PurchasePlanDetBase.hbm.xml">
+    <EmbeddedResource Include="Base\MRP\PurchasePlanDet.hbm.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
@@ -816,7 +816,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Base\MRP\PurchasePlanIpDet.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\PurchasePlanIpDet.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
