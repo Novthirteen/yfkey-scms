@@ -3,6 +3,27 @@
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="cc1" %>
 <script language="javascript" type="text/javascript" src="Js/DatePicker/WdatePicker.js"></script>
 <div id="search" runat="server">
+<table class="mtable">
+        <tr>
+             <td class="td01">
+            计划类型
+            </td>
+            <td class="td02">
+                <asp:RadioButtonList ID="rbType" runat="server" RepeatDirection="Horizontal" 
+                    >
+                    <asp:ListItem Text="天" Value="Daily" Selected="True" />
+                    <asp:ListItem Text="周" Value="Weekly" />
+                </asp:RadioButtonList>
+            </td>
+            <td class="td02">
+            </td>
+            <td class="td01">
+            </td>
+            <td class="td02">
+            </td>
+        </tr>
+    </table>
+    <hr />
     <table class="mtable" runat="server" id="tblSearch">
         <tr>
             <td class="td01">
@@ -22,14 +43,9 @@
         </tr>
         <tr>
             <td class="td01">
-            计划类型
             </td>
             <td class="td02">
-                <asp:RadioButtonList ID="rbType" runat="server" RepeatDirection="Horizontal" 
-                    >
-                    <asp:ListItem Text="天" Value="Daily" Selected="True" />
-                    <asp:ListItem Text="周" Value="Weekly" />
-                </asp:RadioButtonList>
+               
             </td>
             <td>
             </td>

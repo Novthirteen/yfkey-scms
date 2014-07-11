@@ -122,7 +122,14 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                 PurchasePlanId = Convert.ToInt32(row[21]),
             });
         }
-        ListTable(purchasePlanDetList);
+        if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
+        {
+            ListTable(purchasePlanDetList);
+        }
+        else
+        {
+            WeeklyListTable(purchasePlanDetList);
+        }
     }
 
     private void ListTable(IList<PurchasePlanDet> pPlanDetList)
@@ -408,6 +415,183 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         this.list.InnerHtml = headStr + str.ToString();
     }
 
+    private void WeeklyListTable(IList<PurchasePlanDet> pPlanDetList)
+    {
+        if (pPlanDetList == null || pPlanDetList.Count == 0)
+        {
+            this.list.InnerHtml = "没有查到符合条件的记录";
+            return;
+        }
+
+        //var minStartTime = pPlanDetList.Min(s => s.StartTime).AddDays(14);
+        //pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+
+        #region   trace
+        IList<PurchasePlanDetTrace> traceList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        traceList = traceList == null ? new List<PurchasePlanDetTrace>() : traceList;
+
+        if (traceList != null && traceList.Count > 0)
+        {
+            foreach (var sd in pPlanDetList)
+            {
+                var currentLogs = traceList.Where(d => d.UUID == sd.UUID).ToList();
+                var showText = string.Empty;
+                if (currentLogs != null && currentLogs.Count > 0)
+                {
+                    showText = "<table><thead><tr><th>生产计划版本号</th><th>生产线</th><th>成品物料号</th><th>计划日期</th><th>计划数量</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentLogs)
+                    {
+                        showText += "<td>" + c.RefPlanNo + "</td><td>" + c.ProdLine + "</td><td>" + c.ProdItem + "</td><td>" + c.PlanDate.ToShortDateString() + "</td><td>" + c.ProdQty.ToString("0.##") + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.Logs = showText;
+            }
+        }
+        #endregion
+
+        #region  orderQty
+        IList<PurchasePlanOpenOrder> pPlanOpenOrderList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        pPlanOpenOrderList = pPlanOpenOrderList == null ? new List<PurchasePlanOpenOrder>() : pPlanOpenOrderList;
+        if (pPlanOpenOrderList != null && pPlanOpenOrderList.Count > 0)
+        {
+            foreach (var sd in pPlanDetList)
+            {
+                var currentOrders = pPlanOpenOrderList.Where(d => d.UUID == sd.UUID).ToList();
+                var showText = string.Empty;
+                if (currentOrders != null && currentOrders.Count > 0)
+                {
+                    showText = "<table><thead><tr><th>采购路线</th><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentOrders)
+                    {
+                        showText += "<td>" + c.Flow + "</td><td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.OrderDets = showText;
+            }
+        }
+        #endregion
+
+
+        var planByDateIndexs = pPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
+        var planByFlowItems = pPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item });
+
+        StringBuilder str = new StringBuilder();
+        //str.Append(CopyString());
+        //head
+        var flowCode = this.tbFlow.Text.Trim();
+        string headStr = string.Empty;
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th>");
+        int ii = 0;
+        foreach (var planByDateIndex in planByDateIndexs)
+        {
+            ii++;
+            str.Append("<th colspan='3'>");
+            str.Append(planByDateIndex.Key.ToString("yyyy-MM-dd"));
+            str.Append("</th>");
+        }
+        str.Append("</tr><tr class='GVHeader'>");
+        foreach (var planByDateIndex in planByDateIndexs)
+        {
+            str.Append("<th >需求数</th><th >订单数</th><th >采购数</th>");
+        }
+        str.Append("</tr></thead>");
+        str.Append("<tbody>");
+
+        #region  通过长度控制table的宽度
+        string widths = "100%";
+        if (ii > 14)
+        {
+            widths = "260%";
+        }
+        else if (ii > 10)
+        {
+            widths = "210%";
+        }
+        else if (ii > 6)
+        {
+            widths = "160%";
+        }
+        else if (ii > 4)
+        {
+            widths = "140%";
+        }
+
+        headStr += string.Format("<table id='tt' runat='server' border='1' class='GV' style='width:{0};border-collapse:collapse;'>", widths);
+        #endregion
+        int l = 0;
+        int seq = 0;
+        foreach (var planByFlowItem in planByFlowItems)
+        {
+            var firstPlan = planByFlowItem.First();
+            var planDic = planByFlowItem.GroupBy(d => d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q => q.PurchaseQty));
+            l++;
+            if (l % 2 == 0)
+            {
+                str.Append("<tr class='GVAlternatingRow'>");
+            }
+            else
+            {
+                str.Append("<tr class='GVRow'>");
+            }
+            str.Append("<td>");
+            str.Append(l);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(planByFlowItem.Key.Flow);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(planByFlowItem.Key.Item);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.ItemDesc);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.RefItemCode);
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.UnitCount.ToString("0.##"));
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.SafeStock.ToString("0.##"));
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.MaxStock.ToString("0.##"));
+            str.Append("</td>");
+       
+            foreach (var planByDateIndex in planByDateIndexs)
+            {
+                // str.Append("<th >需求数</th><th >订单数</th><th >采购数</th><th >期末</th>")
+                var curenPlan = planByFlowItem.Where(p => p.StartTime == planByDateIndex.Key);
+                var pPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet();
+                str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", pPlanDet.Logs));
+                str.Append(pPlanDet.ReqQty.ToString("0.##"));
+                str.Append("</td>");
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowDetsClick(this)'>", pPlanDet.OrderDets));
+                str.Append(pPlanDet.OrderQty.ToString("0.##"));
+                str.Append("</td>");
+                if (firstPlan.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)
+                {
+                    seq++;
+                    str.Append("<td width='30px'>");
+                    str.Append("<input  type='text' flow='" + firstPlan.Flow + "' item='" + firstPlan.Item + "'  name='UpQty' id='" + pPlanDet.Id + "'value='" + pPlanDet.PurchaseQty.ToString("0.##") + "' releaseNo='" + firstPlan.ReleaseNo + "'  dateFrom='" + planByDateIndex.Key + "' style='width:70px' onblur='doFocusClick(this)' seq='" + seq + "' />");
+                    str.Append("</td>");
+                }
+                else
+                {
+                    str.Append("<td>");
+                    str.Append(pPlanDet.PurchaseQty.ToString("0.##"));
+                    str.Append("</td>");
+                }
+            }
+            str.Append("</tr>");
+        }
+        str.Append("</tbody></table>");
+        this.list.InnerHtml = headStr + str.ToString();
+    }
+
+
     #endregion
 
 
@@ -510,7 +694,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             {
                 ShowErrorMessage("没有要修改的计划。");
             }
-            TheMrpMgr.UpdatePurchasePlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser);
+            TheMrpMgr.UpdatePurchasePlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser,this.rbType.SelectedValue);
             ShowSuccessMessage("修改成功。");
             this.btnSearch_Click(null, null);
         }

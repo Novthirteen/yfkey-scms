@@ -631,7 +631,6 @@ from  MRP_ShipPlanDet as det
     }
     #endregion
 
-
     protected void btnRunProdPlan_Click(object sender, EventArgs e)
     {
         try
@@ -768,8 +767,6 @@ from  MRP_ShipPlanDet as det
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
     }
-
-    
 
     protected void btnBack_Click(object sender, EventArgs e)
     {
