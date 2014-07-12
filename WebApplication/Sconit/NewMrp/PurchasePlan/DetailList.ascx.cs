@@ -140,8 +140,8 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             return;
         }
 
-        //var minStartTime = pPlanDetList.Min(s => s.StartTime).AddDays(14);
-        //pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        var minStartTime = pPlanDetList.Min(s => s.StartTime).AddDays(14);
+        pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
         List<PurchasePlanDetTrace> traceList = new List<PurchasePlanDetTrace>();
@@ -165,10 +165,10 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                 var showText = string.Empty;
                 if (currentLogs != null && currentLogs.Count > 0)
                 {
-                    showText = "<table><thead><tr><th>生产计划版本号</th><th>生产线</th><th>成品物料号</th><th>计划日期</th><th>计划数量</th></tr></thead><tbody><tr>";
+                    showText = "<table><thead><tr><th>成品物料号</th><th>计划日期</th><th>计划数量</th></tr></thead><tbody><tr>";
                     foreach (var c in currentLogs)
                     {
-                        showText += "<td>" + c.RefPlanNo + "</td><td>" + c.ProdLine + "</td><td>" + c.ProdItem + "</td><td>" + c.PlanDate.ToShortDateString() + "</td><td>" + c.ProdQty.ToString("0.##") + "</td></tr><tr>";
+                        showText += "<td>" + c.ProdItem + "</td><td>" + c.PlanDate.ToShortDateString() + "</td><td>" + c.ProdQty.ToString("0.##") + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
@@ -259,9 +259,9 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
 
         #region  通过长度控制table的宽度
         string widths = "100%";
-        if (ii > 14)
+        if (ii >= 14)
         {
-            widths = "260%";
+            widths = "350%";
         }
         else if (ii > 10)
         {
@@ -390,8 +390,8 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
 
                 var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                 var orderQtySum = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
-                var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.PurchaseQty);
-                var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
+                var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.PurchaseQty);
+                var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
 
                 InitStockQty = firstPlan.InitStock + ipQty + orderQtySum + shipQtySum - reqQtySum;
 
@@ -400,7 +400,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
 
                 var ipQty2 = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                 var orderQtySum2 = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
-                var shipQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.PurchaseQty) : 0;
+                var shipQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key && i.WindowTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key && i.WindowTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.PurchaseQty) : 0;
                 //var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty);
 
                 inTransitQty = inTransitQty - ipQty2 + orderQtySum2 + shipQtySum2;
@@ -467,10 +467,10 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                 var showText = string.Empty;
                 if (currentLogs != null && currentLogs.Count > 0)
                 {
-                    showText = "<table><thead><tr><th>生产计划版本号</th><th>生产线</th><th>成品物料号</th><th>计划日期</th><th>计划数量</th></tr></thead><tbody><tr>";
+                    showText = "<table><thead><tr><th>成品物料号</th><th>计划日期</th><th>计划数量</th></tr></thead><tbody><tr>";
                     foreach (var c in currentLogs)
                     {
-                        showText += "<td>" + c.RefPlanNo + "</td><td>" + c.ProdLine + "</td><td>" + c.ProdItem + "</td><td>" + c.PlanDate.ToShortDateString() + "</td><td>" + c.ProdQty.ToString("0.##") + "</td></tr><tr>";
+                        showText += "<td>" + c.ProdItem + "</td><td>" + c.PlanDate.ToShortDateString() + "</td><td>" + c.ProdQty.ToString("0.##") + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
