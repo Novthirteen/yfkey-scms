@@ -1746,31 +1746,33 @@ namespace com.Sconit.Service.MRP.Impl
                         }
                         #endregion
 
-                        #region 读取包装量
-                        string rUnitCount = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
-                        if (string.IsNullOrEmpty(rUnitCount))
-                        {
-                            uc = 0;
-                        }
-                        else
-                        {
-                            if (!decimal.TryParse(rUnitCount, out uc))
-                            {
-                                //throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
-                                errorMessages += "</br>" + string.Format("第{0}行：包装量只能填写大于0数字。", rowCount);
-                                continue;
-                            }
-                            if (uc < 0)
-                            {
-                                //throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
-                                errorMessages += "</br>" + string.Format("第{0}行：包装量只能填写大于0数字。", rowCount);
-                                continue;
-                            }
-                        }
-                        #endregion
+                        
 
                     }
 
+                    #endregion
+
+                    #region 读取包装量
+                    string rUnitCount = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
+                    if (string.IsNullOrEmpty(rUnitCount))
+                    {
+                        uc = 0;
+                    }
+                    else
+                    {
+                        if (!decimal.TryParse(rUnitCount, out uc))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
+                            errorMessages += "</br>" + string.Format("第{0}行：包装量只能填写大于0数字。", rowCount);
+                            continue;
+                        }
+                        if (uc < 0)
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
+                            errorMessages += "</br>" + string.Format("第{0}行：包装量只能填写大于0数字。", rowCount);
+                            continue;
+                        }
+                    }
                     #endregion
 
                     #region 读取物料代码
@@ -1862,6 +1864,9 @@ namespace com.Sconit.Service.MRP.Impl
                     foreach (var l in byFlow.list)
                     {
                         //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
+                        upSql = string.Format(" update FlowDet set Uc={0},lastModifyDate='{1}',LastModifyUser='{2}' where Flow='{3}' and Item='{4}' ", l[10], newTime, user.Code, l[0], l[7]);
+                        this.genericMgr.ExecuteSql(upSql);
+
                         upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], l[10],newTime,user.Code, l[5], l[7]);
                         this.genericMgr.ExecuteSql(upSql);  
                     }
