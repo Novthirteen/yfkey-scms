@@ -34,6 +34,7 @@ namespace com.Sconit.Entity.MRP
         public Int32 Version { get; set; }
         public decimal OrderQty { get; set; }
         public string Type { get; set; }
+        public decimal MinLotSize { get; set; }
         
         
 
