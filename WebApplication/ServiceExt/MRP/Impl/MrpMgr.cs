@@ -739,7 +739,7 @@ namespace com.Sconit.Service.MRP.Impl
                 var flowDets = this.genericMgr.GetDatasetBySql(@"select d.Flow,d.Item,d.RefItemCode,i.Desc1,d.UC,d.Uom,m.LocFrom,isnull(m.MrpLeadTime,0)as MrpLeadTime,m.ShipFlow from FlowDet as d 
                                                                 inner join Item as i on i.Code=d.Item 
                                                                 inner join FlowMstr as m on d.Flow=m.Code 
-                                                                where m.type='Distribution' and d.RefItemCode is not null and d.RefItemCode<>''").Tables[0];
+                                                                where m.type='Distribution' ").Tables[0];          //and d.RefItemCode is not null and d.RefItemCode<>''
                 var allActiveFlowDetList = new List<object[]>();
                 foreach (System.Data.DataRow row in flowDets.Rows)
                 {
@@ -950,16 +950,16 @@ namespace com.Sconit.Service.MRP.Impl
                                 det.Type = dateType;
                                 det.DateFrom = Convert.ToDateTime(dateIndex);
                                 det.DateTo = dateType == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK ? det.DateFrom.AddDays(7) : det.DateFrom;
-                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[5]);
-                                det.UnitCount = (decimal)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[4]);
+                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d =>d[0].ToString() == flowCode && d[1].ToString() == itemCode)[5]);
+                                det.UnitCount = (decimal)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[4]);
                                 det.Qty = qty;
-                                det.Location = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[6]);
+                                det.Location = (string)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[6]);
                                 //det.StartTime = det.DateFrom;
-                                det.StartTime = det.DateFrom.AddDays(Convert.ToInt32(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[7])).Date;
+                                det.StartTime = det.DateFrom.AddDays(Convert.ToInt32(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[7])).Date;
                                 //det.Version = mstr.Version;
                                 det.Flow = flowCode;
                                 //det.ReferenceScheduleNo = mstr.ReferenceScheduleNo;
-                                det.ShipFlow = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[8]);
+                                det.ShipFlow = (string)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[8]);
                                 det.ShipQty = 0;
                                 det.FordPlanId = 0;
                                 //this.genericMgr.Create(det);
@@ -1908,7 +1908,7 @@ namespace com.Sconit.Service.MRP.Impl
                     allDFlowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2] });
                 }
 
-                var allProdItems = this.genericMgr.FindAllWithCustomQuery<Item>(" select i from Item as i where i.Type <> 'P' ");
+                var allProdItems = this.genericMgr.FindAllWithCustomQuery<Item>(" select i from Item as i where i.IsActive=1 ");
                 var allBoms = this.genericMgr.FindAllWithCustomQuery<Bom>(" select i from Bom as i where i.IsActive=1 ");
                 var updateItemList = new List<Item>();
                 int rowCount = 10;
@@ -1943,7 +1943,7 @@ namespace com.Sconit.Service.MRP.Impl
 
                     if (allProdItems.Where(d => d.Code == itemCode).Count() == 0)
                     {
-                        errorMessages +="</br/>"+ string.Format("第{0}行：成品代码{1}不存在。", rowCount, itemCode);
+                        errorMessages += "</br/>" + string.Format("第{0}行：成品代码{1}不存在。", rowCount, itemCode);
                         continue;
                         //throw new BusinessErrorException(string.Format("第{0}行：成品代码{1}不存在。", rowCount, itemCode));
                     }
@@ -1963,7 +1963,7 @@ namespace com.Sconit.Service.MRP.Impl
                         currentItem.Bom = allBoms.FirstOrDefault(d => d.Code == bomCode);
                     }
 
-                   
+
                     #endregion
 
                     #region 生产提前期
@@ -2046,7 +2046,7 @@ namespace com.Sconit.Service.MRP.Impl
                     if (!string.IsNullOrEmpty(rUc))
                     {
                         decimal s;
-                        if (!decimal.TryParse(rMinLotSize, out s))
+                        if (!decimal.TryParse(rUc, out s))
                         {
                             //throw new BusinessErrorException(string.Format("第{0}行：包装量填写有误。", rowCount));
                             errorMessages += "</br/>" + string.Format("第{0}行：包装量填写有误。", rowCount);
@@ -2055,6 +2055,7 @@ namespace com.Sconit.Service.MRP.Impl
                         currentItem.UnitCount = s;
                     }
                     #endregion
+                    updateItemList.Add(currentItem);
 
                 }
                 if (updateItemList.Count == 0)

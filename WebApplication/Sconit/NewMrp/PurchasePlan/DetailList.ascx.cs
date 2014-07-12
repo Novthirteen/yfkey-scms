@@ -142,7 +142,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             return;
         }
 
-        var minStartTime = pPlanDetList.Min(s => s.StartTime).AddDays(14);
+        var minStartTime = pPlanDetList.Min(s => s.StartTime).AddDays(13);
         pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace

@@ -135,8 +135,8 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             return;
         }
 
-        //var minStartTime = productionPlanDetList.Min(s => s.StartTime).AddDays(14);
-        //productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+        var minStartTime = productionPlanDetList.Min(s => s.StartTime).AddDays(13);
+        productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
         List<ProductionPlanDetTrace> traceList = new List<ProductionPlanDetTrace>();
@@ -304,7 +304,18 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             //str.Append("<td>");
             //str.Append((firstPlan.InTransitQty).ToString("0.##"));
             //str.Append("</td>");
-            str.Append("<td>");
+            if (InitStockQty < firstPlan.SafeStock)
+            {
+                str.Append("<td style='background:red;color:white'>");
+            }
+            else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
+            {
+                str.Append("<td style='background:green;color:white'>");
+            }
+            else if (InitStockQty > firstPlan.MaxStock)
+            {
+                str.Append("<td style='background:orange'>");
+            }
             str.Append((firstPlan.InspectQty).ToString("0.##"));
             str.Append("</td>");
             InitStockQty = InitStockQty + firstPlan.InspectQty;
