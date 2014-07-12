@@ -232,7 +232,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         }
         #endregion
 
-        var planByDateIndexs = pPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
+        var planByDateIndexs = pPlanDetList.GroupBy(p => p.WindowTime).OrderBy(p => p.Key);
         var planByFlowItems = pPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item});
 
         StringBuilder str = new StringBuilder();
@@ -283,7 +283,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         foreach (var planByFlowItem in planByFlowItems)
         {
             var firstPlan = planByFlowItem.First();
-            var planDic = planByFlowItem.GroupBy(d => d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q => q.PurchaseQty));
+            var planDic = planByFlowItem.GroupBy(d => d.WindowTime).ToDictionary(d => d.Key, d => d.Sum(q => q.PurchaseQty));
             l++;
             if (l % 2 == 0)
             {
@@ -366,7 +366,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             foreach (var planByDateIndex in planByDateIndexs)
             {
                 // str.Append("<th >需求数</th><th >订单数</th><th >采购数</th><th >期末</th>")
-                var curenPlan = planByFlowItem.Where(p => p.StartTime == planByDateIndex.Key);
+                var curenPlan = planByFlowItem.Where(p => p.WindowTime == planByDateIndex.Key);
                 var pPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet();
                 str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", pPlanDet.Logs));
                 str.Append(pPlanDet.ReqQty.ToString("0.##"));

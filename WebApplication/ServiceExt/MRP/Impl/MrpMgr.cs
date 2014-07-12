@@ -1574,7 +1574,7 @@ namespace com.Sconit.Service.MRP.Impl
                 {
                     rowCount++;
                     HSSFRow row = (HSSFRow)rows.Current;
-                    if (!ImportHelper.CheckValidDataRow(row, 0, 3))
+                    if (!ImportHelper.CheckValidDataRow(row, 1, 4))
                     {
                         break;//边界
                     }
@@ -1795,7 +1795,7 @@ namespace com.Sconit.Service.MRP.Impl
                                     }).ToList();
                 foreach (var byFlow in groupByFlows)
                 {
-                    string upSql = "update FlowMstr set 1=1 ";
+                    string upSql = "update FlowMstr set Code=Code ";
                     if (byFlow.dLeadTime != null)
                     {
                         upSql += string.Format(",MrLeadTime={0}",byFlow.dLeadTime);
@@ -1814,7 +1814,7 @@ namespace com.Sconit.Service.MRP.Impl
                     upSql += string.Format(" where code='{0}' ",byFlow.dFlowCode);
                     this.genericMgr.ExecuteSql(upSql);
 
-                    upSql = string.Format(" update FlowMstr set MrLeadTime={0} where Code='{1}' ", byFlow.tLeadTime, byFlow.tFlowCode);
+                    upSql = string.Format(" update FlowMstr set MrpLeadTime={0} where Code='{1}' ", byFlow.tLeadTime, byFlow.tFlowCode);
                     this.genericMgr.ExecuteSql(upSql);
 
                     foreach (var l in byFlow.list)
