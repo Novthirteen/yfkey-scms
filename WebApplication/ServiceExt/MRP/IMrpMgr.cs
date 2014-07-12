@@ -27,5 +27,10 @@ namespace com.Sconit.Service.MRP
 
         void UpdateWeeklyPurchasePlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user);
         void ReadShipPlanParametersFromXls(Stream inputStream, User user);
+
+        void ReadProductionPlanParametersFromXls(Stream inputStream, User user);
+
+        void ReadPurchasePlanParametersFromXls(Stream inputStream, User user);
+             
     }
 }
