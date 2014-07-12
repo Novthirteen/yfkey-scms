@@ -59,7 +59,8 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime,isnull(det.uc,0),isnull(f.MrpLeadTime,0),m.Id
+        var searchSql = @"
+select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime,isnull(det.uc,0),isnull(f.MrpLeadTime,0),m.Id,isnull(det.MinLotSize,0)
  from MRP_PurchasePlanDet as det 
 inner join MRP_PurchasePlanMstr as m on m.Id=det.PurchasePlanId
  inner join FlowMstr as f on det.Flow=f.Code
@@ -120,6 +121,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                 UnitCount = Convert.ToDecimal(row[19]),
                 MrpLeadTime = Convert.ToDecimal(row[20]),
                 PurchasePlanId = Convert.ToInt32(row[21]),
+                MinLotSize = Convert.ToDecimal(row[22]),
             });
         }
         if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
@@ -240,7 +242,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th><th rowspan='2'>报验</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th><th rowspan='2'>报验</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -310,6 +312,9 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             str.Append("</td>");
             str.Append("<td>");
             str.Append(firstPlan.UnitCount.ToString("0.##"));
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.MinLotSize.ToString("0.##"));
             str.Append("</td>");
             str.Append("<td>");
             str.Append(firstPlan.SafeStock.ToString("0.##"));
