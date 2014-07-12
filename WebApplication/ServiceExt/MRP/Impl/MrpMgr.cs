@@ -1760,7 +1760,7 @@ namespace com.Sconit.Service.MRP.Impl
                             throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在发运路线{2}中,请维护。", rowCount, itemCode, tFlowCode));
                         }
                     }
-
+                      
                     #endregion
                     //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
 
@@ -1793,34 +1793,35 @@ namespace com.Sconit.Service.MRP.Impl
                                         tLeadTime = result.Key.tLeadTime,
                                         list = result.ToList()
                                     }).ToList();
+                DateTime newTime=System.DateTime.Now;
                 foreach (var byFlow in groupByFlows)
                 {
                     string upSql = "update FlowMstr set Code=Code ";
                     if (byFlow.dLeadTime != null)
                     {
-                        upSql += string.Format(",MrLeadTime={0}",byFlow.dLeadTime);
+                        upSql += string.Format(",MrpLeadTime={0}",byFlow.dLeadTime);
                     }
                     if (!string.IsNullOrEmpty(byFlow.mrpCode.ToString()))
                     {
-                        upSql += string.Format(",MrpCode={0}", byFlow.mrpCode);
+                        upSql += string.Format(",MrpCode='{0}'", byFlow.mrpCode);
                     }
                     if (byFlow.dateFst != null) {
-                        upSql +=string.Format( " ,DateFst={0} ",byFlow.dateFst);
+                        upSql +=string.Format( " ,DateFst='{0}' ",byFlow.dateFst);
                     }
                     if (!string.IsNullOrEmpty(byFlow.workDate.ToString()))
                     {
                         upSql += string.Format(",WorkDate='{0}'",byFlow.workDate);
                     }
-                    upSql += string.Format(" where code='{0}' ",byFlow.dFlowCode);
+                    upSql += string.Format(",lastModifyDate='{1}',LastModifyUser='{2}' where code='{0}' ", byFlow.dFlowCode, newTime, user.Code);
                     this.genericMgr.ExecuteSql(upSql);
 
-                    upSql = string.Format(" update FlowMstr set MrpLeadTime={0} where Code='{1}' ", byFlow.tLeadTime, byFlow.tFlowCode);
+                    upSql = string.Format(" update FlowMstr set MrpLeadTime={0},lastModifyDate='{2}',LastModifyUser='{3}' where Code='{1}' ", byFlow.tLeadTime, byFlow.tFlowCode, newTime, user.Code);
                     this.genericMgr.ExecuteSql(upSql);
 
                     foreach (var l in byFlow.list)
                     {
                         //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
-                        upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2} where Flow='{3}' and Item='{4}' ", l[9], l[8], l[10], l[5], l[7]);
+                        upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], l[10],newTime,user.Code, l[5], l[7]);
                         this.genericMgr.ExecuteSql(upSql);  
                     }
 
