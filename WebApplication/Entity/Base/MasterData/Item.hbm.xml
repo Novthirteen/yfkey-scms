@@ -28,5 +28,6 @@
     <property name="MaxStock" column="MaxStock" type="Int32"  />
     <property name="IsMRP" column="IsMRP" type="Boolean"  />
     <property name="MinLotSize" column="MinLotSize" type="Int32"  />
+    <property name="ScrapPct" column="ScrapPct" type="Decimal"  />
   </class>
 </hibernate-mapping>
