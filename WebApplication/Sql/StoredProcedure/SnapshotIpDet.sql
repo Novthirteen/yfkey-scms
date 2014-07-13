@@ -17,7 +17,7 @@ BEGIN
 	declare @DateNow datetime
 	declare @Msg nvarchar(MAX)
 	declare @trancount int
-	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), GetDate(), 121))
+	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), DATEADD(hour, -6, GetDate()), 121))
 	set @Msg = ''
 	set @trancount = @@trancount
 	
@@ -38,7 +38,7 @@ BEGIN
 			inner join OrderLocTrans as oTrans on iDet.OrderLocTransId = oTrans.Id
 			inner join OrderDet as oDet on oTrans.OrderDetId = oDet.Id
 			inner join OrderMstr as oMstr on oDet.OrderNo = oMstr.OrderNo
-			where oMstr.[Type] in ('Procuement', 'Transfer') and iMstr.[Status] = 'Create' and iMstr.[Type] = 'Nml'
+			where oMstr.[Type] in ('Procurement', 'Transfer') and iMstr.[Status] = 'Create' and iMstr.[Type] = 'Nml'
 		end
 
 		if @trancount = 0 

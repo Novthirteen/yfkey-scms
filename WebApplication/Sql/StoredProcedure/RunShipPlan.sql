@@ -216,10 +216,15 @@ BEGIN
 		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempDistributionFlow
 		while @RowId <= @MaxRowId
 		begin
-			select @DistributionFlow = Flow from #tempDistributionFlow where RowId = @RowId
+			set @MaxMstrId = null
+			set @MinWindowTime = null
+			set @MaxWindowTime = null
 
+			select @DistributionFlow = Flow from #tempDistributionFlow where RowId = @RowId
+				
 			select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow
 			select @MinWindowTime = MIN(WindowTime), @MaxWindowTime = MAX(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
+	
 			while exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime)
 			begin
 				delete from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime
@@ -238,10 +243,16 @@ BEGIN
 			insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UC, Location, StartTime, WindowTime)
 			select det.DetId, det.MstrId, det.Flow, det.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty, det.Uom, i.Uom, det.UC, det.Location, det.StartTime, det.WindowTime 
 			from MRP_SplitWeeklyCustScheduleDet as det inner join Item as i on det.Item = i.Code
-			where det.WindowTime > @MaxWindowTime
-
+			where det.Flow = @DistributionFlow and det.WindowTime > @MaxWindowTime
+			
 			set @RowId = @RowId + 1
 		end
+
+		--按周计划添加日计划的路线（没有日计划）
+		insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UC, Location, StartTime, WindowTime)
+		select det.DetId, det.MstrId, det.Flow, det.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty, det.Uom, i.Uom, det.UC, det.Location, det.StartTime, det.WindowTime 
+		from MRP_SplitWeeklyCustScheduleDet as det inner join Item as i on det.Item = i.Code
+		where det.WindowTime > @DateNow and det.Flow not in (select Flow from #tempDistributionFlow)
 
 		--计算单位换算
 		update #tempEffCustScheduleDet set UnitQty = 1 where Uom = BaseUom
@@ -362,7 +373,7 @@ BEGIN
 		--转没有发运路线的，销售路线直接就是发运路线
 		insert into #tempShipPlanDet(UUID, DistributionFlow, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
 		select NEWID(), Flow, Flow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UnitQty, UC, Location, null, StartTime, WindowTime
-		from #tempEffCustScheduleDet where ShipFlow is null
+		from #tempEffCustScheduleDet where ShipFlow is null or ShipFlow = ''
 
 		--记录需求中间表
 		insert into #tempShipPlanDetTrace(UUID, DistributionFlow, Item, ReqDate, ReqQty) 

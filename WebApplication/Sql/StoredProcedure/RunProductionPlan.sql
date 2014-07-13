@@ -72,10 +72,11 @@ BEGIN
 			WindowTime datetime
 		)
 
-		create index IX_WindowTime on #tempCurrentLevlProductPlan(WindowTime asc)
+		create index IX_tempCurrentLevlProductPlan_Item_WindowTime on #tempCurrentLevlProductPlan(Item asc, WindowTime asc)
 
 		create table #tempProductPlanDetTrace
 		(
+			RowId int Identity(1, 1) primary key,
 			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Flow varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
@@ -87,6 +88,8 @@ BEGIN
 			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			UnitQty decimal(18, 8)
 		)
+
+		create index IX_tempProductPlanDetTrace_UUID on #tempProductPlanDetTrace(UUID asc)
 
 		create table #tempTempNextLevlProductPlan
 		(
@@ -137,7 +140,7 @@ BEGIN
 			WindowTime datetime
 		)
 
-		create index IX_StartTime on #tempProductPlanDet(StartTime asc)
+		create index IX_tempProductPlanDet_Item_StartTime on #tempProductPlanDet(Item asc, StartTime asc)
 
 		create table #tempLocatoinDet
 		(
@@ -150,6 +153,8 @@ BEGIN
 			MaxStock decimal(18, 8),
 			RemainQty decimal(18, 8)
 		)
+
+		create index IX_tempLocatoinDet_Item on #tempLocatoinDet(Item asc)
 
 		create table #tempBomDetail
 		(
@@ -186,6 +191,8 @@ BEGIN
 			WeeklyWindowTime datetime,
 			DailyStartTime datetime
 		)
+
+		create index IX_tempWeeklyProductionPlanDetMap_DailyUUID on #tempWeeklyProductionPlanDetMap(DailyUUID asc)
 
 		select @ShipPlanReleaseNo = MAX(ReleaseNo) from MRP_ShipPlanMstr where [Status] = 'Submit'
 
@@ -272,7 +279,7 @@ BEGIN
 					update det set Qty = CASE WHEN @ActiveQty >= Qty THEN 0 WHEN @ActiveQty < Qty and @ActiveQty > 0 THEN Qty - @ActiveQty ELSE Qty END,
 					@ActiveQty = CASE WHEN @ActiveQty >= @LastActiveQty THEN @ActiveQty - @LastActiveQty ELSE 0 END, 
 					@LastActiveQty = Qty
-					from #tempCurrentLevlProductPlan as det with(INDEX(IX_WindowTime))
+					from #tempCurrentLevlProductPlan as det with(INDEX(IX_tempCurrentLevlProductPlan_Item_WindowTime))
 					where det.Item = @Item
 				end
 
@@ -462,7 +469,7 @@ BEGIN
 			begin
 				update det set Qty = CASE WHEN @ActiveQty >= Qty THEN 0 WHEN @ActiveQty < Qty and @ActiveQty>0 THEN Qty - @ActiveQty ELSE Qty END,
 				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = Qty
-				from #tempProductPlanDet as det with(INDEX(IX_StartTime))
+				from #tempProductPlanDet as det with(INDEX(IX_tempProductPlanDet_Item_StartTime))
 				where det.Item = @Item and det.StartTime >= @StartTime
 			end
 
@@ -487,6 +494,7 @@ BEGIN
 		--经济批量
 		update #tempProductPlanDet set Qty = CASE WHEN Qty < MinLotSize THEN MinLotSize ELSE Qty END where MinLotSize > 0
 
+		--记录溢出量
 		update det set OverflowQty = tmp.OverflowQty
 		from #tempProductPlanDet as det inner join
 		(select det2.Item, det2.StartTime, SUM(ISNULL(det1.Qty, 0) - ISNULL(det1.OrgQty, 0)) as OverflowQty
