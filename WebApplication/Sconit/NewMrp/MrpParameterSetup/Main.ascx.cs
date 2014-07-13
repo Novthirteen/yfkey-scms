@@ -32,11 +32,11 @@ public partial class NewMrp_MrpParameterSetup_Main : MainModuleBase
             }
             else if (dateType == "ProductionPlan")
             {
-                var customerPlanList = TheMrpMgr.ReadCustomerPlanFromXls(fileUpload.PostedFile.InputStream, dateType, this.CurrentUser);
+                TheMrpMgr.ReadProductionPlanParametersFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser);
             }
             else if (dateType == "PurchasePlan")
             {
-                var customerPlanList = TheMrpMgr.ReadCustomerPlanFromXls(fileUpload.PostedFile.InputStream, dateType, this.CurrentUser);
+                TheMrpMgr.ReadPurchasePlanParametersFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser);
             }
             ShowSuccessMessage("导入成功。");
         }

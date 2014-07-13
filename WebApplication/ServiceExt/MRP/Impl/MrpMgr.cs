@@ -739,7 +739,7 @@ namespace com.Sconit.Service.MRP.Impl
                 var flowDets = this.genericMgr.GetDatasetBySql(@"select d.Flow,d.Item,d.RefItemCode,i.Desc1,d.UC,d.Uom,m.LocFrom,isnull(m.MrpLeadTime,0)as MrpLeadTime,m.ShipFlow from FlowDet as d 
                                                                 inner join Item as i on i.Code=d.Item 
                                                                 inner join FlowMstr as m on d.Flow=m.Code 
-                                                                where m.type='Distribution' and d.RefItemCode is not null and d.RefItemCode<>''").Tables[0];
+                                                                where m.type='Distribution' ").Tables[0];          //and d.RefItemCode is not null and d.RefItemCode<>''
                 var allActiveFlowDetList = new List<object[]>();
                 foreach (System.Data.DataRow row in flowDets.Rows)
                 {
@@ -831,17 +831,18 @@ namespace com.Sconit.Service.MRP.Impl
                     try
                     {
                         itemReference = ImportHelper.GetCellStringValue(row.GetCell(colRefItemCode));
-                        if (string.IsNullOrEmpty(itemReference))
-                        {
-                            errorMessages.Add(string.Format("客户零件号不能为空,第{0}行." , rowIndex));
-                            continue;
-                        }
-                        var checkItem = allActiveFlowDetList.Where(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode && d[2].ToString() == itemReference);
-                        if (checkItem == null || checkItem.Count() == 0)
-                        {
-                            errorMessages.Add(string.Format("物料号{0}客户零件号{3}销售路线{2},不匹配请维护,第{1}行.", itemCode, rowIndex, flowCode, itemReference));
-                            continue;
-                        }
+                      
+                        //if (string.IsNullOrEmpty(itemReference))
+                        //{
+                        //    errorMessages.Add(string.Format("客户零件号不能为空,第{0}行." , rowIndex));
+                        //    continue;
+                        //}
+                        //var checkItem = allActiveFlowDetList.Where(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode && d[2].ToString() == itemReference);
+                        //if (checkItem == null || checkItem.Count() == 0)
+                        //{
+                        //    errorMessages.Add(string.Format("物料号{0}客户零件号{3}销售路线{2},不匹配请维护,第{1}行.", itemCode, rowIndex, flowCode, itemReference));
+                        //    continue;
+                        //}
                     }
                     catch (Exception ex)
                     {
@@ -949,16 +950,16 @@ namespace com.Sconit.Service.MRP.Impl
                                 det.Type = dateType;
                                 det.DateFrom = Convert.ToDateTime(dateIndex);
                                 det.DateTo = dateType == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK ? det.DateFrom.AddDays(7) : det.DateFrom;
-                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[5]);
-                                det.UnitCount = (decimal)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[4]);
+                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d =>d[0].ToString() == flowCode && d[1].ToString() == itemCode)[5]);
+                                det.UnitCount = (decimal)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[4]);
                                 det.Qty = qty;
-                                det.Location = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[6]);
+                                det.Location = (string)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[6]);
                                 //det.StartTime = det.DateFrom;
-                                det.StartTime = det.DateFrom.AddDays(Convert.ToInt32(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[7])).Date;
+                                det.StartTime = det.DateFrom.AddDays(Convert.ToInt32(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[7])).Date;
                                 //det.Version = mstr.Version;
                                 det.Flow = flowCode;
                                 //det.ReferenceScheduleNo = mstr.ReferenceScheduleNo;
-                                det.ShipFlow = (string)(allActiveFlowDetList.FirstOrDefault(d => d[1].ToString() == itemCode)[8]);
+                                det.ShipFlow = (string)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[8]);
                                 det.ShipQty = 0;
                                 det.FordPlanId = 0;
                                 //this.genericMgr.Create(det);
@@ -1570,6 +1571,7 @@ namespace com.Sconit.Service.MRP.Impl
                 }
                 int rowCount = 10;
                 IList<object[]> allReadList = new List<object[]>();
+                string errorMessages = string.Empty;
                 while (rows.MoveNext())
                 {
                     rowCount++;
@@ -1595,12 +1597,15 @@ namespace com.Sconit.Service.MRP.Impl
                     dFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colDisFlow));
                     if (string.IsNullOrEmpty(dFlowCode))
                     {
-                        throw new BusinessErrorException(string.Format("第{0}行：销售路线不能为空。", rowCount));
+                        errorMessages += string.Format("第{0}行：销售路线不能为空。", rowCount);
+                        continue;
                     }
 
                     if (allDFlowCodeList.Where(d => (d[0]).ToString() == dFlowCode).Count() == 0)
                     {
-                        throw new BusinessErrorException(string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode));
+                        //throw new BusinessErrorException(string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode));
+                        errorMessages +="</br>"+ string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode);
+                        continue;
                     }
                     #endregion
 
@@ -1614,11 +1619,15 @@ namespace com.Sconit.Service.MRP.Impl
                     {
                         if (!int.TryParse(rdLeadTime, out dLeadTime))
                         {
-                            throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
+                            //throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
+                            errorMessages += "</br>" + string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount);
+                            continue;
                         }
                         if (dLeadTime < 0)
                         {
-                            throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
+                            //throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
+                            errorMessages += "</br>" + string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount);
+                            continue;
                         }
                     }
                     #endregion
@@ -1638,11 +1647,15 @@ namespace com.Sconit.Service.MRP.Impl
                         int s;
                         if (!int.TryParse(rDateFst, out s))
                         {
-                            throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
+                            //throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
+                            errorMessages += "</br>" + string.Format("第{0}行：周起始只能填写1-7数字。", rowCount);
+                            continue;
                         }
                         if (s < 0 || s > 7)
                         {
-                            throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
+                            //throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
+                            errorMessages += "</br>" + string.Format("第{0}行：周起始只能填写1-7数字。", rowCount);
+                            continue;
                         }
                         dateFst = s;
                     }
@@ -1658,7 +1671,9 @@ namespace com.Sconit.Service.MRP.Impl
                     {
                         if (allTFlowCodeList.Where(d => (d[0]).ToString() == tFlowCode).Count() == 0)
                         {
-                            throw new BusinessErrorException(string.Format("第{0}行：发运路线{1}不存在。", rowCount, dFlowCode));
+                            //throw new BusinessErrorException(string.Format("第{0}行：发运路线{1}不存在。", rowCount, dFlowCode));
+                            errorMessages += "</br>" + string.Format("第{0}行：发运路线{1}不存在。", rowCount, dFlowCode);
+                            continue;
                         }
 
 
@@ -1672,11 +1687,15 @@ namespace com.Sconit.Service.MRP.Impl
                         {
                             if (!int.TryParse(rtLeadTime, out tLeadTime))
                             {
-                                throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
+                                //throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
+                                errorMessages += "</br>" + string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount);
+                                continue;
                             }
                             if (tLeadTime < 0)
                             {
-                                throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
+                                //throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
+                                errorMessages += "</br>" + string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount);
+                                continue;
                             }
                         }
                         #endregion
@@ -1691,11 +1710,15 @@ namespace com.Sconit.Service.MRP.Impl
                         {
                             if (!decimal.TryParse(rSafeStock, out safeStock))
                             {
-                                throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
+                                //throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
+                                errorMessages += "</br>" + string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount);
+                                continue;
                             }
                             if (safeStock < 0)
                             {
-                                throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
+                                //throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
+                                errorMessages += "</br>" + string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount);
+                                continue;
                             }
                         }
                         #endregion
@@ -1710,36 +1733,46 @@ namespace com.Sconit.Service.MRP.Impl
                         {
                             if (!decimal.TryParse(rMaxStock, out maxStock))
                             {
-                                throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
+                                //throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
+                                errorMessages += "</br>" + string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount);
+                                continue;
                             }
                             if (maxStock < 0)
                             {
-                                throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
+                                //throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
+                                errorMessages += "</br>" + string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount);
+                                continue;
                             }
                         }
                         #endregion
 
-                        #region 读取包装量
-                        string rUnitCount = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
-                        if (string.IsNullOrEmpty(rUnitCount))
-                        {
-                            uc = 0;
-                        }
-                        else
-                        {
-                            if (!decimal.TryParse(rUnitCount, out uc))
-                            {
-                                throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
-                            }
-                            if (uc < 0)
-                            {
-                                throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
-                            }
-                        }
-                        #endregion
+                        
 
                     }
 
+                    #endregion
+
+                    #region 读取包装量
+                    string rUnitCount = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
+                    if (string.IsNullOrEmpty(rUnitCount))
+                    {
+                        uc = 0;
+                    }
+                    else
+                    {
+                        if (!decimal.TryParse(rUnitCount, out uc))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
+                            errorMessages += "</br>" + string.Format("第{0}行：包装量只能填写大于0数字。", rowCount);
+                            continue;
+                        }
+                        if (uc < 0)
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
+                            errorMessages += "</br>" + string.Format("第{0}行：包装量只能填写大于0数字。", rowCount);
+                            continue;
+                        }
+                    }
                     #endregion
 
                     #region 读取物料代码
@@ -1747,17 +1780,23 @@ namespace com.Sconit.Service.MRP.Impl
                     itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
                     if (string.IsNullOrEmpty(itemCode))
                     {
-                        throw new BusinessErrorException(string.Format("第{0}行：物料代码不能为空。", rowCount));
+                        //throw new BusinessErrorException(string.Format("第{0}行：物料代码不能为空。", rowCount));
+                        errorMessages += "</br>" + string.Format("第{0}行：物料代码不能为空。", rowCount);
+                        continue;
                     }
                     if (allDFlowCodeList.Where(f => f[0].ToString() == dFlowCode && f[1].ToString() == itemCode).Count() == 0)
                     {
-                        throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在销售路线{2}中，请维护。", rowCount, itemCode, dFlowCode));
+                        //throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在销售路线{2}中，请维护。", rowCount, itemCode, dFlowCode));
+                        errorMessages += "</br>" + string.Format("第{0}行：物料代码{1}不存在销售路线{2}中，请维护。", rowCount, itemCode, dFlowCode);
+                        continue;
                     }
                     if (!string.IsNullOrEmpty(tFlowCode))
                     {
                         if (allTFlowCodeList.Where(f => f[0].ToString() == tFlowCode && f[1].ToString() == itemCode).Count() == 0)
                         {
-                            throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在发运路线{2}中,请维护。", rowCount, itemCode, tFlowCode));
+                            //throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在发运路线{2}中,请维护。", rowCount, itemCode, tFlowCode));
+                            errorMessages += "</br>" + string.Format("第{0}行：物料代码{1}不存在发运路线{2}中,请维护。", rowCount, itemCode, tFlowCode);
+                            continue;
                         }
                     }
                       
@@ -1770,6 +1809,10 @@ namespace com.Sconit.Service.MRP.Impl
                 if (allReadList.Count == 0)
                 {
                     throw new BusinessErrorException("导入的有效数据为空。");
+                }
+                if (!string.IsNullOrEmpty(errorMessages))
+                {
+                    throw new BusinessErrorException(errorMessages);
                 }
                 var groupByFlows = (from tak in allReadList
                                     group tak by new
@@ -1821,6 +1864,9 @@ namespace com.Sconit.Service.MRP.Impl
                     foreach (var l in byFlow.list)
                     {
                         //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
+                        upSql = string.Format(" update FlowDet set Uc={0},lastModifyDate='{1}',LastModifyUser='{2}' where Flow='{3}' and Item='{4}' ", l[10], newTime, user.Code, l[0], l[7]);
+                        this.genericMgr.ExecuteSql(upSql);
+
                         upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], l[10],newTime,user.Code, l[5], l[7]);
                         this.genericMgr.ExecuteSql(upSql);  
                     }
@@ -1830,311 +1876,451 @@ namespace com.Sconit.Service.MRP.Impl
         }
         #endregion
 
-        //#region   生产计划参数导入
-        //private static object ReadProductionPlanParametersFromXlsLock = new object();
-        //[Transaction(TransactionMode.Requires)]
-        //public void ReadProductionPlanParametersFromXls(Stream inputStream, User user)
-        //{
-        //    lock (ReadProductionPlanParametersFromXlsLock)
-        //    {
-        //        if (inputStream.Length == 0)
-        //        {
-        //            throw new BusinessErrorException("Import.Stream.Empty");
-        //        }
-        //        HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
-        //        Sheet sheet = workbook.GetSheetAt(0);
-        //        IEnumerator rows = sheet.GetRowEnumerator();
-        //        ImportHelper.JumpRows(rows, 10);
+        #region   生产计划参数导入
+        private static object ReadProductionPlanParametersFromXlsLock = new object();
+        [Transaction(TransactionMode.Requires)]
+        public void ReadProductionPlanParametersFromXls(Stream inputStream, User user)
+        {
+            lock (ReadProductionPlanParametersFromXlsLock)
+            {
+                if (inputStream.Length == 0)
+                {
+                    throw new BusinessErrorException("Import.Stream.Empty");
+                }
+                HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+                Sheet sheet = workbook.GetSheetAt(0);
+                IEnumerator rows = sheet.GetRowEnumerator();
+                ImportHelper.JumpRows(rows, 10);
 
-        //        #region 成品/半成品代码	Bom代码	生产提前期	报废率	安全库存	最大库存	经济批量	包装量
-
-
-
-        //        int colItemCode = 1;//成品/半成品代码
-        //        int colBom = 2;//Bom代码
-        //        int colLeadTime = 3;//生产提前期
-        //        int colScrapPct = 4;//报废率
-        //        int colsafeStock = 5;//安全库存
-        //        int colMaxStock = 6;//最大库存
-        //        int colMinLotSize = 7;//经济批量
-        //        int colUnitCount = 8;//包装量
-        //        #endregion
-
-        //        var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
-        //        IList<object[]> allDFlowCodeList = new List<object[]>();
-        //        foreach (System.Data.DataRow flowRow in disFlowCodes.Rows)
-        //        {
-        //            allDFlowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2] });
-        //        }
-
-        //        var traFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Transfer' and m.IsActive=1 ").Tables[0];
-        //        IList<object[]> allTFlowCodeList = new List<object[]>();
-        //        foreach (System.Data.DataRow flowRow in traFlowCodes.Rows)
-        //        {
-        //            allTFlowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2].ToString() });
-        //        }
-        //        int rowCount = 10;
-        //        IList<object[]> allReadList = new List<object[]>();
-        //        while (rows.MoveNext())
-        //        {
-        //            rowCount++;
-        //            HSSFRow row = (HSSFRow)rows.Current;
-        //            if (!ImportHelper.CheckValidDataRow(row, 1, 4))
-        //            {
-        //                break;//边界
-        //            }
-
-        //            string dFlowCode = string.Empty;
-        //            int dLeadTime = 0;
-        //            string mrpCode = string.Empty;
-        //            int? dateFst = null;
-        //            string workDate = string.Empty;
-        //            string tFlowCode = string.Empty;
-        //            int tLeadTime = 0;
-        //            string itemCode = string.Empty;
-        //            decimal safeStock = 0;
-        //            decimal maxStock = 0;
-        //            decimal uc = 0;
-
-        //            #region 读取销售路线
-        //            dFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colDisFlow));
-        //            if (string.IsNullOrEmpty(dFlowCode))
-        //            {
-        //                throw new BusinessErrorException(string.Format("第{0}行：销售路线不能为空。", rowCount));
-        //            }
-
-        //            if (allDFlowCodeList.Where(d => (d[0]).ToString() == dFlowCode).Count() == 0)
-        //            {
-        //                throw new BusinessErrorException(string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode));
-        //            }
-        //            #endregion
-
-        //            #region 读取销售提前期
-        //            string rdLeadTime = ImportHelper.GetCellStringValue(row.GetCell(colDisLeadTime));
-        //            if (string.IsNullOrEmpty(rdLeadTime))
-        //            {
-        //                dLeadTime = 0;
-        //            }
-        //            else
-        //            {
-        //                if (!int.TryParse(rdLeadTime, out dLeadTime))
-        //                {
-        //                    throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
-        //                }
-        //                if (dLeadTime < 0)
-        //                {
-        //                    throw new BusinessErrorException(string.Format("第{0}行：销售路线提前期只能填写大于0数字。", rowCount));
-        //                }
-        //            }
-        //            #endregion
-
-        //            #region MrpCode
-        //            mrpCode = ImportHelper.GetCellStringValue(row.GetCell(colMrpCode));
-        //            #endregion
-
-        //            #region 周起始
-        //            string rDateFst = ImportHelper.GetCellStringValue(row.GetCell(colDateFst));
-        //            if (string.IsNullOrEmpty(rDateFst))
-        //            {
-        //                dateFst = null;
-        //            }
-        //            else
-        //            {
-        //                int s;
-        //                if (!int.TryParse(rDateFst, out s))
-        //                {
-        //                    throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
-        //                }
-        //                if (s < 0 || s > 7)
-        //                {
-        //                    throw new BusinessErrorException(string.Format("第{0}行：周起始只能填写1-7数字。", rowCount));
-        //                }
-        //                dateFst = s;
-        //            }
-        //            #endregion
-
-        //            #region WorkDate
-        //            workDate = ImportHelper.GetCellStringValue(row.GetCell(colWorkDate));
-        //            #endregion
-
-        //            #region 读取发运路线
-        //            tFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colShipFlow));
-        //            if (!string.IsNullOrEmpty(tFlowCode))
-        //            {
-        //                if (allTFlowCodeList.Where(d => (d[0]).ToString() == tFlowCode).Count() == 0)
-        //                {
-        //                    throw new BusinessErrorException(string.Format("第{0}行：发运路线{1}不存在。", rowCount, dFlowCode));
-        //                }
+                #region 成品/半成品代码	Bom代码	生产提前期	报废率	安全库存	最大库存	经济批量	包装量
 
 
-        //                #region 读取发运路线提前期
-        //                string rtLeadTime = ImportHelper.GetCellStringValue(row.GetCell(colShipLeadTime));
-        //                if (string.IsNullOrEmpty(rtLeadTime))
-        //                {
-        //                    tLeadTime = 0;
-        //                }
-        //                else
-        //                {
-        //                    if (!int.TryParse(rtLeadTime, out tLeadTime))
-        //                    {
-        //                        throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
-        //                    }
-        //                    if (tLeadTime < 0)
-        //                    {
-        //                        throw new BusinessErrorException(string.Format("第{0}行：发运路线提前期只能填写大于0数字。", rowCount));
-        //                    }
-        //                }
-        //                #endregion
 
-        //                #region 读取安全库存
-        //                string rSafeStock = ImportHelper.GetCellStringValue(row.GetCell(colSafeStock));
-        //                if (string.IsNullOrEmpty(rSafeStock))
-        //                {
-        //                    safeStock = 0;
-        //                }
-        //                else
-        //                {
-        //                    if (!decimal.TryParse(rSafeStock, out safeStock))
-        //                    {
-        //                        throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
-        //                    }
-        //                    if (safeStock < 0)
-        //                    {
-        //                        throw new BusinessErrorException(string.Format("第{0}行：安全库存只能填写大于0数字。", rowCount));
-        //                    }
-        //                }
-        //                #endregion
+                int colItemCode = 1;//成品/半成品代码
+                int colBom = 2;//Bom代码
+                int colLeadTime = 3;//生产提前期
+                int colScrapPct = 4;//报废率
+                int colsafeStock = 5;//安全库存
+                int colMaxStock = 6;//最大库存
+                int colMinLotSize = 7;//经济批量
+                int colUnitCount = 8;//包装量
+                #endregion
 
-        //                #region 读取最大库存库存
-        //                string rMaxStock = ImportHelper.GetCellStringValue(row.GetCell(colMaxStock));
-        //                if (string.IsNullOrEmpty(rMaxStock))
-        //                {
-        //                    maxStock = 0;
-        //                }
-        //                else
-        //                {
-        //                    if (!decimal.TryParse(rMaxStock, out maxStock))
-        //                    {
-        //                        throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
-        //                    }
-        //                    if (maxStock < 0)
-        //                    {
-        //                        throw new BusinessErrorException(string.Format("第{0}行：最大库存只能填写大于0数字。", rowCount));
-        //                    }
-        //                }
-        //                #endregion
+                var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
+                IList<object[]> allDFlowCodeList = new List<object[]>();
+                foreach (System.Data.DataRow flowRow in disFlowCodes.Rows)
+                {
+                    allDFlowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2] });
+                }
 
-        //                #region 读取包装量
-        //                string rUnitCount = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
-        //                if (string.IsNullOrEmpty(rUnitCount))
-        //                {
-        //                    uc = 0;
-        //                }
-        //                else
-        //                {
-        //                    if (!decimal.TryParse(rUnitCount, out uc))
-        //                    {
-        //                        throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
-        //                    }
-        //                    if (uc < 0)
-        //                    {
-        //                        throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
-        //                    }
-        //                }
-        //                #endregion
+                var allProdItems = this.genericMgr.FindAllWithCustomQuery<Item>(" select i from Item as i where i.IsActive=1 ");
+                var allBoms = this.genericMgr.FindAllWithCustomQuery<Bom>(" select i from Bom as i where i.IsActive=1 ");
+                var updateItemList = new List<Item>();
+                int rowCount = 10;
+                string errorMessages = string.Empty;
+                while (rows.MoveNext())
+                {
+                    rowCount++;
+                    HSSFRow row = (HSSFRow)rows.Current;
+                    if (!ImportHelper.CheckValidDataRow(row, 1, 4))
+                    {
+                        break;//边界
+                    }
+                    // 成品/半成品代码	Bom代码	生产提前期	报废率	安全库存	最大库存	经济批量	包装量
+                    string itemCode = string.Empty;
+                    string bomCode = string.Empty;
+                    int? leadTime = null;
+                    int? scrapPct = null;
+                    int? safeStock = null;
+                    int? maxStock = null;
+                    int? minLotSize = null;
+                    decimal? uc = null;
+                    Item currentItem = null;
 
-        //            }
+                    #region 读取成品代码
+                    itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItemCode));
+                    if (string.IsNullOrEmpty(itemCode))
+                    {
+                        //throw new BusinessErrorException(string.Format("第{0}行：成品代码不能为空。", rowCount));
+                        errorMessages += string.Format("第{0}行：成品代码不能为空。", rowCount);
+                        continue;
+                    }
 
-        //            #endregion
+                    if (allProdItems.Where(d => d.Code == itemCode).Count() == 0)
+                    {
+                        errorMessages += "</br/>" + string.Format("第{0}行：成品代码{1}不存在。", rowCount, itemCode);
+                        continue;
+                        //throw new BusinessErrorException(string.Format("第{0}行：成品代码{1}不存在。", rowCount, itemCode));
+                    }
+                    currentItem = allProdItems.FirstOrDefault(d => d.Code == itemCode);
+                    #endregion
 
-        //            #region 读取物料代码
+                    #region Bom代码
+                    bomCode = ImportHelper.GetCellStringValue(row.GetCell(colBom));
+                    if (!string.IsNullOrEmpty(itemCode))
+                    {
+                        if (allBoms.Where(d => d.Code == bomCode).Count() == 0)
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：Bom代码{1}不存在。", rowCount, bomCode));
+                            errorMessages += "</br/>" + string.Format("第{0}行：Bom代码{1}不存在。", rowCount, bomCode);
+                            continue;
+                        }
+                        currentItem.Bom = allBoms.FirstOrDefault(d => d.Code == bomCode);
+                    }
 
-        //            itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
-        //            if (string.IsNullOrEmpty(itemCode))
-        //            {
-        //                throw new BusinessErrorException(string.Format("第{0}行：物料代码不能为空。", rowCount));
-        //            }
-        //            if (allDFlowCodeList.Where(f => f[0].ToString() == dFlowCode && f[1].ToString() == itemCode).Count() == 0)
-        //            {
-        //                throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在销售路线{2}中，请维护。", rowCount, itemCode, dFlowCode));
-        //            }
-        //            if (!string.IsNullOrEmpty(tFlowCode))
-        //            {
-        //                if (allTFlowCodeList.Where(f => f[0].ToString() == tFlowCode && f[1].ToString() == itemCode).Count() == 0)
-        //                {
-        //                    throw new BusinessErrorException(string.Format("第{0}行：物料代码{1}不存在发运路线{2}中,请维护。", rowCount, itemCode, tFlowCode));
-        //                }
-        //            }
 
-        //            #endregion
-        //            //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
+                    #endregion
 
-        //            object[] objArr = new object[] { dFlowCode, dLeadTime, mrpCode, dateFst, workDate, tFlowCode, tLeadTime, itemCode, safeStock, maxStock, uc };
-        //            allReadList.Add(objArr);
-        //        }
-        //        if (allReadList.Count == 0)
-        //        {
-        //            throw new BusinessErrorException("导入的有效数据为空。");
-        //        }
-        //        var groupByFlows = (from tak in allReadList
-        //                            group tak by new
-        //                            {
-        //                                dFlowCode = tak[0],
-        //                                dLeadTime = tak[1],
-        //                                mrpCode = tak[2],
-        //                                dateFst = tak[3],
-        //                                workDate = tak[4],
-        //                                tFlowCode = tak[5],
-        //                                tLeadTime = tak[6],
-        //                            } into result
-        //                            select new
-        //                            {
-        //                                dFlowCode = result.Key.dFlowCode,
-        //                                dLeadTime = result.Key.dLeadTime,
-        //                                mrpCode = result.Key.mrpCode,
-        //                                dateFst = result.Key.dateFst,
-        //                                workDate = result.Key.workDate,
-        //                                tFlowCode = result.Key.tFlowCode,
-        //                                tLeadTime = result.Key.tLeadTime,
-        //                                list = result.ToList()
-        //                            }).ToList();
-        //        DateTime newTime = System.DateTime.Now;
-        //        foreach (var byFlow in groupByFlows)
-        //        {
-        //            string upSql = "update FlowMstr set Code=Code ";
-        //            if (byFlow.dLeadTime != null)
-        //            {
-        //                upSql += string.Format(",MrpLeadTime={0}", byFlow.dLeadTime);
-        //            }
-        //            if (!string.IsNullOrEmpty(byFlow.mrpCode.ToString()))
-        //            {
-        //                upSql += string.Format(",MrpCode='{0}'", byFlow.mrpCode);
-        //            }
-        //            if (byFlow.dateFst != null)
-        //            {
-        //                upSql += string.Format(" ,DateFst='{0}' ", byFlow.dateFst);
-        //            }
-        //            if (!string.IsNullOrEmpty(byFlow.workDate.ToString()))
-        //            {
-        //                upSql += string.Format(",WorkDate='{0}'", byFlow.workDate);
-        //            }
-        //            upSql += string.Format(",lastModifyDate='{1}',LastModifyUser='{2}' where code='{0}' ", byFlow.dFlowCode, newTime, user.Code);
-        //            this.genericMgr.ExecuteSql(upSql);
+                    #region 生产提前期
+                    string rLeadTime = ImportHelper.GetCellStringValue(row.GetCell(colLeadTime));
+                    if (!string.IsNullOrEmpty(rLeadTime))
+                    {
+                        int s;
+                        if (!int.TryParse(rLeadTime, out s))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：生产提前期只能填写数字。", rowCount));
+                            errorMessages += "</br/>" + string.Format("第{0}行：生产提前期只能填写数字。", rowCount);
+                            continue;
+                        }
+                        currentItem.LeadTime = s;
+                    }
+                    #endregion
 
-        //            upSql = string.Format(" update FlowMstr set MrpLeadTime={0},lastModifyDate='{2}',LastModifyUser='{3}' where Code='{1}' ", byFlow.tLeadTime, byFlow.tFlowCode, newTime, user.Code);
-        //            this.genericMgr.ExecuteSql(upSql);
+                    #region 报废率
+                    string rScrapPct = ImportHelper.GetCellStringValue(row.GetCell(colScrapPct));
+                    if (!string.IsNullOrEmpty(rScrapPct))
+                    {
+                        decimal s;
+                        if (!decimal.TryParse(rScrapPct, out s))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：报废率填写有误。", rowCount));
+                            errorMessages += "</br/>" + string.Format("第{0}行：报废率填写有误。", rowCount);
+                            continue;
+                        }
+                        currentItem.ScrapPct = s;
+                    }
+                    #endregion
 
-        //            foreach (var l in byFlow.list)
-        //            {
-        //                //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
-        //                upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], l[10], newTime, user.Code, l[5], l[7]);
-        //                this.genericMgr.ExecuteSql(upSql);
-        //            }
+                    #region 安全库存
+                    string rSafeStock = ImportHelper.GetCellStringValue(row.GetCell(colsafeStock));
+                    if (!string.IsNullOrEmpty(rSafeStock))
+                    {
+                        int s;
+                        if (!int.TryParse(rSafeStock, out s))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：安全库存填写有误。", rowCount));
+                            errorMessages += "</br/>" + string.Format("第{0}行：安全库存填写有误。", rowCount);
+                            continue;
+                        }
+                        currentItem.SafeStock = s;
+                    }
+                    #endregion
 
-        //        }
-        //    }
-        //}
-        //#endregion
+                    #region 最大库存
+                    string rMaxstock = ImportHelper.GetCellStringValue(row.GetCell(colMaxStock));
+                    if (!string.IsNullOrEmpty(rMaxstock))
+                    {
+                        int s;
+                        if (!int.TryParse(rMaxstock, out s))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：最大库存填写有误。", rowCount));
+                            errorMessages += "</br/>" + string.Format("第{0}行：最大库存填写有误。", rowCount);
+                            continue;
+                        }
+                        currentItem.MaxStock = s;
+                    }
+                    #endregion
+
+                    #region 经济批量
+                    string rMinLotSize = ImportHelper.GetCellStringValue(row.GetCell(colMinLotSize));
+                    if (!string.IsNullOrEmpty(rMinLotSize))
+                    {
+                        int s;
+                        if (!int.TryParse(rMinLotSize, out s))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：经济批量填写有误。", rowCount));
+                            errorMessages += "</br/>" + string.Format("第{0}行：经济批量填写有误。", rowCount);
+                            continue;
+                        }
+                        currentItem.MinLotSize = s;
+                    }
+                    #endregion
+
+                    #region 包装量
+                    string rUc = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
+                    if (!string.IsNullOrEmpty(rUc))
+                    {
+                        decimal s;
+                        if (!decimal.TryParse(rUc, out s))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：包装量填写有误。", rowCount));
+                            errorMessages += "</br/>" + string.Format("第{0}行：包装量填写有误。", rowCount);
+                            continue;
+                        }
+                        currentItem.UnitCount = s;
+                    }
+                    #endregion
+                    updateItemList.Add(currentItem);
+
+                }
+                if (updateItemList.Count == 0)
+                {
+                    throw new BusinessErrorException("导入的有效数据为空。");
+                }
+                if (!string.IsNullOrEmpty(errorMessages))
+                {
+                    throw new BusinessErrorException(errorMessages);
+                }
+                DateTime nowTime = System.DateTime.Now;
+                foreach (var item in updateItemList)
+                {
+                    item.LastModifyDate = nowTime;
+                    item.LastModifyUser = user;
+                    this.genericMgr.Update(item);
+                }
+            }
+        }
+        #endregion
+
+        #region   采购计划参数导入
+        private static object ReadPurchasePlanParametersFromXlsLock = new object();
+        [Transaction(TransactionMode.Requires)]
+        public void ReadPurchasePlanParametersFromXls(Stream inputStream, User user)
+        {
+            lock (ReadPurchasePlanParametersFromXlsLock)
+            {
+                if (inputStream.Length == 0)
+                {
+                    throw new BusinessErrorException("Import.Stream.Empty");
+                }
+                HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+                Sheet sheet = workbook.GetSheetAt(0);
+                IEnumerator rows = sheet.GetRowEnumerator();
+                ImportHelper.JumpRows(rows, 10);
+
+                #region 采购路线	采购提前期	物料代码	安全库存	最大库存	包装量	MOQ	"窗口时间
+
+                int colFlowCode = 1;//采购路线
+                int colLeadTime = 2;//采购提前期
+                int colItemCode= 3;//物料代码
+                int colsafeStock = 4;//安全库存
+                int colMaxStock = 5;//最大库存
+                int colUnitCount = 6;//包装量
+                int colMinLotSize = 7;//MOQ
+                int colWindowTime1 = 8;//窗口时间1
+                int colWindowTime2 = 9;//窗口时间2
+                int colWindowTime3 = 10;//窗口时间3
+                int colWindowTime4 = 11;//窗口时间4
+                int colWindowTime5 = 12;//窗口时间5
+                int colWindowTime6 = 13;//窗口时间6
+                int colWindowTime7 = 14;//窗口时间7
+                #endregion
+
+                IList<Flow> upFlows = new List<Flow>();
+                IList<Item> upItems = new List<Item>();
+                IList<FlowDetail> upFlowDets = new List<FlowDetail>();
+
+                //var allProdItems = this.genericMgr.FindAllWithCustomQuery<Item>(" select i from Item as i where i.Type <> 'P' ");
+                //var allBoms = this.genericMgr.FindAllWithCustomQuery<Bom>(" select i from Bom as i where i.IsActive=1 ");
+                //var updateItemList = new List<Item>();
+                int rowCount = 10;
+                string errorMessages = string.Empty;
+                while (rows.MoveNext())
+                {
+                    rowCount++;
+                    HSSFRow row = (HSSFRow)rows.Current;
+                    if (!ImportHelper.CheckValidDataRow(row, 1, 4))
+                    {
+                        break;//边界
+                    }
+                    // 采购路线	采购提前期	物料代码	安全库存	最大库存	包装量	MOQ	"窗口时间
+                    string flowCode = string.Empty;
+                    int? leadTime = null;
+                    string itemCode = null;
+                    int? safeStock = null;
+                    int? maxStock = null;
+                    decimal? uc = null;
+                    int? minLotSize = null;
+                    string windowTime1 = string.Empty;
+                    string windowTime2 = string.Empty;
+                    string windowTime3 = string.Empty;
+                    string windowTime4 = string.Empty;
+                    string windowTime5 = string.Empty;
+                    string windowTime6 = string.Empty;
+                    string windowTime7 = string.Empty;
+
+                    Flow currentFlow = null;
+                    Item currentItem = null;
+                    FlowDetail currentFlowDetail = null;
+
+                    #region 采购路线
+                    flowCode = ImportHelper.GetCellStringValue(row.GetCell(colFlowCode));
+                    if (string.IsNullOrEmpty(flowCode))
+                    {
+                        //throw new BusinessErrorException(string.Format("第{0}行：成品代码不能为空。", rowCount));
+                        errorMessages += string.Format("第{0}行：采购路线代码不能为空。", rowCount);
+                        continue;
+                    }
+                    #endregion
+
+                    if (upFlows.Where(c => c.Code == flowCode).Count() > 0)
+                    {
+                        currentFlow = upFlows.First(c => c.Code == flowCode);
+                    }
+                    else
+                    {
+                        currentFlow = this.flowMgr.LoadFlow(flowCode);
+
+                        if (currentFlow == null)
+                        {
+                            errorMessages += "</br/>" + string.Format("第{0}行：采购路线{1}不存在。", rowCount,flowCode);
+                            continue;
+                        }
+                        if (currentFlow.Type != "Procurement")
+                        {
+                            errorMessages += "</br/>" + string.Format("第{0}行：采购路线{1}不存在。", rowCount, flowCode);
+                            continue;
+                        }
+
+                        #region 生产提前期
+                        string rLeadTime = ImportHelper.GetCellStringValue(row.GetCell(colLeadTime));
+                        if (!string.IsNullOrEmpty(rLeadTime))
+                        {
+                            decimal s;
+                            if (!decimal.TryParse(rLeadTime, out s))
+                            {
+                                errorMessages += "</br/>" + string.Format("第{0}行：生产提前期只能填写数字。", rowCount);
+                                continue;
+                            }
+                            currentFlow.MrpLeadTime = s;
+                        }
+                        #endregion
+
+                        #region  窗口时间
+                        windowTime1 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime1));
+                        windowTime2 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime2));
+                        windowTime3 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime3));
+                        windowTime4 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime4));
+                        windowTime5 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime5));
+                        windowTime6 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime6));
+                        windowTime7 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime7));
+                        #endregion
+                    }
+
+                    #region 读取物料代码
+                    itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItemCode));
+                    if (string.IsNullOrEmpty(itemCode))
+                    {
+                        //throw new BusinessErrorException(string.Format("第{0}行：成品代码不能为空。", rowCount));
+                        errorMessages += string.Format("第{0}行：物料代码不能为空。", rowCount);
+                        continue;
+                    }
+
+                    if (currentFlow.FlowDetails.Where(d => d.Item.Code == itemCode).Count() == 0)
+                    {
+                        errorMessages += "</br/>" + string.Format("第{0}行：物料代码{1}不存在路线{2}中，请维护。", rowCount, itemCode, currentFlow.Code);
+                        continue;
+                    }
+                    else
+                    {
+                        currentItem = currentFlow.FlowDetails.First(d => d.Item.Code == itemCode).Item;
+
+
+                        #region 安全库存
+                        string rSafeStock = ImportHelper.GetCellStringValue(row.GetCell(colsafeStock));
+                        if (!string.IsNullOrEmpty(rSafeStock))
+                        {
+                            int s;
+                            if (!int.TryParse(rSafeStock, out s))
+                            {
+                                errorMessages += "</br/>" + string.Format("第{0}行：安全库存填写有误。", rowCount);
+                                continue;
+                            }
+                            currentItem.SafeStock = s;
+                        }
+                        #endregion
+
+                        #region 最大库存
+                        string rMaxstock = ImportHelper.GetCellStringValue(row.GetCell(colMaxStock));
+                        if (!string.IsNullOrEmpty(rMaxstock))
+                        {
+                            int s;
+                            if (!int.TryParse(rMaxstock, out s))
+                            {
+                                errorMessages += "</br/>" + string.Format("第{0}行：最大库存填写有误。", rowCount);
+                                continue;
+                            }
+                            currentItem.MaxStock = s;
+                        }
+                        #endregion
+
+                        #region 经济批量
+                        string rMinLotSize = ImportHelper.GetCellStringValue(row.GetCell(colMinLotSize));
+                        if (!string.IsNullOrEmpty(rMinLotSize))
+                        {
+                            int s;
+                            if (!int.TryParse(rMinLotSize, out s))
+                            {
+                                errorMessages += "</br/>" + string.Format("第{0}行：经济批量填写有误。", rowCount);
+                                continue;
+                            }
+                            currentItem.MinLotSize = s;
+                        }
+                        #endregion
+
+                        upItems.Add(currentItem);
+
+                        currentFlowDetail = currentFlow.FlowDetails.First(d => d.Item.Code == itemCode);
+
+                        #region 包装量
+                        string rUc = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
+                        if (!string.IsNullOrEmpty(rUc))
+                        {
+                            decimal s;
+                            if (!decimal.TryParse(rMinLotSize, out s))
+                            {
+                                errorMessages += "</br/>" + string.Format("第{0}行：包装量填写有误。", rowCount);
+                                continue;
+                            }
+                            currentFlowDetail.UnitCount = s;
+                            upFlowDets.Add(currentFlowDetail);
+                        }
+                        #endregion
+                    }
+
+                    #endregion
+                }
+
+                if (upFlows.Count == 0)
+                {
+                    throw new BusinessErrorException("导入的有效数据为空。");
+                }
+                if (!string.IsNullOrEmpty(errorMessages))
+                {
+                    throw new BusinessErrorException(errorMessages);
+                }
+                DateTime nowTime = System.DateTime.Now;
+                foreach (var flow in upFlows)
+                {
+                    flow.LastModifyDate = nowTime;
+                    flow.LastModifyUser = user;
+                    this.genericMgr.Update(flow);
+                }
+                foreach (var det in upFlowDets)
+                {
+                    det.LastModifyDate = nowTime;
+                    det.LastModifyUser = user;
+                    this.genericMgr.Update(det);
+                }
+                foreach (var item in upItems)
+                {
+                    item.LastModifyDate = nowTime;
+                    item.LastModifyUser = user;
+                    this.genericMgr.Update(item);
+                }
+            }
+        }
+        #endregion
 
         #region Private Methods
         private void ProcessEffectiveInventoryBalance(ref IList<MrpLocationLotDetail> inventoryBalanceList, object[] invLoc, IList<SafeInventory> safeQtyList, DateTime effectiveDate, DateTime dateTimeNow, User user)

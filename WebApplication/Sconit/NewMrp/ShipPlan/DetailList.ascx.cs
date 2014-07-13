@@ -171,7 +171,7 @@ from  MRP_ShipPlanDet as det
             this.list.InnerHtml = "没有查到符合条件的记录";
             return;
         }
-        var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(14);
+        var minStartTime = shipPlanDetList.Min(s => s.StartTime).AddDays(13);
         shipPlanDetList = shipPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
 
         #region   trace
@@ -180,7 +180,7 @@ from  MRP_ShipPlanDet as det
         int j = shipPlanDetList.Count % 2000 == 0 ? shipPlanDetList.Count / 2000 : shipPlanDetList.Count / 2000 + 1;
         while (true)
         {
-            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Skip(len * 2000).Take((len + 1) * 200).Select(d => d.UUID).Distinct().ToArray())));
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<ShipPlanDetTrace>(string.Format(" select l from ShipPlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", shipPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
             if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
             len++;
             if (len == j) break;
