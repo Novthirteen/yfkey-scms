@@ -17,7 +17,7 @@ BEGIN
 	declare @DateNow datetime
 	declare @Msg nvarchar(MAX)
 	declare @trancount int
-	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), GetDate(), 121))
+	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), DATEADD(hour, -6, GetDate()), 121))
 	set @Msg = ''
 	set @trancount = @@trancount
 	

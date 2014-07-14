@@ -169,6 +169,16 @@ BEGIN
 			RecQty decimal(18, 8),
 		)
 
+		create table #tempWeeklyShipPlanDetMap
+		(
+			RowId int identity(1, 1) primary key,
+			DailyUUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			WeeklyUUID varchar(50) COLLATE  Chinese_PRC_CI_AS, 
+			WeeklyStartTime datetime,
+			WeeklyWindowTime datetime,
+			DailyStartTime datetime
+		)
+
 		--更新福特计划的发货数
 		--update det set ShipQty = p.CurrenCumQty
 		--from CustScheduleDet as det inner join EDI_FordPlan as p on det.FordPlanId = p.Id
@@ -206,10 +216,15 @@ BEGIN
 		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempDistributionFlow
 		while @RowId <= @MaxRowId
 		begin
-			select @DistributionFlow = Flow from #tempDistributionFlow where RowId = @RowId
+			set @MaxMstrId = null
+			set @MinWindowTime = null
+			set @MaxWindowTime = null
 
+			select @DistributionFlow = Flow from #tempDistributionFlow where RowId = @RowId
+				
 			select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow
 			select @MinWindowTime = MIN(WindowTime), @MaxWindowTime = MAX(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
+	
 			while exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime)
 			begin
 				delete from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime
@@ -228,10 +243,16 @@ BEGIN
 			insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UC, Location, StartTime, WindowTime)
 			select det.DetId, det.MstrId, det.Flow, det.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty, det.Uom, i.Uom, det.UC, det.Location, det.StartTime, det.WindowTime 
 			from MRP_SplitWeeklyCustScheduleDet as det inner join Item as i on det.Item = i.Code
-			where det.WindowTime > @MaxWindowTime
-
+			where det.Flow = @DistributionFlow and det.WindowTime > @MaxWindowTime
+			
 			set @RowId = @RowId + 1
 		end
+
+		--按周计划添加日计划的路线（没有日计划）
+		insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UC, Location, StartTime, WindowTime)
+		select det.DetId, det.MstrId, det.Flow, det.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty, det.Uom, i.Uom, det.UC, det.Location, det.StartTime, det.WindowTime 
+		from MRP_SplitWeeklyCustScheduleDet as det inner join Item as i on det.Item = i.Code
+		where det.WindowTime > @DateNow and det.Flow not in (select Flow from #tempDistributionFlow)
 
 		--计算单位换算
 		update #tempEffCustScheduleDet set UnitQty = 1 where Uom = BaseUom
@@ -330,7 +351,7 @@ BEGIN
 
 		-----------------------------↓缓存在途ASN-----------------------------
 		insert into #tempIpDet(IpNo, Flow, Item, StartTime, WindowTime, Qty)
-		select det.IpNo, det.Flow, det.Item, det.StartTime, DATEADD(day, mstr.LeadTime, det.WindowTime), SUM(det.Qty) as Qty
+		select det.IpNo, det.Flow, det.Item, det.StartTime, DATEADD(day, mstr.LeadTime, det.StartTime), SUM(det.Qty) as Qty
 		from MRP_IpDetSnapShot as det inner join (select distinct Flow, LeadTime from #tempShipFlowDet) as mstr on det.Flow = mstr.Flow
 		group by det.IpNo, det.Flow, det.Item, det.StartTime, mstr.LeadTime, det.WindowTime
 		-----------------------------↑缓存在途-----------------------------
@@ -352,7 +373,7 @@ BEGIN
 		--转没有发运路线的，销售路线直接就是发运路线
 		insert into #tempShipPlanDet(UUID, DistributionFlow, Flow, Item, ItemDesc, RefItemCode, ShipQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
 		select NEWID(), Flow, Flow, Item, ItemDesc, ItemRef, Qty, Uom, BaseUom, UnitQty, UC, Location, null, StartTime, WindowTime
-		from #tempEffCustScheduleDet where ShipFlow is null
+		from #tempEffCustScheduleDet where ShipFlow is null or ShipFlow = ''
 
 		--记录需求中间表
 		insert into #tempShipPlanDetTrace(UUID, DistributionFlow, Item, ReqDate, ReqQty) 
@@ -495,7 +516,7 @@ BEGIN
             begin tran
         end
 
-		-----------------------------↓生成发运计划-----------------------------
+		-----------------------------↓生成发运计划（日）-----------------------------
 		--删除未释放的发运计划
 		delete from MRP_ShipPlanIpDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
 		delete from MRP_ShipPlanOpenOrder where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
@@ -515,32 +536,72 @@ BEGIN
 		set @ShipPlanId = @@Identity
 		
 		--新增发运计划期初库存
-		insert into MRP_ShipPlanInitLocationDet(ShipPlanId, Location, Item, InitStock, SafeStock, MaxStock, InTransitQty, CreateDate, CreateUser)
-		select @ShipPlanId, LocTo, Item, LocQty, SafeStock, MaxStock, InTransitQty, @DateTimeNow, @RunUser from #tempShipFlowDet
+		insert into MRP_ShipPlanInitLocationDet(ShipPlanId, [Type], Location, Item, InitStock, SafeStock, MaxStock, InTransitQty, CreateDate, CreateUser)
+		select @ShipPlanId, 'Daily', LocTo, Item, LocQty, SafeStock, MaxStock, InTransitQty, @DateTimeNow, @RunUser from #tempShipFlowDet
 
 		--新增发运计划在途库存
-		insert into MRP_ShipPlanIpDet(ShipPlanId, IpNo, Flow, Item, StartTime, WindowTime, Qty, CreateDate, CreateUser)
-		select @ShipPlanId, IpNo, Flow, Item, StartTime, WindowTime, Qty, @DateTimeNow, @RunUser from #tempIpDet
-
-		
+		insert into MRP_ShipPlanIpDet(ShipPlanId, [Type], IpNo, Flow, Item, StartTime, WindowTime, Qty, CreateDate, CreateUser)
+		select @ShipPlanId, 'Daily', IpNo, Flow, Item, StartTime, WindowTime, Qty, @DateTimeNow, @RunUser from #tempIpDet
 
 		--新增发运计划明细
-		insert into MRP_ShipPlanDet(ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
+		insert into MRP_ShipPlanDet(ShipPlanId, [Type], UUID, Flow, Item, ItemDesc, RefItemCode, 
 		ReqQty, OrgShipQty, ShipQty, OrderQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
 		CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
-		select @ShipPlanId, UUID, Flow, Item, ItemDesc, RefItemCode, 
+		select @ShipPlanId, 'Daily', UUID, Flow, Item, ItemDesc, RefItemCode, 
 		ISNULL(ReqQty, 0), ISNULL(ShipQty, 0), ISNULL(ShipQty, 0), ISNULL(OrderQty, 0), Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
 		@DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
 		from #tempShipPlanDet
 
 		--新增发运计划明细追溯表
-		insert into MRP_ShipPlanDetTrace(ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, CreateDate, CreateUser)
-		select @ShipPlanId, UUID, DistributionFlow, Item, ReqDate, ReqQty, @DateTimeNow, @RunUser from #tempShipPlanDetTrace
+		insert into MRP_ShipPlanDetTrace(ShipPlanId, [Type], UUID, DistributionFlow, Item, ReqDate, ReqQty, CreateDate, CreateUser)
+		select @ShipPlanId, 'Daily', UUID, DistributionFlow, Item, ReqDate, ReqQty, @DateTimeNow, @RunUser from #tempShipPlanDetTrace
 
 		--新增Open Order追溯表
-		insert into MRP_ShipPlanOpenOrder(ShipPlanId, UUID, Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
-		select @ShipPlanId, UUID, Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, OrderQty, ShipQty, RecQty, @DateTimeNow, @RunUser from #tempOpenOrder
-		-----------------------------↑生成发运计划-----------------------------
+		insert into MRP_ShipPlanOpenOrder(ShipPlanId, [Type], UUID, Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
+		select @ShipPlanId, 'Daily', UUID, Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, OrderQty, ShipQty, RecQty, @DateTimeNow, @RunUser from #tempOpenOrder
+		-----------------------------↑生成发运计划（日）-----------------------------
+
+
+
+		-----------------------------↓生成发运计划（周）-----------------------------
+		set datefirst 1  --设置周一为一周开始时间
+
+
+		--新增日计划和周计划的映射表
+		insert into #tempWeeklyShipPlanDetMap(DailyUUID, WeeklyUUID, WeeklyStartTime, WeeklyWindowTime, DailyStartTime)
+		select tmp.UUID, pl.UUID, tmp.StartTime, DATEADD(DAY, ISNULL(fd.LeadTime, 0), tmp.StartTime), tmp.OldStartTime
+		from #tempShipPlanDet as pl 
+		inner join (select DATEADD(DAY, -datepart(WEEKDAY, StartTime) + 1, StartTime) as StartTime, Flow, Item, UUID, StartTime as OldStartTime
+					from #tempShipPlanDet) as tmp on 
+					pl.Flow = tmp.Flow and pl.Item = tmp.Item and pl.StartTime = tmp.StartTime
+		inner join #tempShipFlowDet as fd on pl.Flow = fd.Flow and pl.Item = fd.Item
+
+		--新增发运计划明细
+		insert into MRP_ShipPlanDet(ShipPlanId, [Type], UUID, Flow, Item, ItemDesc, RefItemCode, 
+		ReqQty, OrgShipQty, ShipQty, OrderQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime, 
+		CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
+		select @ShipPlanId, 'Weekly', map.WeeklyUUID, pl.Flow, pl.Item, pl.ItemDesc, pl.RefItemCode, 
+		SUM(ISNULL(ReqQty, 0)), SUM(ISNULL(ShipQty, 0)), SUM(ISNULL(ShipQty, 0)), SUM(ISNULL(OrderQty, 0)), pl.Uom, pl.BaseUom, pl.UnitQty, pl.UC, pl.LocFrom, pl.LocTo, map.WeeklyStartTime,  map.WeeklyWindowTime, 
+		@DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1
+		from #tempShipPlanDet as pl inner join #tempWeeklyShipPlanDetMap as map on pl.UUID = map.DailyUUID
+		where map.DailyStartTime >= DATEADD(DAY, 14, @DateNow)
+		group by map.WeeklyUUID, pl.Flow, pl.Item, pl.ItemDesc, pl.RefItemCode,  pl.Uom, pl.BaseUom, pl.UnitQty, pl.UC, pl.LocFrom, pl.LocTo, map.WeeklyStartTime,  map.WeeklyWindowTime
+
+		--新增发运计划明细追溯表
+		insert into MRP_ShipPlanDetTrace(ShipPlanId, [Type], UUID, DistributionFlow, Item, ReqDate, ReqQty, CreateDate, CreateUser)
+		select @ShipPlanId, 'Weekly', map.WeeklyUUID, tr.DistributionFlow, tr.Item, tr.ReqDate, tr.ReqQty, @DateTimeNow, @RunUser 
+		from #tempShipPlanDetTrace as tr inner join #tempWeeklyShipPlanDetMap as map on tr.UUID = map.DailyUUID
+		where map.DailyStartTime >= DATEADD(DAY, 14, @DateNow)
+
+		--新增Open Order追溯表
+		insert into MRP_ShipPlanOpenOrder(ShipPlanId, [Type], UUID, Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser)
+		select @ShipPlanId, 'Weekly', map.WeeklyUUID, oo.Flow, oo.OrderNo, oo.Item, oo.OrgStartTime, oo.OrgWindowTime, oo.StartTime, oo.WindowTime, oo.OrderQty, oo.ShipQty, oo.RecQty, @DateTimeNow, @RunUser 
+		from #tempOpenOrder as oo inner join #tempWeeklyShipPlanDetMap as map on oo.UUID = map.DailyUUID
+		where map.DailyStartTime >= DATEADD(DAY, 14, @DateNow)
+		-----------------------------↑生成发运计划（周）-----------------------------
+
+
+
 
 		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Flow, Item, Qty, Uom, LocFrom, LocTo, StartTime, WindowTime, Msg, CreateDate, CreateUser) 
 		select @BatchNo, @DateNow, Lvl, Flow, Item, Qty, Uom, LocFrom, LocTo, StartTime, WindowTime, Msg, @DateTimeNow, @RunUser from #tempMsg
