@@ -522,20 +522,20 @@ BEGIN
 		--在扣减包装
 		set @LastOverflowCount = 0
 		select @CurrentOverflowCount = COUNT(1) from #tempProductPlanDet 
-		where OverflowQty >= UC and UC > 0 and Qty >= UC and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null))
+		where OverflowQty >= UC and UC > 0 and Qty >= UC and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null) or (MinLotSize = 0))
 		while @LastOverflowCount <> @CurrentOverflowCount
 		begin
 			update det set Qty = Qty - CASE WHEN det.StartTime = tmp.StartTime THEN UC ELSE 0 END, OverflowQty = OverflowQty - UC
 			from #tempProductPlanDet as det inner join (select Item, MIN(StartTime) as StartTime from #tempProductPlanDet 
 													where OverflowQty >= UC and UC > 0 and Qty >= UC
-													and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null)) 
+													and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null) or (MinLotSize = 0)) 
 													group by Item) as tmp 
 													on det.Item = tmp.Item and det.StartTime >= tmp.StartTime
 
 			set @LastOverflowCount = @CurrentOverflowCount
 			select @CurrentOverflowCount = COUNT(1) from #tempProductPlanDet 
 			where OverflowQty >= UC and UC > 0 and Qty >= UC
-			and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null))
+			and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null) or (MinLotSize = 0))
 		end
 		-----------------------------↑生产数按包装圆整-----------------------------
 

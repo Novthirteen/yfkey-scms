@@ -33,6 +33,7 @@ BEGIN
 	declare @DetId int
 	declare @MstrId int
 	declare @ProdItem varchar(50)
+	declare @Flow varchar(50)
 	declare @Item varchar(50)
 	declare @ActiveQty decimal(18, 8)
 	declare @LastActiveQty decimal(18, 8)
@@ -168,7 +169,7 @@ BEGIN
 		)
 
 		create index IX_tempPurchasePlanDet_UUID on #tempPurchasePlanDet(UUID asc)
-		create index IX_tempPurchasePlanDet_Flow_Item on #tempPurchasePlanDet(Item asc, PurchaseFlow asc)
+		create index IX_tempPurchasePlanDet_Flow_Item_WindowTime on #tempPurchasePlanDet(Item asc, PurchaseFlow asc, WindowTime asc)
 
 		create table #tempMaterialPlanDetTrace
 		(
@@ -489,42 +490,6 @@ BEGIN
 
 
 
-		-----------------------------↓缓存在途ASN-----------------------------
-		insert into #tempIpDet(IpNo, Flow, Item, StartTime, WindowTime, Qty)
-		select det.IpNo, det.Flow, det.Item, det.StartTime, DATEADD(day, ISNULL(fmstr.MRPLeadTime, 0), det.StartTime), SUM(det.Qty) as Qty
-		from MRP_IpDetSnapShot as det inner join (select distinct Item from #tempMergeMaterialPlanDet) as mstr on det.Item = mstr.Item
-		inner join FlowMstr as fmstr on fmstr.Code = det.Flow
-		group by det.IpNo, det.Flow, det.Item, det.StartTime, fmstr.MRPLeadTime, det.WindowTime
-		-----------------------------↑缓存在途-----------------------------
-
-
-
-		-----------------------------↓按窗口时间扣减在途-----------------------------
-		set @RowId = null
-		set @MaxRowId = null
-		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempIpDet
-		while (@RowId <= @MaxRowId)
-		begin
-			set @Item = null
-			set @ActiveQty = null
-			set @WindowTime = null
-			set @LastActiveQty = 0
-
-			select @ActiveQty = Qty, @Item = Item, @WindowTime = WindowTime from #tempIpDet where RowId = @RowId
-			if (@ActiveQty > 0)
-			begin
-				update det set BasePurchaseQty = CASE WHEN @ActiveQty >= BasePurchaseQty THEN 0 WHEN @ActiveQty < BasePurchaseQty and @ActiveQty > 0 THEN BasePurchaseQty - @ActiveQty ELSE BasePurchaseQty END,
-				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = BasePurchaseQty
-				from #tempMergeMaterialPlanDet as det with(INDEX(IX_tempMergeMaterialPlanDet_Item_ReqTime))
-				where det.Item = @Item and det.ReqTime >= @WindowTime
-			end
-
-			set @RowId = @RowId + 1
-		end		
-		-----------------------------↑按窗口时间扣减在途-----------------------------
-
-
-
 		-----------------------------↓查找采购路线-----------------------------
 		insert into #tempPurchasePlanDet(UUID, PurchaseFlow, LeadTime, Item, ItemDesc, RefItemCode, BaseReqQty, BasePurchaseQty, Uom, BaseUom, UC, MinLotSize, StartTime, WindowTime)
 		select t.UUID, d.Flow, ISNULL(m.MRPLeadTime, 0), t.Item, t.ItemDesc, d.RefItemCode, t.BaseReqQty, t.BasePurchaseQty, d.Uom, t.BaseUom, ISNULL(d.HuLotSize, 0), ISNULL(d.MinLotSize, 0), DATEADD(day, -ISNULL(m.LeadTime, 0), t.ReqTime), t.ReqTime
@@ -573,6 +538,42 @@ BEGIN
 		-----------------------------↑查找采购路线-----------------------------
 
 
+		-----------------------------↓缓存在途ASN-----------------------------
+		insert into #tempIpDet(IpNo, Flow, Item, StartTime, WindowTime, Qty)
+		select det.IpNo, det.Flow, det.Item, det.StartTime, DATEADD(day, ISNULL(fmstr.MRPLeadTime, 0), det.StartTime), SUM(det.Qty) as Qty
+		from MRP_IpDetSnapShot as det inner join (select distinct Item from #tempMergeMaterialPlanDet) as mstr on det.Item = mstr.Item
+		inner join FlowMstr as fmstr on fmstr.Code = det.Flow
+		group by det.IpNo, det.Flow, det.Item, det.StartTime, fmstr.MRPLeadTime, det.WindowTime
+		-----------------------------↑缓存在途-----------------------------
+
+
+
+		-----------------------------↓按窗口时间扣减在途-----------------------------
+		set @RowId = null
+		set @MaxRowId = null
+		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempIpDet
+		while (@RowId <= @MaxRowId)
+		begin
+			set @Item = null
+			set @Flow = null
+			set @ActiveQty = null
+			set @WindowTime = null
+			set @LastActiveQty = 0
+
+			select @ActiveQty = Qty, @Item = Item, @Flow = Flow, @WindowTime = WindowTime from #tempIpDet where RowId = @RowId
+			if (@ActiveQty > 0)
+			begin
+				update det set PurchaseQty = CASE WHEN @ActiveQty >= PurchaseQty THEN 0 WHEN @ActiveQty < PurchaseQty and @ActiveQty > 0 THEN PurchaseQty - @ActiveQty ELSE PurchaseQty END,
+				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = PurchaseQty
+				from #tempPurchasePlanDet as det with(INDEX(IX_tempPurchasePlanDet_Flow_Item_WindowTime))
+				where det.Item = @Item and det.PurchaseFlow = @Flow and det.WindowTime >= @WindowTime
+			end
+
+			set @RowId = @RowId + 1
+		end		
+		-----------------------------↑按窗口时间扣减在途-----------------------------
+
+
 
 		-----------------------------↓更新订单数-----------------------------
 		--查找订单数
@@ -605,6 +606,33 @@ BEGIN
 
 
 
+		-----------------------------↓按窗口时间扣减订单-----------------------------
+		set @RowId = null
+		set @MaxRowId = null
+		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempOpenOrder
+		while (@RowId <= @MaxRowId)
+		begin
+			set @Item = null
+			set @Flow = null
+			set @ActiveQty = null
+			set @WindowTime = null
+			set @LastActiveQty = 0
+
+			select @ActiveQty = OrderQty - ShipQty, @Item = Item, @Flow = Flow, @WindowTime = WindowTime from #tempOpenOrder where RowId = @RowId
+			if (@ActiveQty > 0)
+			begin
+				update det set PurchaseQty = CASE WHEN @ActiveQty >= PurchaseQty THEN 0 WHEN @ActiveQty < PurchaseQty and @ActiveQty > 0 THEN PurchaseQty - @ActiveQty ELSE PurchaseQty END,
+				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = PurchaseQty
+				from #tempPurchasePlanDet as det with(INDEX(IX_tempPurchasePlanDet_Flow_Item_WindowTime))
+				where det.Item = @Item and det.PurchaseFlow = @Flow and det.WindowTime >= @WindowTime
+			end
+
+			set @RowId = @RowId + 1
+		end		
+		-----------------------------↑按窗口时间扣减订单-----------------------------
+
+
+
 		-----------------------------↓按窗口时间合并订单-----------------------------
 
 		-----------------------------↑按窗口时间合并订单-----------------------------
@@ -628,7 +656,6 @@ BEGIN
 		from #tempPurchasePlanDet as det1 inner join #tempPurchasePlanDet as det2 on det1.Item = det2.Item and det1.PurchaseFlow = det2.PurchaseFlow 
 		where det1.WindowTime <= det2.WindowTime
 		group by det2.Item, det2.PurchaseFlow, det2.WindowTime) as tmp on det.Item = tmp.Item and det.PurchaseFlow = tmp.PurchaseFlow and det.WindowTime = tmp.WindowTime
-
 		--先扣减经济批量
 		set @LastOverflowCount = 0
 		select @CurrentOverflowCount = COUNT(1) from #tempPurchasePlanDet 
@@ -645,24 +672,25 @@ BEGIN
 			select @CurrentOverflowCount = COUNT(1) from #tempPurchasePlanDet 
 			where OverflowQty >= MinLotSize and MinLotSize > 0 and (MinLotSize = PurchaseQty or MinLotSize >= PurchaseQty * 2)
 		end
-
+select * from #tempPurchasePlanDet where Item = '386000187417' and PurchaseFlow = 'S0000117_BSB' order by WindowTime asc
 		--在扣减包装
 		set @LastOverflowCount = 0
 		select @CurrentOverflowCount = COUNT(1) from #tempPurchasePlanDet 
-		where OverflowQty >= UC and UC > 0 and PurchaseQty >= UC and ((MinLotSize > 0 and PurchaseQty >= (MinLotSize + UC)) or (MinLotSize is null))
+		where OverflowQty >= UC and UC > 0 and PurchaseQty >= UC and ((MinLotSize > 0 and PurchaseQty >= (MinLotSize + UC)) or (MinLotSize is null) or (MinLotSize = 0))
 		while @LastOverflowCount <> @CurrentOverflowCount
 		begin
 			update det set PurchaseQty = PurchaseQty - CASE WHEN det.WindowTime = tmp.WindowTime THEN UC ELSE 0 END, OverflowQty = OverflowQty - UC
 			from #tempPurchasePlanDet as det inner join (select Item, PurchaseFlow, MIN(WindowTime) as WindowTime from #tempPurchasePlanDet 
 													where OverflowQty >= UC and UC > 0 and PurchaseQty >= UC
-													and ((MinLotSize > 0 and PurchaseQty >= (MinLotSize + UC)) or (MinLotSize is null)) 
+													and ((MinLotSize > 0 and PurchaseQty >= (MinLotSize + UC)) or (MinLotSize is null) or (MinLotSize = 0)) 
 													group by Item, PurchaseFlow) as tmp
 													on det.Item = tmp.Item and det.PurchaseFlow = tmp.PurchaseFlow and det.WindowTime >= tmp.WindowTime
 
 			set @LastOverflowCount = @CurrentOverflowCount
 			select @CurrentOverflowCount = COUNT(1) from #tempPurchasePlanDet 
 			where OverflowQty >= UC and UC > 0 and PurchaseQty >= UC
-			and ((MinLotSize > 0 and PurchaseQty >= (MinLotSize + UC)) or (MinLotSize is null))
+			and ((MinLotSize > 0 and PurchaseQty >= (MinLotSize + UC)) or (MinLotSize is null) or (MinLotSize = 0))
+select * from #tempPurchasePlanDet where Item = '386000187417' and PurchaseFlow = 'S0000117_BSB' order by WindowTime asc
 		end
 		-----------------------------↑到货数按包装圆整-----------------------------
 
