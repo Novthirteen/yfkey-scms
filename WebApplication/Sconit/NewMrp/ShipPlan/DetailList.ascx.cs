@@ -20,9 +20,9 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
     public event EventHandler BackEvent;
     protected void Page_Load(object sender, EventArgs e)
     {
-        //this.tbFlow.ServiceParameter = "string:" + this.Cur
-        this.tbFlow.ServiceParameter = "string:" + this.CurrentUser.Code + ",bool:false,bool:false,bool:true,bool:false,bool:false,bool:false,string:" + BusinessConstants.PARTY_AUTHRIZE_OPTION_BOTH;
-
+        //this.tbFlow.ServiceParameter = "string:" + this.CurrentUser.Code;
+        this.tbFlow.ServiceParameter = "string:" + this.CurrentUser.Code + ",bool:false,bool:true,bool:true,bool:false,bool:true,bool:true,string:" + BusinessConstants.PARTY_AUTHRIZE_OPTION_BOTH;
+        //bool includeProcurement, bool includeDistribution, bool includeTransfer, bool includeProduction, bool includeCustomerGoods, bool includeSubconctracting,
         if (!IsPostBack)
         {
             //this.tbStartDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
@@ -70,9 +70,15 @@ from  MRP_ShipPlanDet as det
         //left join MRP_ShipPlanIpDet as ip on ip.ShipPlanId=m.Id and ip.Item=det.Item where 1=1  ";
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
-        if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
+        string flowCodeValues = this.tbFlow.Value.Trim();
+        if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            searchSql += string.Format(" and det.Flow ='{0}' ", this.tbFlow.Text.Trim());
+            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\n", ",");
+        }
+        if (!string.IsNullOrEmpty(flowCodeValues))
+        {
+            searchSql += string.Format(" and det.Flow in ('{0}') ", flowCodeValues);
         }
         else
         {
@@ -80,6 +86,16 @@ from  MRP_ShipPlanDet as det
             ShowErrorMessage("发运路线不能为空。");
             return;
         }
+        //if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
+        //{
+        //    searchSql += string.Format(" and det.Flow  in '{0}' ", this.tbFlow.Text.Trim());
+        //}
+        //else
+        //{
+        //    this.list.InnerHtml = "";
+        //    ShowErrorMessage("发运路线不能为空。");
+        //    return;
+        //}
 
         //DateTime startTime = DateTime.Today;
         //if (!string.IsNullOrEmpty(this.tbStartDate.Text.Trim()))
@@ -270,7 +286,6 @@ from  MRP_ShipPlanDet as det
         StringBuilder str = new StringBuilder();
         //str.Append(CopyString());
         //head
-        var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
         str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>提前期</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>3PL期初</th><th rowspan='2'>在途</th>");
         int ii = 0;
@@ -297,7 +312,7 @@ from  MRP_ShipPlanDet as det
         }
         else if (ii > 10)
         {
-            widths = "250%";
+            widths = "300%";
         }
         else if (ii > 6)
         {
@@ -541,7 +556,7 @@ from  MRP_ShipPlanDet as det
         StringBuilder str = new StringBuilder();
         //str.Append(CopyString());
         //head
-        var flowCode = this.tbFlow.Text.Trim();
+       
         string headStr = string.Empty;
         str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>提前期</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th>");
         int ii = 0;
@@ -564,7 +579,7 @@ from  MRP_ShipPlanDet as det
         string widths = "100%";
         if (ii > 14)
         {
-            widths = "240%";
+            widths = "350%";
         }
         else if (ii > 10)
         {

@@ -1855,6 +1855,10 @@ namespace com.Sconit.Service.MRP.Impl
                     {
                         upSql += string.Format(",WorkDate='{0}'",byFlow.workDate);
                     }
+                    if (byFlow.tFlowCode!=null && !string.IsNullOrEmpty(byFlow.tFlowCode.ToString()))
+                    {                           
+                        upSql += string.Format(",ShipFlow='{0}'", byFlow.tFlowCode);
+                    }
                     upSql += string.Format(",lastModifyDate='{1}',LastModifyUser='{2}' where code='{0}' ", byFlow.dFlowCode, newTime, user.Code);
                     this.genericMgr.ExecuteSql(upSql);
 
@@ -1957,7 +1961,7 @@ namespace com.Sconit.Service.MRP.Impl
 
                     #region Bom代码
                     bomCode = ImportHelper.GetCellStringValue(row.GetCell(colBom));
-                    if (!string.IsNullOrEmpty(itemCode))
+                    if (!string.IsNullOrEmpty(bomCode))
                     {
                         if (allBoms.Where(d => d.Code == bomCode).Count() == 0)
                         {
@@ -2129,7 +2133,7 @@ namespace com.Sconit.Service.MRP.Impl
                 {
                     rowCount++;
                     HSSFRow row = (HSSFRow)rows.Current;
-                    if (!ImportHelper.CheckValidDataRow(row, 1, 4))
+                    if (!ImportHelper.CheckValidDataRow(row, 1, 2))
                     {
                         break;//边界
                     }
@@ -2205,6 +2209,15 @@ namespace com.Sconit.Service.MRP.Impl
                         windowTime6 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime6));
                         windowTime7 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime7));
                         #endregion
+                        currentFlow.WinTime1 = windowTime1;
+                        currentFlow.WinTime2 = windowTime2;
+                        currentFlow.WinTime3 = windowTime3;
+                        currentFlow.WinTime4 = windowTime4;
+                        currentFlow.WinTime5 = windowTime5;
+                        currentFlow.WinTime6 = windowTime6;
+                        currentFlow.WinTime7 = windowTime7;
+
+                        upFlows.Add(currentFlow);
                     }
 
                     #region 读取物料代码
@@ -2274,12 +2287,13 @@ namespace com.Sconit.Service.MRP.Impl
 
                         #region 包装量
                         string rUc = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
+                        
                         if (!string.IsNullOrEmpty(rUc))
                         {
                             decimal s;
-                            if (!decimal.TryParse(rMinLotSize, out s))
+                            if (!decimal.TryParse(rUc, out s))
                             {
-                                errorMessages += "</br/>" + string.Format("第{0}行：包装量填写有误。", rowCount);
+                                errorMessages += "</br/>" + string.Format("第{0}行：包装量{1}填写有误。", rowCount,rUc);
                                 continue;
                             }
                             currentFlowDetail.UnitCount = s;
@@ -2291,14 +2305,16 @@ namespace com.Sconit.Service.MRP.Impl
                     #endregion
                 }
 
-                if (upFlows.Count == 0)
-                {
-                    throw new BusinessErrorException("导入的有效数据为空。");
-                }
                 if (!string.IsNullOrEmpty(errorMessages))
                 {
                     throw new BusinessErrorException(errorMessages);
                 }
+
+                if (upFlows.Count == 0)
+                {
+                    throw new BusinessErrorException("导入的有效数据为空。");
+                }
+                
                 DateTime nowTime = System.DateTime.Now;
                 foreach (var flow in upFlows)
                 {
