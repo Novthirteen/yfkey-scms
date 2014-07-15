@@ -214,7 +214,10 @@ BEGIN
 		from MRP_ShipPlanDet as det 
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
 		inner join Item as i on det.Item = i.Code
-		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily'
+		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily' 
+		and exists(select top 1 1 from BomDet as bd 
+					where ((i.Bom is not null and bd.Bom = i.Bom) or (i.Bom is null and bd.Bom = det.Item))
+					and bd.StartDate <= det.StartTime and (bd.EndDate >= det.StartTime or bd.EndDate is null))
 		group by det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, det.StartTime, i.Bom, i.LeadTime
 
 		--删除开始日期小于今天的需求
@@ -339,8 +342,9 @@ BEGIN
 						bom.RateQty, bom.ScrapPct, DATEADD(day, -ISNULL(i.LeadTime, 0), @EffDate), @EffDate
 						from #tempBomDetail as bom 
 						inner join Item as i on bom.Item = i.Code
-						inner join BomMstr as bm on (i.Bom is not null and bm.Code = i.Bom) or (i.Bom is null and bm.Code = bom.Item)
-						where bm.IsActive = 1
+						where exists(select top 1 1 from BomDet as bd 
+										where ((i.Bom is not null and bd.Bom = i.Bom) or (i.Bom is null and bd.Bom = bom.Item))
+										and bd.StartDate <= @EffDate and (bd.EndDate >= @EffDate or bd.EndDate is null))
 
 						--删除开始日期小于今天的需求
 						delete from #tempTempNextLevlProductPlan where StartTime < @DateNow
@@ -426,6 +430,25 @@ BEGIN
 		inner join Item as i on d.Item = i.Code
 		where d.RemainQty < 0 and p.Item is null
 		-----------------------------↑低于安全库存的转为当天的生产计划-----------------------------
+
+
+
+		-----------------------------↓补齐日计划-----------------------------
+		select @StartTime = @DateNow, @MaxStartTime = MAX(StartTime) from #tempProductPlanDet
+
+		while (@StartTime <= @MaxStartTime)
+		begin
+			insert into #tempStartTime(StartTime) values (@StartTime)
+			set @StartTime = DATEADD(day, 1, @StartTime)
+		end
+
+		insert into #tempProductPlanDet(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, StartTime, WindowTime)
+		select NEWID(), tmp.Item, i.Desc1, null, i.Uom, 0, ISNULL(i.Bom, tmp.Item), tmp.StartTime, DATEADD(day, ISNULL(i.LeadTime, 0), tmp.StartTime) 
+		from (select a.StartTime, b.Item from #tempStartTime as a, (select distinct Item from #tempProductPlanDet) as b ) as tmp 
+		inner join Item as i on tmp.Item = i.Code
+		left join #tempProductPlanDet as p on p.Item = tmp.Item and p.StartTime = tmp.StartTime
+		where p.Item is null
+		-----------------------------↑补齐日计划-----------------------------
 
 
 
@@ -538,6 +561,7 @@ BEGIN
 			and ((MinLotSize > 0 and Qty >= (MinLotSize + UC)) or (MinLotSize is null) or (MinLotSize = 0))
 		end
 		-----------------------------↑生产数按包装圆整-----------------------------
+
 
 	end try
 	begin catch

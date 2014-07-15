@@ -94,10 +94,10 @@ BEGIN
 			select @Count = COUNT(1) from #tempWeekDay
 
 			insert into #tempCustomerScheduleDet(DetId, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, UC, Location, WindowTime)
-			select det.Id, @MaxMstrId, det.Flow, det.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty / @Count, det.Uom, det.UC, det.Loc,
+			select det.Id, @MaxMstrId, det.Flow, mstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty / @Count, det.Uom, det.UC, det.Loc,
 			DATEADD(DAY, CASE WHEN (tmp.[DateDiff] - @DateFirst + 1) <= 0 THEN (tmp.[DateDiff] - @DateFirst + 1) + 7 ELSE (tmp.[DateDiff] - @DateFirst + 1) END - 1, det.DateFrom) 
-			from CustScheduleDet as det, #tempWeekDay as tmp
-			where ScheduleId = @MaxMstrId
+			from CustScheduleDet as det, FlowMstr as mstr, #tempWeekDay as tmp
+			where det.Flow = mstr.Code and ScheduleId = @MaxMstrId
 			order by det.Id, tmp.RowId
 
 			--数量更新为相同日期的日计划

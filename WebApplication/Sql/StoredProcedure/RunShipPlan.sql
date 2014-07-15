@@ -36,6 +36,8 @@ BEGIN
 	declare @StartTime datetime
 	declare @LastOverflowCount int
 	declare @CurrentOverflowCount int
+	declare @StartTime datetime
+	declare @MaxStartTime datetime
 
 	set @DateTimeNow = GetDate()
 	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
@@ -179,6 +181,11 @@ BEGIN
 			DailyStartTime datetime
 		)
 
+		create table #tempStartTime
+		(
+			StartTime datetime primary key,
+		)
+
 		--更新福特计划的发货数
 		--update det set ShipQty = p.CurrenCumQty
 		--from CustScheduleDet as det inner join EDI_FordPlan as p on det.FordPlanId = p.Id
@@ -194,10 +201,11 @@ BEGIN
 		--选取开始日期大于等于当天的所有客户日程
 		insert into #tempEffCustScheduleDet(Id, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty,
 		Uom, BaseUom, UC, Location, StartTime, WindowTime)
-		select det.Id, mstr.Id as MstrId, mstr.Flow, mstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty,
+		select det.Id, mstr.Id as MstrId, mstr.Flow, fmstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty,
 		det.Uom, i.Uom as BaseUom, det.UC, det.Loc as Location, det.StartTime, det.DateFrom as WindowTime
-		from CustScheduleDet as det 
+		from CustScheduleDet as det
 		inner join CustScheduleMstr as mstr on det.ScheduleId = mstr.Id
+		inner join FlowMstr as fmstr on mstr.Flow = fmstr.Code
 		inner join Item as i on det.Item = i.Code
 		where mstr.[Type] = 'Daily' and mstr.[Status] = 'Submit' and det.StartTime >= @DateNow
 		--and (det.Qty > det.ShipQty or (det.ShipQty is null and det.Qty > 0))
@@ -478,6 +486,26 @@ BEGIN
 
 
 
+		-----------------------------↓补齐日计划-----------------------------
+		select @StartTime = @DateNow, @MaxStartTime = MAX(StartTime) from #tempShipPlanDet
+
+		while (@StartTime <= @MaxStartTime)
+		begin
+			insert into #tempStartTime(StartTime) values (@StartTime)
+			set @StartTime = DATEADD(day, 1, @StartTime)
+		end
+
+		insert into #tempShipPlanDet(UUID, Flow, Item, ItemDesc, RefItemCode, ShipQty, OrderQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
+		select NEWID(), d.Flow, d.Item, d.ItemDesc, d.RefItemCode, 0, 0, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, tmp.StartTime, DATEADD(day, d.LeadTime, tmp.StartTime) 
+		from (select a.StartTime, b.Flow, b.Item from #tempStartTime as a, (select distinct Flow, Item from #tempShipPlanDet) as b ) as tmp 
+		inner join #tempShipFlowDet as d on d.Flow = tmp.Flow and d.Item = tmp.Item
+		left join #tempShipPlanDet as p on p.Flow = tmp.Flow and p.Item = tmp.Item and p.StartTime = tmp.StartTime
+		where p.Flow is null
+		-----------------------------↑补齐日计划-----------------------------
+
+
+
+
 		-----------------------------↓发货数按包装圆整-----------------------------
 		update #tempShipPlanDet set ShipQty = ceiling(ShipQty / UC) * UC, OrgShipQty = ShipQty where ShipQty > 0 and UC > 0
 
@@ -565,7 +593,6 @@ BEGIN
 
 		-----------------------------↓生成发运计划（周）-----------------------------
 		set datefirst 1  --设置周一为一周开始时间
-
 
 		--新增日计划和周计划的映射表
 		insert into #tempWeeklyShipPlanDetMap(DailyUUID, WeeklyUUID, WeeklyStartTime, WeeklyWindowTime, DailyStartTime)
