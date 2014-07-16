@@ -36,7 +36,6 @@ BEGIN
 	declare @StartTime datetime
 	declare @LastOverflowCount int
 	declare @CurrentOverflowCount int
-	declare @StartTime datetime
 	declare @MaxStartTime datetime
 
 	set @DateTimeNow = GetDate()
@@ -334,7 +333,7 @@ BEGIN
 		-----------------------------↓缓存Open Order-----------------------------
 		--插入发运路线的Open Order
 		insert into #tempOpenOrder(Flow, OrderNo, Item, OrgStartTime, OrgWindowTime, StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
-		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, DATEADD(day, fDet.LeadTime, ord.WindowTime), 
+		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, DATEADD(day, fDet.LeadTime, ord.StartTime), 
 		CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, 
 		CASE WHEN ord.StartTime < @DateNow THEN DATEADD(day, fdet.LeadTime, @DateNow) ELSE DATEADD(day, fdet.LeadTime, CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121))) END, 
 		CASE WHEN ord.StartTime < @DateNow THEN @DateNow ELSE CONVERT(datetime, CONVERT(varchar(10), ord.StartTime, 121)) END, 
@@ -466,7 +465,7 @@ BEGIN
 			set @Item = null
 			set @StartTime = null
 
-			select @ActiveQty = (OrderQty - ShipQty), @Flow = Flow, @Item = Item, @StartTime = StartTime from #tempOpenOrder where RowId = @RowId
+			select @ActiveQty = (OrderQty - ShipQty), @Flow = Flow, @Item = Item, @StartTime = CONVERT(varchar(10), StartTime, 121) from #tempOpenOrder where RowId = @RowId
 			if (@ActiveQty > 0)
 			begin
 				update det set ShipQty = CASE WHEN @ActiveQty >= ShipQty THEN 0 WHEN @ActiveQty < ShipQty and @ActiveQty>0 THEN ShipQty - @ActiveQty ELSE ShipQty END,
@@ -487,20 +486,20 @@ BEGIN
 
 
 		-----------------------------↓补齐日计划-----------------------------
-		select @StartTime = @DateNow, @MaxStartTime = MAX(StartTime) from #tempShipPlanDet
+		--select @StartTime = @DateNow, @MaxStartTime = MAX(StartTime) from #tempShipPlanDet
 
-		while (@StartTime <= @MaxStartTime)
-		begin
-			insert into #tempStartTime(StartTime) values (@StartTime)
-			set @StartTime = DATEADD(day, 1, @StartTime)
-		end
+		--while (@StartTime <= @MaxStartTime)
+		--begin
+		--	insert into #tempStartTime(StartTime) values (@StartTime)
+		--	set @StartTime = DATEADD(day, 1, @StartTime)
+		--end
 
-		insert into #tempShipPlanDet(UUID, Flow, Item, ItemDesc, RefItemCode, ShipQty, OrderQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
-		select NEWID(), d.Flow, d.Item, d.ItemDesc, d.RefItemCode, 0, 0, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, tmp.StartTime, DATEADD(day, d.LeadTime, tmp.StartTime) 
-		from (select a.StartTime, b.Flow, b.Item from #tempStartTime as a, (select distinct Flow, Item from #tempShipPlanDet) as b ) as tmp 
-		inner join #tempShipFlowDet as d on d.Flow = tmp.Flow and d.Item = tmp.Item
-		left join #tempShipPlanDet as p on p.Flow = tmp.Flow and p.Item = tmp.Item and p.StartTime = tmp.StartTime
-		where p.Flow is null
+		--insert into #tempShipPlanDet(UUID, Flow, Item, ItemDesc, RefItemCode, ShipQty, OrderQty, Uom, BaseUom, UnitQty, UC, LocFrom, LocTo, StartTime, WindowTime)
+		--select NEWID(), d.Flow, d.Item, d.ItemDesc, d.RefItemCode, 0, 0, d.Uom, d.BaseUom, d.UnitQty, d.UC, d.LocFrom, d.LocTo, tmp.StartTime, DATEADD(day, d.LeadTime, tmp.StartTime) 
+		--from (select a.StartTime, b.Flow, b.Item from #tempStartTime as a, (select distinct Flow, Item from #tempShipPlanDet) as b ) as tmp 
+		--inner join #tempShipFlowDet as d on d.Flow = tmp.Flow and d.Item = tmp.Item
+		--left join #tempShipPlanDet as p on p.Flow = tmp.Flow and p.Item = tmp.Item and p.StartTime = tmp.StartTime
+		--where p.Flow is null
 		-----------------------------↑补齐日计划-----------------------------
 
 

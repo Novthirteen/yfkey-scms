@@ -597,7 +597,7 @@ BEGIN
 			set @WindowTime = null
 			set @LastActiveQty = 0
 
-			select @ActiveQty = OrderQty - ShipQty, @Item = Item, @Flow = Flow, @WindowTime = WindowTime from #tempOpenOrder where RowId = @RowId
+			select @ActiveQty = OrderQty - ShipQty, @Item = Item, @Flow = Flow, @WindowTime = CONVERT(varchar(10), WindowTime, 121) from #tempOpenOrder where RowId = @RowId
 			if (@ActiveQty > 0)
 			begin
 				update det set PurchaseQty = CASE WHEN @ActiveQty >= PurchaseQty THEN 0 WHEN @ActiveQty < PurchaseQty and @ActiveQty > 0 THEN PurchaseQty - @ActiveQty ELSE PurchaseQty END,

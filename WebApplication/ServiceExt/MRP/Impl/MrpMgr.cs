@@ -2209,13 +2209,13 @@ namespace com.Sconit.Service.MRP.Impl
                         windowTime6 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime6));
                         windowTime7 = ImportHelper.GetCellStringValue(row.GetCell(colWindowTime7));
                         #endregion
-                        currentFlow.WinTime1 = windowTime1;
-                        currentFlow.WinTime2 = windowTime2;
-                        currentFlow.WinTime3 = windowTime3;
-                        currentFlow.WinTime4 = windowTime4;
-                        currentFlow.WinTime5 = windowTime5;
-                        currentFlow.WinTime6 = windowTime6;
-                        currentFlow.WinTime7 = windowTime7;
+                        //currentFlow.WinTime1 = windowTime1;
+                        //currentFlow.WinTime2 = windowTime2;
+                        //currentFlow.WinTime3 = windowTime3;
+                        //currentFlow.WinTime4 = windowTime4;
+                        //currentFlow.WinTime5 = windowTime5;
+                        //currentFlow.WinTime6 = windowTime6;
+                        //currentFlow.WinTime7 = windowTime7;
 
                         upFlows.Add(currentFlow);
                     }

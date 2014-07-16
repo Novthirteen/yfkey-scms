@@ -434,20 +434,20 @@ BEGIN
 
 
 		-----------------------------↓补齐日计划-----------------------------
-		select @StartTime = @DateNow, @MaxStartTime = MAX(StartTime) from #tempProductPlanDet
+		--select @StartTime = @DateNow, @MaxStartTime = MAX(StartTime) from #tempProductPlanDet
 
-		while (@StartTime <= @MaxStartTime)
-		begin
-			insert into #tempStartTime(StartTime) values (@StartTime)
-			set @StartTime = DATEADD(day, 1, @StartTime)
-		end
+		--while (@StartTime <= @MaxStartTime)
+		--begin
+		--	insert into #tempStartTime(StartTime) values (@StartTime)
+		--	set @StartTime = DATEADD(day, 1, @StartTime)
+		--end
 
-		insert into #tempProductPlanDet(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, StartTime, WindowTime)
-		select NEWID(), tmp.Item, i.Desc1, null, i.Uom, 0, ISNULL(i.Bom, tmp.Item), tmp.StartTime, DATEADD(day, ISNULL(i.LeadTime, 0), tmp.StartTime) 
-		from (select a.StartTime, b.Item from #tempStartTime as a, (select distinct Item from #tempProductPlanDet) as b ) as tmp 
-		inner join Item as i on tmp.Item = i.Code
-		left join #tempProductPlanDet as p on p.Item = tmp.Item and p.StartTime = tmp.StartTime
-		where p.Item is null
+		--insert into #tempProductPlanDet(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, StartTime, WindowTime)
+		--select NEWID(), tmp.Item, i.Desc1, null, i.Uom, 0, ISNULL(i.Bom, tmp.Item), tmp.StartTime, DATEADD(day, ISNULL(i.LeadTime, 0), tmp.StartTime) 
+		--from (select a.StartTime, b.Item from #tempStartTime as a, (select distinct Item from #tempProductPlanDet) as b ) as tmp 
+		--inner join Item as i on tmp.Item = i.Code
+		--left join #tempProductPlanDet as p on p.Item = tmp.Item and p.StartTime = tmp.StartTime
+		--where p.Item is null
 		-----------------------------↑补齐日计划-----------------------------
 
 
@@ -487,7 +487,7 @@ BEGIN
 			set @Item = null
 			set @StartTime = null
 
-			select @ActiveQty = (OrderQty - RecQty), @Item = Item, @StartTime = StartTime from #tempOpenOrder where RowId = @RowId
+			select @ActiveQty = (OrderQty - RecQty), @Item = Item, @StartTime = CONVERT(varchar(10), StartTime, 121) from #tempOpenOrder where RowId = @RowId
 			if (@ActiveQty > 0)
 			begin
 				update det set Qty = CASE WHEN @ActiveQty >= Qty THEN 0 WHEN @ActiveQty < Qty and @ActiveQty>0 THEN Qty - @ActiveQty ELSE Qty END,
