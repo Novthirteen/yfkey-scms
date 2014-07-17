@@ -557,7 +557,7 @@ BEGIN
 		-----------------------------↓更新订单数-----------------------------
 		--查找订单数
 		insert into #tempOpenOrder(Flow, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty)
-		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, DATEADD(day, pl.LeadTime, ord.WindowTime), ord.OrderQty, ord.ShipQty, ord.RecQty
+		select ord.Flow, ord.OrderNo, ord.Item, ord.StartTime, ord.WindowTime, ord.OrderQty, ord.ShipQty, ord.RecQty
 		from MRP_OpenOrderSnapShot as ord
 		inner join (select distinct Item, PurchaseFlow, LeadTime from #tempPurchasePlanDet) as pl on ord.Item = pl.Item and ord.Flow = pl.PurchaseFlow
 

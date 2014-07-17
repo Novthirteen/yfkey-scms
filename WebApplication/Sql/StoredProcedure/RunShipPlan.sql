@@ -207,7 +207,7 @@ BEGIN
 		inner join FlowMstr as fmstr on mstr.Flow = fmstr.Code
 		inner join Item as i on det.Item = i.Code
 		where mstr.[Type] = 'Daily' and mstr.[Status] = 'Submit' and det.StartTime >= @DateNow
-		--and (det.Qty > det.ShipQty or (det.ShipQty is null and det.Qty > 0))
+		--and det.Qty > 0
 
 		if not exists(select top 1 1 from #tempEffCustScheduleDet)
 		begin
@@ -228,21 +228,30 @@ BEGIN
 			set @MaxWindowTime = null
 
 			select @DistributionFlow = Flow from #tempDistributionFlow where RowId = @RowId
-				
-			select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow
-			select @MinWindowTime = MIN(WindowTime), @MaxWindowTime = MAX(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
+
+			if exists(select top 1 1 from FlowMstr where Code = @DistributionFlow and PartyTo = 'C0000008')
+			begin  --福特
+				delete from #tempEffCustScheduleDet where Flow = @DistributionFlow 
+				and MstrId not in (select Id from CustScheduleMstr where Flow = @DistributionFlow and CreateDate > @DateNow)
+				select @MinWindowTime = MIN(WindowTime), @MaxWindowTime = MAX(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow
+			end
+			else
+			begin  --非福特
+				select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow
+				select @MinWindowTime = MIN(WindowTime), @MaxWindowTime = MAX(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
 	
-			while exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime)
-			begin
-				delete from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime
-				if exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId)
-				begin --没有更小版本的客户日程，跳出循环
-					break;
-				end
-				else
-				begin --取下一个版本的客户日程
-					select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId
-					select @MinWindowTime = MIN(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
+				while exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime)
+				begin
+					delete from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId and WindowTime > @MinWindowTime
+					if exists(select top 1 1 from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId)
+					begin --没有更小版本的客户日程，跳出循环
+						break;
+					end
+					else
+					begin --取下一个版本的客户日程
+						select @MaxMstrId = MAX(MstrId) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId < @MaxMstrId
+						select @MinWindowTime = MIN(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow and MstrId = @MaxMstrId
+					end
 				end
 			end
 
