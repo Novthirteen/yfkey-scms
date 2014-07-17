@@ -212,26 +212,26 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         #endregion
 
         #region    在途
-        IList<PurchasePlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanIpDet>(" select s from  PurchasePlanIpDet as s where s.PurchasePlanId=? and s.Type='" + this.rbType.SelectedValue + "'  ", pPlanDetList.First().PurchasePlanId);    //
-        ipDets = ipDets == null ? new List<PurchasePlanIpDet>() : ipDets;
-        if (ipDets != null && ipDets.Count > 0)
-        {
-            foreach (var sd in pPlanDetList)
-            {
-                var currentIpdets = ipDets.Where(d => d.Item == sd.Item).ToList();
-                var showText = string.Empty;
-                if (currentIpdets != null && currentIpdets.Count > 0)
-                {
-                    showText = "<table><thead><tr><th>ASN号</th><th>路线</th><th>物料</th><th>数量</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
-                    foreach (var c in currentIpdets)
-                    {
-                        showText += "<td>" + c.IpNo + "</td><td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Qty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
-                    }
-                    showText += " </tr></tbody></table> ";
-                }
-                sd.IpDets = showText;
-            }
-        }
+        //IList<PurchasePlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanIpDet>(" select s from  PurchasePlanIpDet as s where s.PurchasePlanId=? and s.Type='" + this.rbType.SelectedValue + "'  ", pPlanDetList.First().PurchasePlanId);    //
+        //ipDets = ipDets == null ? new List<PurchasePlanIpDet>() : ipDets;
+        //if (ipDets != null && ipDets.Count > 0)
+        //{
+        //    foreach (var sd in pPlanDetList)
+        //    {
+        //        var currentIpdets = ipDets.Where(d => d.Item == sd.Item && d.Flow == ss.Flow).ToList();
+        //        var showText = string.Empty;
+        //        if (currentIpdets != null && currentIpdets.Count > 0)
+        //        {
+        //            showText = "<table><thead><tr><th>ASN号</th><th>路线</th><th>物料</th><th>数量</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+        //            foreach (var c in currentIpdets)
+        //            {
+        //                showText += "<td>" + c.IpNo + "</td><td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Qty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+        //            }
+        //            showText += " </tr></tbody></table> ";
+        //        }
+        //        sd.IpDets = showText;
+        //    }
+        //}
         #endregion
 
         var planByDateIndexs = pPlanDetList.GroupBy(p => p.WindowTime).OrderBy(p => p.Key);
@@ -242,7 +242,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         //head
         var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>包装量</th><th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>在途</th><th rowspan='2'>报验</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>包装量</th><th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>报验</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -348,20 +348,20 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             str.Append(colorStr);
             str.Append(firstPlan.InitStock.ToString("0.##"));
             str.Append("</td>");
-            if (InitStockQty < firstPlan.SafeStock)
-            {
-                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:red;color:white' >", firstPlan.IpDets));
-            }
-            else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
-            {
-                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:green;color:white' >", firstPlan.IpDets));
-            }
-            else if (InitStockQty > firstPlan.MaxStock)
-            {
-                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:orange' >", firstPlan.IpDets));
-            }
-            str.Append((firstPlan.InTransitQty).ToString("0.##"));
-            str.Append("</td>");
+            //if (InitStockQty < firstPlan.SafeStock)
+            //{
+            //    str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:red;color:white' >", firstPlan.IpDets));
+            //}
+            //else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
+            //{
+            //    str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:green;color:white' >", firstPlan.IpDets));
+            //}
+            //else if (InitStockQty > firstPlan.MaxStock)
+            //{
+            //    str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:orange' >", firstPlan.IpDets));
+            //}
+            //str.Append((firstPlan.InTransitQty).ToString("0.##"));
+            //str.Append("</td>");
             str.Append(colorStr);
             str.Append((firstPlan.InspectQty).ToString("0.##"));
             str.Append("</td>");
@@ -392,13 +392,14 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                     str.Append("</td>");
                 }
 
-                var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime == planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime == planByDateIndex.Key).Sum(i => i.Qty) : 0;
-                if (fi == 0)
-                {
-                    ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
-                    fi++;
-                }
-                InitStockQty = InitStockQty + ipQty - pPlanDet.ReqQty + pPlanDet.OrderQty + pPlanDet.PurchaseQty;
+                //var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime == planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime == planByDateIndex.Key).Sum(i => i.Qty) : 0;
+                //if (fi == 0)
+                //{
+                //    ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
+                //    fi++;
+                //}
+                //InitStockQty = InitStockQty + ipQty - pPlanDet.ReqQty + pPlanDet.OrderQty + pPlanDet.PurchaseQty;
+                InitStockQty = InitStockQty - pPlanDet.ReqQty + pPlanDet.OrderQty + pPlanDet.PurchaseQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
                     colorStr = "<td style='background:red;color:white'>";

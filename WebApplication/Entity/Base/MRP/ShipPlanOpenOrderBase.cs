@@ -13,6 +13,7 @@ namespace com.Sconit.Entity.MRP
         public Int32 Id { get; set; }
         public Int32 ShipPlanId { get; set; }
         public string UUID { get; set; }
+        public string Flow { get; set; }
         public string OrderNo { get; set; }
         public string Item { get; set; }
         public DateTime StartTime { get; set; }

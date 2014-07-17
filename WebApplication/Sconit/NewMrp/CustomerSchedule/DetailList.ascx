@@ -5,13 +5,13 @@
 <div id="search" runat="server">
     <table class="mtable" runat="server" id="tblSearch">
         <tr>
-            <td class="td01">
+           <%-- <td class="td01">
                 路线:
             </td>
             <td class="td02">
                 <uc3:textbox ID="tbFlow" runat="server" DescField="Description" ValueField="Code"
                     ServicePath="FlowMgr.service" MustMatch="true" Width="250" ServiceMethod="GetFlowList" />
-            </td>
+            </td>--%>
             <td class="td01">
                 物料代码
             </td>

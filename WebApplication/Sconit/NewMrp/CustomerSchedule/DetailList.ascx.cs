@@ -21,11 +21,11 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
     protected void Page_Load(object sender, EventArgs e)
     {
         //this.tbFlow.ServiceParameter = "string:" + this.Cur
-        this.tbFlow.ServiceParameter = "string:" + this.CurrentUser.Code + ",bool:false,bool:false,bool:true,bool:false,bool:false,bool:false,string:" + BusinessConstants.PARTY_AUTHRIZE_OPTION_BOTH;
+        //this.tbFlow.ServiceParameter = "string:" + this.CurrentUser.Code + ",bool:false,bool:false,bool:true,bool:false,bool:false,bool:false,string:" + BusinessConstants.PARTY_AUTHRIZE_OPTION_BOTH;
 
         if (!IsPostBack)
         {
-            this.tbFlow.Text = string.Empty;
+            //this.tbFlow.Text = string.Empty;
         }
 
     }
@@ -38,7 +38,7 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
     #region   明细查询
     public void GetView(string refScheduleNo)
     {
-        this.tbFlow.Text = string.Empty;
+        //this.tbFlow.Text = string.Empty;
         this.list.InnerHtml = "";
         currentRefScheduleNo = refScheduleNo;
     }
@@ -49,11 +49,11 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         var paramList = new List<object>();
         hql += " and c.ReferenceScheduleNo=? ";
         paramList.Add(currentRefScheduleNo);
-        if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
-        {
-            hql += " and c.Flow =? ";
-            paramList.Add(this.tbFlow.Text.Trim());
-        }
+        //if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
+        //{
+        //    hql += " and c.Flow =? ";
+        //    paramList.Add(this.tbFlow.Text.Trim());
+        //}
        
         if (!string.IsNullOrEmpty(this.tbItemCode.Text.Trim()))
         {
@@ -81,7 +81,7 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         StringBuilder str = new StringBuilder();
         //str.Append(CopyString());
         //head
-        var flowCode = this.tbFlow.Text.Trim();
+        //var flowCode = this.tbFlow.Text.Trim();
         string headStr = string.Empty;
         //CopyString();
         str.Append("<thead><tr class='GVHeader'><th>序号</th><th>路线</th><th>版本号</th><th>物料号</th><th>物料描述</th><th>客户零件号</th>");

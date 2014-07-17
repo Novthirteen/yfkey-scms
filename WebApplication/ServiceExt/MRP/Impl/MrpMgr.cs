@@ -921,7 +921,11 @@ namespace com.Sconit.Service.MRP.Impl
                                     string qtyValue = ImportHelper.GetCellStringValue(row.GetCell(i));
                                     if (qtyValue != null)
                                     {
-                                        qty = Convert.ToDecimal(qtyValue);
+                                        if (!decimal.TryParse(qtyValue, out qty))
+                                        {
+                                            errorMessages.Add(string.Format("数量格式不正确,第{0}行", rowIndex));
+                                            continue;
+                                        }
                                     }
                                 }
                             }

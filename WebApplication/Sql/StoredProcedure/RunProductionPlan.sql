@@ -67,7 +67,10 @@ BEGIN
 			RefItemCode varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 			Qty decimal(18, 8),
+			ShipQty decimal(18, 8),
+			OrderQty decimal(18, 8),
 			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			EffDate datetime,
 			StartTime datetime,
 			WindowTime datetime
 		)
@@ -207,21 +210,27 @@ BEGIN
 		end
 
 		-----------------------------↓获取顶层毛需求-----------------------------
-		insert into #tempCurrentLevlProductPlan(UUID, GroupId, GroupSeq, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, StartTime, WindowTime)
+		--记录计划数
+		insert into #tempCurrentLevlProductPlan(UUID, GroupId, GroupSeq, Item, ItemDesc, RefItemCode, Uom, ShipQty, OrderQty, Bom, EffDate, StartTime, WindowTime)
 		select NEWID(), DENSE_RANK() over(Order by det.Item), DENSE_RANK() over(Partition by Item order by det.StartTime),
-		det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, SUM((ISNULL(det.ShipQty, 0) + ISNULL(det.OrderQty, 0)) * (1 + ISNULL(i.ScrapPct, 0) / 100) * ISNULL(det.UnitQty, 0)) as Qty, ISNULL(i.Bom, det.Item),
-		DATEADD(day, -ISNULL(i.LeadTime, 0), det.StartTime) as StartTime, det.StartTime as WindowTime
+		det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, 
+		SUM((ISNULL(det.ShipQty, 0)) * (1 + ISNULL(i.ScrapPct, 0) / 100) * ISNULL(det.UnitQty, 0)) as Qty,
+		SUM((ISNULL(det.OrderQty, 0)) * (1 + ISNULL(i.ScrapPct, 0) / 100) * ISNULL(det.UnitQty, 0)) as Qty, ISNULL(i.Bom, det.Item),
+		det.StartTime as EffDate, DATEADD(day, -ISNULL(i.LeadTime, 0), det.StartTime) as StartTime, det.StartTime as WindowTime
 		from MRP_ShipPlanDet as det 
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
 		inner join Item as i on det.Item = i.Code
-		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily' 
+		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily'
 		and exists(select top 1 1 from BomDet as bd 
 					where ((i.Bom is not null and bd.Bom = i.Bom) or (i.Bom is null and bd.Bom = det.Item))
 					and bd.StartDate <= det.StartTime and (bd.EndDate >= det.StartTime or bd.EndDate is null))
 		group by det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, det.StartTime, i.Bom, i.LeadTime
 
-		--删除开始日期小于今天的需求
-		delete from #tempCurrentLevlProductPlan where StartTime < @DateNow
+		--如果生效时间小于今天的把开始时间设置为今天，不考虑过期的计划数，但是要考虑过期的订单数
+		update tmp set StartTime = @DateNow, WindowTime = DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow), ShipQty = 0
+		from #tempCurrentLevlProductPlan as tmp inner join Item as i on tmp.Item = i.Code
+		where tmp.StartTime < @DateNow
+		update #tempCurrentLevlProductPlan set Qty = ShipQty + OrderQty
 
 		--记录物料追溯表
 		insert into #tempProductPlanDetTrace(UUID, Flow, Item, ReqDate, ReqQty, ScrapPct, Uom, UnitQty)
@@ -229,14 +238,15 @@ BEGIN
 		from MRP_ShipPlanDet as det
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
 		inner join Item as i on det.Item = i.Code
-		inner join #tempCurrentLevlProductPlan as t on t.Item = det.Item and t.WindowTime = det.StartTime
+		inner join #tempCurrentLevlProductPlan as t on t.Item = det.Item and t.EffDate = det.StartTime
 		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily' and ISNULL(det.ShipQty, 0) <> 0
+		and DATEADD(day, -ISNULL(i.LeadTime, 0), det.StartTime) >= @DateNow
 		insert into #tempProductPlanDetTrace(UUID, Flow, Item, ReqDate, ReqQty, ScrapPct, Uom, UnitQty)
 		select t.UUID, det.Flow, det.Item, det.StartTime, ISNULL(det.OrderQty, 0), i.ScrapPct, det.Uom, det.UnitQty
 		from MRP_ShipPlanDet as det
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
 		inner join Item as i on det.Item = i.Code
-		inner join #tempCurrentLevlProductPlan as t on t.Item = det.Item and t.WindowTime = det.StartTime
+		inner join #tempCurrentLevlProductPlan as t on t.Item = det.Item and t.EffDate = det.StartTime
 		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily' and ISNULL(det.OrderQty, 0) <> 0
 		-----------------------------↑获取顶层毛需求-----------------------------
 
@@ -346,12 +356,14 @@ BEGIN
 										where ((i.Bom is not null and bd.Bom = i.Bom) or (i.Bom is null and bd.Bom = bom.Item))
 										and bd.StartDate <= @EffDate and (bd.EndDate >= @EffDate or bd.EndDate is null))
 
-						--删除开始日期小于今天的需求
-						delete from #tempTempNextLevlProductPlan where StartTime < @DateNow
+						--把开始时间小于今天把开始时间更新为今天
+						update tmp set StartTime = @DateNow, WindowTime = DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow)
+						from #tempTempNextLevlProductPlan as tmp inner join Item as i on tmp.Item = i.Code
+						where StartTime < @DateNow
 
 						--插入物料追溯表
 						insert into #tempProductPlanDetTrace(UUID, Item, ReqDate, ReqQty, Bom, RateQty, ScrapPct, Uom)
-						select pl.UUID, @Item, DATEADD(day, -ISNULL(i.LeadTime, 0), @EffDate), @BomQty, @Bom, pl.RateQty, pl.ScrapPct, pl.Uom 
+						select pl.UUID, @Item, pl.StartTime, @BomQty, @Bom, pl.RateQty, pl.ScrapPct, pl.Uom 
 						from #tempTempNextLevlProductPlan as pl
 						inner join Item as i on pl.Item = i.Code
 
@@ -562,7 +574,7 @@ BEGIN
 		end
 		-----------------------------↑生产数按包装圆整-----------------------------
 
-
+		delete from #tempProductPlanDet where Item not like '3%'
 	end try
 	begin catch
 		set @Msg = N'运行主生产计划异常：' + Error_Message()

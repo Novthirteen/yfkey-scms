@@ -7,7 +7,8 @@
     <!--Id, ShipPlanId, UUID, OrderNo, Item, StartTime, WindowTime, OrderQty, ShipQty, RecQty, CreateDate, CreateUser-->
     <property name="ShipPlanId" column="ShipPlanId" type="Int32"  />
     <property name="UUID" column="UUID" type="String" length="50" />
-		<property name="OrderNo" column="OrderNo" type="String" length="50" />
+        <property name="Flow" column="Flow" type="String" length="50" />
+        <property name="OrderNo" column="OrderNo" type="String" length="50" />
 		<property name="Item" column="Item" type="String" length="50" />
     <property name="StartTime" column="StartTime" type="DateTime"  />
     <property name="WindowTime" column="WindowTime" type="DateTime"  />
