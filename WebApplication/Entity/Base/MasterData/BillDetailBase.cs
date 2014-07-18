@@ -135,6 +135,7 @@ namespace com.Sconit.Entity.MasterData
         public String LocationFrom { get; set; }
         public String IpNo { get; set; }
         public String ReferenceItemCode { get; set; }
+        public Boolean IsProvEst { get; set; }
         #endregion
 
 		public override int GetHashCode()

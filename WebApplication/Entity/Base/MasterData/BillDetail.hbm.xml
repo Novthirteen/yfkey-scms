@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
- 	<class name="com.Sconit.Entity.MasterData.BillDetail, com.Sconit.Entity" table="BillDet" lazy="false">
-		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
-      		<generator class="identity" />
+    <class name="com.Sconit.Entity.MasterData.BillDetail, com.Sconit.Entity" table="BillDet" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
         </id>
-		<many-to-one name="Bill" column="BillNo" class="com.Sconit.Entity.MasterData.Bill, com.Sconit.Entity" cascade="none" />
-		<many-to-one name="ActingBill" column="TransId" class="com.Sconit.Entity.MasterData.ActingBill, com.Sconit.Entity" cascade="none" />
-		<property name="BilledQty" column="BilledQty" type="Decimal"  />	
-		<property name="UnitPrice" column="UnitPrice" type="Decimal"  />	
-		<many-to-one name="Currency" column="Currency" class="com.Sconit.Entity.MasterData.Currency, com.Sconit.Entity" cascade="none" />
-		<property name="Discount" column="Discount" type="Decimal" />
-		<property name="IsIncludeTax" column="IsIncludeTax" type="Boolean"  />	
-		<property name="TaxCode" column="TaxCode" type="String" length="50" />	
-		<property name="OrderAmount" column="OrderAmount" type="Decimal"  />
-    <property name="LocationFrom" column="LocFrom" type="String" length="50" />
-    <property name="IpNo" column="IpNo" type="String" length="50" />
-    <property name="ReferenceItemCode" column="RefItemCode" type="String" length="50" />
-  	</class>
+        <many-to-one name="Bill" column="BillNo" class="com.Sconit.Entity.MasterData.Bill, com.Sconit.Entity" cascade="none" />
+        <many-to-one name="ActingBill" column="TransId" class="com.Sconit.Entity.MasterData.ActingBill, com.Sconit.Entity" cascade="none" />
+        <property name="BilledQty" column="BilledQty" type="Decimal"  />
+        <property name="UnitPrice" column="UnitPrice" type="Decimal"  />
+        <many-to-one name="Currency" column="Currency" class="com.Sconit.Entity.MasterData.Currency, com.Sconit.Entity" cascade="none" />
+        <property name="Discount" column="Discount" type="Decimal" />
+        <property name="IsIncludeTax" column="IsIncludeTax" type="Boolean"  />
+        <property name="TaxCode" column="TaxCode" type="String" length="50" />
+        <property name="OrderAmount" column="OrderAmount" type="Decimal"  />
+        <property name="LocationFrom" column="LocFrom" type="String" length="50" />
+        <property name="IpNo" column="IpNo" type="String" length="50" />
+        <property name="ReferenceItemCode" column="RefItemCode" type="String" length="50" />
+        <property name="IsProvEst" column="IsProvEst" type="Boolean"  />
+    </class>
 </hibernate-mapping>
