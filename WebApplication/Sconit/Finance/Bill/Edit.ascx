@@ -112,6 +112,8 @@
             OnClick="btnSave_Click" FunctionId="EditBill" />
         <sc1:Button ID="btnSubmit" runat="server" Text="${Common.Button.Submit}" Width="59px"
             OnClick="btnSubmit_Click" FunctionId="EditBill" />
+           <sc1:Button ID="btnRecalculate" runat="server" Text="${Common.Button.Recalculate}" OnClick="btnRecalculate_Click"
+                   FunctionId="EditBill" />
         <asp:Button ID="btnPrint" runat="server" Text="${Common.Button.Print}" Width="59px"
             OnClick="btnPrint_Click" />
         <sc1:Button ID="btnDelete" runat="server" Text="${Common.Button.Delete}" Width="59px"

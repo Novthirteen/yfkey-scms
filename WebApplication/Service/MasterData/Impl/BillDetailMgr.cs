@@ -55,6 +55,7 @@ namespace com.Sconit.Service.MasterData.Impl
             billDetail.LocationFrom = actingBill.LocationFrom;
             billDetail.IpNo = actingBill.IpNo;
             billDetail.ReferenceItemCode = actingBill.ReferenceItemCode;
+            billDetail.IsProvEst = actingBill.IsProvisionalEstimate;
             if (actingBill.CurrentBillQty != (actingBill.BillQty - actingBill.BilledQty))
             {
                 //本次开票数量大于剩余数量

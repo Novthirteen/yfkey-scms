@@ -13,6 +13,7 @@ using com.Sconit.Utility;
 using com.Sconit.Service.Criteria;
 using com.Sconit.Service.MasterData;
 using NHibernate.Expression;
+using System.Linq;
 
 //TODO: Add other using statements here.
 
@@ -70,6 +71,7 @@ namespace com.Sconit.Service.MasterData.Impl
         private IPlannedBillMgr plannedBillMgr;
         private IBillTransactionMgr billTransactionMgr;
         private ICriteriaMgr criteriaMgr;
+        private IPriceListDetailMgr priceListDetailMgr;
 
         public BillMgr(IBillDao entityDao,
             IBillDetailMgr billDetailMgr,
@@ -80,7 +82,8 @@ namespace com.Sconit.Service.MasterData.Impl
               IEntityPreferenceMgr entityPreferenceMgr,
             IPlannedBillMgr plannedBillMgr,
             IBillTransactionMgr billTransactionMgr,
-            ICriteriaMgr criteriaMgr)
+            ICriteriaMgr criteriaMgr,
+            IPriceListDetailMgr priceListDetailMgr)
             : base(entityDao)
         {
             this.actingBillMgr = actingBillMgr;
@@ -92,6 +95,7 @@ namespace com.Sconit.Service.MasterData.Impl
             this.plannedBillMgr = plannedBillMgr;
             this.billTransactionMgr = billTransactionMgr;
             this.criteriaMgr = criteriaMgr;
+            this.priceListDetailMgr = priceListDetailMgr;
         }
 
         #region Customized Methods
@@ -261,11 +265,20 @@ namespace com.Sconit.Service.MasterData.Impl
                 billDetail.Bill = bill;
                 bill.AddBillDetail(billDetail);
 
+                #region 更新头上暂估表及
+                if (billDetail.IsProvEst && !bill.HasProvEst)
+                {
+                    bill.HasProvEst = true;
+                    this.UpdateBill(bill);
+                }
+                #endregion
+
                 this.billDetailMgr.CreateBillDetail(billDetail);
                 //扣减ActingBill数量和金额
                 this.actingBillMgr.ReverseUpdateActingBill(null, billDetail, user);
             }
 
+           
             return billList;
         }
 
@@ -912,6 +925,47 @@ namespace com.Sconit.Service.MasterData.Impl
                         this.ReleaseBill(bill, monitorUser);
                     }
                 }
+            }
+        }
+
+
+        [Transaction(TransactionMode.Requires)]
+        public void RecalculatePrice(string billNo, User user)
+        {
+            Bill billMstr = this.LoadBill(billNo, true);
+            IList<BillDetail> provEstBillDetList = billMstr.BillDetails.Where(p => p.IsProvEst).ToList();
+            if (provEstBillDetList != null && provEstBillDetList.Count > 0)
+            {
+               
+                foreach (BillDetail billDet in provEstBillDetList)
+                {
+                    PriceListDetail priceListDetail = null;
+
+                    priceListDetail = this.priceListDetailMgr.GetLastestPriceListDetail(billDet.ActingBill.PriceList, billDet.ActingBill.Item, billDet.ActingBill.EffectiveDate, billDet.ActingBill.Currency, billDet.ActingBill.Uom);
+                  
+
+                    if (priceListDetail != null)
+                    {
+                        billDet.UnitPrice = priceListDetail.UnitPrice;
+                        billDet.IsProvEst = priceListDetail.IsProvisionalEstimate;
+                       // billDet.last = dateTimeNow;
+                       // billDet.la.LastModifyUser = user;
+                        //是不是还要更新actbill
+                       // billDet.OrderAmount = billDet.UnitPrice * billDet.BilledQty;
+                        billDetailMgr.UpdateBillDetail(billDet);
+                    }
+                }
+
+                #region 更新头上暂估标记
+                var provEstCount = provEstBillDetList.Where(p => p.IsProvEst).Count();
+                if (provEstCount == 0)
+                {
+                    billMstr.HasProvEst = false;
+                    billMstr.LastModifyDate = DateTime.Now;
+                    billMstr.LastModifyUser = user;
+                    this.UpdateBill(billMstr);
+                }
+                #endregion
             }
         }
 
