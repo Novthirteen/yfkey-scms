@@ -254,6 +254,7 @@ namespace com.Sconit.Service.MasterData.Impl
                     bill.CreateUser = user;
                     bill.LastModifyDate = dateTimeNow;
                     bill.LastModifyUser = user;
+                    bill.HasProvEst = false;
 
                     this.CreateBill(bill);
                     billList.Add(bill);
@@ -317,6 +318,11 @@ namespace com.Sconit.Service.MasterData.Impl
                     BillDetail billDetail = this.billDetailMgr.TransferAtingBill2BillDetail(oldActingBill);
                     billDetail.Bill = oldBill;
                     oldBill.AddBillDetail(billDetail);
+
+                    if (billDetail.IsProvEst && !oldBill.HasProvEst)
+                    {
+                        oldBill.HasProvEst = true;
+                    }
 
                     this.billDetailMgr.CreateBillDetail(billDetail);
                     //扣减ActingBill数量和金额

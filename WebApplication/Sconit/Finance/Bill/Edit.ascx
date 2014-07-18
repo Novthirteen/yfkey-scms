@@ -103,6 +103,12 @@
                 <td class="td02">
                    <asp:TextBox ID="tbMemo" runat="server" Text='<%# Bind("Memo") %>' />
                 </td>
+                <td class="td01">
+                        <asp:Literal ID="Literal2" runat="server" Text="含暂估价" />
+                    </td>
+                    <td class="td02">
+                        <asp:CheckBox ID="cbHasProvEst" runat="server" Checked='<%#Bind("HasProvEst") %>' />
+                    </td>
                 </tr>
             </table>
         </EditItemTemplate>
