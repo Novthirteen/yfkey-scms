@@ -235,7 +235,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         #endregion
 
         var planByDateIndexs = pPlanDetList.GroupBy(p => p.WindowTime).OrderBy(p => p.Key);
-        var planByFlowItems = pPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item});
+        var planByFlowItems = pPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item });
 
         StringBuilder str = new StringBuilder();
         //str.Append(CopyString());
@@ -319,7 +319,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             str.Append("<td>");
             str.Append(firstPlan.MaxStock.ToString("0.##"));
             str.Append("</td>");
-            var InitStockQty = firstPlan.InitStock + firstPlan.InTransitQty+firstPlan.InspectQty;
+            var InitStockQty = firstPlan.InitStock + firstPlan.InspectQty;
             string colorStr = "";
             if (InitStockQty < firstPlan.SafeStock)
             {
@@ -365,7 +365,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             str.Append(colorStr);
             str.Append((firstPlan.InspectQty).ToString("0.##"));
             str.Append("</td>");
-            InitStockQty = InitStockQty - firstPlan.InTransitQty;
+            //InitStockQty = InitStockQty - firstPlan.InTransitQty;
             int fi = 0;
             foreach (var planByDateIndex in planByDateIndexs)
             {
@@ -477,7 +477,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
 
         #region   trace
         List<PurchasePlanDetTrace> traceList = new List<PurchasePlanDetTrace>();
-        int len=0;
+        int len = 0;
         int j = pPlanDetList.Count % 2000 == 0 ? pPlanDetList.Count / 2000 : pPlanDetList.Count / 2000 + 1;
         while (true)
         {
@@ -486,7 +486,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             len++;
             if (len == j) break;
         }
-            //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         traceList = traceList == null ? new List<PurchasePlanDetTrace>() : traceList;
 
         if (traceList != null && traceList.Count > 0)
@@ -511,7 +511,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
 
         #region  orderQty
         List<PurchasePlanOpenOrder> pPlanOpenOrderList = new List<PurchasePlanOpenOrder>();
-            //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
+        //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         len = 0;
         while (true)
         {
@@ -615,7 +615,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             str.Append("<td>");
             str.Append(firstPlan.ItemDesc);
             str.Append("</td>");
-            
+
             str.Append("<td>");
             str.Append(firstPlan.UnitCount.ToString("0.##"));
             str.Append("</td>");
@@ -625,7 +625,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             str.Append("<td>");
             str.Append(firstPlan.MaxStock.ToString("0.##"));
             str.Append("</td>");
-       
+
             foreach (var planByDateIndex in planByDateIndexs)
             {
                 // str.Append("<th >需求数</th><th >订单数</th><th >采购数</th><th >期末</th>")
@@ -760,7 +760,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             {
                 ShowErrorMessage("没有要修改的计划。");
             }
-            TheMrpMgr.UpdatePurchasePlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser,this.rbType.SelectedValue);
+            TheMrpMgr.UpdatePurchasePlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser, this.rbType.SelectedValue);
             ShowSuccessMessage("修改成功。");
             this.btnSearch_Click(null, null);
         }
@@ -772,7 +772,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         this.btSeqHidden.Value = string.Empty;
     }
 
-    
+
 
     protected void btnBack_Click(object sender, EventArgs e)
     {

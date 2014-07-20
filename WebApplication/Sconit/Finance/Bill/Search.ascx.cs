@@ -125,6 +125,11 @@ public partial class Finance_Bill_Search : SearchModuleBase
                 selectCriteria.Add(Expression.Lt("CreateDate", DateTime.Parse(endDate).AddDays(1).AddMilliseconds(-1)));
                 selectCountCriteria.Add(Expression.Lt("CreateDate", DateTime.Parse(endDate).AddDays(1).AddMilliseconds(-1)));
             }
+            if (ddlHasProvEst.SelectedValue != string.Empty)
+            {
+                selectCriteria.Add(Expression.Eq("HasProvEst", bool.Parse(ddlHasProvEst.SelectedValue)));
+                selectCountCriteria.Add(Expression.Eq("HasProvEst", bool.Parse(ddlHasProvEst.SelectedValue)));
+            }
 
             selectCriteria.Add(Expression.Eq("TransactionType", ModuleType));
             selectCountCriteria.Add(Expression.Eq("TransactionType", ModuleType));

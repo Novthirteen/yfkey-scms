@@ -50,7 +50,17 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3" />
+            <td class="td01">
+                <asp:Literal ID="ltlHasProvEst" runat="server" Text="含暂估价:" />
+            </td>
+            <td class="td02">
+                <asp:DropDownList ID="ddlHasProvEst" runat="server">
+                    <asp:ListItem Text="" Value ="" Selected="True"/>
+                    <asp:ListItem Text="仅显示含暂估" Value ="True"/>
+                    <asp:ListItem Text="仅显示不含暂估价" Value ="False"/>
+                </asp:DropDownList>
+            </td>
+            <td/>
             <td class="ttd02">
                 <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" OnClick="btnSearch_Click"
                     Width="59px" CssClass="button2" />
