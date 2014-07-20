@@ -26,7 +26,7 @@ public partial class NewMrp_ProductionPlan_Search : SearchModuleBase
         if (!IsPostBack)
         {
             this.tbCreateStartDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
-            this.tbCreateEndDate.Text = DateTime.Today.AddDays(7).ToString("yyyy-MM-dd");
+            this.tbCreateEndDate.Text = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
         }
     }
 

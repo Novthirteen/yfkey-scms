@@ -13,6 +13,9 @@ using com.Sconit.Web;
 using com.Sconit.Utility;
 using com.Sconit.Entity.Procurement;
 using System.Data.SqlClient;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using System.IO;
 
 public partial class NewMrp_ProductionPlan_DetailList : MainModuleBase
 {
@@ -286,7 +289,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             str.Append("<td>");
             str.Append(firstPlan.MaxStock.ToString("0.##"));
             str.Append("</td>");
-            var InitStockQty = firstPlan.InitStock;
+            var InitStockQty = firstPlan.InitStock + firstPlan.InspectQty;
             if (InitStockQty < firstPlan.SafeStock)
             {
                 str.Append("<td style='background:red;color:white'>");
@@ -299,7 +302,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             {
                 str.Append("<td style='background:orange'>");
             }
-            str.Append((InitStockQty).ToString("0.##"));
+            str.Append((firstPlan.InitStock).ToString("0.##"));
             str.Append("</td>");
             //str.Append("<td>");
             //str.Append((firstPlan.InTransitQty).ToString("0.##"));
@@ -318,7 +321,6 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             }
             str.Append((firstPlan.InspectQty).ToString("0.##"));
             str.Append("</td>");
-            InitStockQty = InitStockQty + firstPlan.InspectQty;
             foreach (var planByDateIndex in planByDateIndexs)
             {
                 var curenPlan = planByItem.Where(p => p.StartTime == planByDateIndex.Key);
@@ -546,4 +548,182 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             BackEvent(sender, e);
         }
     }
+
+    protected void btnExport_Click(object sender, EventArgs e)
+    {
+        var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0)
+ from  dbo.MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as m on det.ProductionPlanId=m.Id
+inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
+
+        searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
+        if (!string.IsNullOrEmpty(this.tbItemCode.Text.Trim()))
+        {
+            searchSql += string.Format(" and det.Item ='{0}' ", this.tbItemCode.Text.Trim());
+        }
+
+        if (!string.IsNullOrEmpty(currentRelesNo))
+        {
+            searchSql += string.Format(" and m.ReleaseNo ='{0}' ", currentRelesNo);
+        }
+
+        searchSql += " order by det.Item asc ";
+
+        var allResult = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
+        var productionPlanDetList = new List<ProductionPlanDet>();
+        foreach (System.Data.DataRow row in allResult.Rows)
+        {
+            productionPlanDetList.Add(new ProductionPlanDet
+            {
+                ProductionPlanId = Int32.Parse(row[0].ToString()),
+                ReleaseNo = Int32.Parse(row[1].ToString()),
+                Id = Int32.Parse(row[2].ToString()),
+                Item = row[3].ToString(),
+                ItemDesc = row[4].ToString(),
+                RefItemCode = row[5].ToString(),
+                OrgQty = Convert.ToDecimal(row[6]),
+                Qty = Convert.ToDecimal(row[7]),
+                Uom = row[8].ToString(),
+                StartTime = Convert.ToDateTime(row[9]),
+                WindowTime = Convert.ToDateTime(row[10]),
+                UUID = row[11].ToString(),
+                OrderQty = Convert.ToDecimal(row[12]),
+                InitStock = Convert.ToDecimal(row[13]),
+                SafeStock = Convert.ToDecimal(row[14]),
+                MaxStock = Convert.ToDecimal(row[15]),
+                InTransitQty = Convert.ToDecimal(row[16]),
+                InspectQty = Convert.ToDecimal(row[17]),
+                ReqQty = Convert.ToDecimal(row[18]),
+                UnitCount = Convert.ToDecimal(row[19]),
+                MinLotSize = Convert.ToDecimal(row[20]),
+            });
+        }
+        if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
+        {
+            var minStartTime = productionPlanDetList.Min(s => s.StartTime).AddDays(13);
+            productionPlanDetList = productionPlanDetList.Where(s => s.StartTime <= minStartTime).ToList();
+            IList<object> data = new List<object>();
+            data.Add(productionPlanDetList);
+            TheReportMgr.WriteToClient("ProductionPlanDaily.xls", data, "ProductionPlanDaily.xls");
+        }
+        else
+        {
+            ExportWeeklyExcel(productionPlanDetList);
+        }
+
+    }
+
+    private void ExportWeeklyExcel(IList<ProductionPlanDet> exportList)
+    {
+        HSSFWorkbook hssfworkbook = new HSSFWorkbook();
+        Sheet sheet1 = hssfworkbook.CreateSheet("sheet1");
+        MemoryStream output = new MemoryStream();
+
+        if (exportList != null && exportList.Count > 0)
+        {
+            var planByDateIndexs = exportList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
+            var planByItems = exportList.GroupBy(p => p.Item);
+            #region 写入字段
+            Row rowHeader = sheet1.CreateRow(0);
+            Row rowHeader2 = sheet1.CreateRow(1);
+            //<th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th>");
+            for (int i = 0; i < 8 + planByDateIndexs.Count() * 3; i++)
+            {
+                if (i == 0) //序号
+                {
+                    rowHeader.CreateCell(i).SetCellValue("序号");
+                }
+                else if (i == 1)    //物料号
+                {
+                    rowHeader.CreateCell(i).SetCellValue("物料号");
+                }
+                else if (i == 2)    //物料描述
+                {
+                    rowHeader.CreateCell(i).SetCellValue("物料描述");
+                }
+                else if (i == 3)      //客户零件号
+                {
+                    rowHeader.CreateCell(i).SetCellValue("客户零件号");
+                }
+                else if (i == 4)      //包装量
+                {
+                    rowHeader.CreateCell(i).SetCellValue("包装量");
+                }
+                else if (i == 5)      //经济批量
+                {
+                    rowHeader.CreateCell(i).SetCellValue("经济批量");
+                }
+                else if (i == 6)      //安全库存
+                {
+                    rowHeader.CreateCell(i).SetCellValue("安全库存");
+                }
+                else if (i == 7)      //最大库存
+                {
+                    rowHeader.CreateCell(i).SetCellValue("最大库存");
+                }
+                else
+                {
+                    foreach (var date in planByDateIndexs)
+                    {
+                        rowHeader.CreateCell(i).SetCellValue(date.Key.ToShortDateString());
+                        int i2 = i;
+                        rowHeader2.CreateCell(i2++).SetCellValue("需求数");
+                        rowHeader2.CreateCell(i2++).SetCellValue("订单数");
+                        rowHeader2.CreateCell(i2++).SetCellValue("计划数");
+                        i += 3;
+                    }
+                }
+            }
+            #endregion
+
+            #region 写入数值
+            int l = 0;
+            int rowIndex = 2;
+            foreach (var planByItem in planByItems)
+            {
+                var firstPlan = planByItem.First();
+                var planDic = planByItem.GroupBy(d => d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q => q.Qty));
+                l++;
+                Row rowDetail = sheet1.CreateRow(rowIndex);
+                int cell = 0;
+                rowDetail.CreateCell(cell++).SetCellValue(l);
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.Item);
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.ItemDesc);
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.RefItemCode);
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.UnitCount.ToString("0.##"));
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.MinLotSize.ToString("0.##"));
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.SafeStock.ToString("0.##"));
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.MaxStock.ToString("0.##"));
+                foreach (var planByDateIndex in planByDateIndexs)
+                {
+                    var curenPlan = planByItem.Where(p => p.StartTime == planByDateIndex.Key);
+                    var pdPlan = curenPlan.Count() > 0 ? curenPlan.First() : new ProductionPlanDet();
+                    var createCell = rowDetail.CreateCell(cell++);
+                    createCell.SetCellType(CellType.NUMERIC);
+                    createCell.SetCellValue(Convert.ToDouble(pdPlan.ReqQty));
+
+                    var createCell2 = rowDetail.CreateCell(cell++);
+                    createCell2.SetCellType(CellType.NUMERIC);
+                    createCell2.SetCellValue(Convert.ToDouble(pdPlan.OrderQty));
+
+                    var createShip = rowDetail.CreateCell(cell++);
+                    createShip.SetCellType(CellType.NUMERIC);
+                    createShip.SetCellValue(Convert.ToDouble(pdPlan.Qty));
+                }
+
+                rowIndex++;
+            }
+            #endregion
+
+            hssfworkbook.Write(output);
+
+            string filename = "ProductionPlanWeekly.xls";
+            Response.ContentType = "application/vnd.ms-excel";
+            Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", filename));
+            Response.Clear();
+            Response.BinaryWrite(output.GetBuffer());
+            Response.End();
+            //return File(output, contentType, exportName + "." + fileSuffiex);
+        }
+    }
+
 }

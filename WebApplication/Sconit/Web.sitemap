@@ -47,9 +47,9 @@
         <siteMapNode url="~/Main.aspx?mid=NewMrp.CustomerSchedule" title="$Resources:Language,CustomerPlan"  description="CustomerPlan" />
         <siteMapNode url="~/Main.aspx?mid=NewMrp.ShipPlan" title="$Resources:Language,ShipPlan"  description="ShipPlan" />
         <siteMapNode url="~/Main.aspx?mid=NewMrp.ProductionPlan" title="$Resources:Language,ProductPlan"  description="ProductPlan"  />
-        <siteMapNode url="~/Main.aspx?mid=NewMrp.ShiftPlan" title="$Resources:Language,ShiftPlan"  description="ShiftPlan"  />
+        <!--<siteMapNode url="~/Main.aspx?mid=NewMrp.ShiftPlan" title="$Resources:Language,ShiftPlan"  description="ShiftPlan"  />-->
         <siteMapNode url="~/Main.aspx?mid=NewMrp.PurchasePlan" title="$Resources:Language,ProcurementPlan"  description="ProcurementPlan"  />
-        <siteMapNode url="~/Main.aspx?mid=NewMrp.WeeklyPurchasePlan" title="$Resources:Language,WeeklyPurchasePlan"  description="WeeklyPurchasePlan"  />
+        <!--<siteMapNode url="~/Main.aspx?mid=NewMrp.WeeklyPurchasePlan" title="$Resources:Language,WeeklyPurchasePlan"  description="WeeklyPurchasePlan"  />-->
         <!--<siteMapNode url="~/Main.aspx?mid=NewMrp.TransferPlan" title="$Resources:Language,TransferPlan"  description="TransferPlan"  />-->
         <!--</siteMapNode>-->
       </siteMapNode>

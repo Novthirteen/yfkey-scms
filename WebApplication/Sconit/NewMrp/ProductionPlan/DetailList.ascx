@@ -37,6 +37,7 @@
             </td>
             <td class="td02">
                 <asp:Button ID="btnSearch" runat="server" Text="查询" OnClick="btnSearch_Click" />
+                    <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}"  OnClick="btnExport_Click" />
                 <asp:Button ID="btnBack" runat="server" Text=" 返回" OnClick="btnBack_Click" />
                 <%--<asp:Button ID="btnRunProdPlan" runat="server" Text="生成主生产需求" OnClick="btnRunProdPlan_Click" />--%>
             </td>
