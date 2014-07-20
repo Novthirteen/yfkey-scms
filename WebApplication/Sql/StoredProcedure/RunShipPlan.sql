@@ -231,8 +231,11 @@ BEGIN
 
 			if exists(select top 1 1 from FlowMstr where Code = @DistributionFlow and PartyTo = 'C0000008')
 			begin  --¸£ÌØ
+				declare @MaxCreateDate varchar(10) 
+				select @MaxCreateDate = MAX(CONVERT(varchar(10), CreateDate, 121)) from CustScheduleMstr where Flow = @DistributionFlow and [Type] = 'Daily'
+				 
 				delete from #tempEffCustScheduleDet where Flow = @DistributionFlow 
-				and MstrId not in (select Id from CustScheduleMstr where Flow = @DistributionFlow and CreateDate > @DateNow)
+				and MstrId not in (select Id from CustScheduleMstr where Flow = @DistributionFlow and [Type] = 'Daily' and [Status] = 'Submit' and CONVERT(varchar(10), CreateDate, 121) = @MaxCreateDate)
 				select @MinWindowTime = MIN(WindowTime), @MaxWindowTime = MAX(WindowTime) from #tempEffCustScheduleDet where Flow = @DistributionFlow
 			end
 			else
