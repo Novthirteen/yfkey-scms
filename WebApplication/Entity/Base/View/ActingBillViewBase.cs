@@ -143,7 +143,32 @@ namespace com.Sconit.Entity.View
 				_id = value;
 			}
 		}
-        
+
+        private Boolean _isProvisionalEstimate;
+        public Boolean IsProvisionalEstimate
+        {
+            get
+            {
+                return _isProvisionalEstimate;
+            }
+            set
+            {
+                _isProvisionalEstimate = value;
+            }
+        }
+
+        private Boolean _isCreateBill;
+        public Boolean IsCreateBill
+        {
+            get
+            {
+                return _isCreateBill;
+            }
+            set
+            {
+                _isCreateBill = value;
+            }
+        }
         #endregion
 
 		public override int GetHashCode()

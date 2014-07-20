@@ -1,6 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Search.ascx.cs" Inherits="Reports_ActBill_Search" %>
 <%@ Register Src="~/Controls/TextBox.ascx" TagName="textbox" TagPrefix="uc3" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ac1" %>
+<%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="cc1" %>
 <fieldset>
     <table class="mtable">
         <tr>
@@ -23,8 +24,8 @@
             </td>
             <td class="td02">
                 <uc3:textbox ID="tbParty" runat="server" Visible="true" Width="250" DescField="Name"
-                    ValueField="Code"  />
-            </td>   
+                    ValueField="Code" />
+            </td>
             <td class="td01">
                 <asp:Literal ID="lblItem" runat="server" Text="${Reports.ActBill.ItemCode}:" />
             </td>
@@ -39,8 +40,8 @@
             </td>
             <td class="td02">
                 <asp:TextBox ID="tbEffectiveDateFrom" runat="server" />
-                <ac1:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEffectiveDateFrom" Format="yyyy-MM-dd"
-                    runat="server">
+                <ac1:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEffectiveDateFrom"
+                    Format="yyyy-MM-dd" runat="server">
                 </ac1:CalendarExtender>
             </td>
             <td class="td01">
@@ -48,9 +49,27 @@
             </td>
             <td class="td02">
                 <asp:TextBox ID="tbEffectiveDateTo" runat="server" />
-                <ac1:CalendarExtender ID="CalendarExtender1" TargetControlID="tbEffectiveDateTo" Format="yyyy-MM-dd"
-                    runat="server">
+                <ac1:CalendarExtender ID="CalendarExtender1" TargetControlID="tbEffectiveDateTo"
+                    Format="yyyy-MM-dd" runat="server">
                 </ac1:CalendarExtender>
+            </td>
+        </tr>
+        <tr>
+            <td class="td01">
+                <asp:Literal ID="ltlIsProvisionalEstimate" runat="server" Text="${Reports.ActBill.IsProvisionalEstimate}:" />
+            </td>
+            <td class="td02">
+                <cc1:CodeMstrDropDownList ID="ddlIsProvisionalEstimate" Code="YesOrNo" runat="server"
+                    IncludeBlankOption="true" DefaultSelectedValue="">
+                </cc1:CodeMstrDropDownList>
+            </td>
+            <td class="td01">
+                <asp:Literal ID="ltlIsCreateBill" runat="server" Text="${Reports.ActBill.IsCreateBill}:" />
+            </td>
+            <td class="td02">
+                <cc1:CodeMstrDropDownList ID="ddlIsCreateBill" Code="YesOrNo" runat="server" IncludeBlankOption="true"
+                    DefaultSelectedValue="">
+                </cc1:CodeMstrDropDownList>
             </td>
         </tr>
         <tr>

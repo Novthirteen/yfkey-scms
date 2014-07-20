@@ -170,6 +170,17 @@ public partial class Reports_ActBill_Search : SearchModuleBase
             selectCountCriteria.Add(Expression.Le("EffectiveDate", DateTime.Parse(this.tbEffectiveDateTo.Text.Trim()).AddDays(1).AddMilliseconds(-1)));
         }
 
+        if (ddlIsProvisionalEstimate.SelectedIndex != 0)
+        {
+            selectCriteria.Add(Expression.Eq("IsProvisionalEstimate", this.ddlIsProvisionalEstimate.SelectedValue == "Y"?true:false));
+            selectCountCriteria.Add(Expression.Eq("IsProvisionalEstimate", this.ddlIsProvisionalEstimate.SelectedValue == "Y" ? true : false));
+        }
+        if (ddlIsCreateBill.SelectedIndex != 0)
+        {
+            selectCriteria.Add(Expression.Eq("IsCreateBill", this.ddlIsCreateBill.SelectedValue == "Y" ? true : false));
+            selectCountCriteria.Add(Expression.Eq("IsCreateBill", this.ddlIsCreateBill.SelectedValue == "Y" ? true : false));
+        }
+
         return new object[] { selectCriteria, selectCountCriteria, alias };
 
     }
