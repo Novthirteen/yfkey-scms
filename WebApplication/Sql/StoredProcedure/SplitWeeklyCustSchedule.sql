@@ -93,12 +93,30 @@ BEGIN
 			update #tempWeekDay set [DateDiff] = LTRIM(RTRIM([DateDiff]))
 			select @Count = COUNT(1) from #tempWeekDay
 
-			insert into #tempCustomerScheduleDet(DetId, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, UC, Location, WindowTime)
-			select det.Id, @MaxMstrId, det.Flow, mstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty / @Count, det.Uom, det.UC, det.Loc,
-			DATEADD(DAY, CASE WHEN (tmp.[DateDiff] - @DateFirst + 1) <= 0 THEN (tmp.[DateDiff] - @DateFirst + 1) + 7 ELSE (tmp.[DateDiff] - @DateFirst + 1) END - 1, det.DateFrom) 
-			from CustScheduleDet as det, FlowMstr as mstr, #tempWeekDay as tmp
-			where det.Flow = mstr.Code and ScheduleId = @MaxMstrId
-			order by det.Id, tmp.RowId
+			if exists(select top 1 1 from FlowMstr where Code = @Flow and PartyTo = 'C0000008')
+			begin  --福特
+				declare @MaxCreateDate varchar(10) 
+				select @MaxCreateDate = MAX(CONVERT(varchar(10), CreateDate, 121)) from CustScheduleMstr where Id = @MaxMstrId
+				 
+				insert into #tempCustomerScheduleDet(DetId, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, UC, Location, WindowTime)
+				select det.Id, @MaxMstrId, det.Flow, fmstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty / @Count, det.Uom, det.UC, det.Loc,
+				DATEADD(DAY, CASE WHEN (tmp.[DateDiff] - @DateFirst + 1) <= 0 THEN (tmp.[DateDiff] - @DateFirst + 1) + 7 ELSE (tmp.[DateDiff] - @DateFirst + 1) END - 1, det.DateFrom) 
+				from CustScheduleDet as det, CustScheduleMstr as mstr, FlowMstr as fmstr, #tempWeekDay as tmp
+				where det.Flow = fmstr.Code 
+				and det.ScheduleId = mstr.id
+				and CONVERT(varchar(10), mstr.CreateDate, 121) = @MaxCreateDate
+				and mstr.[Type] = 'Weekly' and mstr.[Status] = 'Submit'
+				order by det.Id, tmp.RowId
+			end
+			else
+			begin
+				insert into #tempCustomerScheduleDet(DetId, MstrId, Flow, ShipFlow, Item, ItemDesc, ItemRef, Qty, Uom, UC, Location, WindowTime)
+				select det.Id, @MaxMstrId, det.Flow, mstr.ShipFlow, det.Item, det.ItemDesc, det.ItemRef, det.Qty / @Count, det.Uom, det.UC, det.Loc,
+				DATEADD(DAY, CASE WHEN (tmp.[DateDiff] - @DateFirst + 1) <= 0 THEN (tmp.[DateDiff] - @DateFirst + 1) + 7 ELSE (tmp.[DateDiff] - @DateFirst + 1) END - 1, det.DateFrom) 
+				from CustScheduleDet as det, FlowMstr as mstr, #tempWeekDay as tmp
+				where det.Flow = mstr.Code and ScheduleId = @MaxMstrId
+				order by det.Id, tmp.RowId
+			end
 
 			--数量更新为相同日期的日计划
 			update tmp set Qty = det.Qty

@@ -103,6 +103,12 @@
                 <td class="td02">
                    <asp:TextBox ID="tbMemo" runat="server" Text='<%# Bind("Memo") %>' />
                 </td>
+                <td class="td01">
+                        <asp:Literal ID="Literal2" runat="server" Text="含暂估价" />
+                    </td>
+                    <td class="td02">
+                        <asp:CheckBox ID="cbHasProvEst" runat="server" Checked='<%#Bind("HasProvEst") %>' />
+                    </td>
                 </tr>
             </table>
         </EditItemTemplate>
@@ -112,6 +118,8 @@
             OnClick="btnSave_Click" FunctionId="EditBill" />
         <sc1:Button ID="btnSubmit" runat="server" Text="${Common.Button.Submit}" Width="59px"
             OnClick="btnSubmit_Click" FunctionId="EditBill" />
+           <sc1:Button ID="btnRecalculate" runat="server" Text="${Common.Button.Recalculate}" OnClick="btnRecalculate_Click"
+                   FunctionId="EditBill" />
         <asp:Button ID="btnPrint" runat="server" Text="${Common.Button.Print}" Width="59px"
             OnClick="btnPrint_Click" />
         <sc1:Button ID="btnDelete" runat="server" Text="${Common.Button.Delete}" Width="59px"

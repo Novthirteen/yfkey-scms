@@ -120,7 +120,7 @@ public partial class Finance_Bill_NewSearch : SearchModuleBase
         }
 
 
-        IList<ActingBill> actingBillList = TheActingBillMgr.GetActingBill(partyCode, receiver, effDateFrom, effDateTo, itemCode, currency, this.ModuleType, this.billNo);
+        IList<ActingBill> actingBillList = TheActingBillMgr.GetActingBill(partyCode, receiver, effDateFrom, effDateTo, itemCode, currency, this.ModuleType, this.billNo,null);
 
         //djin 2013-3-20 客户回单
         var hd = (from b in actingBillList

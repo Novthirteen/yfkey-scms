@@ -26,6 +26,11 @@
                         <cc1:CodeMstrLabel ID="lblStatus" runat="server" Code="Status" Value='<%# Bind("Status") %>' />
                     </ItemTemplate>
                 </asp:TemplateField>
+                 <asp:TemplateField HeaderText="含暂估价" SortExpression="HasProvEst">
+                    <ItemTemplate>
+                        <asp:CheckBox ID="cbHasProvEst" runat="server" Checked='<%#Bind("HasProvEst") %>' Disabled="true" />
+                    </ItemTemplate>
+                </asp:TemplateField>
                 <asp:TemplateField HeaderText="${Common.GridView.Action}">
                     <ItemTemplate>
                         <cc1:LinkButton ID="lbtnView" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "BillNo") %>'

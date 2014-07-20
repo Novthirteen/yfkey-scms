@@ -750,3 +750,36 @@ insert into CodeMstr values('MRPOpt', 'OrderOnly', 20, 0, '只看定单');
 insert into CodeMstr values('MRPOpt', 'PlanOnly', 30, 0, '只看计划');
 
 ------------ 以上为MRP所用！-------------
+
+---账单修改用
+
+/****** Object:  View [dbo].[ActBillView]    Script Date: 07/20/2014 19:16:56 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[ActBillView]
+AS
+SELECT     MAX(Id) AS Id, OrderNo, RecNo, ExtRecNo, TransType, BillAddr, Item, Uom, UC, EffDate, SUM(BillQty - ISNULL(BilledQty, 0)) AS Qty,Isprovest,0 as IsCreateBill
+FROM         dbo.ActBill
+WHERE     (BillQty > 0) AND (BillQty > BilledQty) OR
+                      (BillQty < 0) AND (BillQty < BilledQty)
+GROUP BY OrderNo, RecNo, ExtRecNo, TransType, BillAddr, Item, Uom, UC, EffDate,Isprovest
+
+union all
+
+SELECT     MAX(b.Id) AS Id, b.OrderNo, b.RecNo, b.ExtRecNo, m.TransType, b.BillAddr, b.Item, b.Uom, b.UC, b.EffDate,sum(d.BilledQty) as Qty,d.Isprovest,1 as IsCreateBill
+FROM         dbo.BillDet d 
+inner join dbo.BillMstr m on d.BillNo = m.BillNo
+inner join dbo.ActBill b on d.TransId = b.Id
+WHERE    m.isexport = 0 and m.TransType = 'SO' 
+GROUP BY b.OrderNo, b.RecNo, b.ExtRecNo, m.TransType, b.BillAddr, b.Item, b.Uom, b.UC, b.EffDate,d.Isprovest
+
+GO
+
+
+
+insert into  codemstr values ('YesOrNo','Y',10,1,'是')
+insert into  codemstr values ('YesOrNo','N',20,0,'否')

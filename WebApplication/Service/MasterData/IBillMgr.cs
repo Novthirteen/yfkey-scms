@@ -94,6 +94,8 @@ namespace com.Sconit.Service.MasterData
         ActingBill CreateActingBill(PlannedBill plannedBill, LocationLotDetail locationLotDetail, User user);
 
         void TryCreateBill(string customers);
+
+        void RecalculatePrice(string billNo, User user);
         #endregion Customized Methods
     }
 }

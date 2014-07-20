@@ -335,6 +335,21 @@ public partial class Finance_Bill_Edit : EditModuleBase
         }
     }
 
+    protected void btnRecalculate_Click(object sender, EventArgs e)
+    {
+        try
+        {
+           
+                TheBillMgr.RecalculatePrice(this.BillNo, this.CurrentUser);
+                this.ShowSuccessMessage("MasterData.ActingBill.Recalculate.Successfully");
+            
+        }
+        catch (BusinessErrorException ex)
+        {
+            this.ShowErrorMessage(ex);
+        }
+    }
+
     protected void AddBack_Render(object sender, EventArgs e)
     {
         this.ucNewSearch.Visible = false;
@@ -418,6 +433,8 @@ public partial class Finance_Bill_Edit : EditModuleBase
             this.btnDeleteDetail.Visible = false;
             this.btnPrint.Visible = false;
         }
+
+        this.btnRecalculate.Visible = bill.HasProvEst ? true : false; //暂估可以重新计价
         #endregion
 
         #region 根据状态隐藏/显示字段

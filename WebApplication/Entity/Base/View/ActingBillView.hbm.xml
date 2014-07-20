@@ -13,6 +13,8 @@
 		<many-to-one name="Uom" column="Uom" class="com.Sconit.Entity.MasterData.Uom, com.Sconit.Entity" cascade="none" />
 		<property name="UnitCount" column="UC" type="Decimal"  />	
 		<property name="EffectiveDate" column="EffDate" type="DateTime"  />	
-		<property name="Qty" column="Qty" type="Decimal"  />	
-  	</class>
+		<property name="Qty" column="Qty" type="Decimal"  />
+    <property name="IsProvisionalEstimate" column="IsProvEst" type="Boolean"  />
+    <property name="IsCreateBill" column="IsCreateBill" type="Boolean"  />
+  </class>
 </hibernate-mapping>

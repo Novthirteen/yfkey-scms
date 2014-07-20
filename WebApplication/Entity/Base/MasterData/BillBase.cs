@@ -235,6 +235,8 @@ namespace com.Sconit.Entity.MasterData
                 _billDetails = value;
             }
         }
+
+        public Boolean HasProvEst { get; set; }
         #endregion
 
         public override int GetHashCode()
