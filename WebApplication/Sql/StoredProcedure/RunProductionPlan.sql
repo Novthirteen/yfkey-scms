@@ -597,8 +597,8 @@ BEGIN
 		delete from MRP_ProductionPlanMstr where ReleaseNo = @ShipPlanReleaseNo
 
 		--新增主生产计划头
-		insert into MRP_ProductionPlanMstr(ReleaseNo, BatchNo, EffDate, CreateDate, CreateUser)
-		values(@ShipPlanReleaseNo, @BatchNo, @DateNow, @DateTimeNow, @RunUser)
+		insert into MRP_ProductionPlanMstr(ReleaseNo, BatchNo, EffDate, [Status], CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
+		values(@ShipPlanReleaseNo, @BatchNo, @DateNow, 'Create', @DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1)
 
 		--获取主生产计划头Id
 		set @ProductionPlanId = @@Identity
@@ -673,7 +673,6 @@ BEGIN
         end 
        
 		set @Msg = N'运行主生产计划异常' + Error_Message()
-		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
 		RAISERROR(@Msg, 16, 1) 
 	end catch 
 END 

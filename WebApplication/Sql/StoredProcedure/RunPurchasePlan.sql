@@ -252,6 +252,7 @@ BEGIN
 		select det.Item, det.ItemDesc, det.RefItemCode, (ISNULL(det.Qty, 0) + ISNULL(det.OrderQty, 0)), det.Uom, det.Uom, 1, det.StartTime
 		from MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as mstr on det.ProductionPlanId = mstr.Id
 		where mstr.Id in (select MAX(Id) from MRP_ProductionPlanMstr) and det.[Type] = 'Daily' and det.StartTime >= @DateNow
+		--where mstr.Id in (select MAX(Id) from MRP_ProductionPlanMstr and [Status] = 'Submit') and det.[Type] = 'Daily' and det.StartTime >= @DateNow
 		-----------------------------↑获取生产计划-----------------------------
 
 

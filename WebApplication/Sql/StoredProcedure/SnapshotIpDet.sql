@@ -27,9 +27,9 @@ BEGIN
             begin tran
         end
 		
-		if not exists(select top 1 1 from MRP_IpDetSnapShot) or
-			exists(select top 1 1 from MRP_IpDetSnapShot where EffDate <> @DateNow)
-		begin
+		--if not exists(select top 1 1 from MRP_IpDetSnapShot) or
+		--	exists(select top 1 1 from MRP_IpDetSnapShot where EffDate <> @DateNow)
+		--begin
 			truncate table MRP_IpDetSnapShot
 			insert into MRP_IpDetSnapShot(IpDetId, IpNo, Flow, Item, StartTime, WindowTime, Qty, EffDate)
 			select iDet.Id, imstr.IpNo, oMstr.Flow, oDet.Item, convert(varchar(10), oMstr.StartTime, 121), convert(varchar(10), oMstr.WindowTime, 121), iDet.Qty - ISNULL(iDet.RecQty, 0), @DateNow
@@ -39,7 +39,7 @@ BEGIN
 			inner join OrderDet as oDet on oTrans.OrderDetId = oDet.Id
 			inner join OrderMstr as oMstr on oDet.OrderNo = oMstr.OrderNo
 			where oMstr.[Type] in ('Procurement', 'Transfer') and iMstr.[Status] = 'Create' and iMstr.[Type] = 'Nml'
-		end
+		--end
 
 		if @trancount = 0 
 		begin  

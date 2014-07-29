@@ -45,6 +45,7 @@ BEGIN
 	
 	exec GetNextSequence 'RunShipPlan', @BatchNo output
 	begin try
+
 		create table #tempMsg
 		(
 			Lvl varchar(50) COLLATE  Chinese_PRC_CI_AS,
