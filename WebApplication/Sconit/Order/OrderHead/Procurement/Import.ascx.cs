@@ -146,7 +146,7 @@ public partial class Order_OrderHead_Procurement_Import : ModuleBase
                 orderHead.SubType = "Nml";
                 orderHead.WindowTime = windowTime;
                 orderHead.Priority = "Normal";
-                orderHead.Type = "Procurement";
+                //orderHead.Type = "Procurement";
                 orderHead.StartTime = System.DateTime.Now;
                 orderHead.IsAutoRelease = true;
                 foreach (OrderDetail det in orderHead.OrderDetails)

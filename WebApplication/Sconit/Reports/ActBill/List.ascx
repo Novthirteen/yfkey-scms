@@ -59,6 +59,10 @@
                         <asp:Label ID="lblEffectiveDate" runat="server" Text='<%# Eval("EffectiveDate")%>' />
                     </ItemTemplate>
                 </asp:TemplateField>
+                <asp:CheckBoxField DataField="IsProvisionalEstimate" HeaderText="${Reports.ActBill.IsProvisionalEstimate}"
+                    SortExpression="IsProvisionalEstimate" />
+                       <asp:CheckBoxField DataField="IsCreateBill" HeaderText="${Reports.ActBill.IsCreateBill}"
+                    SortExpression="IsCreateBill" />
             </Columns>
         </cc1:GridView>
         <cc1:GridPager ID="gp" runat="server" GridViewID="GV_List" PageSize="10">

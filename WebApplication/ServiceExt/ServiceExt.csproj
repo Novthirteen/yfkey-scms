@@ -207,6 +207,8 @@
     <Compile Include="MRP\IMrpShipPlanMgr.cs" />
     <Compile Include="MRP\IMrpShipPlanViewMgr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\Yfk\Impl\PurchasePlanDailyMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\ProductionPlanDailyMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepASNMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepBarCodeA4Mgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepBarCodeMgr.cs" />
@@ -226,6 +228,7 @@
     <Compile Include="Report\Yfk\Impl\RepRequisitionOrderInternalMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepRequisitionOrderMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepRequisitionOrderOverseaMgr.cs" />
+    <Compile Include="Report\Yfk\Impl\ShipPlanDailyMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepSHPMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepStocktakingMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepUnqualifiedGoodsMgr.cs" />

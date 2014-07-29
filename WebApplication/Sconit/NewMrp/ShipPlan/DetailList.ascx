@@ -30,9 +30,9 @@
                 路线:
             </td>
             <td class="td02">
-                <uc3:textbox ID="tbFlow" runat="server" DescField="Description" ValueField="Code"
-                    ServicePath="FlowMgr.service" MustMatch="true" Width="250" ServiceMethod="GetFlowList" />
-                  <%--  <textarea id="tbFlow" rows="2" runat="server"  style="width:200" />--%>
+            <%--    <uc3:textbox ID="tbFlow" runat="server" DescField="Description" ValueField="Code"
+                    ServicePath="FlowMgr.service" MustMatch="true" Width="250" ServiceMethod="GetFlowList" />--%>
+                    <textarea id="tbFlow" rows="2" runat="server"  style="width:200" />
             </td>
             <td class="td01">
                 物料代码
@@ -68,6 +68,7 @@
             <td class="td02">
                 <asp:Button ID="btnSearch" runat="server" Text="查询" OnClick="btnSearch_Click" />
                 <asp:Button ID="btnSave" runat="server" Text="保存" OnClick="btnSave_Click" />
+                    <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}"  OnClick="btnExport_Click" />
                 <asp:Button ID="btnBack" runat="server" Text=" 返回" OnClick="btnBack_Click" />
                 <input type="hidden" id="btSeqHidden" runat="server" />
                 <input type="hidden" id="btQtyHidden" runat="server" />
