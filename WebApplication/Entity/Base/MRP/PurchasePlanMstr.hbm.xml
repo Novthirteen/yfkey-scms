@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
-	<class name="com.Sconit.Entity.MRP.PurchasePlanMstr, com.Sconit.Entity" table="MRP_PurchasePlanMstr" lazy="false">
-		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
-			<generator class="identity" />
-		</id>
-    <!--Id, ReleaseNo, BatchNo, EffDate, Status, CreateDate, CreateUser, LastModifyDate, LastModifyUser, ReleaseDate, ReleaseUser, Version-->
-    <property name="ReleaseNo" column="ReleaseNo" type="Int32" />
-    <property name="BatchNo" column="BatchNo" type="Int32" />
-    <property name="EffDate" column="EffDate" type="DateTime"  />
-    <property name="Status" column="Status" type="String" length="50" />
-		<property name="CreateDate" column="CreateDate" type="DateTime"  />
-		<property name="CreateUser" column="CreateUser" type="String" length="50" />
-		<property name="ReleaseDate" column="ReleaseDate" type="DateTime"  />
-		<property name="ReleaseUser" column="ReleaseUser" type="String" length="50" />
-		<property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
-    <property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
-    <property name="Version" column="Version" type="Int32"  />
-  </class>
+    <class name="com.Sconit.Entity.MRP.PurchasePlanMstr, com.Sconit.Entity" table="MRP_PurchasePlanMstr" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
+        </id>
+        <version name="Version" column="Version" type="Int32" />
+        <property name="ReleaseNo" column="ReleaseNo" type="Int32" />
+        <property name="BatchNo" column="BatchNo" type="Int32" />
+        <property name="EffDate" column="EffDate" type="DateTime"  />
+        <property name="Status" column="Status" type="String" length="50" />
+        <property name="CreateDate" column="CreateDate" type="DateTime"  />
+        <property name="CreateUser" column="CreateUser" type="String" length="50" />
+        <property name="ReleaseDate" column="ReleaseDate" type="DateTime"  />
+        <property name="ReleaseUser" column="ReleaseUser" type="String" length="50" />
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+        <property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
+    </class>
 </hibernate-mapping>

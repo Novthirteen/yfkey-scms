@@ -2835,7 +2835,7 @@ namespace com.Sconit.Service.MRP.Impl
             //string[] idArr = ids.Split(',');
             string sql = string.Format(" select e from ShipPlanDet as e  where Id in ({0}) ",ids);
             IList<ShipPlanDet> getDets = this.genericMgr.FindAllWithCustomQuery<ShipPlanDet>(sql);
-            DateTime nowTime = new DateTime();
+            DateTime nowTime = System.DateTime.Now;
             if (getDets != null && getDets.Count > 0)
             {
                 var groups = getDets.GroupBy(g => new { g.Flow, g.WindowTime, g.StartTime });
@@ -2858,6 +2858,8 @@ namespace com.Sconit.Service.MRP.Impl
                     OrderHead orderHead = this.orderMgr.TransferFlow2Order(currentFlow);
                     orderHead.WindowTime = g.Key.WindowTime;
                     orderHead.StartTime = g.Key.StartTime;
+                    orderHead.SubType = "Nml";
+                    orderHead.Priority = "Normal";
                     orderHead.IsAutoRelease = true;
                     foreach (var od in orderHead.OrderDetails)
                     {

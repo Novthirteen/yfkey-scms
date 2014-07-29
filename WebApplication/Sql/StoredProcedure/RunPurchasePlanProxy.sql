@@ -25,11 +25,7 @@ BEGIN
 		exec RunPurchasePlan @RunUser
 	end try
 	begin catch
-        if @trancount = 0
-        begin
-            rollback
-        end 
-       
+		declare @Msg varchar(max)
 		set @Msg = N'运行物料需求计划异常：' + Error_Message()
 		RAISERROR(@Msg, 16, 1) 
 	end catch 

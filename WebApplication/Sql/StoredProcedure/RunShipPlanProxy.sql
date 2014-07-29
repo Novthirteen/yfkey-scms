@@ -24,11 +24,7 @@ BEGIN
 		exec RunShipPlan @RunUser
 	end try
 	begin catch
-        if @trancount = 0
-        begin
-            rollback
-        end
-       
+		declare @Msg varchar(max)
 		set @Msg = N'运行发运计划异常：' + Error_Message()
 		RAISERROR(@Msg, 16, 1) 
 	end catch 
