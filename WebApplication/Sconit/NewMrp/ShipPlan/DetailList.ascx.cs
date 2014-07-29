@@ -43,6 +43,15 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.tbFlow.Value = string.Empty;
         this.list.InnerHtml = "";
         currentRelesNo = relesNo;
+        var shipPlanMstr = TheGenericMgr.FindAllWithCustomQuery<ShipPlanMstr>(" select s from ShipPlanMstr as s where s.ReleaseNo=? ", currentRelesNo).First();
+        if (shipPlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
+        {
+            this.importDiv.Visible = false;
+        }
+        else
+        {
+            this.importDiv.Visible = true;
+        }
     }
 
     protected void btnSearch_Click(object sender, EventArgs e)
@@ -281,6 +290,10 @@ from  MRP_ShipPlanDet as det
         {
             ii++;
             str.Append("<th colspan='5'>");
+            if (shipPlanDetList.First().Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT && planByDateIndex.Key.Date==System.DateTime.Now.Date)
+            {
+                str.Append("<input type='checkbox' id='CheckAll' name='CheckAll'  onclick='doCheckAllClick()' />");
+            }
             str.Append(planByDateIndex.Key.ToString("yyyy-MM-dd"));
             str.Append("</th>");
         }
@@ -411,6 +424,10 @@ from  MRP_ShipPlanDet as det
                 else
                 {
                     str.Append("<td>");
+                    if (planByDateIndex.Key.Date == System.DateTime.Now.Date)
+                    {
+                        str.Append("<input type='checkbox' id='CheckBoxGroup' name='CheckBoxGroup' value='" + shipPlanDet.Id + "' runat='' onclick='doCheckClick()' />");
+                    }
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
@@ -1224,19 +1241,55 @@ from  MRP_ShipPlanDet as det
         }
     }
 
-    protected void btnImport_Click(object sender, EventArgs e)
+    protected void btnUpload_Click(object sender, EventArgs e)
     {
-        //try
-        //{
-        //    var dateType = (CodeMaster.TimeUnit)(int.Parse(this.rblDateType.SelectedValue));
-        //    var customerPlanList = TheMrpMgr.ReadCustomerPlanFromXls(fileUpload.PostedFile.InputStream, dateType, this.CurrentUser);
+        try
+        {
+            this.btQtyHidden.Value = string.Empty;
+            this.btSeqHidden.Value = string.Empty;
+            if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
+            {
+                var shipPlanMstr = TheGenericMgr.FindAllWithCustomQuery<ShipPlanMstr>(" select s from ShipPlanMstr as s where s.ReleaseNo=? ",currentRelesNo).First();
+                if (shipPlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
+                {
+                    throw new BusinessErrorException("已释放的发运计划不能导入。");
+                }
+                TheMrpMgr.ReadShipPlanFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser, shipPlanMstr);
+                ShowSuccessMessage("导入成功。");
+                this.btnSearch_Click(null, null);
+            }
+            else
+            {
+                throw new BusinessErrorException("只能导入日计划。");
+            }
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
+    }
 
-        //    this.ListTable(customerPlanList);
-        //}
-        //catch (BusinessErrorException ex)
-        //{
-        //    ShowErrorMessage(ex);
-        //}
+    protected void btnCreateOrder_Click(object sender, EventArgs e)
+    {
+        string ids = this.btIds.Value;
+        try
+        {
+            if (!string.IsNullOrEmpty(ids))
+            {
+                TheMrpMgr.CreateOrderByShipPlan(ids.Substring(0, ids.Length - 1), this.CurrentUser);
+                ShowSuccessMessage("发运计划生成订单成功。");
+            }
+            else
+            {
+                throw new BusinessErrorException("请选择要转订单明细。");
+            }
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex.Message);
+        }
+       
+
     }
 
 }

@@ -31,6 +31,12 @@ namespace com.Sconit.Service.MRP
         void ReadProductionPlanParametersFromXls(Stream inputStream, User user);
 
         void ReadPurchasePlanParametersFromXls(Stream inputStream, User user);
-             
+
+        void ReadShipPlanFromXls(Stream inputStream, User user, ShipPlanMstr shipPlanMstr);
+
+        void ReadPurchasePlanFromXls(Stream inputStream, User user, PurchasePlanMstr purchasePlanMstr);
+
+        void CreateOrderByShipPlan(string ids, User user);
+
     }
 }

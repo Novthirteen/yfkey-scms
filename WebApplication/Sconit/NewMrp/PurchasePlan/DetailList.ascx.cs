@@ -56,6 +56,15 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.tbFlow.Value = string.Empty;
         this.list.InnerHtml = "";
         currentRelesNo = relesNo;
+        var purchasePlanMstr = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanMstr>(" select s from PurchasePlanMstr as s where s.ReleaseNo=? ", currentRelesNo).First();
+        if (purchasePlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
+        {
+            this.importDiv.Visible = false;
+        }
+        else
+        {
+            this.importDiv.Visible = true;
+        }
     }
 
     protected void btnSearch_Click(object sender, EventArgs e)
@@ -1021,6 +1030,35 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             Response.BinaryWrite(output.GetBuffer());
             Response.End();
             //return File(output, contentType, exportName + "." + fileSuffiex);
+        }
+    }
+
+    protected void btnUpload_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            this.btQtyHidden.Value = string.Empty;
+            this.btSeqHidden.Value = string.Empty;
+            if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
+            {
+
+                var purchasePlanMstr = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanMstr>(" select s from PurchasePlanMstr as s where s.ReleaseNo=? ", currentRelesNo).First();
+                if (purchasePlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
+                {
+                    throw new BusinessErrorException("已释放的采购计划不能导入。");
+                }
+                TheMrpMgr.ReadPurchasePlanFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser, purchasePlanMstr);
+                ShowSuccessMessage("导入成功。");
+                this.btnSearch_Click(null, null);
+            }
+            else
+            {
+                throw new BusinessErrorException("只能导入日计划。");
+            }
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
         }
     }
 

@@ -42,6 +42,22 @@
                     DescField="Description" ValueField="Code" ServicePath="ItemMgr.service" ServiceMethod="GetCacheAllItem" />
             </td>
         </tr>
+        <tr id="importDiv"  runat="server">
+         <td class="td01">
+            </td>
+            <td class="td02">
+           
+            </td>
+            <td class="td01">
+                <asp:Literal ID="ltlSelect" runat="server" Text="${Common.FileUpload.PleaseSelect}:"></asp:Literal>
+            </td>
+            <td class="td02">
+                <asp:FileUpload ID="fileUpload" ContentEditable="false" runat="server" />
+                    <asp:Button ID="btnImport" runat="server" Text="${Common.Button.Import}" OnClick="btnUpload_Click"
+                        CssClass="apply" />
+            </td>
+           
+        </tr>
        <%-- <tr>
             <td class="td01">
                 发运日期 从
@@ -69,7 +85,11 @@
                 <asp:Button ID="btnSearch" runat="server" Text="查询" OnClick="btnSearch_Click" />
                 <asp:Button ID="btnSave" runat="server" Text="保存" OnClick="btnSave_Click" />
                     <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}"  OnClick="btnExport_Click" />
+                   <%-- <asp:Button ID="Button2" runat="server" Text="${Common.Button.Import}" OnClick="btnUpload_Click"
+                        CssClass="apply" />--%>
+                <asp:Button ID="btnCreateOrder" runat="server" Text="生成订单" style="display:none" OnClick="btnCreateOrder_Click" />
                 <asp:Button ID="btnBack" runat="server" Text=" 返回" OnClick="btnBack_Click" />
+                <input type="hidden" id="btIds" runat="server"  />
                 <input type="hidden" id="btSeqHidden" runat="server" />
                 <input type="hidden" id="btQtyHidden" runat="server" />
                 <%--<asp:Button ID="btnRunProdPlan" runat="server" Text="生成主生产需求" OnClick="btnRunProdPlan_Click" />--%>
@@ -88,6 +108,12 @@
     <div id="ShowIpdets" style="position:absolute; width:500px;">
     </div>
 </div>
+ <fieldset runat="server" id="fs01" visible="false">
+        <legend>文件上传</legend>
+        <table style="width: 100%" class="mtable">
+            
+        </table>
+    </fieldset>
 <script type="text/javascript">
     function doTdClick(e) {
         var htmlt = $(e).attr("tital");
@@ -216,6 +242,39 @@
         //        $("#ctl01_ucList_btHidden").val(e);
         //        document.getElementById('ctl01_ucList_btShowDetail').click();
     }
+
+    function doCheckAllClick() {
+        if ($("#CheckAll").attr("checked") == true) {
+            $("input:checkbox").attr("checked", true);
+            $("#ctl01_ucDetailList_btnCreateOrder").show();
+        }
+        else {
+            $("input:checkbox").attr("checked", false);
+            $("#ctl01_ucDetailList_btnCreateOrder").hide();
+        }
+        getCheckedValue();
+    }
+
+    function doCheckClick() {
+        var $checkRecords = $("input:checkbox[name='CheckBoxGroup']");
+        $("#CheckAll").attr("checked", $checkRecords.length == $("input:checkbox[name='CheckBoxGroup'][checked]").length);
+        if ($("input:checkbox[name='CheckBoxGroup'][checked]").length > 0) {
+            $("#ctl01_ucDetailList_btnCreateOrder").show();
+        } else {
+            $("#ctl01_ucDetailList_btnCreateOrder").hide();
+        }
+        getCheckedValue();
+    }
+
+    function getCheckedValue() {
+        var $checkRecords = $("input:checkbox[name='CheckBoxGroup'][checked]");
+        var ids = "";
+        for (var i = 0; i < $checkRecords.length; i++) {
+            ids += $($checkRecords[i]).val() + ",";
+        }
+        $("#ctl01_ucDetailList_btIds").val(ids);
+    }
+
 </script>
 <!----new-->
 <%--<script type="text/javascript">

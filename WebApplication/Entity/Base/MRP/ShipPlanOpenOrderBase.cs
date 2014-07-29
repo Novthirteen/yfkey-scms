@@ -26,6 +26,7 @@ namespace com.Sconit.Entity.MRP
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
         public string Type { get; set; }
+        public bool? IsTransferOrder { get; set; }
         
 
 		public override int GetHashCode()

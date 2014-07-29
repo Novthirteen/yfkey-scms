@@ -43,6 +43,22 @@
                     DescField="Description" ValueField="Code" ServicePath="ItemMgr.service" ServiceMethod="GetCacheAllItem" />
             </td>
         </tr>
+         <tr id="importDiv"  runat="server">
+         <td class="td01">
+            </td>
+            <td class="td02">
+           
+            </td>
+            <td class="td01">
+                <asp:Literal ID="ltlSelect" runat="server" Text="${Common.FileUpload.PleaseSelect}:"></asp:Literal>
+            </td>
+            <td class="td02">
+                <asp:FileUpload ID="fileUpload" ContentEditable="false" runat="server" />
+                    <asp:Button ID="btnImport" runat="server" Text="${Common.Button.Import}" OnClick="btnUpload_Click"
+                        CssClass="apply" />
+            </td>
+           
+        </tr>
         <tr>
             <td class="td01">
             </td>
