@@ -280,7 +280,6 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
         str.Append("</tbody></table>");
         this.list.InnerHtml = headStr + str.ToString();
     }
-
     #endregion
 
     protected void btnBack_Click(object sender, EventArgs e)
@@ -295,7 +294,8 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"  select s.ProdLine,s.Id,s.Item,s.Itemdesc,s.Qty,s.Uom,s.UC,s.PlanDate,s.Shift,isnull(t1.Qty,0) OrderQty  from MRP_ShiftPlanDet s left join (select d.Item,sum((d.OrderQty-d.RecQty)) as Qty,m.StartTime,m.Flow,m.Shift from  OrderDet d inner join OrderMstr m on m.OrderNo=d.OrderNo where m.Type='Production' and m.Status='Submit' and d.OrderQty>d.RecQty group by d.Item,m.StartTime,m.Flow,m.Shift ) t1 on s.ProdLine=t1.Flow and s.Item=t1.Item and s.Shift=t1.Shift and CONVERT(varchar(10), s.PlanDate, 121)=CONVERT(varchar(10), t1.StartTime, 121) ";
+        var searchSql = @"select m.ReleaseNo,m.Status,s.ProdLine,s.Id,s.Item,s.Itemdesc,s.Qty,s.Uom,s.UC,s.PlanDate,s.Shift,isnull(t1.Qty,0) OrderQty  from MRP_ShiftPlanDet s inner join MRP_ShiftPlanMstr m on m.Id=s.MstrId
+ left join (select d.Item,sum((d.OrderQty-d.RecQty)) as Qty,m.StartTime,m.Flow,m.Shift from  OrderDet d inner join OrderMstr m on m.OrderNo=d.OrderNo where m.Type='Production' and m.Status='Submit' and d.OrderQty>d.RecQty group by d.Item,m.StartTime,m.Flow,m.Shift ) t1 on s.ProdLine=t1.Flow and s.Item=t1.Item and s.Shift=t1.Shift and CONVERT(varchar(10), s.PlanDate, 121)=CONVERT(varchar(10), t1.StartTime, 121) where 1=1 ";
 
         if (!string.IsNullOrEmpty(this.tbItemCode.Text.Trim()))
         {
@@ -335,6 +335,7 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
                 OrderQty = Convert.ToDecimal(row[11]),
             });
         }
+        ExportExcel(planDetList);
         //if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
         //if(1==1)
         //{
@@ -351,7 +352,7 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
 
     }
 
-    private void ExportWeeklyExcel(IList<ProductionPlanDet> exportList)
+    private void ExportExcel(IList<ShiftPlanDet> exportList)
     {
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         Sheet sheet1 = hssfworkbook.CreateSheet("sheet1");
@@ -359,13 +360,14 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
 
         if (exportList != null && exportList.Count > 0)
         {
-            var planByDateIndexs = exportList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
+            var planByDateIndexs = exportList.GroupBy(p => p.PlanDate).OrderBy(p => p.Key);
             var planByItems = exportList.GroupBy(p => p.Item);
             #region 写入字段
             Row rowHeader = sheet1.CreateRow(0);
             Row rowHeader2 = sheet1.CreateRow(1);
-            //<th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th>");
-            for (int i = 0; i < 8 + planByDateIndexs.Count() * 3; i++)
+            Row rowHeader3 = sheet1.CreateRow(2);
+            //<th rowspan='3'>序号</th><th rowspan='3'>生产线</th><th rowspan='3'>物料号</th><th rowspan='3'>物料描述</th><th rowspan='3'>包装量</th><th rowspan='3'>单位</th>;
+            for (int i = 0; i < 6 + planByDateIndexs.Count() * 6; i++)
             {
                 if (i == 0) //序号
                 {
@@ -373,15 +375,15 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
                 }
                 else if (i == 1)    //物料号
                 {
-                    rowHeader.CreateCell(i).SetCellValue("物料号");
+                    rowHeader.CreateCell(i).SetCellValue("生产线");
                 }
                 else if (i == 2)    //物料描述
                 {
-                    rowHeader.CreateCell(i).SetCellValue("物料描述");
+                    rowHeader.CreateCell(i).SetCellValue("物料号");
                 }
                 else if (i == 3)      //客户零件号
                 {
-                    rowHeader.CreateCell(i).SetCellValue("客户零件号");
+                    rowHeader.CreateCell(i).SetCellValue("物料描述");
                 }
                 else if (i == 4)      //包装量
                 {
@@ -389,26 +391,31 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
                 }
                 else if (i == 5)      //经济批量
                 {
-                    rowHeader.CreateCell(i).SetCellValue("经济批量");
-                }
-                else if (i == 6)      //安全库存
-                {
-                    rowHeader.CreateCell(i).SetCellValue("安全库存");
-                }
-                else if (i == 7)      //最大库存
-                {
-                    rowHeader.CreateCell(i).SetCellValue("最大库存");
+                    rowHeader.CreateCell(i).SetCellValue("单位");
                 }
                 else
                 {
                     foreach (var date in planByDateIndexs)
                     {
                         rowHeader.CreateCell(i).SetCellValue(date.Key.ToShortDateString());
+                        int ii = i;
+                        rowHeader2.CreateCell(ii).SetCellValue("早班");
+                        ii += 2;
+                        rowHeader2.CreateCell(ii++).SetCellValue("中班");
+                        ii += 2;
+                        rowHeader2.CreateCell(ii++).SetCellValue("晚班");
+
+
                         int i2 = i;
-                        rowHeader2.CreateCell(i2++).SetCellValue("需求数");
-                        rowHeader2.CreateCell(i2++).SetCellValue("订单数");
-                        rowHeader2.CreateCell(i2++).SetCellValue("计划数");
-                        i += 3;
+                        rowHeader3.CreateCell(i2++).SetCellValue("订单数");
+                        rowHeader3.CreateCell(i2++).SetCellValue("计划数");
+
+                        rowHeader3.CreateCell(i2++).SetCellValue("订单数");
+                        rowHeader3.CreateCell(i2++).SetCellValue("计划数");
+
+                        rowHeader3.CreateCell(i2++).SetCellValue("订单数");
+                        rowHeader3.CreateCell(i2++).SetCellValue("计划数");
+                        i += 6;
                     }
                 }
             }
@@ -416,37 +423,55 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
 
             #region 写入数值
             int l = 0;
-            int rowIndex = 2;
-            foreach (var planByItem in planByItems)
+            int rowIndex = 3;
+            foreach (var planByFlowItem in planByItems)
             {
-                var firstPlan = planByItem.First();
-                var planDic = planByItem.GroupBy(d => d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q => q.Qty));
+                var firstPlan = planByFlowItem.First();
                 l++;
                 Row rowDetail = sheet1.CreateRow(rowIndex);
                 int cell = 0;
+                //<th rowspan='3'>序号</th><th rowspan='3'>生产线</th><th rowspan='3'>物料号</th><th rowspan='3'>物料描述</th><th rowspan='3'>包装量</th><th rowspan='3'>单位</th>;
                 rowDetail.CreateCell(cell++).SetCellValue(l);
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.ProdLine);
                 rowDetail.CreateCell(cell++).SetCellValue(firstPlan.Item);
                 rowDetail.CreateCell(cell++).SetCellValue(firstPlan.ItemDesc);
-                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.RefItemCode);
                 rowDetail.CreateCell(cell++).SetCellValue(firstPlan.UnitCount.ToString("0.##"));
-                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.MinLotSize.ToString("0.##"));
-                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.SafeStock.ToString("0.##"));
-                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.MaxStock.ToString("0.##"));
+                rowDetail.CreateCell(cell++).SetCellValue(firstPlan.Uom);
                 foreach (var planByDateIndex in planByDateIndexs)
                 {
-                    var curenPlan = planByItem.Where(p => p.StartTime == planByDateIndex.Key);
-                    var pdPlan = curenPlan.Count() > 0 ? curenPlan.First() : new ProductionPlanDet();
+                    var shiftplansByDate = planByFlowItem.Where(s => s.PlanDate == planByDateIndex.Key);
+                    shiftplansByDate = shiftplansByDate.Count() > 0 ? shiftplansByDate : new List<ShiftPlanDet>();
+
+                    var aShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "A");
+                    var bShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "B");
+                    var cShift = shiftplansByDate.Where(s => s.Shift.ToUpper() == "C");
+                    var shiftPA = aShift.Count() > 0 ? aShift.First() : new ShiftPlanDet { Shift = "A" };
+                    var shiftPB = bShift.Count() > 0 ? bShift.First() : new ShiftPlanDet { Shift = "B" };
+                    var shiftPC = cShift.Count() > 0 ? cShift.First() : new ShiftPlanDet { Shift = "C" };
+
                     var createCell = rowDetail.CreateCell(cell++);
                     createCell.SetCellType(CellType.NUMERIC);
-                    createCell.SetCellValue(Convert.ToDouble(pdPlan.ReqQty));
+                    createCell.SetCellValue(Convert.ToDouble(shiftPA.OrderQty));
+
+                    var createCellQty = rowDetail.CreateCell(cell++);
+                    createCellQty.SetCellType(CellType.NUMERIC);
+                    createCellQty.SetCellValue(Convert.ToDouble(shiftPA.Qty));
 
                     var createCell2 = rowDetail.CreateCell(cell++);
                     createCell2.SetCellType(CellType.NUMERIC);
-                    createCell2.SetCellValue(Convert.ToDouble(pdPlan.OrderQty));
+                    createCell2.SetCellValue(Convert.ToDouble(shiftPB.OrderQty));
 
-                    var createShip = rowDetail.CreateCell(cell++);
-                    createShip.SetCellType(CellType.NUMERIC);
-                    createShip.SetCellValue(Convert.ToDouble(pdPlan.Qty));
+                    var createCell2Qty = rowDetail.CreateCell(cell++);
+                    createCell2Qty.SetCellType(CellType.NUMERIC);
+                    createCell2Qty.SetCellValue(Convert.ToDouble(shiftPB.Qty));
+
+                    var createCell3 = rowDetail.CreateCell(cell++);
+                    createCell3.SetCellType(CellType.NUMERIC);
+                    createCell3.SetCellValue(Convert.ToDouble(shiftPC.OrderQty));
+
+                    var createCell3Qty = rowDetail.CreateCell(cell++);
+                    createCell3Qty.SetCellType(CellType.NUMERIC);
+                    createCell3Qty.SetCellValue(Convert.ToDouble(shiftPC.Qty));
                 }
 
                 rowIndex++;
@@ -455,7 +480,7 @@ public partial class NewMrp_Shift_DetailList : MainModuleBase
 
             hssfworkbook.Write(output);
 
-            string filename = "ProductionPlanWeekly.xls";
+            string filename = "ShiftPlanDetXml.xls";
             Response.ContentType = "application/vnd.ms-excel";
             Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", filename));
             Response.Clear();
