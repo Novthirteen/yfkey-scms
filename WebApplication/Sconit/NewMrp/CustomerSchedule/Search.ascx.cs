@@ -31,6 +31,7 @@ public partial class NewMrp_CustomerSchedule_Search : SearchModuleBase
             this.tbCreateStartDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
             this.tbCreateEndDate.Text = DateTime.Today.AddDays(7).ToString("yyyy-MM-dd");
         }
+        this.showTimes.Style.Value = "display:none";
     }
 
 
@@ -127,6 +128,7 @@ public partial class NewMrp_CustomerSchedule_Search : SearchModuleBase
     {
         try
         {
+
             TheMrpMgr.RunShipPlan(this.CurrentUser);
             ShowSuccessMessage("生成成功。");
         }
@@ -138,6 +140,7 @@ public partial class NewMrp_CustomerSchedule_Search : SearchModuleBase
         {
             ShowErrorMessage(ee.Message);
         }
+        this.showTimes.Style.Value = "display:none";
     }
 
 

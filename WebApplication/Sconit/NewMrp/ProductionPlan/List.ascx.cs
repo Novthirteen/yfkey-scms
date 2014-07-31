@@ -29,6 +29,7 @@ public partial class NewMrp_ProductionPlan_List : ListModuleBase
     protected void Page_Load(object sender, EventArgs e)
     {
         this.ucShowErrorMsg.BackEvent += new System.EventHandler(this.Back_Render);
+        this.showTimes.Style.Value = "display:none";
     }
 
     public override void UpdateView()
@@ -113,6 +114,7 @@ public partial class NewMrp_ProductionPlan_List : ListModuleBase
         {
             ShowErrorMessage(ee.Message);
         }
+        this.showTimes.Style.Value = "display:none";
     }
 
     protected void Back_Render(object sender, EventArgs e)
