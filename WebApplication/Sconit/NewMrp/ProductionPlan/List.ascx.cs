@@ -47,17 +47,29 @@ public partial class NewMrp_ProductionPlan_List : ListModuleBase
                 System.Web.UI.WebControls.LinkButton lbtnShowErrorMsg = e.Row.FindControl("lbtnShowErrorMsg") as System.Web.UI.WebControls.LinkButton;
                 lbtnShowErrorMsg.Visible = false;
             }
-
-            string searchSql = "select  max(releaseno) from MRP_ProductionPlanMstr ";
-            var maxReleaseNos = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-            int releaseNo = 0;
-            foreach (System.Data.DataRow row in maxReleaseNos.Rows)
+            if (m.Status != BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)
             {
-                releaseNo = Convert.ToInt32(row[0]);
+                System.Web.UI.WebControls.LinkButton lbtSubmit = e.Row.FindControl("lbtSubmit") as System.Web.UI.WebControls.LinkButton;
+                lbtSubmit.Visible = false;
             }
-            if (releaseNo == m.ReleaseNo)
+            if (m.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT)
             {
+                string searchSql = "select  max(releaseno) from MRP_ProductionPlanMstr where Status='Submit' ";
+                var maxReleaseNos = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
+                int releaseNo = 0;
+                foreach (System.Data.DataRow row in maxReleaseNos.Rows)
+                {
+                    releaseNo = Convert.ToInt32(row[0]);
+                }
+                if (releaseNo == m.ReleaseNo)
+                {
 
+                }
+                else
+                {
+                    System.Web.UI.WebControls.LinkButton lbtRunProdPlan = e.Row.FindControl("lbtRunProdPlan") as System.Web.UI.WebControls.LinkButton;
+                    lbtRunProdPlan.Visible = false;
+                }
             }
             else
             {
@@ -106,6 +118,30 @@ public partial class NewMrp_ProductionPlan_List : ListModuleBase
     protected void Back_Render(object sender, EventArgs e)
     {
         this.ucShowErrorMsg.Visible = false;
+    }
+
+   
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        string releaseNo = ((LinkButton)sender).CommandArgument;
+        IList<ProductionPlanMstr> mstr = TheGenericMgr.FindAllWithCustomQuery<ProductionPlanMstr>(string.Format(" select m from ProductionPlanMstr as m where m.Status='{0}' and ReleaseNo={1} ", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE, releaseNo));
+        if (mstr != null && mstr.Count > 0)
+        {
+            ProductionPlanMstr m = mstr.First();
+            DateTime dateNow = System.DateTime.Now;
+            m.LastModifyUser = this.CurrentUser.Code;
+            m.LastModifyDate = dateNow;
+            m.ReleaseDate = dateNow;
+            m.ReleaseUser = this.CurrentUser.Code;
+            m.Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT;
+            TheGenericMgr.Update(m);
+            ShowSuccessMessage("释放成功。");
+        }
+        else
+        {
+            ShowErrorMessage("没有需要释放的发运计划。");
+        }
     }
 
 }

@@ -11,5 +11,7 @@ namespace com.Sconit.Entity.MRP
 
         public string Status { get; set; }
         public Int32 Version { get; set; }
+        public Int32 ReleaseNo { get; set; }
+        public decimal OrderQty { get; set; }
     }
 }
