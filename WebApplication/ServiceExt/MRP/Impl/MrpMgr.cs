@@ -96,21 +96,21 @@ namespace com.Sconit.Service.MRP.Impl
 
         public void RunShipPlan(User user)
         {
-            lock (RunShipPlanLock)
+            lock (RunPlanLock)
             {
                 //RunShipPlan(DateTime.Now, user);
                 SqlParameter[] sqlParameterArr = new SqlParameter[1];
                 sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
                 sqlParameterArr[0].Value = user.Code;
-                this.genericMgr.GetDatasetByStoredProcedure("RunShipPlan", sqlParameterArr);
+                this.genericMgr.GetDatasetByStoredProcedure("RunShipPlanProxy", sqlParameterArr);
             }
         }
 
-        private static object RunProductionPlanLock = new object();
+        private static object RunPlanLock = new object();
         [Transaction(TransactionMode.Requires)]
         public void RunProductionPlan(User user)
         {
-            lock (RunProductionPlanLock)
+            lock (RunPlanLock)
             {
                 //string searchPlanSql = @"select r.Plant from MRP_ShipPlanDet as d  inner join Location as l on l.Code=d.LocFrom inner join Region as r on r.Code=l.Region group by r.Plant";
                 //var plans = this.genericMgr.GetDatasetBySql(searchPlanSql).Tables[0];
@@ -132,15 +132,14 @@ namespace com.Sconit.Service.MRP.Impl
                 SqlParameter[] sqlParameterArr = new SqlParameter[1];
                 sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
                 sqlParameterArr[0].Value = user.Code;
-                this.genericMgr.GetDatasetByStoredProcedure("RunProductionPlan", sqlParameterArr); 
+                this.genericMgr.GetDatasetByStoredProcedure("RunProductionPlanProxy", sqlParameterArr); 
                 
             }
         }
 
-        private static object RunShipPlanLock = new object();
         public void RunShipPlan(DateTime effectiveDate, User user)
         {
-            lock (RunShipPlanLock)
+            lock (RunPlanLock)
             {
                 int batchNo = int.Parse(this.numberControlMgr.GetNextSequence("RunShipPlan"));
                 DateTime dateTimeNow = DateTime.Now;
@@ -676,16 +675,15 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
 
-        private static object RunPurchasePlanLock = new object();
         [Transaction(TransactionMode.Requires)]
         public void RunMrp(User user)
         {
-            lock (RunPurchasePlanLock)
+            lock (RunPlanLock)
             {
                 SqlParameter[] sqlParameterArr = new SqlParameter[1];
                 sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
                 sqlParameterArr[0].Value = user.Code;
-                this.genericMgr.GetDatasetByStoredProcedure("RunPurchasePlan", sqlParameterArr);
+                this.genericMgr.GetDatasetByStoredProcedure("RunPurchasePlanProxy", sqlParameterArr);
 
             }
         }

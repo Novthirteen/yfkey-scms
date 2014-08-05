@@ -111,7 +111,6 @@ public partial class NewMrp_ShipPlan_List : ListModuleBase
             m.ReleaseDate = dateNow;
             m.ReleaseUser = this.CurrentUser.Code;
             m.Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT;
-            m.Version += 1;
             TheGenericMgr.Update(m);
             ShowSuccessMessage("释放成功。");
         }

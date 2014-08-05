@@ -290,9 +290,9 @@ from  MRP_ShipPlanDet as det
         {
             ii++;
             str.Append("<th colspan='5'>");
-            if (shipPlanDetList.First().Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT && planByDateIndex.Key.Date==System.DateTime.Now.Date)
+            if (shipPlanDetList.First().Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT )
             {
-                str.Append("<input type='checkbox' id='CheckAll' name='CheckAll'  onclick='doCheckAllClick()' />");
+                str.Append("<input type='checkbox' id='CheckAll' key='HeadCheck' name='" + planByDateIndex.Key.ToString("yyyyMMdd") + "'  onclick='doCheckAllClick(this)' />");
             }
             str.Append(planByDateIndex.Key.ToString("yyyy-MM-dd"));
             str.Append("</th>");
@@ -424,10 +424,10 @@ from  MRP_ShipPlanDet as det
                 else
                 {
                     str.Append("<td>");
-                    if (planByDateIndex.Key.Date == System.DateTime.Now.Date)
-                    {
-                        str.Append("<input type='checkbox' id='CheckBoxGroup' name='CheckBoxGroup' value='" + shipPlanDet.Id + "' runat='' onclick='doCheckClick()' />");
-                    }
+                    //if (planByDateIndex.Key.Date == System.DateTime.Now.Date)
+                    //{
+                    str.Append("<input type='checkbox' id='CheckBoxGroup' name='D" + planByDateIndex.Key.ToString("yyyyMMdd") + "' value='" + shipPlanDet.Id + "' runat='' onclick='doCheckClick(this)' />");
+                    //}
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
