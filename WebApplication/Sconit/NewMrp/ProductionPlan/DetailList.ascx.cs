@@ -54,11 +54,22 @@ public partial class NewMrp_ProductionPlan_DetailList : MainModuleBase
         //this.tbFlow.Text = string.Empty;
         this.list.InnerHtml = "";
         currentRelesNo = relesNo;
+        var shipPlanMstr = TheGenericMgr.FindAllWithCustomQuery<ProductionPlanMstr>(" select s from ProductionPlanMstr as s where s.ReleaseNo=? ", currentRelesNo).First();
+        if (shipPlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
+        {
+            this.importDiv.Visible = false;
+        }
+        else
+        {
+            this.importDiv.Visible = true;
+        }
     }
 
     protected void btnSearch_Click(object sender, EventArgs e)
     {
-        var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0)
+        this.btQtyHidden.Value = string.Empty;
+        this.btSeqHidden.Value = string.Empty;
+        var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0),isnull(m.Status,'Submit')
  from  dbo.MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as m on det.ProductionPlanId=m.Id
 inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
 
@@ -118,6 +129,7 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
                 ReqQty = Convert.ToDecimal(row[18]),
                 UnitCount = Convert.ToDecimal(row[19]),
                 MinLotSize = Convert.ToDecimal(row[20]),
+                Status =  row[21].ToString(),
             });
         }
         if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
@@ -218,6 +230,10 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         {
             ii++;
             str.Append("<th colspan='4'>");
+            //if (productionPlanDetList.First().Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT && planByDateIndex.Key.Date == System.DateTime.Now.Date)
+            //{
+            //    str.Append("<input type='checkbox' id='CheckAll' name='CheckAll'  onclick='doCheckAllClick()' />");
+            //}
             str.Append(planByDateIndex.Key.ToString("yyyy-MM-dd"));
             str.Append("</th>");
         }
@@ -332,9 +348,29 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
                 str.Append(pdPlan.OrderQty.ToString("0.##"));
                 str.Append("</td>");
 
-                str.Append("<td>");
-                str.Append(pdPlan.Qty.ToString("0.##"));
-                str.Append("</td>");
+                //str.Append("<td>");
+                //str.Append(pdPlan.Qty.ToString("0.##"));
+                //str.Append("</td>");
+
+                if (firstPlan.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)
+                {
+                    seq++;
+                    str.Append("<td width='30px'>");
+                    str.Append("<input  type='text'  item='" + firstPlan.Item + "'  name='UpQty' id='" + pdPlan.Id + "'value='" + pdPlan.Qty.ToString("0.##") + "' releaseNo='" + firstPlan.ReleaseNo + "'  dateFrom='" + planByDateIndex.Key + "' style='width:70px' onblur='doFocusClick(this)' seq='" + seq + "' />");
+                    str.Append("</td>");
+                }
+                else
+                {
+                    str.Append("<td>");
+                    //if (planByDateIndex.Key.Date == System.DateTime.Now.Date)
+                    //{
+                    //    str.Append("<input type='checkbox' id='CheckBoxGroup' name='CheckBoxGroup' value='" + pdPlan.Id + "' runat='' onclick='doCheckClick()' />");
+                    //}
+                    str.Append(pdPlan.Qty.ToString("0.##"));
+                    str.Append("</td>");
+                }
+
+
                 InitStockQty = InitStockQty + pdPlan.Qty-pdPlan.ReqQty+pdPlan.OrderQty;
                 if (InitStockQty < firstPlan.SafeStock)
                 {
@@ -539,8 +575,6 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
 
     #endregion
 
-
-
     protected void btnBack_Click(object sender, EventArgs e)
     {
         if (BackEvent != null)
@@ -551,6 +585,8 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
 
     protected void btnExport_Click(object sender, EventArgs e)
     {
+        this.btQtyHidden.Value = string.Empty;
+        this.btSeqHidden.Value = string.Empty;
         var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0)
  from  dbo.MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as m on det.ProductionPlanId=m.Id
 inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
@@ -725,5 +761,171 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
             //return File(output, contentType, exportName + "." + fileSuffiex);
         }
     }
+
+    protected void btnSave_Click(object sender, EventArgs e)
+    {
+        try
+        {
+
+            var allSeqArr = string.IsNullOrEmpty(this.btSeqHidden.Value) ? new string[0] : this.btSeqHidden.Value.Split(',');
+            var allShipQty = string.IsNullOrEmpty(this.btQtyHidden.Value) ? new string[0] : this.btQtyHidden.Value.Split(',');
+            string allHtml = this.list.InnerHtml;
+            IList<string> itemList = new List<string>();
+            IList<string> qtyList = new List<string>();
+            IList<string> idList = new List<string>();
+            IList<string> releaseNoList = new List<string>();
+            IList<string> dateFromList = new List<string>();
+
+            string item = string.Empty;
+            string qty = string.Empty;
+            string id = string.Empty;
+            string releaseNo = string.Empty;
+            string dateFrom = string.Empty;
+            string seq = string.Empty;
+            while (allHtml.Length > 0)
+            {
+                //int startIndex = allHtml.IndexOf("flow='");
+                //if (startIndex == -1) { allHtml = string.Empty; break; }
+                //allHtml = allHtml.Substring(startIndex + 6);
+                //int endIndex = allHtml.IndexOf("'");
+                //flow = allHtml.Substring(0, endIndex);
+
+                int startIndex = allHtml.IndexOf("item='");
+                if (startIndex == -1) { allHtml = string.Empty; break; }
+                allHtml = allHtml.Substring(startIndex + 6);
+                int endIndex = allHtml.IndexOf("'");
+                item = allHtml.Substring(0, endIndex);
+
+                startIndex = allHtml.IndexOf("id='");
+                allHtml = allHtml.Substring(startIndex + 4);
+                endIndex = allHtml.IndexOf("'");
+                id = allHtml.Substring(0, endIndex);
+
+                startIndex = allHtml.IndexOf("value='");
+                allHtml = allHtml.Substring(startIndex + 7);
+                endIndex = allHtml.IndexOf("'");
+                qty = allHtml.Substring(0, endIndex);
+
+                startIndex = allHtml.IndexOf("releaseNo='");
+                allHtml = allHtml.Substring(startIndex + 11);
+                endIndex = allHtml.IndexOf("'");
+                releaseNo = allHtml.Substring(0, endIndex);
+
+                startIndex = allHtml.IndexOf("dateFrom='");
+                allHtml = allHtml.Substring(startIndex + 10);
+                endIndex = allHtml.IndexOf("'");
+                dateFrom = allHtml.Substring(0, endIndex);
+
+                startIndex = allHtml.IndexOf("seq='");
+                allHtml = allHtml.Substring(startIndex + 5);
+                endIndex = allHtml.IndexOf("'");
+                seq = allHtml.Substring(0, endIndex);
+                if (allSeqArr.Contains(seq))
+                {
+                    int i = 0;
+                    foreach (var s in allSeqArr)
+                    {
+                        i++;
+                        if (s == seq) break;
+                    }
+                    if (allShipQty[i - 1] == qty)
+                    { }
+                    else
+                    {
+                        //flowList.Add(flow);
+                        itemList.Add(item);
+                        idList.Add(id);
+                        qtyList.Add(allShipQty[i - 1]);
+                        releaseNoList.Add(releaseNo);
+                        dateFromList.Add(dateFrom);
+                    }
+                }
+
+
+            }
+            IList<decimal> shipQtyList = new List<decimal>();
+            foreach (var q in qtyList)
+            {
+                try
+                {
+                    shipQtyList.Add(Convert.ToDecimal(q));
+                }
+                catch (Exception exc)
+                {
+                    ShowErrorMessage("数量" + q + "填写错误");
+                }
+            }
+            if (itemList.Count == 0)
+            {
+                ShowErrorMessage("没有要修改的计划。");
+            }
+            TheMrpMgr.UpdateProductionPlanQty( itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser, this.rbType.SelectedValue);
+            ShowSuccessMessage("修改成功。");
+            this.btnSearch_Click(null, null);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage(ex.Message);
+        }
+        this.btQtyHidden.Value = string.Empty;
+        this.btSeqHidden.Value = string.Empty;
+    }
+
+    protected void btnUpload_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            this.btQtyHidden.Value = string.Empty;
+            this.btSeqHidden.Value = string.Empty;
+            if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
+            {
+                var productionPlanMstr = TheGenericMgr.FindAllWithCustomQuery<ProductionPlanMstr>(" select s from ProductionPlanMstr as s where s.ReleaseNo=? ", currentRelesNo).First();
+                if (productionPlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
+                {
+                    throw new BusinessErrorException("已释放的生产计划不能导入。");
+                }
+                TheMrpMgr.ReadProductionPlanFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser, productionPlanMstr);
+                ShowSuccessMessage("导入成功。");
+                this.btnSearch_Click(null, null);
+            }
+            else
+            {
+                throw new BusinessErrorException("只能导入日计划。");
+            }
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
+    }
+
+    //protected void btnCreateOrder_Click(object sender, EventArgs e)
+    //{
+    //    string ids = this.btIds.Value;
+    //    try
+    //    {
+    //        if (!string.IsNullOrEmpty(ids))
+    //        {
+    //            TheMrpMgr.CreateOrderByProductionPlan(ids.Substring(0, ids.Length - 1), this.CurrentUser);
+    //            ShowSuccessMessage("生产计划生成订单成功。");
+    //            this.btnSearch_Click(null, null);
+    //        }
+    //        else
+    //        {
+    //            throw new BusinessErrorException("请选择要转订单明细。");
+    //        }
+    //    }
+    //    catch (BusinessErrorException ex)
+    //    {
+    //        ShowErrorMessage(ex.Message);
+    //    }
+    //    catch (Exception et)
+    //    {
+    //        ShowErrorMessage(et.Message);
+    //    }
+
+
+    //}
+
 
 }

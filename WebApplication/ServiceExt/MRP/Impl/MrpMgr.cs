@@ -96,21 +96,21 @@ namespace com.Sconit.Service.MRP.Impl
 
         public void RunShipPlan(User user)
         {
-            lock (RunShipPlanLock)
+            lock (RunPlanLock)
             {
                 //RunShipPlan(DateTime.Now, user);
                 SqlParameter[] sqlParameterArr = new SqlParameter[1];
                 sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
                 sqlParameterArr[0].Value = user.Code;
-                this.genericMgr.GetDatasetByStoredProcedure("RunShipPlan", sqlParameterArr);
+                this.genericMgr.GetDatasetByStoredProcedure("RunShipPlanProxy", sqlParameterArr);
             }
         }
 
-        private static object RunProductionPlanLock = new object();
+        private static object RunPlanLock = new object();
         [Transaction(TransactionMode.Requires)]
         public void RunProductionPlan(User user)
         {
-            lock (RunProductionPlanLock)
+            lock (RunPlanLock)
             {
                 //string searchPlanSql = @"select r.Plant from MRP_ShipPlanDet as d  inner join Location as l on l.Code=d.LocFrom inner join Region as r on r.Code=l.Region group by r.Plant";
                 //var plans = this.genericMgr.GetDatasetBySql(searchPlanSql).Tables[0];
@@ -132,15 +132,14 @@ namespace com.Sconit.Service.MRP.Impl
                 SqlParameter[] sqlParameterArr = new SqlParameter[1];
                 sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
                 sqlParameterArr[0].Value = user.Code;
-                this.genericMgr.GetDatasetByStoredProcedure("RunProductionPlan", sqlParameterArr); 
+                this.genericMgr.GetDatasetByStoredProcedure("RunProductionPlanProxy", sqlParameterArr); 
                 
             }
         }
 
-        private static object RunShipPlanLock = new object();
         public void RunShipPlan(DateTime effectiveDate, User user)
         {
-            lock (RunShipPlanLock)
+            lock (RunPlanLock)
             {
                 int batchNo = int.Parse(this.numberControlMgr.GetNextSequence("RunShipPlan"));
                 DateTime dateTimeNow = DateTime.Now;
@@ -676,16 +675,15 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
 
-        private static object RunPurchasePlanLock = new object();
         [Transaction(TransactionMode.Requires)]
         public void RunMrp(User user)
         {
-            lock (RunPurchasePlanLock)
+            lock (RunPlanLock)
             {
                 SqlParameter[] sqlParameterArr = new SqlParameter[1];
                 sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
                 sqlParameterArr[0].Value = user.Code;
-                this.genericMgr.GetDatasetByStoredProcedure("RunPurchasePlan", sqlParameterArr);
+                this.genericMgr.GetDatasetByStoredProcedure("RunPurchasePlanProxy", sqlParameterArr);
 
             }
         }
@@ -1153,6 +1151,7 @@ namespace com.Sconit.Service.MRP.Impl
         public void UpdateShipPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList,IList<string> dateFrom,User user,string type)
         {
             var dateTimeNow=System.DateTime.Now;
+            Random r = new Random();
             for (int i = 0; i < idList.Count; i++)
             {
                 int id = int.Parse(idList[i]);
@@ -1186,12 +1185,65 @@ namespace com.Sconit.Service.MRP.Impl
                         newShipPlanDet.Version = 1;
                         newShipPlanDet.Id = 0;
                         newShipPlanDet.Type=type;
+                        newShipPlanDet.UUID = System.DateTime.Now.ToString() + r.Next(100, 500) + r.Next(511, 1000);
                         this.genericMgr.Create(newShipPlanDet);
                     }
                 }
                 else
                 {
-                    this.genericMgr.ExecuteSql(string.Format(" update MRP_ShipPlanDet set ShipQty={0},Version=Version+1 where id={1} ",qtyList[i],id));
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_ShipPlanDet set ShipQty={0},Version=Version+1,LastModifyDate='{2}',LastModifyUser='{3}' where id={1} ", qtyList[i], id,dateTimeNow,user.Code));
+                }
+            }
+        }
+        #endregion
+
+        #region    修改生产计划
+        [Transaction(TransactionMode.Requires)]
+        public void UpdateProductionPlanQty(IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, string type)
+        {
+            var dateTimeNow = System.DateTime.Now;
+            for (int i = 0; i < idList.Count; i++)
+            {
+                int id = int.Parse(idList[i]);
+                if (id == 0)
+                {
+                    IList<ProductionPlanMstr> pMaster = this.genericMgr.FindAllWithCustomQuery<ProductionPlanMstr>(" select m from ProductionPlanMstr as m where m.ReleaseNo=? ", new object[] { releaseNoList[i] });
+                    IList<ProductionPlanDet> searchPlandets = this.genericMgr.FindAllWithCustomQuery<ProductionPlanDet>(" select d from ProductionPlanDet as d where d.Item=? and d.ShipPlanId=? ", new object[] {  itemList[i], pMaster.First().Id });
+                    if (searchPlandets != null && searchPlandets.Count > 0)
+                    {
+                        Random r = new Random();
+                        //Id, ProductionPlanId, Type, UUID, Item, ItemDesc, RefItemCode, ReqQty, OrgQty, Qty, 
+                        //OrderQty, Uom, UC, MinLotSize, StartTime, WindowTime, CreateDate, CreateUser, LastModifyUser, LastModifyDate, Version
+                        var first = searchPlandets.First();
+                        ProductionPlanDet newShipPlanDet = new ProductionPlanDet();
+                        newShipPlanDet.ProductionPlanId = first.ProductionPlanId;
+                        newShipPlanDet.UUID = System.DateTime.Now.ToString() + r.Next(100,500)+r.Next(511,1000);
+                        newShipPlanDet.Type = type;
+                        newShipPlanDet.Item = first.Item;
+                        newShipPlanDet.ItemDesc = first.ItemDesc;
+                        newShipPlanDet.RefItemCode = first.RefItemCode;
+
+                        newShipPlanDet.ReqQty = 0;
+                        newShipPlanDet.OrgQty = 0;
+                        newShipPlanDet.Qty = Convert.ToDecimal(qtyList[i]);
+                        newShipPlanDet.OrderQty = 0;
+                        newShipPlanDet.Uom = first.Uom;
+                        newShipPlanDet.UnitCount = first.UnitCount;
+                        newShipPlanDet.MinLotSize = first.MinLotSize;
+                        newShipPlanDet.WindowTime = Convert.ToDateTime(dateFrom[i]);
+                        newShipPlanDet.StartTime = Convert.ToDateTime(dateFrom[i]);
+                        newShipPlanDet.CreateDate = dateTimeNow;
+                        newShipPlanDet.CreateUser = user.Code;
+                        newShipPlanDet.LastModifyDate = dateTimeNow;
+                        newShipPlanDet.LastModifyUser = user.Code;
+                        newShipPlanDet.Version = 1;
+                        newShipPlanDet.Id = 0;
+                        this.genericMgr.Create(newShipPlanDet);
+                    }
+                }
+                else
+                {
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_ProductionPlanDet set Qty={0},Version=Version+1,LastModifyDate='{2}',LastModifyUser='{3}' where id={1} ", qtyList[i], id, dateTimeNow, user.Code));
                 }
             }
         }
@@ -1202,6 +1254,7 @@ namespace com.Sconit.Service.MRP.Impl
         public void UpdatePurchasePlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user,string type)
         {
             var dateTimeNow = System.DateTime.Now;
+            Random r = new Random();
             for (int i = 0; i < idList.Count; i++)
             {
                 int id = int.Parse(idList[i]);
@@ -1235,12 +1288,13 @@ namespace com.Sconit.Service.MRP.Impl
                         newPlan.Version = 1;
                         newPlan.Id = 0;
                         newPlan.Type = type;
+                        newPlan.UUID = System.DateTime.Now.ToString() + r.Next(100, 500) + r.Next(511, 1000);
                         this.genericMgr.Create(newPlan);
                     }
                 }
                 else
                 {
-                    this.genericMgr.ExecuteSql(string.Format(" update MRP_PurchasePlanDet set PurchaseQty={0},Version=Version+1 where id={1} ", qtyList[i], id));
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_PurchasePlanDet set PurchaseQty={0},Version=Version+1,LastModifyDate='{2}',LastModifyUser='{3}' where id={1} ", qtyList[i], id, dateTimeNow, user.Code));
                 }
             }
         }
@@ -1294,6 +1348,50 @@ namespace com.Sconit.Service.MRP.Impl
         }
         #endregion
 
+        
+        #region    修改班产计划
+        [Transaction(TransactionMode.Requires)]
+        public void UpdateShiftPlanPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, IList<string> shiftCodeList)
+        {
+            var dateTimeNow = System.DateTime.Now;
+            Random r = new Random();
+            for (int i = 0; i < idList.Count; i++)
+            {
+                int id = int.Parse(idList[i]);
+                if (id == 0)
+                {
+                    IList<ShiftPlanMstr> pMaster = this.genericMgr.FindAllWithCustomQuery<ShiftPlanMstr>(" select m from ShiftPlanMstr as m where m.ReleaseNo=? ", new object[] { releaseNoList[i] });
+                    IList<ShiftPlanDet> searchPlandets = this.genericMgr.FindAllWithCustomQuery<ShiftPlanDet>(" select d from ShiftPlanDet as d where d.ProdLine=? and d.Item=? and d.MstrId=? ", new object[] { flowList[i], itemList[i], pMaster.First().Id });
+                    if (searchPlandets != null && searchPlandets.Count > 0)
+                    {
+                        //Id, PurchasePlanId, UUID, Flow, Item, ItemDesc, RefItemCode, ReqQty, OrgPurchaseQty, 
+                        //PurchaseQty, Uom, BaseUom, UnitQty, UC, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version
+                        var first = searchPlandets.First();
+                        ShiftPlanDet shiftPlan = new ShiftPlanDet();
+                        shiftPlan.MstrId = first.MstrId;
+                        shiftPlan.ProdLine = first.ProdLine;
+                        shiftPlan.Item = first.Item;
+                        shiftPlan.ItemDesc = first.ItemDesc;
+                        shiftPlan.Qty = Convert.ToDecimal(qtyList[i]);
+                        shiftPlan.Uom = first.Uom;
+                        shiftPlan.UnitCount = first.UnitCount;
+                        shiftPlan.PlanDate = Convert.ToDateTime(dateFrom[i]);
+                        shiftPlan.Shift = shiftCodeList[i];
+                        shiftPlan.CreateDate = dateTimeNow;
+                        shiftPlan.CreateUser = user.Code;
+                        shiftPlan.LastModifyDate = dateTimeNow;
+                        shiftPlan.LastModifyUser = user.Code;
+                        this.genericMgr.Create(shiftPlan);
+                    }
+                }
+                else
+                {
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_ShiftPlanDet set Qty={0},LastModifyDate='{2}',LastModifyUser='{3}' where id={1} ", qtyList[i], id, dateTimeNow, user.Code));
+                }
+            }
+        }
+        #endregion
+
         #region    Import ShiftPlan
         private static object readShiftPlanFromXlsLock = new object();
         [Transaction(TransactionMode.Requires)]
@@ -1302,7 +1400,7 @@ namespace com.Sconit.Service.MRP.Impl
             lock (readShiftPlanFromXlsLock)
             {
                 DateTime startDate = DateTime.Today;
-                DateTime endDate = DateTime.Today.AddDays(30);
+                DateTime endDate = DateTime.Today.AddDays(13);
                 List<ShiftPlanDet> shiftPlanList = new List<ShiftPlanDet>();
                 IList<Shift> shifts = shiftMgr.GetAllShift();
                 if (inputStream.Length == 0)
@@ -1317,18 +1415,17 @@ namespace com.Sconit.Service.MRP.Impl
                 ImportHelper.JumpRows(rows, 2);
 
                 #region 列定义
-                int colFlow = 0;//生产线
-                int colItem = 1;//物料代码
+                int colFlow = 1;//生产线
+                int colItem = 2;//物料代码
                 #endregion
 
-                var flowCodes = this.genericMgr.GetDatasetBySql(" select Code,desc1 from flowmstr  where [Type]='Production' ").Tables[0];
-                IList<object[]> flowCodeList = new List<object[]>();
-                foreach (System.Data.DataRow flowRow in flowCodes.Rows)
+                var parameters = this.genericMgr.GetDatasetBySql(" select d.Flow,d.Item,i.Desc1,d.uom,d.uc from FlowDet d inner join FlowMstr m on d.Flow=m.Code inner join Item i on i.Code=d.Item where m.Type='Production' ").Tables[0];
+                IList<object[]> parameterList = new List<object[]>();
+                foreach (System.Data.DataRow flowRow in parameters.Rows)
                 {
-                    flowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString() });
+                    parameterList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2].ToString(), flowRow[3].ToString(), Convert.ToDecimal(flowRow[4].ToString()) });
                 }
-                //var flowDic = this.flowMgr.GetAllFlow().Where(p => p.Type == BusinessConstants.CODE_MASTER_FLOW_TYPE_VALUE_PRODUCTION)
-                //   .ToDictionary(d => d.Code, d => d);
+
                 while (rows.MoveNext())
                 {
                     HSSFRow row = (HSSFRow)rows.Current;
@@ -1348,9 +1445,9 @@ namespace com.Sconit.Service.MRP.Impl
                         //throw new BusinessErrorException("Import.PSModel.Empty.Error.Flow", (row.RowNum + 1).ToString());
                     }
 
-                    if (flowCodeList.Where(d => (d[0]).ToString() == flowCode).Count() == 0)
+                    if (parameterList.Where(d => (d[0]).ToString().ToUpper() == flowCode.ToUpper()).Count() == 0)
                     {
-                        throw new BusinessErrorException(string.Format("生产线{0}不存在,请注意,区分大小写:{1}", flowCode, (row.RowNum + 1).ToString()));
+                        throw new BusinessErrorException(string.Format("第{0}行：生产线{1}不存在", (row.RowNum + 1).ToString(), flowCode));
                     }
                     #endregion
 
@@ -1362,6 +1459,13 @@ namespace com.Sconit.Service.MRP.Impl
                         {
                             throw new BusinessErrorException("Import.PSModel.Empty.Error.ItemCode", (row.RowNum + 1).ToString());
                         }
+                        else
+                        {
+                            if (parameterList.Where(d => (d[0]).ToString().ToUpper() == flowCode.ToUpper() && (d[1]).ToString().ToUpper() == itemCode.ToUpper()).Count() == 0)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行：生产线{1}与物料{2}不匹配。", (row.RowNum + 1).ToString(), flowCode, itemCode));
+                            }
+                        }
                     }
                     catch
                     {
@@ -1370,12 +1474,12 @@ namespace com.Sconit.Service.MRP.Impl
                     #endregion
 
                     #region
-                    int startColIndex = 2;
+                    int startColIndex = 4;
+                    var parameter = parameterList.Where(d => (d[0]).ToString().ToUpper() == flowCode.ToUpper() && (d[1]).ToString().ToUpper() == itemCode.ToUpper()).First();
+                    DateTime planDate = DateTime.Now;
                     while (true)
                     {
                         Cell dateCell = dateRow.GetCell(startColIndex);
-
-                        DateTime planDate = DateTime.Now;
                         if (dateCell == null)
                         {
                             break;
@@ -1404,37 +1508,85 @@ namespace com.Sconit.Service.MRP.Impl
                         {
                             break;
                         }
-                        for (int i = 0; i < 3; i++)
-                        {
-                            string shiftName = ImportHelper.GetCellStringValue(shiftRow.GetCell(startColIndex));
-                            string qty_ = ImportHelper.GetCellStringValue(row.GetCell(startColIndex));
-                            startColIndex++;
-                            var shift = shifts.FirstOrDefault(s => StringHelper.Eq(s.ShiftName, shiftName));
-                            if (shift == null)
-                            {
-                                continue;
-                            }
-                            decimal planQty = 0;
-                            if (qty_ != null)
-                            {
-                                bool isSuccess = decimal.TryParse(qty_, out planQty);
-                                if (!isSuccess)
-                                {
-                                    throw new BusinessErrorException(string.Format("数量输入有误,行{0}", (row.RowNum + 1).ToString()));
-                                }
 
-                                if (planQty < 0)
-                                {
-                                    throw new BusinessErrorException(string.Format("班产计划数量不能小于0,行:{0}", (row.RowNum + 1).ToString()));
-                                }
-                                ShiftPlanDet shiftPlan = new ShiftPlanDet();
-                                shiftPlan.ProdLine = flowCode;
-                                shiftPlan.Item = itemCode;
-                                shiftPlan.Qty = planQty;
-                                shiftPlan.PlanDate = planDate;
-                                shiftPlan.Shift = shift.Code;
-                                shiftPlanList.Add(shiftPlan);
+                        string qty_a = ImportHelper.GetCellStringValue(row.GetCell(startColIndex++));
+                        string qty_b = ImportHelper.GetCellStringValue(row.GetCell(startColIndex++));
+                        string qty_c = ImportHelper.GetCellStringValue(row.GetCell(startColIndex++));
+
+                        decimal planQty = 0;
+                        if (qty_a != null)
+                        {
+                            bool isSuccess = decimal.TryParse(qty_a, out planQty);
+                            if (!isSuccess)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行:早班数量{1}输入有误", (row.RowNum + 1).ToString()));
                             }
+
+                            if (planQty < 0)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行:班产计划数量不能小于0", (row.RowNum + 1).ToString()));
+                            }
+                            //Id, MstrId, ProdLine, Item, ItemDesc, Qty, , Uom, UnitCount, PlanDate, Shift, CreateDate, CreateUser, LastModifyDate, LastModifyUser
+                            ShiftPlanDet shiftPlan = new ShiftPlanDet();
+                            shiftPlan.ProdLine = flowCode;
+                            shiftPlan.Item = parameter[1].ToString();
+                            shiftPlan.ItemDesc = parameter[2].ToString();
+                            shiftPlan.Qty = planQty;
+                            shiftPlan.Uom = parameter[3].ToString();
+                            shiftPlan.UnitCount = Convert.ToDecimal(parameter[4]);
+                            shiftPlan.PlanDate = planDate;
+                            shiftPlan.Shift = "A";
+                            shiftPlanList.Add(shiftPlan);
+                        }
+
+                        if (qty_b != null)
+                        {
+                            bool isSuccess = decimal.TryParse(qty_b, out planQty);
+                            if (!isSuccess)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行:中班数量{1}输入有误", (row.RowNum + 1).ToString()));
+                            }
+
+                            if (planQty < 0)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行:班产计划数量不能小于0", (row.RowNum + 1).ToString()));
+                            }
+                            //Id, MstrId, ProdLine, Item, ItemDesc, Qty, , Uom, UnitCount, PlanDate, Shift, CreateDate, CreateUser, LastModifyDate, LastModifyUser
+                            ShiftPlanDet shiftPlan = new ShiftPlanDet();
+                            shiftPlan.ProdLine = flowCode;
+                            shiftPlan.Item = parameter[1].ToString();
+                            shiftPlan.ItemDesc = parameter[2].ToString();
+                            shiftPlan.Qty = planQty;
+                            shiftPlan.Uom = parameter[3].ToString();
+                            shiftPlan.UnitCount = Convert.ToDecimal(parameter[4]);
+                            shiftPlan.PlanDate = planDate;
+                            shiftPlan.Shift = "B";
+                            shiftPlanList.Add(shiftPlan);
+                        }
+
+                        if (qty_c != null)
+                        {
+                            bool isSuccess = decimal.TryParse(qty_c, out planQty);
+                            if (!isSuccess)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行:晚班数量{1}输入有误", (row.RowNum + 1).ToString()));
+                            }
+
+                            if (planQty < 0)
+                            {
+                                throw new BusinessErrorException(string.Format("第{0}行:班产计划数量不能小于0", (row.RowNum + 1).ToString()));
+                            }
+                            //Id, MstrId, ProdLine, Item, ItemDesc, Qty, , Uom, UnitCount, PlanDate, Shift, CreateDate, CreateUser, LastModifyDate, LastModifyUser
+                            ShiftPlanDet shiftPlan = new ShiftPlanDet();
+                            shiftPlan.ProdLine = flowCode;
+                            shiftPlan.Item = parameter[1].ToString();
+                            shiftPlan.ItemDesc = parameter[2].ToString();
+                            shiftPlan.Qty = planQty;
+                            shiftPlan.Uom = parameter[3].ToString();
+                            shiftPlan.UnitCount = Convert.ToDecimal(parameter[4]);
+                            shiftPlan.PlanDate = planDate;
+                            shiftPlan.Shift = "C";
+                            shiftPlanList.Add(shiftPlan);
                         }
                     }
                     #endregion
@@ -1444,86 +1596,49 @@ namespace com.Sconit.Service.MRP.Impl
                     throw new BusinessErrorException("Import.Result.Error.ImportNothing");
                 }
 
-                List<string> errorMessages = new List<string>();
-                var groupShiftPlanByFlow = shiftPlanList.GroupBy(p => p.ProdLine);
-                foreach (var groupShiftPlan in groupShiftPlanByFlow)
-                {
-                    var flowDetails = this.GetFlowDetails(groupShiftPlan.Key);
-                    foreach (var shiftPlan in groupShiftPlan)
-                    {
-                        var checkeFdets = flowDetails.Where(p => p.Item.Code == shiftPlan.Item);
-                        var flowDetail = flowDetails == null ? null : flowDetails.First();
-                        if (flowDetail != null)
-                        {
-                            shiftPlan.ItemDesc = flowDetail.Item.Description;
-                            shiftPlan.RefItemCode = flowDetail.ReferenceItemCode;
-                            shiftPlan.Uom = flowDetail.Uom.Code;
-                            shiftPlan.UnitQty = uomConversionMgr.ConvertUomQty(flowDetail.Item.Code, flowDetail.Uom, 1, flowDetail.Item.Uom);
-                        }
-                        else
-                        {
-                            errorMessages.Add(string.Format("没有找到路线{0}中匹配的物料{1}", shiftPlan.ProdLine, shiftPlan.Item));
-                        }
-                    }
-                }
-
-                if (errorMessages.Count > 0)
-                {
-                    throw new BusinessErrorException(string.Format("导入时出现错误:{0}", string.Join(",", errorMessages.Distinct().ToArray())));
-                }
 
                 var planDateList = shiftPlanList.Select(p => p.PlanDate.ToString("yyyy-MM-dd")).Distinct().ToArray();
 
-                string sql = string.Format(" Delete MRP_ShiftPlanDet  where exists(select 1 from MRP_ShiftPlanMstr as m where m.Id=PlanId and m.Status='Create') and ProdLine in ('{0}');delete MRP_ShiftPlanMstr where Status='Create' and ProdLine in ('{0}') ", string.Join("','", shiftPlanList.Select(p => p.ProdLine).Distinct().ToArray()));
+                string sql = string.Format(" Delete MRP_ShiftPlanDet  where exists(select 1 from MRP_ShiftPlanMstr as m where m.Id=MstrId and m.Status='Create') and CreateUser ='{0}';delete MRP_ShiftPlanMstr where Status='Create' and  CreateUser ='{0}' ", user.Code);
                 this.genericMgr.ExecuteSql(sql, null);
                 //Dictionary<string, int> planVersions = new Dictionary<string, int>();
                 //foreach (var allFlowCode in shiftPlanList.Select(p => p.ProdLine).Distinct())
                 //{
                 //    planVersions.Add(allFlowCode, numberControlMgr.GenerateNumberNextSequence(string.Format("MRP_ShiftPlan_{0}", allFlowCode)));
                 //}
+                var batchNo = numberControlMgr.GenerateNumberNextSequence(string.Format("MRP_ShiftPlan_{0}", user.Code));
+                string createUsersSql = "select isnull(Max(ReleaseNo),0) from  MRP_ShiftPlanMstr ";
 
-                string searchVersions = "select ProdLine,Max(Version) from  MRP_ShiftPlanMstr group by  ProdLine";
-
-                var versions = this.genericMgr.GetDatasetBySql(searchVersions).Tables[0];
-                Dictionary<string, int> planVersions = new Dictionary<string, int>();
-                foreach (System.Data.DataRow row in versions.Rows)
+                var createUsers = this.genericMgr.GetDatasetBySql(createUsersSql).Tables[0];
+                var releasNo = 0;
+                foreach (System.Data.DataRow row in createUsers.Rows)
                 {
-                    planVersions.Add(row[0].ToString(),int.Parse(row[1].ToString()));
+                    releasNo=int.Parse(row[0].ToString());
                 }
                 var groupByFlow = shiftPlanList.GroupBy(g => g.ProdLine);
-                foreach (var gb in groupByFlow)
-                {
-                    DateTime dateNow = System.DateTime.Now;
-                    var version=planVersions.Keys.Contains(gb.First().ProdLine)? planVersions[gb.First().ProdLine]+1:1;
-                    ShiftPlanMstr m = new ShiftPlanMstr(); 
-                    m.RefPlanNo= gb.First().ProdLine+"-"+version.ToString().PadLeft(3,'0');
-                    m.ProdLine = gb.First().ProdLine;
-                    m.Status= "Create";
-                    m.CreateDate = dateNow;
-                    m.CreateUser= user.Code;
-                    m.LastModifyDate = dateNow;
-                    m.LastModifyUser = user.Code;
-                    m.Version = version;
-                    this.genericMgr.Create(m);
 
-                    foreach (var g in gb)
-                    {
-                        g.PlanId = m.Id;
-                        g.RefPlanNo = m.RefPlanNo;
-                        g.ProdLine = m.ProdLine;
-                        g.CreateDate = dateNow;
-                        g.CreateUser = user.Code;
-                        this.genericMgr.Create(g);
-                    }
+                DateTime dateNow = System.DateTime.Now;
+                ShiftPlanMstr m = new ShiftPlanMstr();
+                m.Status = "Create";
+                m.CreateDate = dateNow;
+                m.CreateUser = user.Code;
+                m.LastModifyDate = dateNow;
+                m.LastModifyUser = user.Code;
+                m.ReleaseNo = releasNo + 1;
+                m.BatchNo = batchNo;
+                this.genericMgr.Create(m);
+
+                foreach (var g in shiftPlanList)
+                {
+                    g.MstrId = m.Id;
+                    g.CreateDate = dateNow;
+                    g.CreateUser = user.Code;
+                    g.LastModifyDate = dateNow;
+                    g.LastModifyUser = user.Code;
+                    this.genericMgr.Create(g);
                 }
                 return shiftPlanList;
             }
-        }
-
-        private IList<FlowDetail> GetFlowDetails(string flowCode)
-        {
-            var flowMaster = this.genericMgr.FindById<Flow>(flowCode);
-            return flowMaster.FlowDetails;
         }
 
         #endregion
@@ -2420,6 +2535,9 @@ namespace com.Sconit.Service.MRP.Impl
                     try
                     {
                         int i = 11;
+                        Random r = new Random();
+                        int t = r.Next(0,300);
+                        int tt = r.Next(500,1000);
                         while(true)
                         {
                             if (i >81)
@@ -2545,7 +2663,7 @@ namespace com.Sconit.Service.MRP.Impl
                                     nDet.Version =1;
                                     nDet.OrgShipQty = 0;
                                     nDet.ReqQty = 0;
-                                    nDet.UUID = string.Empty;
+                                    nDet.UUID = System.DateTime.Now.ToString() + t++ + tt++;
                                     nDet.OrderQty = 0;
                                     nDet.Type = "Daily";
                                     shipPlanList.Add(nDet);
@@ -2580,6 +2698,240 @@ namespace com.Sconit.Service.MRP.Impl
                     else
                     {
                         this.genericMgr.Create(shipPlan);
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region  生产计划导入
+        private static object ReadProductionPlanFromXlsLock = new object();
+        [Transaction(TransactionMode.Requires)]
+        public void ReadProductionPlanFromXls(Stream inputStream, User user, ProductionPlanMstr productionPlanMstr)
+        {
+            lock (ReadProductionPlanFromXlsLock)
+            {
+                DateTime startDate = DateTime.Today;
+                DateTime endDate = startDate.AddDays(13);
+                DateTime nowTime = System.DateTime.Now;
+
+                if (inputStream.Length == 0)
+                {
+                    throw new BusinessErrorException("Import.Stream.Empty");
+                }
+
+                HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+
+                Sheet sheet = workbook.GetSheetAt(0);
+
+                IEnumerator rows = sheet.GetRowEnumerator();
+
+                Row dateRow = sheet.GetRow(0);
+
+                ImportHelper.JumpRows(rows, 2);
+
+                var planList = new List<ProductionPlanDet>();
+                var existsDets = this.genericMgr.FindAllWithCustomQuery<ProductionPlanDet>(" select s from ProductionPlanDet as s where s.ProductionPlanId=? ", productionPlanMstr.Id);
+
+                int colItemCode = 1;//物料号
+
+                List<string> errorMessages = new List<string>();
+
+
+                while (rows.MoveNext())
+                {
+                    string flowCode = null;
+                    string itemCode = null;
+
+                    HSSFRow row = (HSSFRow)rows.Current;
+                    if (!ImportHelper.CheckValidDataRow(row, 0, 3))
+                    {
+                        break;//边界
+                    }
+                    string rowIndex = (row.RowNum + 1).ToString();
+
+                    #region 读取物料代码
+                    try
+                    {
+                        itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItemCode));
+                        if (itemCode == null)
+                        {
+                            errorMessages.Add(string.Format("物料不能为空,第{0}行", rowIndex));
+                            continue;
+                        }
+                    }
+                    catch
+                    {
+                        errorMessages.Add(string.Format("读取物料时出错,第{0}行.", rowIndex));
+                        continue;
+                    }
+                    #endregion
+
+                    #region 读取数量
+                    try
+                    {
+                        int i = 10;
+                        Random r = new Random();
+                        int t = r.Next(0, 300);
+                        int tt = r.Next(500, 1000);
+                        while (true)
+                        {
+                            if (i > 62)
+                            {
+                                break;
+                            }
+                            Cell dateCell = dateRow.GetCell(i);
+                            string dateIndex = null;
+
+                            #region 读取计划日期
+                            if (dateCell != null)
+                            {
+                                DateTime currentDateTime = DateTime.Today;
+                                if (dateCell.CellType == CellType.STRING)
+                                {
+                                    dateIndex = dateCell.StringCellValue;
+                                }
+
+                                //if (currentDateTime.CompareTo(startDate) < 0)
+                                //{
+                                //    continue;
+                                //}
+                                //if (currentDateTime.CompareTo(endDate) > 0)
+                                //{
+                                //    break;
+                                //}
+                            }
+                            else
+                            {
+                                break;
+                            }
+                            #endregion
+
+                            decimal qty = 0;
+                            if (row.GetCell(i + 2) != null)
+                            {
+                                if (row.GetCell(i + 2).CellType == CellType.NUMERIC)
+                                {
+                                    qty = Convert.ToDecimal(row.GetCell(i + 2).NumericCellValue);
+                                }
+                                else
+                                {
+                                    string qtyValue = ImportHelper.GetCellStringValue(row.GetCell(i + 2));
+                                    if (qtyValue != null)
+                                    {
+                                        if (!decimal.TryParse(qtyValue, out qty))
+                                        {
+                                            errorMessages.Add(string.Format("数量格式不正确,第{0}行", rowIndex));
+                                            i += 4;
+                                            continue;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                i += 4;
+                                continue;
+                            }
+
+                            if (qty < 0)
+                            {
+                                errorMessages.Add(string.Format("数量不能小于0,第{0}行", rowIndex));
+                                i += 4;
+                                continue;
+                            }
+                            else
+                            {
+                                var existsDet = existsDets.Where(e=>e.Item == itemCode && e.StartTime.ToString("yyyy-MM-dd") == dateIndex);
+                                if (existsDet != null && existsDet.Count() > 0)
+                                {
+                                    var first = existsDet.First();
+                                    if (first.Qty != qty)
+                                    {
+                                        first.Qty = qty;
+                                        first.LastModifyDate = nowTime;
+                                        first.LastModifyUser = user.Code;
+                                        planList.Add(first);
+                                    }
+                                }
+                                else
+                                {
+                                    if (qty == 0)
+                                    {
+                                        i += 4;
+                                        continue;
+                                    }
+                                    var flowDets = this.genericMgr.GetDatasetBySql(string.Format(@"select i.Code,i.Desc1,d.RefItemCode,i.Uom,i.UC,i.MinLotSize from Item i left join FlowDet d on i.Code=d.Item where i.Code='{0}' and d.RefItemCode is not null and d.RefItemCode<>'' ", itemCode)).Tables[0];          //m.Code,m.LocFrom,d.Item,d.RefItemCode,d.UC,d.Uom,i.Desc1
+                                    var getFlowDetList = new List<object[]>();
+                                    foreach (System.Data.DataRow readRow in flowDets.Rows)
+                                    {
+                                        getFlowDetList.Add(new object[] { readRow[0].ToString(), readRow[1].ToString(), readRow[2].ToString(), readRow[3].ToString(), Convert.ToDecimal(readRow[4].ToString()), Convert.ToDecimal(readRow[5].ToString()) });
+                                    }
+                                    if (getFlowDetList.Count == 0)
+                                    {
+                                        errorMessages.Add(string.Format("第{0}行:路线{1}中没有维护物料{2}", rowIndex, flowCode, itemCode));
+                                        i += 4;
+                                        continue;
+                                    }
+                                    //i.Code,i.Desc1,d.RefItemCode,i.Uom,i.UC,i.MinLotSize
+                                    //Id, ProductionPlanId, Type, UUID, Item, ItemDesc, RefItemCode, ReqQty, OrgQty, Qty, 
+                                    //OrderQty, Uom, UC, MinLotSize, StartTime, WindowTime, CreateDate, CreateUser, LastModifyUser, LastModifyDate, Version
+
+                                    //Item itemE = this.genericMgr.FindById<Item>(itemCode);
+                                    ProductionPlanDet nDet = new ProductionPlanDet();
+                                    nDet.Id = 0;
+                                    nDet.ProductionPlanId = productionPlanMstr.Id;
+                                    nDet.Type = "Daily";
+                                    nDet.UUID = System.DateTime.Now.ToString() + t++ + tt++;
+                                    nDet.Item = getFlowDetList[0][0].ToString();
+                                    nDet.ItemDesc = getFlowDetList[0][1].ToString();
+                                    nDet.RefItemCode = getFlowDetList[0][2].ToString();
+                                    nDet.ReqQty = 0;
+                                    nDet.OrgQty = 0;
+                                    nDet.Qty = qty;
+                                    nDet.OrderQty = 0;
+                                    nDet.Uom = getFlowDetList[0][3].ToString();
+                                    nDet.UnitCount = Convert.ToDecimal(getFlowDetList[0][4]);
+                                    nDet.MinLotSize = Convert.ToDecimal(getFlowDetList[0][5]);
+                                    nDet.StartTime = Convert.ToDateTime(dateIndex);
+                                    nDet.WindowTime = Convert.ToDateTime(dateIndex);
+                                    nDet.CreateDate = nowTime;
+                                    nDet.CreateUser = user.Code;
+                                    nDet.LastModifyDate = nowTime;
+                                    nDet.LastModifyUser = user.Code;
+                                    nDet.Version = 1;
+                                    planList.Add(nDet);
+                                }
+                            }
+                            i += 4;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessages.Add(ex.Message);
+                    }
+                    #endregion
+                }
+
+                if (errorMessages.Count > 0)
+                {
+                    string errorMes = string.Empty;
+                    foreach (var error in errorMessages)
+                    {
+                        errorMes += error + "-";
+                    }
+                    throw new BusinessErrorException(errorMes);
+                }
+
+                foreach (var p in planList)
+                {
+                    if (p.Id > 0)
+                    {
+                        this.genericMgr.Update(p);
+                    }
+                    else
+                    {
+                        this.genericMgr.Create(p);
                     }
                 }
             }
@@ -2663,6 +3015,9 @@ namespace com.Sconit.Service.MRP.Impl
                     try
                     {
                         int i = 10;
+                        Random r = new Random();
+                        int t = r.Next(0, 300);
+                        int tt = r.Next(500, 1000);
                         while (true)
                         {
                             if (i > 66)
@@ -2769,7 +3124,7 @@ namespace com.Sconit.Service.MRP.Impl
                                     nDet.Id = 0;
                                     nDet.PurchasePlanId = purchasePlanMstr.Id;
                                     nDet.Type = "Daily";
-                                    nDet.UUID = string.Empty;
+                                    nDet.UUID = System.DateTime.Now.ToString() + t++ + tt++;
                                     nDet.Flow = getFlowDetList[0][0].ToString();
                                     nDet.Item = getFlowDetList[0][1].ToString();
                                     nDet.ItemDesc = getFlowDetList[0][5].ToString();
@@ -2911,6 +3266,173 @@ namespace com.Sconit.Service.MRP.Impl
                 //    this.orderMgr.CreateOrder(odHead, user);
                 //}
             }
+        }
+        #endregion
+
+        //#region  生产计划转订单
+        //[Transaction(TransactionMode.Requires)]
+        //public void CreateOrderByProductionPlan(string ids, User user)
+        //{
+        //    //string[] idArr = ids.Split(',');
+        //    string sql = string.Format(" select e from ProductionPlanDet as e  where Id in ({0}) ", ids);
+        //    IList<ProductionPlanDet> getDets = this.genericMgr.FindAllWithCustomQuery<ProductionPlanDet>(sql);
+        //    DateTime nowTime = System.DateTime.Now;
+        //    if (getDets != null && getDets.Count > 0)
+        //    {
+        //        var groups = getDets.GroupBy(g => new { g.Flow, g.WindowTime, g.StartTime });
+        //        IList<OrderHead> orderHeads = new List<OrderHead>();
+        //        foreach (var g in groups)
+        //        {
+        //            Flow currentFlow = this.flowMgr.LoadFlow(g.Key.Flow);
+        //            IList<FlowDetail> flowDets = new List<FlowDetail>();
+        //            foreach (var fd in currentFlow.FlowDetails)
+        //            {
+        //                foreach (var l in g)
+        //                {
+        //                    if (fd.Item.Code == l.Item && l.ShipQty > 0)
+        //                    {
+        //                        flowDets.Add(fd);
+        //                    }
+        //                }
+        //            }
+        //            currentFlow.FlowDetails = flowDets;
+        //            OrderHead orderHead = this.orderMgr.TransferFlow2Order(currentFlow);
+        //            orderHead.WindowTime = g.Key.WindowTime;
+        //            orderHead.StartTime = g.Key.StartTime;
+        //            orderHead.SubType = "Nml";
+        //            orderHead.Priority = "Normal";
+        //            orderHead.IsAutoRelease = true;
+        //            foreach (var od in orderHead.OrderDetails)
+        //            {
+        //                foreach (var l in g)
+        //                {
+        //                    if (od.Item.Code == l.Item)
+        //                    {
+        //                        od.RequiredQty = l.ShipQty;
+        //                        od.OrderedQty = l.ShipQty;
+        //                        l.OrderQty += l.ShipQty;
+        //                        l.ShipQty = 0;
+        //                    }
+        //                }
+        //            }
+        //            this.orderMgr.CreateOrder(orderHead, user);
+        //            orderHeads.Add(orderHead);
+        //            foreach (var od in orderHead.OrderDetails)
+        //            {
+        //                foreach (var l in g)
+        //                {
+        //                    if (od.Item.Code == l.Item)
+        //                    {
+        //                        ShipPlanOpenOrder nOpenOrder = new ShipPlanOpenOrder();
+        //                        nOpenOrder.ShipPlanId = l.ShipPlanId;
+        //                        nOpenOrder.Type = l.Type;
+        //                        nOpenOrder.UUID = l.UUID;
+        //                        nOpenOrder.Flow = l.Flow;
+        //                        nOpenOrder.OrderNo = od.OrderHead.OrderNo;
+        //                        nOpenOrder.Item = l.Item;
+        //                        nOpenOrder.OrgStartTime = l.StartTime;
+        //                        nOpenOrder.OrgWindowTime = l.WindowTime;
+        //                        nOpenOrder.StartTime = l.StartTime;
+        //                        nOpenOrder.WindowTime = l.WindowTime;
+        //                        nOpenOrder.OrderQty = od.OrderedQty;
+        //                        nOpenOrder.ShipQty = od.ShippedQty.HasValue ? od.ShippedQty.Value : 0;
+        //                        nOpenOrder.RecQty = od.ReceivedQty.HasValue ? od.ReceivedQty.Value : 0;
+        //                        nOpenOrder.CreateDate = nowTime;
+        //                        nOpenOrder.CreateUser = user.Code;
+        //                        nOpenOrder.IsTransferOrder = true;
+        //                        this.genericMgr.Update(l);
+        //                        this.genericMgr.Create(nOpenOrder);
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        //foreach (var odHead in orderHeads)
+        //        //{
+        //        //    this.orderMgr.CreateOrder(odHead, user);
+        //        //}
+        //    }
+        //}
+        //#endregion
+
+        #region  班产计划转订单
+        [Transaction(TransactionMode.Requires)]
+        public IList<OrderHead> CreateOrderByShiftPlan(string ids, User user, int leadTime)
+        {
+            //string[] idArr = ids.Split(',');
+            string sql = string.Format(" select e from ShiftPlanDet as e  where Id in ({0}) ", ids);
+            IList<ShiftPlanDet> getDets = this.genericMgr.FindAllWithCustomQuery<ShiftPlanDet>(sql);
+            DateTime nowTime = System.DateTime.Now;
+            if (getDets == null || getDets.Count == 0)
+            {
+                throw new BusinessErrorException("请选择需要转订单的明细。");
+            }
+            List<FlowDetail> tempFlowdets = new List<FlowDetail>();
+            //string searchExistsSql = string.Format("select d.orderNo,d.Item,d.orderqty,isnull(d.recqty,0) as recqty from orderdet as d where exists(select 1 from ordermstr as m where m.orderno=d.orderno and m.type='Production' and m.Status in('In-Process') ) and d.orderqty>d.recqty and d.Item in('{0}') ",string.Join("','", shiftPlanList.Select(s=>s.Item).Distinct().ToArray()));
+            //var existsDetRows = TheGenericMgr.GetDatasetBySql(searchExistsSql).Tables[0];
+            //var existsDetList = new List<TempOrderDet>();
+            //foreach (System.Data.DataRow row in existsDetRows.Rows)
+            //{
+            //    existsDetList.Add(new TempOrderDet{
+            //        OrderNo = row[0].ToString(),
+            //        ItemCode = row[1].ToString(),
+            //        OrderedQty = Convert.ToDecimal(row[2].ToString()),
+            //        ReceivedQty = Convert.ToDecimal(row[3].ToString()),
+            //    });
+            //}
+            IList<OrderHead> orderHeadList = new List<OrderHead>();
+            foreach (ShiftPlanDet sps in getDets)
+            {
+                var currentFlowDet = this.genericMgr.GetDatasetBySql(string.Format("select  Id,orderlotsize,item  from flowdet where flow='{0}' and item='{1}' ", sps.ProdLine, sps.Item)).Tables[0];
+                int flowDetId = 0;
+                decimal orderLotSize = 0;
+                foreach (System.Data.DataRow row in currentFlowDet.Rows)
+                {
+                    flowDetId = Convert.ToInt32((object)row[0]);
+                    orderLotSize = !string.IsNullOrEmpty(row[1].ToString()) ? (decimal)Convert.ToDecimal(row[1].ToString()) : 0;
+                }
+                IList<decimal> reqQtyList = OrderHelper.SplitByOrderLotSize((decimal)sps.Qty, orderLotSize);
+                DateTime startTime = this.shiftMgr.GetShiftStartTime(sps.PlanDate, sps.Shift);
+                DateTime windowTime = startTime.AddHours(Convert.ToDouble(leadTime));
+
+                //int i = 0;
+                foreach (decimal reqQty in reqQtyList)
+                {
+                    OrderHead oh = new OrderHead();
+                    Flow currentFlow = this.flowMgr.LoadFlow(sps.ProdLine, user.Code, true);
+                    if (tempFlowdets.Where(d => d.Flow.Code == currentFlow.Code).Count() > 0)
+                    {
+                        currentFlow.FlowDetails = tempFlowdets.Where(d => d.Flow.Code == currentFlow.Code).ToList();
+                    }
+                    else
+                    {
+                        tempFlowdets.AddRange(currentFlow.FlowDetails);
+                    }
+                    currentFlow.FlowDetails = currentFlow.FlowDetails.Where(d => d.Id == flowDetId).ToList();
+                    oh = this.orderMgr.TransferFlow2Order(currentFlow, BusinessConstants.CODE_MASTER_ORDER_SUB_TYPE_VALUE_NML, false, DateTime.Now);
+                    oh.Priority = BusinessConstants.CODE_MASTER_ORDER_PRIORITY_VALUE_NORMAL;
+
+                    oh.StartTime = startTime;
+                    oh.WindowTime = windowTime;
+
+                    oh.GetOrderDetailByFlowDetailIdAndItemCode(flowDetId, sps.Item).RequiredQty = reqQty;
+                    oh.GetOrderDetailByFlowDetailIdAndItemCode(flowDetId, sps.Item).OrderedQty = reqQty;
+                    oh.Shift = this.shiftMgr.LoadShift(sps.Shift);
+
+                    //if (i == 0)
+                    //{
+                    //    oh.ExistsProdDetails = existsDetList.Where(e => e.ItemCode == sps.Item).ToList();
+                    //} 
+                    //i++;
+
+
+                    orderHeadList.Add(oh);
+
+                    startTime = windowTime;
+                    windowTime = startTime.AddHours(Convert.ToDouble(leadTime));
+                }
+            }
+            return orderHeadList;
         }
         #endregion
 

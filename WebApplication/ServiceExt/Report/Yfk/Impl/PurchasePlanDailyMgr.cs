@@ -77,10 +77,10 @@ namespace com.Sconit.Service.Report.Yfk.Impl
                     this.SetRowCell(pageIndex, rowIndex, 3, firstPlan.ItemDesc);
                     this.SetRowCell(pageIndex, rowIndex, 4, firstPlan.UnitCount.ToString("0.##"));
                     this.SetRowCell(pageIndex, rowIndex, 5, firstPlan.MinLotSize.ToString("0.##"));
-                    this.SetRowCell(pageIndex, rowIndex, 6, firstPlan.SafeStock.ToString("0.##"));
-                    this.SetRowCell(pageIndex, rowIndex, 7, firstPlan.MaxStock.ToString("0.##"));
-                    this.SetRowCell(pageIndex, rowIndex, 8, firstPlan.InitStock.ToString("0.##"));
-                    this.SetRowCell(pageIndex, rowIndex, 9, firstPlan.InspectQty.ToString("0.##"));
+                    this.SetRowCell(pageIndex, rowIndex, 6, Convert.ToDouble(firstPlan.SafeStock));
+                    this.SetRowCell(pageIndex, rowIndex, 7, Convert.ToDouble(firstPlan.MaxStock));
+                    this.SetRowCell(pageIndex, rowIndex, 8, Convert.ToDouble(firstPlan.InitStock));
+                    this.SetRowCell(pageIndex, rowIndex, 9, Convert.ToDouble(firstPlan.InspectQty));
 
                     int cell = 10;
                     var initStockQty = firstPlan.InitStock + firstPlan.InspectQty;
@@ -94,7 +94,7 @@ namespace com.Sconit.Service.Report.Yfk.Impl
 
                         initStockQty = initStockQty - pPlanDet.ReqQty + pPlanDet.OrderQty + pPlanDet.PurchaseQty;
 
-                        this.SetRowCell(pageIndex, rowIndex, cell++, initStockQty.ToString("0.##"));
+                        this.SetRowCell(pageIndex, rowIndex, cell++, Convert.ToDouble(initStockQty));
                        
 
                     }

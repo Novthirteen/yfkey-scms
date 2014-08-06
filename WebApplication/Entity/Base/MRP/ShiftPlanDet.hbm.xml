@@ -4,19 +4,19 @@
 		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
 			<generator class="identity" />
 		</id>
-    <!--Id, PlanId, RefPlanNo, ProdLine, Item, ItemDesc, RefItemCode, Qty, Uom, UnitQty, PlanDate, Shift, CreateDate, CreateUser-->
-    <property name="PlanId" column="PlanId" type="Int32"  />
-    <property name="RefPlanNo" column="RefPlanNo" type="String" length="50" />
+    <!--Id, MstrId, ProdLine, Item, ItemDesc, Qty, OrderQty, Uom, UnitQty, PlanDate, Shift, CreateDate, CreateUser, LastModifyDate, LastModifyUser-->
+    <property name="MstrId" column="MstrId" type="Int32"  />
     <property name="ProdLine" column="ProdLine" type="String" length="50" />
     <property name="Item" column="Item" type="String" length="50" />
 		<property name="ItemDesc" column="ItemDesc" type="String" length="510" />
-		<property name="RefItemCode" column="RefItemCode" type="String" length="50" />
     <property name="Qty" column="Qty" type="Decimal"  />
     <property name="Uom" column="Uom" type="String" length="50" />
-    <property name="UnitQty" column="UnitQty" type="Decimal"  />
+    <property name="UnitCount" column="UC" type="Decimal"  />
     <property name="PlanDate" column="PlanDate" type="DateTime"  />
     <property name="Shift" column="Shift" type="String" length="50" />
     <property name="CreateDate" column="CreateDate" type="DateTime"  />
     <property name="CreateUser" column="CreateUser" type="String" length="50" />
+    <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+    <property name="LastModifyUser" column="LastModifyUser" type="String" length="50" />
   </class>
 </hibernate-mapping>

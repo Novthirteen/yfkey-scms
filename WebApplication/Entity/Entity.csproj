@@ -758,7 +758,9 @@
     <EmbeddedResource Include="Base\MRP\ShipPlanDetTrace.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Base\MRP\ShiftPlanMstr.hbm.xml" />
+    <EmbeddedResource Include="Base\MRP\ShiftPlanMstr.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Base\MRP\ShiftPlanDet.hbm.xml">
