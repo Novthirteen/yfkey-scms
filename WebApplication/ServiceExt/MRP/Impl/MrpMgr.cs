@@ -1348,6 +1348,57 @@ namespace com.Sconit.Service.MRP.Impl
         }
         #endregion
 
+            #region    修改采购计划
+        [Transaction(TransactionMode.Requires)]
+        public void UpdatePurchasePlanQty2(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user,string type)
+        {
+            var dateTimeNow = System.DateTime.Now;
+            Random r = new Random();
+            for (int i = 0; i < idList.Count; i++)
+            {
+                int id = int.Parse(idList[i]);
+                if (id == 0)
+                {
+                    IList<PurchasePlanMstr2> pMaster = this.genericMgr.FindAllWithCustomQuery<PurchasePlanMstr2>(" select m from PurchasePlanMstr2 as m where m.ReleaseNo=? ", new object[] { releaseNoList[i] });
+                    IList<PurchasePlanDet2> searchPlandets = this.genericMgr.FindAllWithCustomQuery<PurchasePlanDet2>(" select d from PurchasePlanDet2 as d where d.Flow=? and d.Item=? and d.PurchasePlanId=? ", new object[] { flowList[i], itemList[i], pMaster.First().Id });
+                    if (searchPlandets != null && searchPlandets.Count > 0)
+                    {
+                        //Id, PurchasePlanId, UUID, Flow, Item, ItemDesc, RefItemCode, ReqQty, OrgPurchaseQty, 
+                        //PurchaseQty, Uom, BaseUom, UnitQty, UC, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version
+                        var first = searchPlandets.First();
+                        PurchasePlanDet2 newPlan = new PurchasePlanDet2();
+                        newPlan.PurchasePlanId = first.PurchasePlanId;
+                        newPlan.Flow = first.Flow;
+                        newPlan.Item = first.Item;
+                        newPlan.ItemDesc = first.ItemDesc;
+                        newPlan.RefItemCode = first.RefItemCode;
+                        newPlan.PurchaseQty = Convert.ToDecimal(qtyList[i]);
+                        newPlan.Uom = first.Uom;
+                        newPlan.BaseUom = first.BaseUom;
+                        newPlan.UnitCount = first.UnitCount;
+                        newPlan.UnitQty = first.UnitQty;
+                        newPlan.OrgPurchaseQty = 0;
+                        newPlan.WindowTime = Convert.ToDateTime(dateFrom[i]);
+                        newPlan.StartTime = Convert.ToDateTime(dateFrom[i]);
+                        newPlan.CreateDate = dateTimeNow;
+                        newPlan.CreateUser = user.Code;
+                        newPlan.LastModifyDate = dateTimeNow;
+                        newPlan.LastModifyUser = user.Code;
+                        newPlan.Version = 1;
+                        newPlan.Id = 0;
+                        newPlan.Type = type;
+                        newPlan.UUID = System.DateTime.Now.ToString() + r.Next(100, 500) + r.Next(511, 1000);
+                        this.genericMgr.Create(newPlan);
+                    }
+                }
+                else
+                {
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_PurchasePlanDet2 set PurchaseQty={0},Version=Version+1,LastModifyDate='{2}',LastModifyUser='{3}' where id={1} ", qtyList[i], id, dateTimeNow, user.Code));
+                }
+            }
+        }
+        #endregion
+
         
         #region    修改班产计划
         [Transaction(TransactionMode.Requires)]
@@ -3183,6 +3234,251 @@ namespace com.Sconit.Service.MRP.Impl
         }
         #endregion
 
+        #region  采购计划导入2
+        private static object readPurchasePlanFromXlsLock2 = new object();
+        [Transaction(TransactionMode.Requires)]
+        public void ReadPurchasePlanFromXls2(Stream inputStream, User user, PurchasePlanMstr purchasePlanMstr)
+        {
+            lock (readPurchasePlanFromXlsLock2)
+            {
+                DateTime startDate = DateTime.Today;
+                DateTime endDate = startDate.AddDays(13);
+                DateTime nowTime = System.DateTime.Now;
+
+                if (inputStream.Length == 0)
+                {
+                    throw new BusinessErrorException("Import.Stream.Empty");
+                }
+
+                HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+
+                Sheet sheet = workbook.GetSheetAt(0);
+
+                IEnumerator rows = sheet.GetRowEnumerator();
+
+                Row dateRow = sheet.GetRow(0);
+
+                ImportHelper.JumpRows(rows, 2);
+
+                var purchasePlanDetList = new List<PurchasePlanDet2>();
+                var existsDets = this.genericMgr.FindAllWithCustomQuery<PurchasePlanDet2>(" select s from PurchasePlanDet2 as s where s.PurchasePlanId=? ", purchasePlanMstr.Id);
+
+                int colFlow = 1;//路线
+                int colItemCode = 2;//物料号
+
+                List<string> errorMessages = new List<string>();
+
+
+                while (rows.MoveNext())
+                {
+                    string flowCode = null;
+                    string itemCode = null;
+
+                    HSSFRow row = (HSSFRow)rows.Current;
+                    if (!ImportHelper.CheckValidDataRow(row, 0, 3))
+                    {
+                        break;//边界
+                    }
+                    string rowIndex = (row.RowNum + 1).ToString();
+
+                    #region 读取路线代码
+                    flowCode = ImportHelper.GetCellStringValue(row.GetCell(colFlow));
+                    if (string.IsNullOrEmpty(flowCode))
+                    {
+                        errorMessages.Add(string.Format("路线不能为空,第{0}行", rowIndex));
+                        continue;
+                    }
+                    #endregion
+
+                    #region 读取物料代码
+                    try
+                    {
+                        itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItemCode));
+                        if (itemCode == null)
+                        {
+                            errorMessages.Add(string.Format("物料不能为空,第{0}行", rowIndex));
+                            continue;
+                        }
+                    }
+                    catch
+                    {
+                        errorMessages.Add(string.Format("读取物料时出错,第{0}行.", rowIndex));
+                        continue;
+                    }
+                    #endregion
+
+                    #region 读取数量
+                    try
+                    {
+                        int i = 11;
+                        Random r = new Random();
+                        int t = r.Next(0, 300);
+                        int tt = r.Next(500, 1000);
+                        while (true)
+                        {
+                            if (i > 80)
+                            {
+                                break;
+                            }
+                            Cell dateCell = dateRow.GetCell(i);
+                            string dateIndex = null;
+
+                            #region 读取计划日期
+                            if (dateCell != null)
+                            {
+                                DateTime currentDateTime = DateTime.Today;
+                                if (dateCell.CellType == CellType.STRING)
+                                {
+                                    dateIndex = dateCell.StringCellValue;
+                                }
+
+                                //if (currentDateTime.CompareTo(startDate) < 0)
+                                //{
+                                //    continue;
+                                //}
+                                //if (currentDateTime.CompareTo(endDate) > 0)
+                                //{
+                                //    break;
+                                //}
+                            }
+                            else
+                            {
+                                break;
+                            }
+                            #endregion
+
+                            decimal qty = 0;
+                            if (row.GetCell(i + 2) != null)
+                            {
+                                if (row.GetCell(i + 2).CellType == CellType.NUMERIC)
+                                {
+                                    qty = Convert.ToDecimal(row.GetCell(i + 2).NumericCellValue);
+                                }
+                                else
+                                {
+                                    string qtyValue = ImportHelper.GetCellStringValue(row.GetCell(i + 2));
+                                    if (qtyValue != null)
+                                    {
+                                        if (!decimal.TryParse(qtyValue, out qty))
+                                        {
+                                            errorMessages.Add(string.Format("数量格式不正确,第{0}行", rowIndex));
+                                            i += 5;
+                                            continue;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                i += 5;
+                                continue;
+                            }
+
+                            if (qty < 0)
+                            {
+                                errorMessages.Add(string.Format("数量不能小于0,第{0}行", rowIndex));
+                                i += 5;
+                                continue;
+                            }
+                            else
+                            {
+                                var existsDet = existsDets.Where(e => e.Flow == flowCode && e.Item == itemCode && e.StartTime.ToString("yyyy-MM-dd") == dateIndex);
+                                if (existsDet != null && existsDet.Count() > 0)
+                                {
+                                    var first = existsDet.First();
+                                    if (first.PurchaseQty != qty)
+                                    {
+                                        first.PurchaseQty = qty;
+                                        first.LastModifyDate = nowTime;
+                                        first.LastModifyUser = user.Code;
+                                        purchasePlanDetList.Add(first);
+                                    }
+                                }
+                                else
+                                {
+                                    if (qty == 0)
+                                    {
+                                        i += 5;
+                                        continue;
+                                    }
+                                    var flowDets = this.genericMgr.GetDatasetBySql(string.Format(@"select d.Flow,d.Item,d.RefItemCode,d.UC,d.UOM,i.Desc1,isnull(i.MinLotSize,0) from flowdet as d inner join Item as i on d.Item=i.Code where d.Flow='{0}' and d.Item='{1}' ", flowCode, itemCode)).Tables[0];          //m.Code,m.LocFrom,d.Item,d.RefItemCode,d.UC,d.Uom,i.Desc1
+                                    var getFlowDetList = new List<object[]>();
+                                    foreach (System.Data.DataRow readRow in flowDets.Rows)
+                                    {
+                                        //d.Flow,d.Item,d.RefItemCode,d.UC,d.UOM,i.Desc1,i.MinLotSize 
+                                        getFlowDetList.Add(new object[] { readRow[0].ToString(), readRow[1].ToString(), readRow[2].ToString(), Convert.ToDecimal(readRow[3].ToString()), readRow[4].ToString(), readRow[5].ToString(), Convert.ToDecimal(readRow[6].ToString()) });
+                                    }
+                                    if (getFlowDetList.Count == 0)
+                                    {
+                                        errorMessages.Add(string.Format("第{0}行:路线{1}中没有维护物料{2}", rowIndex, flowCode, itemCode));
+                                        i += 5;
+                                        continue;
+                                    }
+                                    //Id, PurchasePlanId, Type, UUID, Flow, Item, ItemDesc, RefItemCode, ReqQty, OrgPurchaseQty, PurchaseQty, OrderQty, Uom, BaseUom,
+                                    //UnitQty, UC, MinLotSize, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, Version
+                                    PurchasePlanDet2 nDet = new PurchasePlanDet2();
+                                    nDet.Id = 0;
+                                    nDet.PurchasePlanId = purchasePlanMstr.Id;
+                                    nDet.Type = "Daily";
+                                    nDet.UUID = System.DateTime.Now.ToString() + t++ + tt++;
+                                    nDet.Flow = getFlowDetList[0][0].ToString();
+                                    nDet.Item = getFlowDetList[0][1].ToString();
+                                    nDet.ItemDesc = getFlowDetList[0][5].ToString();
+                                    nDet.RefItemCode = getFlowDetList[0][2].ToString();
+                                    nDet.ReqQty = 0;
+                                    nDet.OrgPurchaseQty = 0;
+                                    nDet.PurchaseQty = qty;
+                                    nDet.OrderQty = 0;
+                                    nDet.Uom = getFlowDetList[0][4].ToString();
+                                    nDet.BaseUom = getFlowDetList[0][4].ToString();
+                                    nDet.UnitQty = 1;
+                                    nDet.UnitCount = Convert.ToDecimal(getFlowDetList[0][3]);
+                                    nDet.MinLotSize = Convert.ToDecimal(getFlowDetList[0][6]);
+                                    nDet.StartTime = Convert.ToDateTime(dateIndex);
+                                    nDet.WindowTime = Convert.ToDateTime(dateIndex);
+                                    nDet.CreateDate = nowTime;
+                                    nDet.CreateUser = user.Code;
+                                    nDet.LastModifyDate = nowTime;
+                                    nDet.LastModifyUser = user.Code;
+                                    nDet.Version = 1;
+                                    purchasePlanDetList.Add(nDet);
+                                }
+                            }
+                            i += 4;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessages.Add(ex.Message);
+                    }
+                    #endregion
+                }
+
+                if (errorMessages.Count > 0)
+                {
+                    string errorMes = string.Empty;
+                    foreach (var error in errorMessages)
+                    {
+                        errorMes += error + "-";
+                    }
+                    throw new BusinessErrorException(errorMes);
+                }
+
+                foreach (var shipPlan in purchasePlanDetList)
+                {
+                    if (shipPlan.Id > 0)
+                    {
+                        this.genericMgr.Update(shipPlan);
+                    }
+                    else
+                    {
+                        this.genericMgr.Create(shipPlan);
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region  发运计划转订单
         [Transaction(TransactionMode.Requires)]
         public void CreateOrderByShipPlan(string ids,User user)
@@ -3433,6 +3729,91 @@ namespace com.Sconit.Service.MRP.Impl
                 }
             }
             return orderHeadList;
+        }
+        #endregion
+
+        #region  采购计划发货
+        [Transaction(TransactionMode.Requires)]
+        public void CreateOrderByPurchasePlan(string ids, User user)
+        {
+            //string[] idArr = ids.Split(',');
+            string sql = string.Format(" select e from PurchasePlanDet2 as e  where Id in ({0}) ", ids);
+            IList<PurchasePlanDet2> getDets = this.genericMgr.FindAllWithCustomQuery<PurchasePlanDet2>(sql);
+            DateTime nowTime = System.DateTime.Now;
+            if (getDets != null && getDets.Count > 0)
+            {
+                var groups = getDets.GroupBy(g => new { g.Flow,  g.StartTime });
+                IList<OrderHead> orderHeads = new List<OrderHead>();
+                foreach (var g in groups)
+                {
+                    Flow currentFlow = this.flowMgr.LoadFlow(g.Key.Flow);
+                    IList<FlowDetail> flowDets = new List<FlowDetail>();
+                    foreach (var fd in currentFlow.FlowDetails)
+                    {
+                        foreach (var l in g)
+                        {
+                            if (fd.Item.Code == l.Item && l.PurchaseQty > 0)
+                            {
+                                flowDets.Add(fd);
+                            }
+                        }
+                    }
+                    currentFlow.FlowDetails = flowDets;
+                    var mepLeadTime = currentFlow.MrpLeadTime.HasValue ? Convert.ToInt32(currentFlow.MrpLeadTime) : 0;
+                    OrderHead orderHead = this.orderMgr.TransferFlow2Order(currentFlow);
+                    orderHead.WindowTime = g.Key.StartTime.AddDays(mepLeadTime);
+                    orderHead.StartTime = g.Key.StartTime;
+                    orderHead.SubType = "Nml";
+                    orderHead.Priority = "Normal";
+                    orderHead.IsAutoRelease = true;
+                    foreach (var od in orderHead.OrderDetails)
+                    {
+                        foreach (var l in g)
+                        {
+                            if (od.Item.Code == l.Item)
+                            {
+                                od.RequiredQty = l.PurchaseQty;
+                                od.OrderedQty = l.PurchaseQty;
+                                l.OrderQty += l.PurchaseQty;
+                                l.PurchaseQty = 0;
+                            }
+                        }
+                    }
+                    this.orderMgr.CreateOrder(orderHead, user);
+                    orderHeads.Add(orderHead);
+                    foreach (var od in orderHead.OrderDetails)
+                    {
+                        foreach (var l in g)
+                        {
+                            if (od.Item.Code == l.Item)
+                            {
+                                PurchasePlanOpenOrder2 nOpenOrder = new PurchasePlanOpenOrder2();
+                                nOpenOrder.PurchasePlanId = l.PurchasePlanId;
+                                nOpenOrder.Type = l.Type;
+                                nOpenOrder.UUID = l.UUID;
+                                nOpenOrder.Flow = l.Flow;
+                                nOpenOrder.OrderNo = od.OrderHead.OrderNo;
+                                nOpenOrder.Item = l.Item;
+                                nOpenOrder.StartTime = l.StartTime;
+                                nOpenOrder.WindowTime = l.WindowTime;
+                                nOpenOrder.OrderQty = od.OrderedQty;
+                                nOpenOrder.ShipQty = od.ShippedQty.HasValue ? od.ShippedQty.Value : 0;
+                                nOpenOrder.RecQty = od.ReceivedQty.HasValue ? od.ReceivedQty.Value : 0;
+                                nOpenOrder.CreateDate = nowTime;
+                                nOpenOrder.CreateUser = user.Code;
+                                //nOpenOrder.IsTransferOrder = true;
+                                this.genericMgr.Update(l);
+                                this.genericMgr.Create(nOpenOrder);
+                            }
+                        }
+                    }
+                }
+
+                //foreach (var odHead in orderHeads)
+                //{
+                //    this.orderMgr.CreateOrder(odHead, user);
+                //}
+            }
         }
         #endregion
 

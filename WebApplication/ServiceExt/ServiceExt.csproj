@@ -207,6 +207,7 @@
     <Compile Include="MRP\IMrpShipPlanMgr.cs" />
     <Compile Include="MRP\IMrpShipPlanViewMgr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\Yfk\Impl\RePurchasePlanDaily2Mgr.cs" />
     <Compile Include="Report\Yfk\Impl\PurchasePlanDailyMgr.cs" />
     <Compile Include="Report\Yfk\Impl\ProductionPlanDailyMgr.cs" />
     <Compile Include="Report\Yfk\Impl\RepASNMgr.cs" />

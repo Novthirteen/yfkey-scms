@@ -942,4 +942,7 @@
   <data name="MrpParameterSetup" xml:space="preserve">
     <value>MrpParameterSetup</value>
   </data>
+  <data name="ProcurementPlan2" xml:space="preserve">
+    <value>ProcurementPlan2</value>
+  </data>
 </root>

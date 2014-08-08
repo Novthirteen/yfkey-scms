@@ -204,6 +204,12 @@
     <Compile Include="Base\Mes\ProductLineUserBase.cs" />
     <Compile Include="Base\Mes\ShelfBase.cs" />
     <Compile Include="Base\Mes\ShelfItemBase.cs" />
+    <Compile Include="Base\MRP\PurchasePlanDetBase2.cs" />
+    <Compile Include="Base\MRP\PurchasePlanDetTraceBase2.cs" />
+    <Compile Include="Base\MRP\PurchasePlanIpDetBase2.cs" />
+    <Compile Include="Base\MRP\PurchasePlanMstrBase2.cs" />
+    <Compile Include="Base\MRP\PurchasePlanOpenOrderBase2.cs" />
+    <Compile Include="Base\MRP\RunPurchasePlanLogBase2.cs" />
     <Compile Include="Base\MRP\PurchasePlanIpDetBase.cs" />
     <Compile Include="Base\MRP\ShipPlanIpDetBase.cs" />
     <Compile Include="Base\MRP\RunWeeklyMRPLogBase.cs" />
@@ -408,6 +414,12 @@
     <Compile Include="Mes\ProductLineUser.cs" />
     <Compile Include="Mes\Shelf.cs" />
     <Compile Include="Mes\ShelfItem.cs" />
+    <Compile Include="MRP\PurchasePlanDet2.cs" />
+    <Compile Include="MRP\PurchasePlanDetTrace2.cs" />
+    <Compile Include="MRP\PurchasePlanIpDet2.cs" />
+    <Compile Include="MRP\PurchasePlanMstr2.cs" />
+    <Compile Include="MRP\PurchasePlanOpenOrder2.cs" />
+    <Compile Include="MRP\RunPurchasePlanLog2.cs" />
     <Compile Include="MRP\PurchasePlanIpDet.cs" />
     <Compile Include="MRP\ShipPlanIpDet.cs" />
     <Compile Include="MRP\RunWeeklyMRPLog.cs" />
@@ -819,6 +831,26 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Base\MRP\PurchasePlanIpDet.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\PurchasePlanDetTrace2.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\PurchasePlanIpDet2.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\PurchasePlanDet2.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\PurchasePlanMstr2.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\PurchasePlanOpenOrder2.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\MRP\RunPurchasePlanLog2.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

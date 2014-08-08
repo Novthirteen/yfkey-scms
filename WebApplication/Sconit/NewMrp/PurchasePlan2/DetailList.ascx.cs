@@ -56,7 +56,7 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.tbFlow.Value = string.Empty;
         this.list.InnerHtml = "";
         currentRelesNo = relesNo;
-        var purchasePlanMstr = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanMstr>(" select s from PurchasePlanMstr as s where s.ReleaseNo=? ", currentRelesNo).First();
+        var purchasePlanMstr = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanMstr2>(" select s from PurchasePlanMstr2 as s where s.ReleaseNo=? ", currentRelesNo).First();
         if (purchasePlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
         {
             this.importDiv.Visible = false;
@@ -73,10 +73,10 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
 select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime,isnull(det.uc,0),isnull(f.MrpLeadTime,0),m.Id,isnull(det.MinLotSize,0)
- from MRP_PurchasePlanDet as det 
-inner join MRP_PurchasePlanMstr as m on m.Id=det.PurchasePlanId
+ from MRP_PurchasePlanDet2 as det 
+inner join MRP_PurchasePlanMstr2 as m on m.Id=det.PurchasePlanId
  inner join FlowMstr as f on det.Flow=f.Code
-left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
+left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
 
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
@@ -110,12 +110,12 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         searchSql += " order by det.Flow,det.Item asc ";
 
         var flowCodes = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-        var purchasePlanDetList = new List<PurchasePlanDet>();
+        var purchasePlanDetList = new List<PurchasePlanDet2>();
         foreach (System.Data.DataRow row in flowCodes.Rows)
         {
             //det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),
             //isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0)
-            purchasePlanDetList.Add(new PurchasePlanDet
+            purchasePlanDetList.Add(new PurchasePlanDet2
             {
                 Id = Convert.ToInt32(row[0].ToString()),
                 UUID = row[1].ToString(),
@@ -152,7 +152,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         }
     }
 
-    private void ListTable(IList<PurchasePlanDet> pPlanDetList)
+    private void ListTable(IList<PurchasePlanDet2> pPlanDetList)
     {
         if (pPlanDetList == null || pPlanDetList.Count == 0)
         {
@@ -160,22 +160,22 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             return;
         }
 
-        var minWindowTime = pPlanDetList.Min(s => s.WindowTime).AddDays(13);
-        pPlanDetList = pPlanDetList.Where(s => s.WindowTime <= minWindowTime).ToList();
+        var minWindowTime = pPlanDetList.Min(s => s.StartTime).AddDays(13);
+        pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minWindowTime).ToList();
 
         #region   trace
-        List<PurchasePlanDetTrace> traceList = new List<PurchasePlanDetTrace>();
+        List<PurchasePlanDetTrace2> traceList = new List<PurchasePlanDetTrace2>();
         int len = 0;
         int j = pPlanDetList.Count % 2000 == 0 ? pPlanDetList.Count / 2000 : pPlanDetList.Count / 2000 + 1;
         while (true)
         {
-            var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace2>(string.Format(" select l from PurchasePlanDetTrace2 as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
             if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
             len++;
             if (len == j) break;
         }
         //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
-        traceList = traceList == null ? new List<PurchasePlanDetTrace>() : traceList;
+        traceList = traceList == null ? new List<PurchasePlanDetTrace2>() : traceList;
 
         if (traceList != null && traceList.Count > 0)
         {
@@ -198,17 +198,17 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         #endregion
 
         #region  orderQty
-        List<PurchasePlanOpenOrder> pPlanOpenOrderList = new List<PurchasePlanOpenOrder>();
+        List<PurchasePlanOpenOrder2> pPlanOpenOrderList = new List<PurchasePlanOpenOrder2>();
         //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where Type='{0}' and l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
         len = 0;
         while (true)
         {
-            var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+            var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder2>(string.Format(" select l from PurchasePlanOpenOrder2 as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
             if (cList != null && cList.Count > 0) { pPlanOpenOrderList.AddRange(cList); }
             len++;
             if (len == j) break;
         }
-        pPlanOpenOrderList = pPlanOpenOrderList == null ? new List<PurchasePlanOpenOrder>() : pPlanOpenOrderList;
+        pPlanOpenOrderList = pPlanOpenOrderList == null ? new List<PurchasePlanOpenOrder2>() : pPlanOpenOrderList;
         if (pPlanOpenOrderList != null && pPlanOpenOrderList.Count > 0)
         {
             foreach (var sd in pPlanDetList)
@@ -230,69 +230,73 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         #endregion
 
         #region    在途
-        //IList<PurchasePlanIpDet> ipDets = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanIpDet>(" select s from  PurchasePlanIpDet as s where s.PurchasePlanId=? and s.Type='" + this.rbType.SelectedValue + "'  ", pPlanDetList.First().PurchasePlanId);    //
-        //ipDets = ipDets == null ? new List<PurchasePlanIpDet>() : ipDets;
-        //if (ipDets != null && ipDets.Count > 0)
-        //{
-        //    foreach (var sd in pPlanDetList)
-        //    {
-        //        var currentIpdets = ipDets.Where(d => d.Item == sd.Item && d.Flow == ss.Flow).ToList();
-        //        var showText = string.Empty;
-        //        if (currentIpdets != null && currentIpdets.Count > 0)
-        //        {
-        //            showText = "<table><thead><tr><th>ASN号</th><th>路线</th><th>物料</th><th>数量</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
-        //            foreach (var c in currentIpdets)
-        //            {
-        //                showText += "<td>" + c.IpNo + "</td><td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Qty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
-        //            }
-        //            showText += " </tr></tbody></table> ";
-        //        }
-        //        sd.IpDets = showText;
-        //    }
-        //}
+        IList<PurchasePlanIpDet2> ipDets = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanIpDet2>(" select s from  PurchasePlanIpDet2 as s where s.PurchasePlanId=? and s.Type='" + this.rbType.SelectedValue + "'  ", pPlanDetList.First().PurchasePlanId);    //
+        ipDets = ipDets == null ? new List<PurchasePlanIpDet2>() : ipDets;
+        if (ipDets != null && ipDets.Count > 0)
+        {
+            foreach (var sd in pPlanDetList)
+            {
+                var currentIpdets = ipDets.Where(d => d.Item == sd.Item && d.Flow == sd.Flow).ToList();
+                var showText = string.Empty;
+                if (currentIpdets != null && currentIpdets.Count > 0)
+                {
+                    showText = "<table><thead><tr><th>ASN号</th><th>路线</th><th>物料</th><th>数量</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentIpdets)
+                    {
+                        showText += "<td>" + c.IpNo + "</td><td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Qty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.IpDets = showText;
+            }
+        }
         #endregion
 
-        var planByDateIndexs = pPlanDetList.GroupBy(p => p.WindowTime).OrderBy(p => p.Key);
+        var planByDateIndexs = pPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
         var planByFlowItems = pPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item});
 
         StringBuilder str = new StringBuilder();
         //str.Append(CopyString());
         //head
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>包装量</th><th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>报验</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>路线</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>包装量</th><th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>报验</th><th rowspan='2'>在途</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
             ii++;
-            str.Append("<th colspan='4'>");
+            str.Append("<th colspan='5'>");
+            if (pPlanDetList.First().Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT)
+            {
+                str.Append("<input type='checkbox' id='CheckAll' key='HeadCheck' name='" + planByDateIndex.Key.ToString("yyyyMMdd") + "'  onclick='doCheckAllClick(this)' />");
+            }
             str.Append(planByDateIndex.Key.ToString("yyyy-MM-dd"));
             str.Append("</th>");
         }
         str.Append("</tr><tr class='GVHeader'>");
         foreach (var planByDateIndex in planByDateIndexs)
         {
-            str.Append("<th >需求数</th><th >订单数</th><th >采购数</th><th >期末</th>");
+            str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th><th >在途期末</th>");
         }
         str.Append("</tr></thead>");
         str.Append("<tbody>");
 
         #region  通过长度控制table的宽度
         string widths = "100%";
-        if (ii >= 14)
+        if (ii > 14)
         {
-            widths = "350%";
+            widths = "390%";
         }
         else if (ii > 10)
         {
-            widths = "210%";
+            widths = "300%";
         }
         else if (ii > 6)
         {
-            widths = "160%";
+            widths = "210%";
         }
         else if (ii > 4)
         {
-            widths = "140%";
+            widths = "170%";
         }
 
         headStr += string.Format("<table id='tt' runat='server' border='1' class='GV' style='width:{0};border-collapse:collapse;'>", widths);
@@ -336,7 +340,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             str.Append("<td>");
             str.Append(firstPlan.MaxStock.ToString("0.##"));
             str.Append("</td>");
-            var InitStockQty = firstPlan.InitStock + firstPlan.InspectQty;  //+ firstPlan.InTransitQty
+            var InitStockQty = firstPlan.InitStock + firstPlan.InspectQty + firstPlan.InTransitQty;
             string colorStr = "";
             if (InitStockQty < firstPlan.SafeStock)
             {
@@ -365,30 +369,33 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             str.Append(colorStr);
             str.Append(firstPlan.InitStock.ToString("0.##"));
             str.Append("</td>");
-            //if (InitStockQty < firstPlan.SafeStock)
-            //{
-            //    str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:red;color:white' >", firstPlan.IpDets));
-            //}
-            //else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
-            //{
-            //    str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:green;color:white' >", firstPlan.IpDets));
-            //}
-            //else if (InitStockQty > firstPlan.MaxStock)
-            //{
-            //    str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:orange' >", firstPlan.IpDets));
-            //}
-            //str.Append((firstPlan.InTransitQty).ToString("0.##"));
-            //str.Append("</td>");
             str.Append(colorStr);
-            str.Append((firstPlan.InspectQty).ToString("0.##"));
+            str.Append(firstPlan.InspectQty.ToString("0.##"));
             str.Append("</td>");
-            //InitStockQty = InitStockQty - firstPlan.InTransitQty;
+            //str.Append(colorStr);
+            //str.Append(firstPlan.InTransitQty.ToString("0.##"));
+            //str.Append("</td>");
+            if (InitStockQty < firstPlan.SafeStock)
+            {
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:red;color:white' >", firstPlan.IpDets));
+            }
+            else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
+            {
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:green;color:white' >", firstPlan.IpDets));
+            }
+            else if (InitStockQty > firstPlan.MaxStock)
+            {
+                str.Append(string.Format("<td tital='{0}'  onclick='doShowIpdets(this)' style='background:orange' >", firstPlan.IpDets));
+            }
+            str.Append((firstPlan.InTransitQty).ToString("0.##"));
+            str.Append("</td>");
+            InitStockQty = InitStockQty - firstPlan.InTransitQty;
             int fi = 0;
             foreach (var planByDateIndex in planByDateIndexs)
             {
-                // str.Append("<th >需求数</th><th >订单数</th><th >采购数</th><th >期末</th>")
-                var curenPlan = planByFlowItem.Where(p => p.WindowTime == planByDateIndex.Key);
-                var pPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet();
+                //str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th><th >在途期末</th>");
+                var curenPlan = planByFlowItem.Where(p => p.StartTime == planByDateIndex.Key);
+                var pPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet2();
                 str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", pPlanDet.Logs));
                 str.Append(pPlanDet.ReqQty.ToString("0.##"));
                 str.Append("</td>");
@@ -405,6 +412,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                 else
                 {
                     str.Append("<td>");
+                    str.Append("<input type='checkbox' id='CheckBoxGroup' name='D" + planByDateIndex.Key.ToString("yyyyMMdd") + "' value='" + pPlanDet.Id + "' runat='' onclick='doCheckClick(this)' />");
                     str.Append(pPlanDet.PurchaseQty.ToString("0.##"));
                     str.Append("</td>");
                 }
@@ -416,63 +424,63 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                 //    fi++;
                 //}
                 //InitStockQty = InitStockQty + ipQty - pPlanDet.ReqQty + pPlanDet.OrderQty + pPlanDet.PurchaseQty;
-                InitStockQty = InitStockQty - pPlanDet.ReqQty + pPlanDet.OrderQty + pPlanDet.PurchaseQty;
-                if (InitStockQty < firstPlan.SafeStock)
-                {
-                    colorStr = "<td style='background:red;color:white'>";
-                }
-                else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
-                {
-                    colorStr = "<td style='background:green;color:white' >";
-                }
-                else if (InitStockQty > firstPlan.MaxStock)
-                {
-                    colorStr = "<td style='background:orange;'>";
-                }
-                str.Append(colorStr);
-                str.Append(InitStockQty.ToString("0.##"));
-                str.Append("</td>");
-
-                #region
-                //var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
-                //var orderQtySum = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
-                //var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.PurchaseQty);
-                //var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
-
-                //InitStockQty = firstPlan.InitStock + ipQty + orderQtySum + shipQtySum - reqQtySum;
-
-                //var inTransitQty = firstPlan.InTransitQty;
-
-
-                //var ipQty2 = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
-                //var orderQtySum2 = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
-                //var shipQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key && i.WindowTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key && i.WindowTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.PurchaseQty) : 0;
-                ////var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty);
-
-                //inTransitQty = inTransitQty - ipQty2 + orderQtySum2 + shipQtySum2;
-                //var redColor = InitStockQty + inTransitQty;
-
-
-                //if (redColor < firstPlan.SafeStock)
+                //InitStockQty = InitStockQty - pPlanDet.ReqQty + pPlanDet.OrderQty + pPlanDet.PurchaseQty;
+                //if (InitStockQty < firstPlan.SafeStock)
                 //{
                 //    colorStr = "<td style='background:red;color:white'>";
                 //}
-                //else if (redColor >= firstPlan.SafeStock && redColor <= firstPlan.MaxStock)
+                //else if (InitStockQty >= firstPlan.SafeStock && InitStockQty <= firstPlan.MaxStock)
                 //{
                 //    colorStr = "<td style='background:green;color:white' >";
                 //}
-                //else if (redColor > firstPlan.MaxStock)
+                //else if (InitStockQty > firstPlan.MaxStock)
                 //{
                 //    colorStr = "<td style='background:orange;'>";
                 //}
                 //str.Append(colorStr);
                 //str.Append(InitStockQty.ToString("0.##"));
                 //str.Append("</td>");
-                ////InitStockQty = InitStockQty + shipPlanDet.OrderQty;
 
-                //str.Append(colorStr);
-                //str.Append(inTransitQty.ToString("0.##"));
-                //str.Append("</td>");
+                #region
+               var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
+               var orderQtySum = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
+                var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.PurchaseQty);
+                var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
+
+                InitStockQty = firstPlan.InitStock + firstPlan.InspectQty + ipQty + orderQtySum + shipQtySum - reqQtySum;
+
+                var inTransitQty = firstPlan.InTransitQty;
+
+
+                var ipQty2 = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
+                var orderQtySum2 = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
+                var shipQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.PurchaseQty) : 0;
+                //var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty);
+
+                inTransitQty = inTransitQty - ipQty2 + orderQtySum2 + shipQtySum2;
+                var redColor = InitStockQty + inTransitQty;
+
+
+                if (redColor < firstPlan.SafeStock)
+                {
+                    colorStr = "<td style='background:red;color:white'>";
+                }
+                else if (redColor >= firstPlan.SafeStock && redColor <= firstPlan.MaxStock)
+                {
+                    colorStr = "<td style='background:green;color:white' >";
+                }
+                else if (redColor > firstPlan.MaxStock)
+                {
+                    colorStr = "<td style='background:orange;'>";
+                }
+                str.Append(colorStr);
+                str.Append(InitStockQty.ToString("0.##"));
+                str.Append("</td>");
+                //InitStockQty = InitStockQty + shipPlanDet.OrderQty;
+
+                str.Append(colorStr);
+                str.Append(inTransitQty.ToString("0.##"));
+                str.Append("</td>");
                 #endregion
             }
             str.Append("</tr>");
@@ -481,7 +489,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         this.list.InnerHtml = headStr + str.ToString();
     }
 
-    private void WeeklyListTable(IList<PurchasePlanDet> pPlanDetList)
+    private void WeeklyListTable(IList<PurchasePlanDet2> pPlanDetList)
     {
         if (pPlanDetList == null || pPlanDetList.Count == 0)
         {
@@ -558,8 +566,30 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         }
         #endregion
 
+        #region    在途
+        IList<PurchasePlanIpDet2> ipDets = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanIpDet2>(" select s from  PurchasePlanIpDet2 as s where s.PurchasePlanId=? and s.Type='" + this.rbType.SelectedValue + "'  ", pPlanDetList.First().PurchasePlanId);    //
+        ipDets = ipDets == null ? new List<PurchasePlanIpDet2>() : ipDets;
+        if (ipDets != null && ipDets.Count > 0)
+        {
+            foreach (var sd in pPlanDetList)
+            {
+                var currentIpdets = ipDets.Where(d => d.Item == sd.Item && d.Flow == sd.Flow).ToList();
+                var showText = string.Empty;
+                if (currentIpdets != null && currentIpdets.Count > 0)
+                {
+                    showText = "<table><thead><tr><th>ASN号</th><th>路线</th><th>物料</th><th>数量</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                    foreach (var c in currentIpdets)
+                    {
+                        showText += "<td>" + c.IpNo + "</td><td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Qty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                    }
+                    showText += " </tr></tbody></table> ";
+                }
+                sd.IpDets = showText;
+            }
+        }
+        #endregion
 
-        var planByDateIndexs = pPlanDetList.GroupBy(p => p.WindowTime).OrderBy(p => p.Key);
+        var planByDateIndexs = pPlanDetList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
         var planByFlowItems = pPlanDetList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item });
 
         StringBuilder str = new StringBuilder();
@@ -578,7 +608,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         str.Append("</tr><tr class='GVHeader'>");
         foreach (var planByDateIndex in planByDateIndexs)
         {
-            str.Append("<th >需求数</th><th >订单数</th><th >采购数</th>");
+            str.Append("<th >需求数</th><th >订单数</th><th >计划数</th>");
         }
         str.Append("</tr></thead>");
         str.Append("<tbody>");
@@ -644,9 +674,9 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
        
             foreach (var planByDateIndex in planByDateIndexs)
             {
-                // str.Append("<th >需求数</th><th >订单数</th><th >采购数</th><th >期末</th>")
+                // str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th><th >在途期末</th>")
                 var curenPlan = planByFlowItem.Where(p => p.WindowTime == planByDateIndex.Key);
-                var pPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet();
+                var pPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet2();
                 str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", pPlanDet.Logs));
                 str.Append(pPlanDet.ReqQty.ToString("0.##"));
                 str.Append("</td>");
@@ -776,7 +806,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             {
                 ShowErrorMessage("没有要修改的计划。");
             }
-            TheMrpMgr.UpdatePurchasePlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser,this.rbType.SelectedValue);
+            TheMrpMgr.UpdatePurchasePlanQty2(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser,this.rbType.SelectedValue);
             ShowSuccessMessage("修改成功。");
             this.btnSearch_Click(null, null);
         }
@@ -802,10 +832,10 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
 select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime,isnull(det.uc,0),isnull(f.MrpLeadTime,0),m.Id,isnull(det.MinLotSize,0)
- from MRP_PurchasePlanDet as det 
-inner join MRP_PurchasePlanMstr as m on m.Id=det.PurchasePlanId
+ from MRP_PurchasePlanDet2 as det 
+inner join MRP_PurchasePlanMstr2 as m on m.Id=det.PurchasePlanId
  inner join FlowMstr as f on det.Flow=f.Code
-left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
+left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1   ";
 
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
@@ -839,12 +869,12 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         searchSql += " order by det.Flow,det.Item asc ";
 
         var flowCodes = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
-        var purchasePlanDetList = new List<PurchasePlanDet>();
+        var pPlanDetList = new List<PurchasePlanDet2>();
         foreach (System.Data.DataRow row in flowCodes.Rows)
         {
             //det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),
             //isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0)
-            purchasePlanDetList.Add(new PurchasePlanDet
+            pPlanDetList.Add(new PurchasePlanDet2
             {
                 Id = Convert.ToInt32(row[0].ToString()),
                 UUID = row[1].ToString(),
@@ -873,52 +903,76 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         }
         if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
         {
-            var minStartTime = purchasePlanDetList.Min(s => s.WindowTime).AddDays(13);
-            purchasePlanDetList = purchasePlanDetList.Where(s => s.WindowTime <= minStartTime).ToList();
+            var minWindowTime = pPlanDetList.Min(s => s.StartTime).AddDays(13);
+            pPlanDetList = pPlanDetList.Where(s => s.StartTime <= minWindowTime).ToList();
 
             #region   trace
-            List<PurchasePlanDetTrace> traceList = new List<PurchasePlanDetTrace>();
+            List<PurchasePlanDetTrace2> traceList = new List<PurchasePlanDetTrace2>();
             int len = 0;
-            int j = purchasePlanDetList.Count % 2000 == 0 ? purchasePlanDetList.Count / 2000 : purchasePlanDetList.Count / 2000 + 1;
+            int j = pPlanDetList.Count % 2000 == 0 ? pPlanDetList.Count / 2000 : pPlanDetList.Count / 2000 + 1;
             while (true)
             {
-                var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", purchasePlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+                var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace2>(string.Format(" select l from PurchasePlanDetTrace2 as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
                 if (cList != null && cList.Count > 0) { traceList.AddRange(cList); }
                 len++;
                 if (len == j) break;
             }
             //this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanDetTrace>(string.Format(" select l from PurchasePlanDetTrace as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Select(d => d.UUID).Distinct().ToArray())));
-            traceList = traceList == null ? new List<PurchasePlanDetTrace>() : traceList;
+            traceList = traceList == null ? new List<PurchasePlanDetTrace2>() : traceList;
             #endregion
 
             #region  orderQty
-            List<PurchasePlanOpenOrder> pPlanOpenOrderList = new List<PurchasePlanOpenOrder>();
+            List<PurchasePlanOpenOrder2> pPlanOpenOrderList = new List<PurchasePlanOpenOrder2>();
             len = 0;
             while (true)
             {
-                var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder>(string.Format(" select l from PurchasePlanOpenOrder as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", purchasePlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
+                var cList = this.TheGenericMgr.FindAllWithCustomQuery<PurchasePlanOpenOrder2>(string.Format(" select l from PurchasePlanOpenOrder2 as l where l.Type='{0}' and  l.UUID in ('{1}') ", this.rbType.SelectedValue, string.Join("','", pPlanDetList.Skip(len * 2000).Take((len + 1) * 2000).Select(d => d.UUID).Distinct().ToArray())));
                 if (cList != null && cList.Count > 0) { pPlanOpenOrderList.AddRange(cList); }
                 len++;
                 if (len == j) break;
             }
-            pPlanOpenOrderList = pPlanOpenOrderList == null ? new List<PurchasePlanOpenOrder>() : pPlanOpenOrderList;
+            pPlanOpenOrderList = pPlanOpenOrderList == null ? new List<PurchasePlanOpenOrder2>() : pPlanOpenOrderList;
+            #endregion
+
+            #region    在途
+            IList<PurchasePlanIpDet2> ipDets = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanIpDet2>(" select s from  PurchasePlanIpDet2 as s where s.PurchasePlanId=? and s.Type='" + this.rbType.SelectedValue + "'  ", pPlanDetList.First().PurchasePlanId);    //
+            ipDets = ipDets == null ? new List<PurchasePlanIpDet2>() : ipDets;
+            if (ipDets != null && ipDets.Count > 0)
+            {
+                foreach (var sd in pPlanDetList)
+                {
+                    var currentIpdets = ipDets.Where(d => d.Item == sd.Item && d.Flow == sd.Flow).ToList();
+                    var showText = string.Empty;
+                    if (currentIpdets != null && currentIpdets.Count > 0)
+                    {
+                        showText = "<table><thead><tr><th>ASN号</th><th>路线</th><th>物料</th><th>数量</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                        foreach (var c in currentIpdets)
+                        {
+                            showText += "<td>" + c.IpNo + "</td><td>" + c.Flow + "</td><td>" + c.Item + "</td><td>" + c.Qty.ToString("0.##") + "</td><td>" + c.StartTime.ToShortDateString() + "</td><td>" + c.WindowTime.ToShortDateString() + "</td></tr><tr>";
+                        }
+                        showText += " </tr></tbody></table> ";
+                    }
+                    sd.IpDets = showText;
+                }
+            }
             #endregion
 
 
             IList<object> data = new List<object>();
-            data.Add(purchasePlanDetList);
+            data.Add(pPlanDetList);
             data.Add(traceList);
+            data.Add(ipDets);
             data.Add(pPlanOpenOrderList);
-            TheReportMgr.WriteToClient("PurchasePlanDaily.xls", data, "PurchasePlanDaily.xls");
+            TheReportMgr.WriteToClient("PurchasePlanDaily2.xls", data, "PurchasePlanDaily2.xls");
         }
         else
         {
-            ExportWeeklyExcel(purchasePlanDetList);
+            //ExportWeeklyExcel(pPlanDetList);
         }
 
     }
 
-    private void ExportWeeklyExcel(IList<PurchasePlanDet> exportList)
+    private void ExportWeeklyExcel(IList<PurchasePlanDet2> exportList)
     {
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         Sheet sheet1 = hssfworkbook.CreateSheet("sheet1");
@@ -926,7 +980,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
 
         if (exportList != null && exportList.Count > 0)
         {
-            var planByDateIndexs = exportList.GroupBy(p => p.WindowTime).OrderBy(p => p.Key);
+            var planByDateIndexs = exportList.GroupBy(p => p.StartTime).OrderBy(p => p.Key);
             var planByFlowItems = exportList.OrderBy(p => p.Flow).GroupBy(p => new { p.Flow, p.Item });
             #region 写入字段
             Row rowHeader = sheet1.CreateRow(0);
@@ -975,7 +1029,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                         int i2 = i;
                         rowHeader2.CreateCell(i2++).SetCellValue("需求数");
                         rowHeader2.CreateCell(i2++).SetCellValue("订单数");
-                        rowHeader2.CreateCell(i2++).SetCellValue("采购数");
+                        rowHeader2.CreateCell(i2++).SetCellValue("计划数");
                         i += 3;
                     }
                 }
@@ -988,7 +1042,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
             foreach (var planByFlowItem in planByFlowItems)
             {
                 var firstPlan = planByFlowItem.First();
-                var planDic = planByFlowItem.GroupBy(d => d.WindowTime).ToDictionary(d => d.Key, d => d.Sum(q => q.PurchaseQty));
+                var planDic = planByFlowItem.GroupBy(d => d.StartTime).ToDictionary(d => d.Key, d => d.Sum(q => q.PurchaseQty));
                 l++;
                 Row rowDetail = sheet1.CreateRow(rowIndex);
                 int cell = 0;
@@ -1003,7 +1057,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
                 foreach (var planByDateIndex in planByDateIndexs)
                 {
                     var curenPlan = planByFlowItem.Where(p => p.StartTime == planByDateIndex.Key);
-                    var pdPlan = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet();
+                    var pdPlan = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet2();
                     var createCell = rowDetail.CreateCell(cell++);
                     createCell.SetCellType(CellType.NUMERIC);
                     createCell.SetCellValue(Convert.ToDouble(pdPlan.ReqQty));
@@ -1023,7 +1077,7 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
 
             hssfworkbook.Write(output);
 
-            string filename = "PurchasePlanWeekly.xls";
+            string filename = "PurchasePlanWeekly2.xls";
             Response.ContentType = "application/vnd.ms-excel";
             Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", filename));
             Response.Clear();
@@ -1060,6 +1114,34 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         {
             ShowErrorMessage(ex);
         }
+    }
+
+    protected void btnCreateOrder_Click(object sender, EventArgs e)
+    {
+        string ids = this.btIds.Value;
+        try
+        {
+            if (!string.IsNullOrEmpty(ids))
+            {
+                TheMrpMgr.CreateOrderByShipPlan(ids.Substring(0, ids.Length - 1), this.CurrentUser);
+                ShowSuccessMessage("发运计划生成订单成功。");
+                this.btnSearch_Click(null, null);
+            }
+            else
+            {
+                throw new BusinessErrorException("请选择要转订单明细。");
+            }
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex.Message);
+        }
+        catch (Exception et)
+        {
+            ShowErrorMessage(et.Message);
+        }
+
+
     }
 
 }

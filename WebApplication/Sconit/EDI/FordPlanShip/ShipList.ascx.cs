@@ -376,6 +376,7 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                 
 
                 #region   累计发货量
+                eDIFordPlan.LastShippedCumulative = eDIFordPlan.LastShippedCumulative.HasValue ? eDIFordPlan.LastShippedCumulative : 0;
                 //try
                 //{
                 //    eDIFordPlan.ShipQtyCum = decimal.Parse(((TextBox)gvr.FindControl("tbShipQtyCum")).Text.Trim());
