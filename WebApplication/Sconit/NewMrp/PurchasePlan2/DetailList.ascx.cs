@@ -1124,12 +1124,12 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
             if (!string.IsNullOrEmpty(ids))
             {
                 TheMrpMgr.CreateOrderByShipPlan(ids.Substring(0, ids.Length - 1), this.CurrentUser);
-                ShowSuccessMessage("发运计划生成订单成功。");
+                ShowSuccessMessage("发货成功。");
                 this.btnSearch_Click(null, null);
             }
             else
             {
-                throw new BusinessErrorException("请选择要转订单明细。");
+                throw new BusinessErrorException("请选择要发货订单明细。");
             }
         }
         catch (BusinessErrorException ex)
