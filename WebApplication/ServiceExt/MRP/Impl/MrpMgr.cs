@@ -132,8 +132,8 @@ namespace com.Sconit.Service.MRP.Impl
                 SqlParameter[] sqlParameterArr = new SqlParameter[1];
                 sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
                 sqlParameterArr[0].Value = user.Code;
-                this.genericMgr.GetDatasetByStoredProcedure("RunProductionPlanProxy", sqlParameterArr); 
-                
+                this.genericMgr.GetDatasetByStoredProcedure("RunProductionPlanProxy", sqlParameterArr);
+
             }
         }
 
@@ -640,7 +640,7 @@ namespace com.Sconit.Service.MRP.Impl
                                     continue;
                                 }
                                 else
-                                {                                   
+                                {
                                     MrpReceivePlan mrpReceivePlan = new MrpReceivePlan();
                                     mrpReceivePlan.Item = lackInventory.Item;
                                     mrpReceivePlan.ItemDescription = item.Description;
@@ -701,9 +701,9 @@ namespace com.Sconit.Service.MRP.Impl
             {
                 DateTime startDate = DateTime.Today;
                 DateTime endDate = startDate.AddDays(14);
-                if (dateType ==BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK)
+                if (dateType == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK)
                 {
-                    endDate = startDate.AddDays(7*30);
+                    endDate = startDate.AddDays(7 * 30);
                 }
 
                 if (startDate > endDate)
@@ -805,7 +805,7 @@ namespace com.Sconit.Service.MRP.Impl
                     #region 读取物料代码
                     try
                     {
-                         itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItemCode));
+                        itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItemCode));
                         if (itemCode == null)
                         {
                             errorMessages.Add(string.Format("物料不能为空,第{0}行", rowIndex));
@@ -829,7 +829,7 @@ namespace com.Sconit.Service.MRP.Impl
                     try
                     {
                         itemReference = ImportHelper.GetCellStringValue(row.GetCell(colRefItemCode));
-                      
+
                         //if (string.IsNullOrEmpty(itemReference))
                         //{
                         //    errorMessages.Add(string.Format("客户零件号不能为空,第{0}行." , rowIndex));
@@ -952,7 +952,7 @@ namespace com.Sconit.Service.MRP.Impl
                                 det.Type = dateType;
                                 det.DateFrom = Convert.ToDateTime(dateIndex);
                                 det.DateTo = dateType == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_WEEK ? det.DateFrom.AddDays(7) : det.DateFrom;
-                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d =>d[0].ToString() == flowCode && d[1].ToString() == itemCode)[5]);
+                                det.Uom = (string)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[5]);
                                 det.UnitCount = (decimal)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[4]);
                                 det.Qty = qty;
                                 det.Location = (string)(allActiveFlowDetList.FirstOrDefault(d => d[0].ToString() == flowCode && d[1].ToString() == itemCode)[6]);
@@ -989,10 +989,10 @@ namespace com.Sconit.Service.MRP.Impl
                 Dictionary<string, int> planVersions = new Dictionary<string, int>();
                 foreach (var allFlowCode in customerPlanList.Select(p => p.Flow).Distinct())
                 {
-                    planVersions.Add(allFlowCode, numberControlMgr.GenerateNumberNextSequence(string.Format("CustomerPlan_{0}_{1}",allFlowCode.ToString(), dateType.ToString() )));
+                    planVersions.Add(allFlowCode, numberControlMgr.GenerateNumberNextSequence(string.Format("CustomerPlan_{0}_{1}", allFlowCode.ToString(), dateType.ToString())));
                 }
 
-                var custmerPlnaGroup = customerPlanList.GroupBy(g => new { g.Flow}).ToDictionary(d=>d.Key,d=>d.ToList());
+                var custmerPlnaGroup = customerPlanList.GroupBy(g => new { g.Flow }).ToDictionary(d => d.Key, d => d.ToList());
 
                 foreach (var g in custmerPlnaGroup)
                 {
@@ -1148,16 +1148,16 @@ namespace com.Sconit.Service.MRP.Impl
 
         #region    修改发货计划
         [Transaction(TransactionMode.Requires)]
-        public void UpdateShipPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList,IList<string> dateFrom,User user,string type)
+        public void UpdateShipPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, string type)
         {
-            var dateTimeNow=System.DateTime.Now;
+            var dateTimeNow = System.DateTime.Now;
             Random r = new Random();
             for (int i = 0; i < idList.Count; i++)
             {
                 int id = int.Parse(idList[i]);
                 if (id == 0)
                 {
-                    IList<ShipPlanMstr> pMaster = this.genericMgr.FindAllWithCustomQuery<ShipPlanMstr>(" select m from ShipPlanMstr as m where m.ReleaseNo=? ",new object[]{ releaseNoList[i]});
+                    IList<ShipPlanMstr> pMaster = this.genericMgr.FindAllWithCustomQuery<ShipPlanMstr>(" select m from ShipPlanMstr as m where m.ReleaseNo=? ", new object[] { releaseNoList[i] });
                     IList<ShipPlanDet> searchPlandets = this.genericMgr.FindAllWithCustomQuery<ShipPlanDet>(" select d from ShipPlanDet as d where d.Flow=? and d.Item=? and d.ShipPlanId=? ", new object[] { flowList[i], itemList[i], pMaster.First().Id });
                     if (searchPlandets != null && searchPlandets.Count > 0)
                     {
@@ -1184,14 +1184,14 @@ namespace com.Sconit.Service.MRP.Impl
                         newShipPlanDet.LastModifyUser = user.Code;
                         newShipPlanDet.Version = 1;
                         newShipPlanDet.Id = 0;
-                        newShipPlanDet.Type=type;
+                        newShipPlanDet.Type = type;
                         newShipPlanDet.UUID = System.DateTime.Now.ToString() + r.Next(100, 500) + r.Next(511, 1000);
                         this.genericMgr.Create(newShipPlanDet);
                     }
                 }
                 else
                 {
-                    this.genericMgr.ExecuteSql(string.Format(" update MRP_ShipPlanDet set ShipQty={0},Version=Version+1,LastModifyDate='{2}',LastModifyUser='{3}' where id={1} ", qtyList[i], id,dateTimeNow,user.Code));
+                    this.genericMgr.ExecuteSql(string.Format(" update MRP_ShipPlanDet set ShipQty={0},Version=Version+1,LastModifyDate='{2}',LastModifyUser='{3}' where id={1} ", qtyList[i], id, dateTimeNow, user.Code));
                 }
             }
         }
@@ -1208,7 +1208,7 @@ namespace com.Sconit.Service.MRP.Impl
                 if (id == 0)
                 {
                     IList<ProductionPlanMstr> pMaster = this.genericMgr.FindAllWithCustomQuery<ProductionPlanMstr>(" select m from ProductionPlanMstr as m where m.ReleaseNo=? ", new object[] { releaseNoList[i] });
-                    IList<ProductionPlanDet> searchPlandets = this.genericMgr.FindAllWithCustomQuery<ProductionPlanDet>(" select d from ProductionPlanDet as d where d.Item=? and d.ShipPlanId=? ", new object[] {  itemList[i], pMaster.First().Id });
+                    IList<ProductionPlanDet> searchPlandets = this.genericMgr.FindAllWithCustomQuery<ProductionPlanDet>(" select d from ProductionPlanDet as d where d.Item=? and d.ShipPlanId=? ", new object[] { itemList[i], pMaster.First().Id });
                     if (searchPlandets != null && searchPlandets.Count > 0)
                     {
                         Random r = new Random();
@@ -1217,7 +1217,7 @@ namespace com.Sconit.Service.MRP.Impl
                         var first = searchPlandets.First();
                         ProductionPlanDet newShipPlanDet = new ProductionPlanDet();
                         newShipPlanDet.ProductionPlanId = first.ProductionPlanId;
-                        newShipPlanDet.UUID = System.DateTime.Now.ToString() + r.Next(100,500)+r.Next(511,1000);
+                        newShipPlanDet.UUID = System.DateTime.Now.ToString() + r.Next(100, 500) + r.Next(511, 1000);
                         newShipPlanDet.Type = type;
                         newShipPlanDet.Item = first.Item;
                         newShipPlanDet.ItemDesc = first.ItemDesc;
@@ -1251,7 +1251,7 @@ namespace com.Sconit.Service.MRP.Impl
 
         #region    修改采购计划
         [Transaction(TransactionMode.Requires)]
-        public void UpdatePurchasePlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user,string type)
+        public void UpdatePurchasePlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, string type)
         {
             var dateTimeNow = System.DateTime.Now;
             Random r = new Random();
@@ -1348,9 +1348,9 @@ namespace com.Sconit.Service.MRP.Impl
         }
         #endregion
 
-            #region    修改采购计划
+        #region    修改采购计划2
         [Transaction(TransactionMode.Requires)]
-        public void UpdatePurchasePlanQty2(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user,string type)
+        public void UpdatePurchasePlanQty2(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, string type)
         {
             var dateTimeNow = System.DateTime.Now;
             Random r = new Random();
@@ -1399,7 +1399,7 @@ namespace com.Sconit.Service.MRP.Impl
         }
         #endregion
 
-        
+
         #region    修改班产计划
         [Transaction(TransactionMode.Requires)]
         public void UpdateShiftPlanPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, IList<string> shiftCodeList)
@@ -1664,7 +1664,7 @@ namespace com.Sconit.Service.MRP.Impl
                 var releasNo = 0;
                 foreach (System.Data.DataRow row in createUsers.Rows)
                 {
-                    releasNo=int.Parse(row[0].ToString());
+                    releasNo = int.Parse(row[0].ToString());
                 }
                 var groupByFlow = shiftPlanList.GroupBy(g => g.ProdLine);
 
@@ -1774,7 +1774,7 @@ namespace com.Sconit.Service.MRP.Impl
                     if (allDFlowCodeList.Where(d => (d[0]).ToString() == dFlowCode).Count() == 0)
                     {
                         //throw new BusinessErrorException(string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode));
-                        errorMessages +="</br>"+ string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode);
+                        errorMessages += "</br>" + string.Format("第{0}行：销售路线{1}不存在。", rowCount, dFlowCode);
                         continue;
                     }
                     #endregion
@@ -1916,7 +1916,7 @@ namespace com.Sconit.Service.MRP.Impl
                         }
                         #endregion
 
-                        
+
 
                     }
 
@@ -1969,7 +1969,7 @@ namespace com.Sconit.Service.MRP.Impl
                             continue;
                         }
                     }
-                      
+
                     #endregion
                     //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
 
@@ -2006,27 +2006,28 @@ namespace com.Sconit.Service.MRP.Impl
                                         tLeadTime = result.Key.tLeadTime,
                                         list = result.ToList()
                                     }).ToList();
-                DateTime newTime=System.DateTime.Now;
+                DateTime newTime = System.DateTime.Now;
                 foreach (var byFlow in groupByFlows)
                 {
                     string upSql = "update FlowMstr set Code=Code ";
                     if (byFlow.dLeadTime != null)
                     {
-                        upSql += string.Format(",MrpLeadTime={0}",byFlow.dLeadTime);
+                        upSql += string.Format(",MrpLeadTime={0}", byFlow.dLeadTime);
                     }
                     if (!string.IsNullOrEmpty(byFlow.mrpCode.ToString()))
                     {
                         upSql += string.Format(",MrpCode='{0}'", byFlow.mrpCode);
                     }
-                    if (byFlow.dateFst != null) {
-                        upSql +=string.Format( " ,DateFst='{0}' ",byFlow.dateFst);
+                    if (byFlow.dateFst != null)
+                    {
+                        upSql += string.Format(" ,DateFst='{0}' ", byFlow.dateFst);
                     }
                     if (!string.IsNullOrEmpty(byFlow.workDate.ToString()))
                     {
-                        upSql += string.Format(",WorkDate='{0}'",byFlow.workDate);
+                        upSql += string.Format(",WorkDate='{0}'", byFlow.workDate);
                     }
-                    if (byFlow.tFlowCode!=null && !string.IsNullOrEmpty(byFlow.tFlowCode.ToString()))
-                    {                           
+                    if (byFlow.tFlowCode != null && !string.IsNullOrEmpty(byFlow.tFlowCode.ToString()))
+                    {
                         upSql += string.Format(",ShipFlow='{0}'", byFlow.tFlowCode);
                     }
                     upSql += string.Format(",lastModifyDate='{1}',LastModifyUser='{2}' where code='{0}' ", byFlow.dFlowCode, newTime, user.Code);
@@ -2041,8 +2042,8 @@ namespace com.Sconit.Service.MRP.Impl
                         upSql = string.Format(" update FlowDet set Uc={0},lastModifyDate='{1}',LastModifyUser='{2}' where Flow='{3}' and Item='{4}' ", l[10], newTime, user.Code, l[0], l[7]);
                         this.genericMgr.ExecuteSql(upSql);
 
-                        upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], l[10],newTime,user.Code, l[5], l[7]);
-                        this.genericMgr.ExecuteSql(upSql);  
+                        upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], l[10], newTime, user.Code, l[5], l[7]);
+                        this.genericMgr.ExecuteSql(upSql);
                     }
 
                 }
@@ -2276,7 +2277,7 @@ namespace com.Sconit.Service.MRP.Impl
 
                 int colFlowCode = 1;//采购路线
                 int colLeadTime = 2;//采购提前期
-                int colItemCode= 3;//物料代码
+                int colItemCode = 3;//物料代码
                 int colsafeStock = 4;//安全库存
                 int colMaxStock = 5;//最大库存
                 int colUnitCount = 6;//包装量
@@ -2347,7 +2348,7 @@ namespace com.Sconit.Service.MRP.Impl
 
                         if (currentFlow == null)
                         {
-                            errorMessages += "</br/>" + string.Format("第{0}行：采购路线{1}不存在。", rowCount,flowCode);
+                            errorMessages += "</br/>" + string.Format("第{0}行：采购路线{1}不存在。", rowCount, flowCode);
                             continue;
                         }
                         if (currentFlow.Type != "Procurement")
@@ -2457,13 +2458,13 @@ namespace com.Sconit.Service.MRP.Impl
 
                         #region 包装量
                         string rUc = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
-                        
+
                         if (!string.IsNullOrEmpty(rUc))
                         {
                             decimal s;
                             if (!decimal.TryParse(rUc, out s))
                             {
-                                errorMessages += "</br/>" + string.Format("第{0}行：包装量{1}填写有误。", rowCount,rUc);
+                                errorMessages += "</br/>" + string.Format("第{0}行：包装量{1}填写有误。", rowCount, rUc);
                                 continue;
                             }
                             currentFlowDetail.UnitCount = s;
@@ -2484,7 +2485,7 @@ namespace com.Sconit.Service.MRP.Impl
                 {
                     throw new BusinessErrorException("导入的有效数据为空。");
                 }
-                
+
                 DateTime nowTime = System.DateTime.Now;
                 foreach (var flow in upFlows)
                 {
@@ -2511,14 +2512,14 @@ namespace com.Sconit.Service.MRP.Impl
         #region  发运计划导入
         private static object readShipPlanFromXlsLock = new object();
         [Transaction(TransactionMode.Requires)]
-        public void ReadShipPlanFromXls(Stream inputStream, User user,ShipPlanMstr shipPlanMstr)
+        public void ReadShipPlanFromXls(Stream inputStream, User user, ShipPlanMstr shipPlanMstr)
         {
             lock (readShipPlanFromXlsLock)
             {
                 DateTime startDate = DateTime.Today;
                 DateTime endDate = startDate.AddDays(13);
                 DateTime nowTime = System.DateTime.Now;
-              
+
                 if (inputStream.Length == 0)
                 {
                     throw new BusinessErrorException("Import.Stream.Empty");
@@ -2587,11 +2588,11 @@ namespace com.Sconit.Service.MRP.Impl
                     {
                         int i = 11;
                         Random r = new Random();
-                        int t = r.Next(0,300);
-                        int tt = r.Next(500,1000);
-                        while(true)
+                        int t = r.Next(0, 300);
+                        int tt = r.Next(500, 1000);
+                        while (true)
                         {
-                            if (i >81)
+                            if (i > 81)
                             {
                                 break;
                             }
@@ -2623,7 +2624,7 @@ namespace com.Sconit.Service.MRP.Impl
                             #endregion
 
                             decimal qty = 0;
-                            if (row.GetCell(i+2) != null)
+                            if (row.GetCell(i + 2) != null)
                             {
                                 if (row.GetCell(i + 2).CellType == CellType.NUMERIC)
                                 {
@@ -2671,7 +2672,8 @@ namespace com.Sconit.Service.MRP.Impl
                                 }
                                 else
                                 {
-                                    if (qty == 0) {
+                                    if (qty == 0)
+                                    {
                                         i += 5;
                                         continue;
                                     }
@@ -2684,9 +2686,9 @@ namespace com.Sconit.Service.MRP.Impl
                                     {
                                         getFlowDetList.Add(new object[] { readRow[0].ToString(), readRow[1].ToString(), readRow[2].ToString(), readRow[3].ToString(), Convert.ToDecimal(readRow[4].ToString()), readRow[5].ToString(), readRow[6].ToString() });
                                     }
-                                    if (getFlowDetList.Count==0)
+                                    if (getFlowDetList.Count == 0)
                                     {
-                                        errorMessages.Add(string.Format("第{0}行:路线{1}中没有维护物料{2}", rowIndex,flowCode,itemCode));
+                                        errorMessages.Add(string.Format("第{0}行:路线{1}中没有维护物料{2}", rowIndex, flowCode, itemCode));
                                         i += 5;
                                         continue;
                                     }
@@ -2705,13 +2707,13 @@ namespace com.Sconit.Service.MRP.Impl
                                     nDet.UnitCount = Convert.ToDecimal(getFlowDetList[0][4]);
                                     nDet.LocFrom = getFlowDetList[0][1].ToString();
                                     nDet.LocTo = string.Empty;
-                                    nDet.StartTime =Convert.ToDateTime( dateIndex);
+                                    nDet.StartTime = Convert.ToDateTime(dateIndex);
                                     nDet.WindowTime = Convert.ToDateTime(dateIndex);
                                     nDet.CreateDate = nowTime;
                                     nDet.CreateUser = user.Code;
                                     nDet.LastModifyDate = nowTime;
-                                    nDet.LastModifyUser =user.Code;
-                                    nDet.Version =1;
+                                    nDet.LastModifyUser = user.Code;
+                                    nDet.Version = 1;
                                     nDet.OrgShipQty = 0;
                                     nDet.ReqQty = 0;
                                     nDet.UUID = System.DateTime.Now.ToString() + t++ + tt++;
@@ -2893,7 +2895,7 @@ namespace com.Sconit.Service.MRP.Impl
                             }
                             else
                             {
-                                var existsDet = existsDets.Where(e=>e.Item == itemCode && e.StartTime.ToString("yyyy-MM-dd") == dateIndex);
+                                var existsDet = existsDets.Where(e => e.Item == itemCode && e.StartTime.ToString("yyyy-MM-dd") == dateIndex);
                                 if (existsDet != null && existsDet.Count() > 0)
                                 {
                                     var first = existsDet.First();
@@ -3117,7 +3119,7 @@ namespace com.Sconit.Service.MRP.Impl
                                         if (!decimal.TryParse(qtyValue, out qty))
                                         {
                                             errorMessages.Add(string.Format("数量格式不正确,第{0}行", rowIndex));
-                                            i +=4;
+                                            i += 4;
                                             continue;
                                         }
                                     }
@@ -3161,7 +3163,7 @@ namespace com.Sconit.Service.MRP.Impl
                                     foreach (System.Data.DataRow readRow in flowDets.Rows)
                                     {
                                         //d.Flow,d.Item,d.RefItemCode,d.UC,d.UOM,i.Desc1,i.MinLotSize 
-                                        getFlowDetList.Add(new object[] { readRow[0].ToString(), readRow[1].ToString(), readRow[2].ToString(),  Convert.ToDecimal(readRow[3].ToString()),readRow[4].ToString(), readRow[5].ToString(), Convert.ToDecimal(readRow[6].ToString()) });
+                                        getFlowDetList.Add(new object[] { readRow[0].ToString(), readRow[1].ToString(), readRow[2].ToString(), Convert.ToDecimal(readRow[3].ToString()), readRow[4].ToString(), readRow[5].ToString(), Convert.ToDecimal(readRow[6].ToString()) });
                                     }
                                     if (getFlowDetList.Count == 0)
                                     {
@@ -3444,7 +3446,7 @@ namespace com.Sconit.Service.MRP.Impl
                                     purchasePlanDetList.Add(nDet);
                                 }
                             }
-                            i += 4;
+                            i += 5;
                         }
                     }
                     catch (Exception ex)
@@ -3477,14 +3479,32 @@ namespace com.Sconit.Service.MRP.Impl
                 }
             }
         }
+
+        [Transaction(TransactionMode.Requires)]
+        public void UpdatePurchaseDets(List<PurchasePlanDet2>  purchasePlanDetList)
+        {
+            foreach (var pPlan in purchasePlanDetList)
+            {
+                if (pPlan.Id > 0)
+                {
+                    this.genericMgr.Update(pPlan);
+                }
+                else
+                {
+                    this.genericMgr.Create(pPlan);
+                }
+            }
+        }
         #endregion
+
+
 
         #region  发运计划转订单
         [Transaction(TransactionMode.Requires)]
-        public void CreateOrderByShipPlan(string ids,User user)
+        public void CreateOrderByShipPlan(string ids, User user)
         {
             //string[] idArr = ids.Split(',');
-            string sql = string.Format(" select e from ShipPlanDet as e  where Id in ({0}) ",ids);
+            string sql = string.Format(" select e from ShipPlanDet as e  where Id in ({0}) ", ids);
             IList<ShipPlanDet> getDets = this.genericMgr.FindAllWithCustomQuery<ShipPlanDet>(sql);
             DateTime nowTime = System.DateTime.Now;
             if (getDets != null && getDets.Count > 0)
@@ -3499,7 +3519,7 @@ namespace com.Sconit.Service.MRP.Impl
                     {
                         foreach (var l in g)
                         {
-                            if (fd.Item.Code == l.Item && l.ShipQty>0)
+                            if (fd.Item.Code == l.Item && l.ShipQty > 0)
                             {
                                 flowDets.Add(fd);
                             }
@@ -3514,7 +3534,7 @@ namespace com.Sconit.Service.MRP.Impl
                     orderHead.IsAutoRelease = true;
                     foreach (var od in orderHead.OrderDetails)
                     {
-                       foreach (var l in g)
+                        foreach (var l in g)
                         {
                             if (od.Item.Code == l.Item)
                             {
@@ -3523,7 +3543,7 @@ namespace com.Sconit.Service.MRP.Impl
                                 l.OrderQty += l.ShipQty;
                                 l.ShipQty = 0;
                             }
-                        } 
+                        }
                     }
                     this.orderMgr.CreateOrder(orderHead, user);
                     orderHeads.Add(orderHead);
@@ -3545,7 +3565,7 @@ namespace com.Sconit.Service.MRP.Impl
                                 nOpenOrder.StartTime = l.StartTime;
                                 nOpenOrder.WindowTime = l.WindowTime;
                                 nOpenOrder.OrderQty = od.OrderedQty;
-                                nOpenOrder.ShipQty = od.ShippedQty.HasValue?od.ShippedQty.Value:0;
+                                nOpenOrder.ShipQty = od.ShippedQty.HasValue ? od.ShippedQty.Value : 0;
                                 nOpenOrder.RecQty = od.ReceivedQty.HasValue ? od.ReceivedQty.Value : 0;
                                 nOpenOrder.CreateDate = nowTime;
                                 nOpenOrder.CreateUser = user.Code;
@@ -3553,7 +3573,7 @@ namespace com.Sconit.Service.MRP.Impl
                                 this.genericMgr.Update(l);
                                 this.genericMgr.Create(nOpenOrder);
                             }
-                        } 
+                        }
                     }
                 }
 
@@ -3564,7 +3584,7 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
         #endregion
-
+                                                          
         //#region  生产计划转订单
         //[Transaction(TransactionMode.Requires)]
         //public void CreateOrderByProductionPlan(string ids, User user)
@@ -3742,7 +3762,7 @@ namespace com.Sconit.Service.MRP.Impl
             DateTime nowTime = System.DateTime.Now;
             if (getDets != null && getDets.Count > 0)
             {
-                var groups = getDets.GroupBy(g => new { g.Flow,  g.StartTime });
+                var groups = getDets.GroupBy(g => new { g.Flow, g.StartTime });
                 IList<OrderHead> orderHeads = new List<OrderHead>();
                 foreach (var g in groups)
                 {
@@ -4435,50 +4455,50 @@ namespace com.Sconit.Service.MRP.Impl
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, string msg)
         {
-          
+
         }
 
         private void InsertErrRunShipPlanLog(int batchNo, DateTime effDate, string userName, string msg)
         {
-           
+
         }
 
         private void InsertErrRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, string msg)
         {
-           
+
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, string msg)
         {
-            
+
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpReceivePlan mrpReceivePlan, string msg)
         {
-           
+
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, MrpLocationLotDetail inventory)
         {
-            
+
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpShipPlan mrpShipPlan, TransitInventory inventory)
         {
-           
+
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpLocationLotDetail lackInventory)
         {
-           
+
         }
 
         private void InsertInfoRunShipPlanLog(int batchNo, DateTime effDate, string userName, MrpLocationLotDetail lackInventory, TransitInventory inventory)
         {
-            
+
         }
 
-        
+
         #endregion
 
         class SafeInventory
