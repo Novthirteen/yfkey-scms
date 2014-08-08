@@ -59,7 +59,7 @@ namespace com.Sconit.Service.MasterData.Impl
             if (actingBill.CurrentBillQty != (actingBill.BillQty - actingBill.BilledQty))
             {
                 //本次开票数量大于剩余数量
-                if (actingBill.CurrentBillQty > (actingBill.BillQty - actingBill.BilledQty))
+                if (Math.Abs(actingBill.CurrentBillQty) > Math.Abs(actingBill.BillQty - actingBill.BilledQty))
                 {
                     throw new BusinessErrorException("ActingBill.Error.CurrentBillQtyGeRemainQty");
                 }
