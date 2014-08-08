@@ -671,11 +671,11 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
             str.Append("<td>");
             str.Append(firstPlan.MaxStock.ToString("0.##"));
             str.Append("</td>");
-       
+
             foreach (var planByDateIndex in planByDateIndexs)
             {
                 // str.Append("<th >需求数</th><th >订单数</th><th >发货数</th><th >期末</th><th >在途期末</th>")
-                var curenPlan = planByFlowItem.Where(p => p.WindowTime == planByDateIndex.Key);
+                var curenPlan = planByFlowItem.Where(p => p.StartTime == planByDateIndex.Key);
                 var pPlanDet = curenPlan.Count() > 0 ? curenPlan.First() : new PurchasePlanDet2();
                 str.Append(string.Format("<td tital='{0}'  onclick='doTdClick(this)'>", pPlanDet.Logs));
                 str.Append(pPlanDet.ReqQty.ToString("0.##"));
@@ -683,19 +683,9 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
                 str.Append(string.Format("<td tital='{0}'  onclick='doShowDetsClick(this)'>", pPlanDet.OrderDets));
                 str.Append(pPlanDet.OrderQty.ToString("0.##"));
                 str.Append("</td>");
-                if (firstPlan.Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)
-                {
-                    seq++;
-                    str.Append("<td width='30px'>");
-                    str.Append("<input  type='text' flow='" + firstPlan.Flow + "' item='" + firstPlan.Item + "'  name='UpQty' id='" + pPlanDet.Id + "'value='" + pPlanDet.PurchaseQty.ToString("0.##") + "' releaseNo='" + firstPlan.ReleaseNo + "'  dateFrom='" + planByDateIndex.Key + "' style='width:70px' onblur='doFocusClick(this)' seq='" + seq + "' />");
-                    str.Append("</td>");
-                }
-                else
-                {
-                    str.Append("<td>");
-                    str.Append(pPlanDet.PurchaseQty.ToString("0.##"));
-                    str.Append("</td>");
-                }
+                str.Append("<td>");
+                str.Append(pPlanDet.PurchaseQty.ToString("0.##"));
+                str.Append("</td>");
             }
             str.Append("</tr>");
         }
@@ -961,13 +951,13 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
             IList<object> data = new List<object>();
             data.Add(pPlanDetList);
             data.Add(traceList);
-            data.Add(ipDets);
             data.Add(pPlanOpenOrderList);
+            data.Add(ipDets);
             TheReportMgr.WriteToClient("PurchasePlanDaily2.xls", data, "PurchasePlanDaily2.xls");
         }
         else
         {
-            //ExportWeeklyExcel(pPlanDetList);
+            ExportWeeklyExcel(pPlanDetList);
         }
 
     }
@@ -1096,12 +1086,12 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
             if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
             {
 
-                var purchasePlanMstr = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanMstr>(" select s from PurchasePlanMstr as s where s.ReleaseNo=? ", currentRelesNo).First();
+                var purchasePlanMstr = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanMstr2>(" select s from PurchasePlanMstr2 as s where s.ReleaseNo=? ", currentRelesNo).First();
                 if (purchasePlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
                 {
                     throw new BusinessErrorException("已释放的采购计划不能导入。");
                 }
-                TheMrpMgr.ReadPurchasePlanFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser, purchasePlanMstr);
+                TheMrpMgr.ReadPurchasePlanFromXls2(fileUpload.PostedFile.InputStream, this.CurrentUser, purchasePlanMstr);
                 ShowSuccessMessage("导入成功。");
                 this.btnSearch_Click(null, null);
             }

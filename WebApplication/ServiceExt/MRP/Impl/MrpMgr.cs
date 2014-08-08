@@ -3237,7 +3237,7 @@ namespace com.Sconit.Service.MRP.Impl
         #region  采购计划导入2
         private static object readPurchasePlanFromXlsLock2 = new object();
         [Transaction(TransactionMode.Requires)]
-        public void ReadPurchasePlanFromXls2(Stream inputStream, User user, PurchasePlanMstr purchasePlanMstr)
+        public void ReadPurchasePlanFromXls2(Stream inputStream, User user, PurchasePlanMstr2 purchasePlanMstr)
         {
             lock (readPurchasePlanFromXlsLock2)
             {

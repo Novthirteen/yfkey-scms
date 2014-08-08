@@ -47,5 +47,7 @@ namespace com.Sconit.Service.MRP
         //void CreateOrderByProductionPlan(string ids, User user);
 
         void UpdateShiftPlanPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, IList<string> shiftCodeList);
+
+        void ReadPurchasePlanFromXls2(Stream inputStream, User user, PurchasePlanMstr2 purchasePlanMstr);
     }
 }
