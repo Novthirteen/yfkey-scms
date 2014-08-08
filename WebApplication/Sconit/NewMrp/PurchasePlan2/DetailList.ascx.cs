@@ -1123,7 +1123,7 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
         {
             if (!string.IsNullOrEmpty(ids))
             {
-                TheMrpMgr.CreateOrderByShipPlan(ids.Substring(0, ids.Length - 1), this.CurrentUser);
+                TheMrpMgr.CreateOrderByPurchasePlan(ids.Substring(0, ids.Length - 1), this.CurrentUser);
                 ShowSuccessMessage("发货成功。");
                 this.btnSearch_Click(null, null);
             }
