@@ -84,8 +84,8 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
         string flowCodeValues = this.tbFlow.Value.Trim();
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
-            flowCodeValues = flowCodeValues.Replace("\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\r\n", "','");
+            flowCodeValues = flowCodeValues.Replace("\n", "','");
         }
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
@@ -446,9 +446,9 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
                var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                var orderQtySum = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
                 var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.PurchaseQty);
-                var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
+                //var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
 
-                InitStockQty = firstPlan.InitStock + firstPlan.InspectQty + ipQty + orderQtySum + shipQtySum - reqQtySum;
+                InitStockQty = firstPlan.InitStock + firstPlan.InspectQty + ipQty + orderQtySum + shipQtySum ;    // - reqQtySum
 
                 var inTransitQty = firstPlan.InTransitQty;
 
@@ -833,8 +833,8 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
         string flowCodeValues = this.tbFlow.Value.Trim();
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
-            flowCodeValues = flowCodeValues.Replace("\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\r\n", "','");
+            flowCodeValues = flowCodeValues.Replace("\n", "','");
         }
         if (!string.IsNullOrEmpty(flowCodeValues))
         {

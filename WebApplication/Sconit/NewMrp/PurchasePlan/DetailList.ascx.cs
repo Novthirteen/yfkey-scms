@@ -83,8 +83,8 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         string flowCodeValues = this.tbFlow.Value.Trim();
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
-            flowCodeValues = flowCodeValues.Replace("\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\r\n", "','");
+            flowCodeValues = flowCodeValues.Replace("\n", "','");
         }
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
@@ -812,8 +812,8 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         string flowCodeValues = this.tbFlow.Value.Trim();
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
-            flowCodeValues = flowCodeValues.Replace("\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\r\n", "','");
+            flowCodeValues = flowCodeValues.Replace("\n", "','");
         }
         if (!string.IsNullOrEmpty(flowCodeValues))
         {

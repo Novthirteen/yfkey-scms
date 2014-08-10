@@ -70,8 +70,8 @@ from  MRP_ShipPlanDet as det
         string flowCodeValues = this.tbFlow.Value.Trim();
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
-            flowCodeValues = flowCodeValues.Replace("\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\r\n", "','");
+            flowCodeValues = flowCodeValues.Replace("\n", "','");
         }
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
@@ -836,8 +836,8 @@ from  MRP_ShipPlanDet as det
         string flowCodeValues = this.tbFlow.Value.Trim();
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
-            flowCodeValues = flowCodeValues.Replace("\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\r\n", "','");
+            flowCodeValues = flowCodeValues.Replace("\n", "','");
         }
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
