@@ -418,7 +418,7 @@ public partial class EDI_FordPlan_ShipList : ListModuleBase
                 #endregion
 
                 #region   内包装数量
-                eDIFordPlan.InPackQty = eDIFordPlan.PerLoadQty == null ? null : (decimal?)Convert.ToDecimal((eDIFordPlan.ShipQty.Value % eDIFordPlan.PerLoadQty.Value == 0 ? eDIFordPlan.ShipQty.Value / eDIFordPlan.PerLoadQty.Value : eDIFordPlan.ShipQty.Value / eDIFordPlan.PerLoadQty.Value + 1));
+                eDIFordPlan.InPackQty = eDIFordPlan.PerLoadQty == null ? 1 : (int?)Convert.ToInt32((eDIFordPlan.ShipQty.Value % eDIFordPlan.PerLoadQty.Value == 0 ? eDIFordPlan.ShipQty.Value / eDIFordPlan.PerLoadQty.Value : eDIFordPlan.ShipQty.Value / eDIFordPlan.PerLoadQty.Value + 1));
                 //try
                 //{
                 //    eDIFordPlan.InPackQty = decimal.Parse(((TextBox)gvr.FindControl("tbInPackQty")).Text.Trim());

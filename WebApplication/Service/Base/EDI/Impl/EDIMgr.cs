@@ -527,6 +527,17 @@ namespace com.Sconit.Service.EDI.Impl
                 currentFlow.FlowDetails = (from det in currentFlow.FlowDetails
                                           where shipEDIFordPlanList.Select(s => s.Item).Contains(det.Item.Code) 
                                           select det).ToList();
+
+                #region   路线明细
+                IList<FlowDetail> flowDets = new List<FlowDetail>();
+                var groupsByItem=currentFlow.FlowDetails.GroupBy(f => f.Item.Code).ToDictionary(d=>d.Key,d=>d.ToList());
+                foreach (var g in groupsByItem)
+                {
+                    flowDets.Add(g.Value.First());
+                }
+                currentFlow.FlowDetails = flowDets;
+                #endregion
+
                 #region 新建订单
                 OrderHead orderHead = orderMgr.TransferFlow2Order(currentFlow);
                 orderHead.SubType = "Nml";
