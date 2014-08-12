@@ -95,9 +95,9 @@ namespace com.Sconit.Service.Report.Yfk.Impl
                         var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item  && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                         var orderQtySum = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
                         var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.PurchaseQty);
-                        var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
+                        var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(i.MrpLeadTime)) <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(i.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
 
-                        var initStockQty = firstPlan.InitStock + firstPlan.InspectQty + ipQty + orderQtySum + shipQtySum;// -reqQtySum;
+                        var initStockQty = firstPlan.InitStock + firstPlan.InspectQty + ipQty + orderQtySum + shipQtySum -reqQtySum;
                         this.SetRowCell(pageIndex, rowIndex, cell++, Convert.ToDouble(initStockQty));
 
                         var inTransitQty = firstPlan.InTransitQty;

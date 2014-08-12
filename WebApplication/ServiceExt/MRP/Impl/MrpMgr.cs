@@ -2454,8 +2454,8 @@ namespace com.Sconit.Service.MRP.Impl
 
                         upItems.Add(currentItem);
 
-                        currentFlowDetail = currentFlow.FlowDetails.First(d => d.Item.Code == itemCode);
-
+                        //currentFlowDetail = currentFlow.FlowDetails.First(d => d.Item.Code == itemCode);
+                        var cFlowDetails = currentFlow.FlowDetails.Where(d => d.Item.Code == itemCode);
                         #region 包装量
                         string rUc = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
 
@@ -2467,8 +2467,12 @@ namespace com.Sconit.Service.MRP.Impl
                                 errorMessages += "</br/>" + string.Format("第{0}行：包装量{1}填写有误。", rowCount, rUc);
                                 continue;
                             }
-                            currentFlowDetail.UnitCount = s;
-                            upFlowDets.Add(currentFlowDetail);
+                            foreach (var fd in cFlowDetails)
+                            {
+                                fd.UnitCount = s;
+                                fd.HuLotSize = Convert.ToInt32(s);
+                                upFlowDets.Add(fd);
+                            }
                         }
                         #endregion
                     }

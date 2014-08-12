@@ -73,11 +73,12 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
-select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime,isnull(det.uc,0),isnull(f.MrpLeadTime,0),m.Id,isnull(det.MinLotSize,0)
+		select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,max(isnull(det.ReqQty,0)),max(isnull(det.PurchaseQty,0)),det.WindowTime,det.Version,m.ReleaseNo,m.Status,max(isnull(l.InitStock,0)),max(isnull(fd.SafeStock,0)),max(isnull(l.InTransitQty,0)),max(isnull(l.InspectQty,0)),max(isnull(det.OrderQty,0)),max(isnull(fd.MaxStock,0)),det.StartTime,max(isnull(det.uc,0)),max(isnull(f.MrpLeadTime,0)),m.Id,max(isnull(det.MinLotSize,0)),max(isnull(det.UnitQty,0))
  from MRP_PurchasePlanDet2 as det 
 inner join MRP_PurchasePlanMstr2 as m on m.Id=det.PurchasePlanId
- inner join FlowMstr as f on det.Flow=f.Code
-left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
+inner join FlowMstr as f on det.Flow=f.Code
+inner join FlowDet as fd on det.Flow=fd.Flow and det.Item=fd.Item
+left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1   ";
 
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
@@ -108,7 +109,7 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
             searchSql += string.Format(" and m.ReleaseNo ='{0}' ", currentRelesNo);
         }
 
-        searchSql += " order by det.Flow,det.Item asc ";
+        searchSql += " group by det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,det.WindowTime,det.Version,m.ReleaseNo,m.Status,det.StartTime,m.Id order by det.Flow,det.Item asc ";
 
         var flowCodes = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
         var purchasePlanDetList = new List<PurchasePlanDet2>();
@@ -141,6 +142,7 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
                 MrpLeadTime = Convert.ToDecimal(row[20]),
                 PurchasePlanId = Convert.ToInt32(row[21]),
                 MinLotSize = Convert.ToDecimal(row[22]),
+                UnitQty = Convert.ToDecimal(row[23]),
             });
         }
         if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
@@ -186,10 +188,10 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
                 var showText = string.Empty;
                 if (currentLogs != null && currentLogs.Count > 0)
                 {
-                    showText = "<table><thead><tr><th>成品物料号</th><th>计划日期</th><th>计划数量</th></tr></thead><tbody><tr>";
+                    showText = "<table><thead><tr><th>成品物料号</th><th>计划日期</th><th>计划数量</th><th>需求数量</th></tr></thead><tbody><tr>";
                     foreach (var c in currentLogs)
                     {
-                        showText += "<td>" + c.ProdItem + "</td><td>" + c.PlanDate.ToShortDateString() + "</td><td>" + c.ProdQty.ToString("0.##") + "</td></tr><tr>";
+                        showText += "<td>" + c.ProdItem + "</td><td>" + c.PlanDate.ToShortDateString() + "</td><td>" + c.ProdQty.ToString("0.##") + "</td><td>" + (c.ProdQty*(c.ScrapPct/100+c.RateQty)*sd.UnitQty).ToString("0.##") + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
@@ -446,9 +448,9 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
                var ipQty = ipDets.Where(i => i.Item == firstPlan.Item &&  i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item &&  i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                var orderQtySum = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
                 var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.PurchaseQty);
-                //var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
+                var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
 
-                InitStockQty = firstPlan.InitStock + firstPlan.InspectQty + ipQty + orderQtySum + shipQtySum ;    // - reqQtySum
+                InitStockQty = firstPlan.InitStock + firstPlan.InspectQty + ipQty + orderQtySum + shipQtySum - reqQtySum;
 
                 var inTransitQty = firstPlan.InTransitQty;
 
@@ -456,7 +458,7 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
                 var ipQty2 = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item &&  i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                 var orderQtySum2 = pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Count() > 0 ? pPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
                 var shipQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.PurchaseQty) : 0;
-                //var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty);
+                //var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty); traceList
 
                 inTransitQty = inTransitQty - ipQty2 + orderQtySum2 + shipQtySum2;
                 var redColor = InitStockQty + inTransitQty;
@@ -822,10 +824,11 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
-select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime,isnull(det.uc,0),isnull(f.MrpLeadTime,0),m.Id,isnull(det.MinLotSize,0)
+		select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,max(isnull(det.ReqQty,0)),max(isnull(det.PurchaseQty,0)),det.WindowTime,det.Version,m.ReleaseNo,m.Status,max(isnull(l.InitStock,0)),max(isnull(fd.SafeStock,0)),max(isnull(l.InTransitQty,0)),max(isnull(l.InspectQty,0)),max(isnull(det.OrderQty,0)),max(isnull(fd.MaxStock,0)),det.StartTime,max(isnull(det.uc,0)),max(isnull(f.MrpLeadTime,0)),m.Id,max(isnull(det.MinLotSize,0)),max(isnull(det.UnitQty,0))
  from MRP_PurchasePlanDet2 as det 
 inner join MRP_PurchasePlanMstr2 as m on m.Id=det.PurchasePlanId
- inner join FlowMstr as f on det.Flow=f.Code
+inner join FlowMstr as f on det.Flow=f.Code
+inner join FlowDet as fd on det.Flow=fd.Flow and det.Item=fd.Item
 left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1   ";
 
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
@@ -857,7 +860,8 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
             searchSql += string.Format(" and m.ReleaseNo ='{0}' ", currentRelesNo);
         }
 
-        searchSql += " order by det.Flow,det.Item asc ";
+        searchSql += " group by det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,det.WindowTime,det.Version,m.ReleaseNo,m.Status,det.StartTime,m.Id order by det.Flow,det.Item asc ";
+        //searchSql += " order by det.Flow,det.Item asc ";
 
         var flowCodes = TheGenericMgr.GetDatasetBySql(searchSql).Tables[0];
         var pPlanDetList = new List<PurchasePlanDet2>();
