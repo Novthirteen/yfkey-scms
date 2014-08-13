@@ -824,12 +824,12 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
-		select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,max(isnull(det.ReqQty,0)),max(isnull(det.PurchaseQty,0)),det.WindowTime,det.Version,m.ReleaseNo,m.Status,max(isnull(l.InitStock,0)),max(isnull(fd.SafeStock,0)),max(isnull(l.InTransitQty,0)),max(isnull(l.InspectQty,0)),max(isnull(det.OrderQty,0)),max(isnull(fd.MaxStock,0)),det.StartTime,max(isnull(det.uc,0)),max(isnull(f.MrpLeadTime,0)),m.Id,max(isnull(det.MinLotSize,0)),max(isnull(det.UnitQty,0))
+	select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,max(isnull(det.ReqQty,0)),max(isnull(det.PurchaseQty,0)),det.WindowTime,det.Version,m.ReleaseNo,m.Status,max(isnull(l.InitStock,0)),max(isnull(fd.SafeStock,0)),max(isnull(l.InTransitQty,0)),max(isnull(l.InspectQty,0)),max(isnull(det.OrderQty,0)),max(isnull(fd.MaxStock,0)),det.StartTime,max(isnull(det.uc,0)),max(isnull(f.MrpLeadTime,0)),m.Id,max(isnull(det.MinLotSize,0)),max(isnull(det.UnitQty,0))
  from MRP_PurchasePlanDet2 as det 
 inner join MRP_PurchasePlanMstr2 as m on m.Id=det.PurchasePlanId
 inner join FlowMstr as f on det.Flow=f.Code
 inner join FlowDet as fd on det.Flow=fd.Flow and det.Item=fd.Item
-left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1   ";
+left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1     ";
 
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
@@ -894,6 +894,7 @@ left join MRP_PurchasePlanInitLocationDet2 as l on det.PurchasePlanId=l.Purchase
                 MrpLeadTime = Convert.ToDecimal(row[20]),
                 PurchasePlanId = Convert.ToInt32(row[21]),
                 MinLotSize = Convert.ToDecimal(row[22]),
+                UnitQty = Convert.ToDecimal(row[23]),
             });
         }
         if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
