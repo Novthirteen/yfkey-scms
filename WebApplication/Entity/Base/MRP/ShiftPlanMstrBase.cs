@@ -11,12 +11,11 @@ namespace com.Sconit.Entity.MRP
     {
         #region O/R Mapping Properties
 
-    //<!--Id, RefPlanNo, ProdLine, Status, CreateDate, CreateUser, ReleaseDate, ReleaseUser, LastModifyDate, LastModifyUser, Version-->
+        //<!--Id, Status, ReleaseNo, BatchNo, CreateDate, CreateUser, ReleaseDate, ReleaseUser, LastModifyDate, LastModifyUser, Version-->
         public Int32 Id { get; set; }
-        public string RefPlanNo { get; set; }
-        public string ProdLine { get; set; }
-        public DateTime EffDate { get; set; }
         public string Status { get; set; }
+        public Int32 ReleaseNo { get; set; }
+        public Int32 BatchNo { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
         public DateTime LastModifyDate { get; set; }

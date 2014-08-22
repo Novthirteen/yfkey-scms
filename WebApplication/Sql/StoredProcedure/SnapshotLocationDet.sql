@@ -27,9 +27,9 @@ BEGIN
             begin tran
         end
 		
-		if not exists(select top 1 1 from MRP_LocationDetSnapShot) or
-			exists(select top 1 1 from MRP_LocationDetSnapShot where EffDate <> @DateNow)
-		begin
+		--if not exists(select top 1 1 from MRP_LocationDetSnapShot) or
+		--	exists(select top 1 1 from MRP_LocationDetSnapShot where EffDate <> @DateNow)
+		--begin
 			truncate table MRP_LocationDetSnapShot
 			insert into MRP_LocationDetSnapShot(Item, Location, Plant, Qty, InTransitQty, PurchaseInTransitQty, InspectQty, EffDate)
 			select loc.Item, loc.Location, r.Plant, SUM(Qty) as Qty, SUM(InTransitQty) as InTransitQty, SUM(PurchaseInTransitQty) as PurchaseInTransitQty, SUM(InspectQty) as InspectQty, @DateNow
@@ -73,7 +73,7 @@ BEGIN
 			) as loc inner join Location as l on l.Code = loc.Location
 			inner join Region as r on l.Region = r.Code
 			group by loc.Item, loc.Location, r.Plant
-		end
+		--end
 
 		if @trancount = 0 
 		begin  

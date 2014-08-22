@@ -19,7 +19,7 @@ using com.Sconit.Entity;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
-public partial class NewMrp_WeeklyShipPlan_List : ListModuleBase
+public partial class NewMrp_ShipPlan_List : ListModuleBase
 {
     public EventHandler EditEvent;
     public EventHandler SearchDetailEvent;
@@ -40,9 +40,9 @@ public partial class NewMrp_WeeklyShipPlan_List : ListModuleBase
     {
         if (e.Row.DataItem != null)
         {
-            WeeklyPurchasePlanMstr m = (WeeklyPurchasePlanMstr)e.Row.DataItem;
-            var runWeeklyMRPLog = TheGenericMgr.FindAllWithCustomQuery<RunWeeklyMRPLog>("select r from RunWeeklyMRPLog as r where r.BatchNo=?", m.BatchNo);
-            if (runWeeklyMRPLog == null || runWeeklyMRPLog.Count == 0)
+            PurchasePlanMstr2 m = (PurchasePlanMstr2)e.Row.DataItem;
+            var runShipPlanLogs = TheGenericMgr.FindAllWithCustomQuery<RunPurchasePlanLog2>("select r from RunPurchasePlanLog2 as r where r.BatchNo=?", m.BatchNo);
+            if (runShipPlanLogs == null || runShipPlanLogs.Count == 0)
             {
                 System.Web.UI.WebControls.LinkButton lbtnShowErrorMsg = e.Row.FindControl("lbtnShowErrorMsg") as System.Web.UI.WebControls.LinkButton;
                 lbtnShowErrorMsg.Visible = false;
@@ -67,7 +67,7 @@ public partial class NewMrp_WeeklyShipPlan_List : ListModuleBase
     protected void lbtnShowErrorMsg_Click(object sender, EventArgs e)
     {
         string batchNo = ((LinkButton)sender).CommandArgument;
-        var runShipPlanLogs = TheGenericMgr.FindAllWithCustomQuery<RunWeeklyMRPLog>("select r from RunWeeklyMRPLog as r where r.BatchNo=?", batchNo);
+        var runShipPlanLogs = TheGenericMgr.FindAllWithCustomQuery<RunPurchasePlanLog2>("select r from RunPurchasePlanLog2 as r where r.BatchNo=?", batchNo);
         this.ucShowErrorMsg.Visible = true;
         this.ucShowErrorMsg.InitPageParameter(runShipPlanLogs);
         //this.ucShowErrorMsg.
@@ -76,17 +76,16 @@ public partial class NewMrp_WeeklyShipPlan_List : ListModuleBase
     protected void btnSubmit_Click(object sender, EventArgs e)
     {
         string releaseNo = ((LinkButton)sender).CommandArgument;
-        IList<WeeklyPurchasePlanMstr> mstr = TheGenericMgr.FindAllWithCustomQuery<WeeklyPurchasePlanMstr>(string.Format(" select m from WeeklyPurchasePlanMstr as m where m.Status='{0}' and ReleaseNo={1} ", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE, releaseNo));
+        IList<PurchasePlanMstr2> mstr = TheGenericMgr.FindAllWithCustomQuery<PurchasePlanMstr2>(string.Format(" select m from PurchasePlanMstr2 as m where m.Status='{0}' and ReleaseNo={1} ", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE, releaseNo));
         if (mstr != null && mstr.Count > 0)
         {
-            WeeklyPurchasePlanMstr m = mstr.First();
+            PurchasePlanMstr2 m = mstr.First();
             DateTime dateNow = System.DateTime.Now;
             m.LastModifyUser = this.CurrentUser.Code;
             m.LastModifyDate = dateNow;
             m.ReleaseDate = dateNow;
             m.ReleaseUser = this.CurrentUser.Code;
             m.Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT;
-            m.Version += 1;
             TheGenericMgr.Update(m);
             ShowSuccessMessage("释放成功。");
         }

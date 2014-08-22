@@ -87,7 +87,7 @@ namespace com.Sconit.Entity.EDI
         /// <summary>
         /// 内包装类型个数
         /// </summary>
-        public decimal? InPackQty { get; set; }
+        public int? InPackQty { get; set; }
         /// <summary>
         /// 每个包装数量
         /// </summary>

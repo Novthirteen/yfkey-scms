@@ -1134,4 +1134,7 @@
   <data name="MrpParameterSetup" xml:space="preserve">
     <value>Mrp参数设置</value>
   </data>
+  <data name="ProcurementPlan2" xml:space="preserve">
+    <value>采购计划发货</value>
+  </data>
 </root>

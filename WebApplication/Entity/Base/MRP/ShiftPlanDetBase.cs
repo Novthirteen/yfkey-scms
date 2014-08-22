@@ -9,21 +9,21 @@ namespace com.Sconit.Entity.MRP
     [Serializable]
     public abstract class ShiftPlanDetBase : EntityBase
     {
-        //Id, PlanId, RefPlanNo, ProdLine, Item, ItemDesc, RefItemCode, Qty, Uom, UnitQty, PlanDate, Shift, CreateDate, CreateUser
+        //Id, MstrId, ProdLine, Item, ItemDesc, Qty, OrderQty, Uom, UnitQty, PlanDate, Shift, CreateDate, CreateUser, LastModifyDate, LastModifyUser
         public Int32 Id { get; set; }
-        public Int32 PlanId { get; set; }
-        public string RefPlanNo { get; set; }
+        public Int32 MstrId { get; set; }
         public string ProdLine { get; set; }
         public string Item { get; set; }
         public string ItemDesc { get; set; }
-        public string RefItemCode { get; set; }
         public decimal Qty { get; set; }
         public string Uom { get; set; }
-        public decimal UnitQty { get; set; }
+        public decimal UnitCount { get; set; }
         public DateTime PlanDate { get; set; }
         public string Shift { get; set; }
         public DateTime CreateDate { get; set; }
         public string CreateUser { get; set; }
+        public DateTime LastModifyDate { get; set; }
+        public string LastModifyUser { get; set; }
         
         
 

@@ -29,6 +29,7 @@ public partial class NewMrp_ShipPlan_List : ListModuleBase
     protected void Page_Load(object sender, EventArgs e)
     {
         this.ucShowErrorMsg.BackEvent += new System.EventHandler(this.Back_Render);
+        this.showTimes.Style.Value = "display:none";
     }
 
     public override void UpdateView()
@@ -110,7 +111,6 @@ public partial class NewMrp_ShipPlan_List : ListModuleBase
             m.ReleaseDate = dateNow;
             m.ReleaseUser = this.CurrentUser.Code;
             m.Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT;
-            m.Version += 1;
             TheGenericMgr.Update(m);
             ShowSuccessMessage("释放成功。");
         }
@@ -135,6 +135,7 @@ public partial class NewMrp_ShipPlan_List : ListModuleBase
         {
             ShowErrorMessage(ee.Message);
         }
+        this.showTimes.Style.Value = "display:none";
     }
 
     protected void Back_Render(object sender, EventArgs e)

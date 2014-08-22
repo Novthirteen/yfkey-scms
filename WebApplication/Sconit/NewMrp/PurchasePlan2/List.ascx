@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="List.ascx.cs" Inherits="NewMrp_WeeklyShipPlan_List" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="List.ascx.cs" Inherits="NewMrp_ShipPlan_List" %>
 <%@ Register Assembly="com.Sconit.Control" Namespace="com.Sconit.Control" TagPrefix="cc1" %>
 <%@ Register Src="ShowErrorMsg.ascx"   TagName="ShowErrorMsg"   TagPrefix="uc2" %>
 <fieldset>
@@ -10,10 +10,10 @@
             SelectCountMethod="FindCount" OnRowDataBound="GV_List_RowDataBound">
             <Columns>
                 <asp:BoundField DataField="ReleaseNo" HeaderText="版本号" SortExpression="ReleaseNo" />
-                <asp:BoundField DataField="EffDate" HeaderText="生效日期" SortExpression="EffDate" />
+                <asp:BoundField DataField="EffDateFormat" HeaderText="生效日期" SortExpression="EffDateFormat" />
                 <asp:BoundField DataField="Status" HeaderText="状态" SortExpression="Status" />
-                <asp:BoundField DataField="CreateDate" HeaderText="创建用户" SortExpression="CreateDate" />
-                <asp:BoundField DataField="CreateUser" HeaderText="创建时间" SortExpression="CreateUser" />
+                <asp:BoundField DataField="CreateUser" HeaderText="创建用户" SortExpression="CreateUser" />
+                <asp:BoundField DataField="CreateDate" HeaderText="创建时间" SortExpression="CreateDate" />
                 <asp:BoundField DataField="LastModifyUser" HeaderText="最后修改用户" SortExpression="LastModifyUser" />
                 <asp:BoundField DataField="LastModifyDate" HeaderText="最后修改时间" SortExpression="LastModifyDate" />
                 <asp:BoundField DataField="ReleaseUser" HeaderText="释放用户" SortExpression="LastModifyUser" />

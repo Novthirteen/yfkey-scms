@@ -40,6 +40,7 @@ BEGIN
 	declare @StartTime datetime
 	declare @LastOverflowCount int
 	declare @CurrentOverflowCount int
+	declare @ReleaseNo int
 
 	set @DateTimeNow = GetDate()
 	set @DateNow = CONVERT(datetime, CONVERT(varchar(10), @DateTimeNow, 121))
@@ -590,15 +591,18 @@ BEGIN
 
 		-----------------------------↓生成生产计划（日）-----------------------------
 		--删除未释放的发运计划
-		delete from MRP_ProductionPlanOpenOrder where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where ReleaseNo = @ShipPlanReleaseNo)
-		delete from MRP_ProductionPlanInitLocationDet where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where ReleaseNo = @ShipPlanReleaseNo)
-		delete from MRP_ProductionPlanDetTrace where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where ReleaseNo = @ShipPlanReleaseNo)
-		delete from MRP_ProductionPlanDet where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where ReleaseNo = @ShipPlanReleaseNo)
-		delete from MRP_ProductionPlanMstr where ReleaseNo = @ShipPlanReleaseNo
+		delete from MRP_ProductionPlanOpenOrder where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
+		delete from MRP_ProductionPlanInitLocationDet where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
+		delete from MRP_ProductionPlanDetTrace where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
+		delete from MRP_ProductionPlanDet where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
+		delete from MRP_ProductionPlanMstr where  [Status] = 'Create'
+
+		--获取ReleaseNo
+		select @ReleaseNo = ISNULL(MAX(ReleaseNo), 0) + 1 from MRP_ProductionPlanMstr
 
 		--新增主生产计划头
-		insert into MRP_ProductionPlanMstr(ReleaseNo, BatchNo, EffDate, CreateDate, CreateUser)
-		values(@ShipPlanReleaseNo, @BatchNo, @DateNow, @DateTimeNow, @RunUser)
+		insert into MRP_ProductionPlanMstr(ReleaseNo, BatchNo, EffDate, [Status], CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
+		values(@ReleaseNo, @BatchNo, @DateNow, 'Create', @DateTimeNow, @RunUser, @DateTimeNow, @RunUser, 1)
 
 		--获取主生产计划头Id
 		set @ProductionPlanId = @@Identity
@@ -673,7 +677,6 @@ BEGIN
         end 
        
 		set @Msg = N'运行主生产计划异常' + Error_Message()
-		insert into MRP_RunShipPlanLog(BatchNo, EffDate, Lvl, Msg, CreateDate, CreateUser) values(@BatchNo, @DateNow, 'Error', @Msg, @DateTimeNow, @RunUser)
 		RAISERROR(@Msg, 16, 1) 
 	end catch 
 END 

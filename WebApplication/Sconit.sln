@@ -19,7 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sql", "Sql", "{DF041382-619
 		Sql\Mes初始化脚本.sql = Sql\Mes初始化脚本.sql
 		Sql\readme.txt = Sql\readme.txt
 		Sql\sconittrunk20100812.sql = Sql\sconittrunk20100812.sql
-		Sql\update.sql = Sql\update.sql
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entity", "Entity\Entity.csproj", "{CADA5382-5233-4D03-9F4F-655382538AB1}"

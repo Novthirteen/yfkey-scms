@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Main.ascx.cs" Inherits="NewMrp_WeeklyPurchasePlan_Main" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="Main.ascx.cs" Inherits="NewMrp_PurchasePlan_Main" %>
 <%@ Register Src="Search.ascx" TagName="Search" TagPrefix="uc2" %>
 <%@ Register Src="List.ascx"   TagName="List"   TagPrefix="uc2" %>
 <%@ Register Src="DetailList.ascx"   TagName="DetailList"   TagPrefix="uc2" %>

@@ -160,13 +160,17 @@
                             <asp:Literal ID="lblDateFst" runat="server" Text="${MasterData.Flow.DateFst}:" />
                         </td>
                         <td class="td02">
-                            <asp:TextBox ID="tbDateFst" runat="server" Text='<%# Bind("DateFst") %>' />
+                            <asp:TextBox ID="tbDateFst" runat="server"  CssClass="inputRequired" Text='<%# Bind("DateFst") %>' />
+                            <asp:RequiredFieldValidator ID="rfvDateFst" runat="server" ErrorMessage="周的开始日期不能为空"
+                                Display="Dynamic" ControlToValidate="tbDateFst" ValidationGroup="vgSave"  />
                         </td>
                         <td class="td01">
                             <asp:Literal ID="lblWorkDatet" runat="server" Text="${MasterData.Flow.WorkDate}:" />
                         </td>
                         <td class="td02">
-                            <asp:TextBox ID="tbWorkDate" runat="server" Text='<%# Bind("WorkDate") %>' />
+                            <asp:TextBox ID="tbWorkDate" runat="server"  CssClass="inputRequired" Text='<%# Bind("WorkDate") %>' />
+                            <asp:RequiredFieldValidator ID="rfvWorkDate" runat="server" ErrorMessage="周工作日不能为空"
+                                Display="Dynamic" ControlToValidate="tbWorkDate" ValidationGroup="vgSave" />
                         </td>
                         
                     </tr>

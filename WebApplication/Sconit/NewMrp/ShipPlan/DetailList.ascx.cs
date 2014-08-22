@@ -43,6 +43,15 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.tbFlow.Value = string.Empty;
         this.list.InnerHtml = "";
         currentRelesNo = relesNo;
+        var shipPlanMstr = TheGenericMgr.FindAllWithCustomQuery<ShipPlanMstr>(" select s from ShipPlanMstr as s where s.ReleaseNo=? ", currentRelesNo).First();
+        if (shipPlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
+        {
+            this.importDiv.Visible = false;
+        }
+        else
+        {
+            this.importDiv.Visible = true;
+        }
     }
 
     protected void btnSearch_Click(object sender, EventArgs e)
@@ -61,8 +70,8 @@ from  MRP_ShipPlanDet as det
         string flowCodeValues = this.tbFlow.Value.Trim();
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
-            flowCodeValues = flowCodeValues.Replace("\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\r\n", "','");
+            flowCodeValues = flowCodeValues.Replace("\n", "','");
         }
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
@@ -231,12 +240,12 @@ from  MRP_ShipPlanDet as det
                 var showText = string.Empty;
                 if (currentOrders != null && currentOrders.Count > 0)
                 {
-                    showText = "<table><thead><tr><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th></tr></thead><tbody><tr>";
+                    showText = "<table><thead><tr><th>订单号</th><th>物料</th><th>订单数</th><th>发货数</th><th>收货数</th><th>开始时间</th><th>窗口时间</th><th>计划转订单</th></tr></thead><tbody><tr>";
                     foreach (var c in currentOrders)
                     {
                         string sTime = c.StartTime != c.OrgStartTime ? c.StartTime.ToShortDateString() + "(" + c.OrgStartTime.ToShortDateString() + ")" : c.StartTime.ToShortDateString();
                         string sWime = c.WindowTime != c.OrgWindowTime ? c.WindowTime.ToShortDateString() + "(" + c.OrgWindowTime.ToShortDateString() + ")" : c.WindowTime.ToShortDateString();
-                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + sTime + "</td><td>" + sWime + "</td></tr><tr>";
+                        showText += "<td>" + c.OrderNo + "</td><td>" + c.Item + "</td><td>" + c.OrderQty.ToString("0.##") + "</td><td>" + c.ShipQty.ToString("0.##") + "</td><td>" + c.RecQty.ToString("0.##") + "</td><td>" + sTime + "</td><td>" + sWime + "</td><td>" + c.TransferOrderFormat + "</td></tr><tr>";
                     }
                     showText += " </tr></tbody></table> ";
                 }
@@ -252,7 +261,7 @@ from  MRP_ShipPlanDet as det
         {
             foreach (var sd in shipPlanDetList)
             {
-                var currentIpdets = ipDets.Where(d => d.Item == sd.Item && d.Flow == sd.Flow).ToList();
+                var currentIpdets = ipDets.Where(d => d.Item == sd.Item ).ToList();
                 var showText = string.Empty;
                 if (currentIpdets != null && currentIpdets.Count > 0)
                 {
@@ -281,6 +290,10 @@ from  MRP_ShipPlanDet as det
         {
             ii++;
             str.Append("<th colspan='5'>");
+            if (shipPlanDetList.First().Status == BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT )
+            {
+                str.Append("<input type='checkbox' id='CheckAll' key='HeadCheck' name='" + planByDateIndex.Key.ToString("yyyyMMdd") + "'  onclick='doCheckAllClick(this)' />");
+            }
             str.Append(planByDateIndex.Key.ToString("yyyy-MM-dd"));
             str.Append("</th>");
         }
@@ -411,20 +424,24 @@ from  MRP_ShipPlanDet as det
                 else
                 {
                     str.Append("<td>");
+                    //if (planByDateIndex.Key.Date == System.DateTime.Now.Date)
+                    //{
+                    str.Append("<input type='checkbox' id='CheckBoxGroup' name='D" + planByDateIndex.Key.ToString("yyyyMMdd") + "' value='" + shipPlanDet.Id + "' runat='' onclick='doCheckClick(this)' />");
+                    //}
                     str.Append(shipPlanDet.ShipQty.ToString("0.##"));
                     str.Append("</td>");
                 }
-                var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
+                var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item  && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                 var orderQtySum = shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
                 var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.ShipQty);
-                var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
+                var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime<= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
 
                 InitStockQty = firstPlan.InitStock + ipQty + orderQtySum + shipQtySum - reqQtySum;
 
                 var inTransitQty = firstPlan.InTransitQty;
 
 
-                var ipQty2 = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
+                var ipQty2 = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item  && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                 var orderQtySum2 = shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Count() > 0 ? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
                 var shipQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.ShipQty) : 0;
                 //var reqQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty);
@@ -819,8 +836,8 @@ from  MRP_ShipPlanDet as det
         string flowCodeValues = this.tbFlow.Value.Trim();
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
-            flowCodeValues = flowCodeValues.Replace("\r\n", ",");
-            flowCodeValues = flowCodeValues.Replace("\n", ",");
+            flowCodeValues = flowCodeValues.Replace("\r\n", "','");
+            flowCodeValues = flowCodeValues.Replace("\n", "','");
         }
         if (!string.IsNullOrEmpty(flowCodeValues))
         {
@@ -1224,19 +1241,60 @@ from  MRP_ShipPlanDet as det
         }
     }
 
-    protected void btnImport_Click(object sender, EventArgs e)
+    protected void btnUpload_Click(object sender, EventArgs e)
     {
-        //try
-        //{
-        //    var dateType = (CodeMaster.TimeUnit)(int.Parse(this.rblDateType.SelectedValue));
-        //    var customerPlanList = TheMrpMgr.ReadCustomerPlanFromXls(fileUpload.PostedFile.InputStream, dateType, this.CurrentUser);
+        try
+        {
+            this.btQtyHidden.Value = string.Empty;
+            this.btSeqHidden.Value = string.Empty;
+            if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
+            {
+                var shipPlanMstr = TheGenericMgr.FindAllWithCustomQuery<ShipPlanMstr>(" select s from ShipPlanMstr as s where s.ReleaseNo=? ",currentRelesNo).First();
+                if (shipPlanMstr.Status == BusinessConstants.CODE_MASTER_BINDING_TYPE_VALUE_SUBMIT)
+                {
+                    throw new BusinessErrorException("已释放的发运计划不能导入。");
+                }
+                TheMrpMgr.ReadShipPlanFromXls(fileUpload.PostedFile.InputStream, this.CurrentUser, shipPlanMstr);
+                ShowSuccessMessage("导入成功。");
+                this.btnSearch_Click(null, null);
+            }
+            else
+            {
+                throw new BusinessErrorException("只能导入日计划。");
+            }
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
+    }
 
-        //    this.ListTable(customerPlanList);
-        //}
-        //catch (BusinessErrorException ex)
-        //{
-        //    ShowErrorMessage(ex);
-        //}
+    protected void btnCreateOrder_Click(object sender, EventArgs e)
+    {
+        string ids = this.btIds.Value;
+        try
+        {
+            if (!string.IsNullOrEmpty(ids))
+            {
+                TheMrpMgr.CreateOrderByShipPlan(ids.Substring(0, ids.Length - 1), this.CurrentUser);
+                ShowSuccessMessage("发运计划生成订单成功。");
+                this.btnSearch_Click(null, null);
+            }
+            else
+            {
+                throw new BusinessErrorException("请选择要转订单明细。");
+            }
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex.Message);
+        }
+        catch (Exception et)
+        {
+            ShowErrorMessage(et.Message);
+        }
+       
+
     }
 
 }

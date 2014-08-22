@@ -88,10 +88,10 @@ namespace com.Sconit.Service.Report.Yfk.Impl
                     this.SetRowCell(pageIndex, rowIndex, 4, firstPlan.ItemDesc);
                     this.SetRowCell(pageIndex, rowIndex, 5, firstPlan.RefItemCode);
                     this.SetRowCell(pageIndex, rowIndex, 6, firstPlan.UnitCount.ToString("0.##"));
-                    this.SetRowCell(pageIndex, rowIndex, 7, firstPlan.SafeStock.ToString("0.##"));
-                    this.SetRowCell(pageIndex, rowIndex, 8, firstPlan.MaxStock.ToString("0.##"));
-                    this.SetRowCell(pageIndex, rowIndex, 9, firstPlan.InitStock.ToString("0.##"));
-                    this.SetRowCell(pageIndex, rowIndex, 10, firstPlan.InTransitQty.ToString("0.##"));
+                    this.SetRowCell(pageIndex, rowIndex, 7, Convert.ToDouble(firstPlan.SafeStock));
+                    this.SetRowCell(pageIndex, rowIndex, 8, Convert.ToDouble(firstPlan.MaxStock));
+                    this.SetRowCell(pageIndex, rowIndex, 9, Convert.ToDouble(firstPlan.InitStock));
+                    this.SetRowCell(pageIndex, rowIndex, 10, Convert.ToDouble(firstPlan.InTransitQty));
 
                     int cell = 11;
                     foreach (var planByDateIndex in planByDateIndexs)
@@ -103,21 +103,21 @@ namespace com.Sconit.Service.Report.Yfk.Impl
                         this.SetRowCell(pageIndex, rowIndex, cell++, shipPlanDet.ShipQty.ToString("0.##"));
 
 
-                        var ipQty = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
+                        var ipQty = ipDets.Where(i => i.Item == firstPlan.Item &&  i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item  && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                         var orderQtySum = shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
                         var shipQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) <= planByDateIndex.Key).Sum(i => i.ShipQty);
                         var reqQtySum = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key).Sum(i => i.ReqQty) : 0;
 
                         var initStockQty = firstPlan.InitStock + ipQty + orderQtySum + shipQtySum - reqQtySum;
-                        this.SetRowCell(pageIndex, rowIndex, cell++, initStockQty.ToString("0.##"));
+                        this.SetRowCell(pageIndex, rowIndex, cell++, Convert.ToDouble(initStockQty));
 
                         var inTransitQty = firstPlan.InTransitQty;
-                        var ipQty2 = ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
+                        var ipQty2 = ipDets.Where(i => i.Item == firstPlan.Item && i.WindowTime <= planByDateIndex.Key).Count() > 0 ? ipDets.Where(i => i.Item == firstPlan.Item  && i.WindowTime <= planByDateIndex.Key).Sum(i => i.Qty) : 0;
                         var orderQtySum2 = shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Count() > 0 ? shipPlanOpenOrderList.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.WindowTime > planByDateIndex.Key).Sum(i => i.OrderQty - i.ShipQty) : 0;
                         var shipQtySum2 = planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Count() > 0 ? planByFlowItem.Where(i => i.Item == firstPlan.Item && i.Flow == firstPlan.Flow && i.StartTime <= planByDateIndex.Key && i.StartTime.AddDays(Convert.ToDouble(firstPlan.MrpLeadTime)) > planByDateIndex.Key).Sum(i => i.ShipQty) : 0;
                         inTransitQty = inTransitQty - ipQty2 + orderQtySum2 + shipQtySum2;
 
-                        this.SetRowCell(pageIndex, rowIndex, cell++, inTransitQty.ToString("0.##"));
+                        this.SetRowCell(pageIndex, rowIndex, cell++, Convert.ToDouble(inTransitQty));
 
                     }
                     if (this.isPageBottom(rowIndex, rowTotal))//页的最后一行

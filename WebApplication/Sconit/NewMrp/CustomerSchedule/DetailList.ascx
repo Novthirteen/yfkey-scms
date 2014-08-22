@@ -5,7 +5,7 @@
 <div id="search" runat="server">
     <table class="mtable" runat="server" id="tblSearch">
         <tr>
-           <%-- <td class="td01">
+            <%-- <td class="td01">
                 路线:
             </td>
             <td class="td02">
@@ -29,6 +29,7 @@
             </td>
             <td class="td02">
                 <asp:Button ID="btnSearch" runat="server" Text="查询" OnClick="btnSearch_Click" />
+                <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" OnClick="btnExport_Click" />
                 <asp:Button ID="btnBack" runat="server" Text=" 返回" OnClick="btnBack_Click" />
             </td>
         </tr>
@@ -38,8 +39,8 @@
     <asp:Literal ID="ltlPlanVersion" runat="server" />
     <div id="mstrList" runat="server">
     </div>
-    <div id="ShowTraceDiv" style="position:absolute;width:500px; ">
+    <div id="ShowTraceDiv" style="position: absolute; width: 500px;">
     </div>
-    <div id="ShowDetsDiv" style="position:absolute; width:500px;">
+    <div id="ShowDetsDiv" style="position: absolute; width: 500px;">
     </div>
 </div>

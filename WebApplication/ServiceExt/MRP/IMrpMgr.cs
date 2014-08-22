@@ -24,6 +24,7 @@ namespace com.Sconit.Service.MRP
         void UpdateShipPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, string type);
 
         void UpdatePurchasePlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, string type);
+        void UpdatePurchasePlanQty2(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, string type);
 
         void UpdateWeeklyPurchasePlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user);
         void ReadShipPlanParametersFromXls(Stream inputStream, User user);
@@ -31,6 +32,24 @@ namespace com.Sconit.Service.MRP
         void ReadProductionPlanParametersFromXls(Stream inputStream, User user);
 
         void ReadPurchasePlanParametersFromXls(Stream inputStream, User user);
-             
+
+        void ReadShipPlanFromXls(Stream inputStream, User user, ShipPlanMstr shipPlanMstr);
+
+        void ReadPurchasePlanFromXls(Stream inputStream, User user, PurchasePlanMstr purchasePlanMstr);
+
+        void CreateOrderByShipPlan(string ids, User user);
+
+        void CreateOrderByPurchasePlan(string ids, User user);
+
+        void UpdateProductionPlanQty(IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, string type);
+
+        void ReadProductionPlanFromXls(Stream inputStream, User user, ProductionPlanMstr productionPlanMstr);
+        //void CreateOrderByProductionPlan(string ids, User user);
+
+        void UpdateShiftPlanPlanQty(IList<string> flowList, IList<string> itemList, IList<string> idList, IList<decimal> qtyList, IList<string> releaseNoList, IList<string> dateFrom, User user, IList<string> shiftCodeList);
+
+        void ReadPurchasePlanFromXls2(Stream inputStream, User user, PurchasePlanMstr2 purchasePlanMstr);
+
+        void UpdatePurchaseDets(List<PurchasePlanDet2> purchasePlanDetList);
     }
 }

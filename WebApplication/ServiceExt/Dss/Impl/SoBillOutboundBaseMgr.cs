@@ -105,7 +105,8 @@ namespace com.Sconit.Service.Dss.Impl
                     dssExportHistory.Item = billDetail.ActingBill.Item.Code;
                     dssExportHistory.Location = dssExportHistory.DssOutboundControl.UndefinedString1;//客户库位
                     dssExportHistory.Qty = billDetail.BilledQty;
-                    dssExportHistory.EffectiveDate = billDetail.Bill.CreateDate.Date;
+                    //dssExportHistory.EffectiveDate = billDetail.Bill.CreateDate.Date;
+                    dssExportHistory.EffectiveDate = DateTime.Now;
                     dssExportHistory.PartyTo = billDetail.Bill.BillAddress.Party.Code;//客户
 
                     dssExportHistory.DefinedString1 = billDetail.Bill.BillNo;//开票通知单号
