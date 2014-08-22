@@ -710,6 +710,8 @@ namespace com.Sconit.Service.MasterData.Impl
             oldBill.LastModifyDate = dateTimeNow;
             oldBill.LastModifyUser = user;
 
+            //原账单暂估标记去掉
+            oldBill.HasProvEst = false;
             this.UpdateBill(oldBill);
             #endregion
 

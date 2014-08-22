@@ -51,7 +51,7 @@ namespace com.Sconit.Service.Dss.Impl
                 //  .Add(Expression.Gt("Id", dssOutboundControl.Mark))  不根据id了，根据是否导出，是否暂估和状态非创建
                 .Add(Expression.Eq("b.HasProvEst", false))
                 .Add(Expression.Eq("b.IsExport", false))
-                .Add(Expression.Not(Expression.Eq("b.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)))
+              //  .Add(Expression.Not(Expression.Eq("b.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_CREATE)))
                 .Add(Expression.Eq("b.TransactionType", BusinessConstants.BILL_TRANS_TYPE_SO))
                 .Add(Expression.In("b.Status", new string[] { BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT ,BusinessConstants.CODE_MASTER_STATUS_VALUE_CLOSE ,BusinessConstants.CODE_MASTER_STATUS_VALUE_VOID}));
 
