@@ -822,6 +822,7 @@ namespace com.Sconit.Service.EDI.Impl
                 throw new Exception("ÎÄ¼þÎª¿Õ¡£");
             }
             fileName = fileName.Substring(fileName.LastIndexOf("/") + 1);
+            fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
             //datStrs.ToList().Remove(datStrs.First());
             TEMP_FORD_EDI_830 fistEntity= new TEMP_FORD_EDI_830();
             for (int i = 0; i < datStrs.Length; i++)
@@ -836,7 +837,7 @@ namespace com.Sconit.Service.EDI.Impl
                     fistEntity.Sender_ID = GetLineDataValue(lineData, 3);
                     fistEntity.Receiver_ID_Title = GetLineDataValue(lineData, 4);
                     fistEntity.Receiver_ID = GetLineDataValue(lineData, 5);
-                    if (fileName.Contains("830"))
+                    if (fileName.Contains("_830_"))
                     {
                         fistEntity.BatchNo = numberControlMgr.GenerateNumberNextSequence(BusinessConstants.CODE_PREFIX_IMPORT_TEMPEDI830);
                     }
@@ -844,7 +845,7 @@ namespace com.Sconit.Service.EDI.Impl
                     //{
                     //    fistEntity.BatchNo = numberControlMgr.GenerateNumberNextSequence(BusinessConstants.CODE_PREFIX_IMPORT_TEMPEDI856);
                     //}
-                    else if (fileName.Contains("862"))
+                    else if (fileName.Contains("_862_"))
                     {
                         fistEntity.BatchNo = numberControlMgr.GenerateNumberNextSequence(BusinessConstants.CODE_PREFIX_IMPORT_TEMPEDI862);
                     }
@@ -887,7 +888,7 @@ namespace com.Sconit.Service.EDI.Impl
         private void CreateTemp_FORD_EDI(TEMP_FORD_EDI_830 fistEntity, string[] lineData, string fileName,string userName)
         {
             DateTime datetimeNow = System.DateTime.Now;
-            if (fileName.Contains("830"))
+            if (fileName.Contains("_830_"))
             {
                 #region 
                 TEMP_FORD_EDI_830 temp_FORD_EDI_830 = new TEMP_FORD_EDI_830();
@@ -989,7 +990,7 @@ namespace com.Sconit.Service.EDI.Impl
             //    this.genericMgr.Create(temp_FORD_EDI_856);
             //    #endregion
             //}
-            else if (fileName.Contains("862"))
+            else if (fileName.Contains("_862_"))
             {
                 TEMP_FORD_EDI_862 temp_FORD_EDI_862 = new TEMP_FORD_EDI_862();
                 temp_FORD_EDI_862.Message_Type_Code = fistEntity.Message_Type_Code;
