@@ -41,6 +41,56 @@ public partial class MasterData_User_New : NewModuleBase
         user = (User)e.InputParameters[0];
         RadioButtonList rblGender = (RadioButtonList)(this.FV_User.FindControl("rblGender"));
         string password = ((TextBox)(this.FV_User.FindControl("tbPassword"))).Text.Trim();
+
+        #region   校验密码
+        if (password.Length < 8)
+        {
+            throw new Exception("密码长度必须大于等于8，请重新输入。");
+        }
+
+        char[] letters = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+        char[] numbers = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        char[] specials = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '_' };
+
+        bool existsUpLetter = false;
+        bool existsLoLetter = false;
+        bool existsNumber = false;
+        bool existsSpecials = false;
+        foreach (var letter in password)
+        {
+            if (letters.Where(l => l == letter).Count() > 0)
+            {
+                existsUpLetter = true;
+                continue;
+            }
+            if (letters.Where(l => Convert.ToChar(l.ToString().ToLower()) == letter).Count() > 0)
+            {
+                existsLoLetter = true;
+                continue;
+            }
+            if (numbers.Where(l => l == letter).Count() > 0)
+            {
+                existsNumber = true;
+                continue;
+            }
+            if (specials.Where(l => l == letter).Count() > 0)
+            {
+                existsSpecials = true;
+                continue;
+            }
+        }
+        int count = 0;
+        if (existsUpLetter) count++;
+        if (existsLoLetter) count++;
+        if (existsNumber) count++;
+        if (existsSpecials) count++;
+
+        if (count < 3)
+        {
+            throw new Exception("密码不符合复杂度要求（英大小写、数、特殊字符4取3）");
+        }
+        #endregion
+
         password = FormsAuthentication.HashPasswordForStoringInConfigFile(password, "MD5");
         user.Code = user.Code.ToLower().Trim();
         user.Gender = rblGender.SelectedValue.Trim();

@@ -340,15 +340,41 @@ public partial class Finance_Bill_NewSearch : SearchModuleBase
                         {
                             if (qty == 0) break;//扣减完了
                             if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty == 0) continue;//actbill可用数量用完了
-                            if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty >= 0)
+                            //if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty >= 0)
+                            //{
+                            //    _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
+                            //    qty = 0;
+                            //}
+                            //else
+                            //{
+                            //    _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                            //    qty = qty - _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                            //}
+                            if (_actbill.BillQty > 0)
                             {
-                                _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
-                                qty = 0;
+                                if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty >= 0)
+                                {
+                                    _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
+                                    qty = 0;
+                                }
+                                else
+                                {
+                                    _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                                    qty = qty - _actbill.CurrentBillQty;
+                                }
                             }
                             else
                             {
-                                _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
-                                qty = qty - _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                                if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty <= 0)
+                                {
+                                    _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
+                                    qty = 0;
+                                }
+                                else
+                                {
+                                    _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                                    qty = qty - _actbill.CurrentBillQty;
+                                }
                             }
                             createBillList.Add(_actbill);
 

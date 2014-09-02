@@ -117,9 +117,12 @@ namespace com.Sconit.Control
                 IList<CodeMaster> newList = list;
                 list = new List<CodeMaster>();
                 list.Add(codeMstr);
-                foreach (CodeMaster codeMaster in newList)
+                if (newList != null && newList.Count > 0)
                 {
-                    list.Add(codeMaster);
+                    foreach (CodeMaster codeMaster in newList)
+                    {
+                        list.Add(codeMaster);
+                    }
                 }
             }
 
