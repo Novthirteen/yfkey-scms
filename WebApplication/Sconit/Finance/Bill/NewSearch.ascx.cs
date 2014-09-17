@@ -290,285 +290,293 @@ public partial class Finance_Bill_NewSearch : SearchModuleBase
 
     protected void btnUpload_Click(object sender, EventArgs e)
     {
-        HSSFWorkbook excel = new HSSFWorkbook(fileUpload.PostedFile.InputStream);
-        Sheet sheet = excel.GetSheetAt(0);
-        IEnumerator rows = sheet.GetRowEnumerator();
-        Row custrow = sheet.GetRow(2);
-        string cust = custrow.GetCell(1).StringCellValue;//客户代码
-        Customer customer = TheCustomerMgr.LoadCustomer(cust);
-        Row row_startdate = sheet.GetRow(3);
-        string startdate = row_startdate.GetCell(1).StringCellValue;//开始日期
-        Row row_enddate = sheet.GetRow(4);
-        string enddate = row_enddate.GetCell(1).StringCellValue;//结束日期
-        startdate = startdate == string.Empty ? DateTime.Now.AddMonths(-1).ToShortDateString() : startdate;
-        enddate = enddate == string.Empty ? DateTime.Now.ToShortDateString() : enddate;
-        IList<ActingBill> actingBillList = TheActingBillMgr.GetActingBill(cust, "", DateTime.Parse(startdate), DateTime.Parse(enddate), "", "", this.ModuleType, this.billNo);
-
-        var actbill = (from i in actingBillList//按ASN ITME聚合 得到总的可用数量
-                       group i by new
-                       {
-                           i.IpNo,
-                           i.Item.Code
-                       } into k
-                       select new
-                       {
-                           Item = k.Key.Code,
-                           IpNo = k.Key.IpNo,
-                           Amt = k.Sum(i => i.BillQty - i.BilledQty)
-                       }).ToList();
-
-        ImportHelper.JumpRows(rows, 7);
-        IList<ActingBill> createBillList = new List<ActingBill>();
-        IList<Bill> createdBill = new List<Bill>();
-
-        while (rows.MoveNext())
-        {
-            Row curow = (HSSFRow)rows.Current;
-            string asn = curow.GetCell(0).StringCellValue;
-            string item = curow.GetCell(1).NumericCellValue.ToString();
-
-            decimal qty = decimal.Parse(curow.GetCell(2).NumericCellValue.ToString());
-            if (asn != string.Empty)
-            {
-                var temp_qty = actbill.Where(i => i.Item == item && i.IpNo == asn).ToList();
-                if (temp_qty.Count > 0)
-                {
-                    if (Math.Abs(temp_qty[0].Amt) - Math.Abs(qty) >= 0)
-                    {
-                        IList<ActingBill> result = actingBillList.Where(i => i.Item.Code == item && i.IpNo == asn).ToList();
-                        foreach (ActingBill _actbill in result)
-                        {
-                            if (qty == 0) break;//扣减完了
-                            if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty == 0) continue;//actbill可用数量用完了
-                            //if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty >= 0)
-                            //{
-                            //    _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
-                            //    qty = 0;
-                            //}
-                            //else
-                            //{
-                            //    _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
-                            //    qty = qty - _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
-                            //}
-                            if (_actbill.BillQty > 0)
-                            {
-                                if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty >= 0)
-                                {
-                                    _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
-                                    qty = 0;
-                                }
-                                else
-                                {
-                                    _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
-                                    qty = qty - _actbill.CurrentBillQty;
-                                }
-                            }
-                            else
-                            {
-                                if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty <= 0)
-                                {
-                                    _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
-                                    qty = 0;
-                                }
-                                else
-                                {
-                                    _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
-                                    qty = qty - _actbill.CurrentBillQty;
-                                }
-                            }
-                            createBillList.Add(_actbill);
-
-                        }
-                    }
-                    else
-                    {
-                        ShowErrorMessage("行" + (curow.RowNum + 1).ToString() + "数量大于剩余开票数量！");
-                        return;
-                    }
-                }
-                else
-                {
-                    ShowErrorMessage("行" + (curow.RowNum + 1).ToString() + " ASN或零件不存在！请查询对应记录后再导入！");
-                    return;
-                }
-            }
-        }
-        int cnt = 0;
         try
         {
-            while (0 < createBillList.Count)
-            {
-                cnt++;
-                var t = from i in createBillList
-                        group i by new
-                        {
-                            i.Item.Code
-                        } into k
-                        select new
-                        {
-                            Item = k.Key.Code,
-                            Amt = k.Sum(i => i.CurrentBillQty * i.UnitPrice)
-                        };
 
-                List<string> abM = new List<string>();
-                List<string> zeroM = new List<string>();
-                foreach (var i in t)
-                {
-                    if (i.Amt > 1000000)
-                        abM.Add(i.Item);
-                    if (i.Amt == 0 && cnt == 1)
-                        zeroM.Add(i.Item);
-                }
 
-                #region 超过100w的
-                foreach (string s in abM)
-                {
-                    IList<ActingBill> tempList = createBillList.Where(i => i.Item.Code == s).OrderByDescending(i => i.UnitPrice * i.CurrentBillQty).ToList();
-                    IList<ActingBill> amtList = new List<ActingBill>();
-                    decimal amount = 0;
-                    foreach (ActingBill act in tempList)
-                    {
+            HSSFWorkbook excel = new HSSFWorkbook(fileUpload.PostedFile.InputStream);
+            Sheet sheet = excel.GetSheetAt(0);
+            IEnumerator rows = sheet.GetRowEnumerator();
+            Row custrow = sheet.GetRow(2);
+            string cust = custrow.GetCell(1).StringCellValue;//客户代码
+            Customer customer = TheCustomerMgr.LoadCustomer(cust);
+            Row row_startdate = sheet.GetRow(3);
+            string startdate = row_startdate.GetCell(1).StringCellValue;//开始日期
+            Row row_enddate = sheet.GetRow(4);
+            string enddate = row_enddate.GetCell(1).StringCellValue;//结束日期
+            startdate = startdate == string.Empty ? DateTime.Now.AddMonths(-1).ToShortDateString() : startdate;
+            enddate = enddate == string.Empty ? DateTime.Now.ToShortDateString() : enddate;
+            IList<ActingBill> actingBillList = TheActingBillMgr.GetActingBill(cust, "", DateTime.Parse(startdate), DateTime.Parse(enddate), "", "", this.ModuleType, this.billNo);
 
-                        if (amount + act.CurrentBillQty * act.UnitPrice <= 1000000)
-                        {
-                            amtList.Add(act);
-                            amount += act.CurrentBillQty * act.UnitPrice;
-                        }
-                        else if (act.CurrentBillQty * act.UnitPrice > 1000000)
-                        {
-                            decimal qty = Math.Round(1000000 / act.UnitPrice, 0);
-                            act.CurrentBillQty = qty;
-                            amtList.Add(act);
-                        }
-                        else
-                            continue;
-                    }
-
-                    if (amtList.Count > 0)
-                    {
-                        IList<Bill> billList = TheBillMgr.CreateBill(amtList, this.CurrentUser);
-                        createdBill.Add(billList[0]);
-                    }
-                    foreach (ActingBill act in amtList)
-                    {
-                        if (Math.Round(1000000 / act.UnitPrice, 0) > act.CurrentBillQty)
-                        {
-                            createBillList.Remove(act);
-
-                        }
-                        else
-                            act.CurrentBillQty = act.BillQty - act.BilledQty - Math.Round(1000000 / act.UnitPrice, 0) * cnt;
-                    }
-
-                }
-
-                #endregion
-                #region 未超过100w的
-                List<string> normal = new List<string>();
-                var bAm = (from i in createBillList
+            var actbill = (from i in actingBillList//按ASN ITME聚合 得到总的可用数量
                            group i by new
                            {
+                               i.IpNo,
                                i.Item.Code
                            } into k
                            select new
                            {
                                Item = k.Key.Code,
-                               Amt = k.Sum(i => i.CurrentBillQty * i.UnitPrice)
-                           }).Where(i => i.Amt < 1000000 && i.Amt != 0).OrderByDescending(i => i.Amt).ToList();
-                while (bAm.Count > 0)
+                               IpNo = k.Key.IpNo,
+                               Amt = k.Sum(i => i.BillQty - i.BilledQty)
+                           }).ToList();
+
+            ImportHelper.JumpRows(rows, 7);
+            IList<ActingBill> createBillList = new List<ActingBill>();
+            IList<Bill> createdBill = new List<Bill>();
+
+            while (rows.MoveNext())
+            {
+                Row curow = (HSSFRow)rows.Current;
+                string asn = curow.GetCell(0).StringCellValue;
+                string item = curow.GetCell(1).NumericCellValue.ToString();
+
+                decimal qty = decimal.Parse(curow.GetCell(2).NumericCellValue.ToString());
+                if (asn != string.Empty)
                 {
-                    decimal tempAmt = 0;
-                    IList<string> tempGroup = new List<string>();
-                    foreach (var i in bAm)
+                    var temp_qty = actbill.Where(i => i.Item == item && i.IpNo == asn).ToList();
+                    if (temp_qty.Count > 0)
                     {
-                        if (i.Amt + tempAmt <= 1000000)
+                        if (Math.Abs(temp_qty[0].Amt) - Math.Abs(qty) >= 0)
                         {
-                            tempGroup.Add(i.Item);
-                            tempAmt += i.Amt;
+                            IList<ActingBill> result = actingBillList.Where(i => i.Item.Code == item && i.IpNo == asn).ToList();
+                            foreach (ActingBill _actbill in result)
+                            {
+                                if (qty == 0) break;//扣减完了
+                                if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty == 0) continue;//actbill可用数量用完了
+                                //if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty >= 0)
+                                //{
+                                //    _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
+                                //    qty = 0;
+                                //}
+                                //else
+                                //{
+                                //    _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                                //    qty = qty - _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                                //}
+                                if (_actbill.BillQty > 0)
+                                {
+                                    if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty >= 0)
+                                    {
+                                        _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
+                                        qty = 0;
+                                    }
+                                    else
+                                    {
+                                        _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                                        qty = qty - _actbill.CurrentBillQty;
+                                    }
+                                }
+                                else
+                                {
+                                    if (_actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty - qty <= 0)
+                                    {
+                                        _actbill.CurrentBillQty = _actbill.CurrentBillQty + qty;
+                                        qty = 0;
+                                    }
+                                    else
+                                    {
+                                        _actbill.CurrentBillQty = _actbill.BillQty - _actbill.BilledQty - _actbill.CurrentBillQty;
+                                        qty = qty - _actbill.CurrentBillQty;
+                                    }
+                                }
+                                createBillList.Add(_actbill);
+
+                            }
                         }
                         else
-                            continue;
-                    }
-                    List<ActingBill> tempAct = new List<ActingBill>();
-                    foreach (string item in tempGroup)
-                    {
-                        List<ActingBill> _tempAct = (createBillList.Where(i => i.Item.Code == item)).ToList();
-                        foreach (ActingBill bill in _tempAct)
                         {
-                            tempAct.Add(bill);
+                            ShowErrorMessage("行" + (curow.RowNum + 1).ToString() + "数量大于剩余开票数量！");
+                            return;
                         }
                     }
-                    for (int i = bAm.Count; i > 0; i--)
+                    else
                     {
-                        if (tempGroup.Contains(bAm[i - 1].Item))
-                        {
-                            bAm.Remove(bAm[i - 1]);
-                            i = bAm.Count + 1;
-                        }
-                    }
-                    if (tempAct.Count > 0)
-                    {
-                        IList<Bill> billList = TheBillMgr.CreateBill(tempAct, this.CurrentUser);
-                        createdBill.Add(billList[0]);
-                    }
-                    foreach (ActingBill bill in tempAct)
-                    {
-                        createBillList.Remove(bill);
+                        ShowErrorMessage("行" + (curow.RowNum + 1).ToString() + " ASN或零件不存在！请查询对应记录后再导入！");
+                        return;
                     }
                 }
-
-
-                #endregion
-                if (zeroM.Count > 0 && cnt == 1)
+            }
+            int cnt = 0;
+            try
+            {
+                while (0 < createBillList.Count)
                 {
-                    foreach (string code in zeroM)
-                    {
-                        IList<ActingBill> tempList = createBillList.Where(i => i.Item.Code == code).OrderByDescending(i => i.UnitPrice * i.CurrentBillQty).ToList();
-                        if (tempList.Count > 0)
-                        {
-                            if (createdBill.Count > 0)
+                    cnt++;
+                    var t = from i in createBillList
+                            group i by new
                             {
+                                i.Item.Code
+                            } into k
+                            select new
+                            {
+                                Item = k.Key.Code,
+                                Amt = k.Sum(i => i.CurrentBillQty * i.UnitPrice)
+                            };
 
-                                TheBillMgr.AddBillDetail(createdBill[0], tempList, this.CurrentUser);
+                    List<string> abM = new List<string>();
+                    List<string> zeroM = new List<string>();
+                    foreach (var i in t)
+                    {
+                        if (i.Amt > 1000000)
+                            abM.Add(i.Item);
+                        if (i.Amt == 0 && cnt == 1)
+                            zeroM.Add(i.Item);
+                    }
+
+                    #region 超过100w的
+                    foreach (string s in abM)
+                    {
+                        IList<ActingBill> tempList = createBillList.Where(i => i.Item.Code == s).OrderByDescending(i => i.UnitPrice * i.CurrentBillQty).ToList();
+                        IList<ActingBill> amtList = new List<ActingBill>();
+                        decimal amount = 0;
+                        foreach (ActingBill act in tempList)
+                        {
+
+                            if (amount + act.CurrentBillQty * act.UnitPrice <= 1000000)
+                            {
+                                amtList.Add(act);
+                                amount += act.CurrentBillQty * act.UnitPrice;
+                            }
+                            else if (act.CurrentBillQty * act.UnitPrice > 1000000)
+                            {
+                                decimal qty = Math.Round(1000000 / act.UnitPrice, 0);
+                                act.CurrentBillQty = qty;
+                                amtList.Add(act);
+                            }
+                            else
+                                continue;
+                        }
+
+                        if (amtList.Count > 0)
+                        {
+                            IList<Bill> billList = TheBillMgr.CreateBill(amtList, this.CurrentUser);
+                            createdBill.Add(billList[0]);
+                        }
+                        foreach (ActingBill act in amtList)
+                        {
+                            if (Math.Round(1000000 / act.UnitPrice, 0) > act.CurrentBillQty)
+                            {
+                                createBillList.Remove(act);
 
                             }
                             else
+                                act.CurrentBillQty = act.BillQty - act.BilledQty - Math.Round(1000000 / act.UnitPrice, 0) * cnt;
+                        }
+
+                    }
+
+                    #endregion
+                    #region 未超过100w的
+                    List<string> normal = new List<string>();
+                    var bAm = (from i in createBillList
+                               group i by new
+                               {
+                                   i.Item.Code
+                               } into k
+                               select new
+                               {
+                                   Item = k.Key.Code,
+                                   Amt = k.Sum(i => i.CurrentBillQty * i.UnitPrice)
+                               }).Where(i => i.Amt < 1000000 && i.Amt != 0).OrderByDescending(i => i.Amt).ToList();
+                    while (bAm.Count > 0)
+                    {
+                        decimal tempAmt = 0;
+                        IList<string> tempGroup = new List<string>();
+                        foreach (var i in bAm)
+                        {
+                            if (i.Amt + tempAmt <= 1000000)
                             {
-                                IList<Bill> billList = TheBillMgr.CreateBill(tempList, this.CurrentUser);
-                                createdBill.Add(billList[0]);
+                                tempGroup.Add(i.Item);
+                                tempAmt += i.Amt;
+                            }
+                            else
+                                continue;
+                        }
+                        List<ActingBill> tempAct = new List<ActingBill>();
+                        foreach (string item in tempGroup)
+                        {
+                            List<ActingBill> _tempAct = (createBillList.Where(i => i.Item.Code == item)).ToList();
+                            foreach (ActingBill bill in _tempAct)
+                            {
+                                tempAct.Add(bill);
                             }
                         }
-                        foreach (ActingBill actb in tempList)
+                        for (int i = bAm.Count; i > 0; i--)
                         {
-                            createBillList.Remove(actb);
+                            if (tempGroup.Contains(bAm[i - 1].Item))
+                            {
+                                bAm.Remove(bAm[i - 1]);
+                                i = bAm.Count + 1;
+                            }
+                        }
+                        if (tempAct.Count > 0)
+                        {
+                            IList<Bill> billList = TheBillMgr.CreateBill(tempAct, this.CurrentUser);
+                            createdBill.Add(billList[0]);
+                        }
+                        foreach (ActingBill bill in tempAct)
+                        {
+                            createBillList.Remove(bill);
                         }
                     }
+
+
+                    #endregion
+                    if (zeroM.Count > 0 && cnt == 1)
+                    {
+                        foreach (string code in zeroM)
+                        {
+                            IList<ActingBill> tempList = createBillList.Where(i => i.Item.Code == code).OrderByDescending(i => i.UnitPrice * i.CurrentBillQty).ToList();
+                            if (tempList.Count > 0)
+                            {
+                                if (createdBill.Count > 0)
+                                {
+
+                                    TheBillMgr.AddBillDetail(createdBill[0], tempList, this.CurrentUser);
+
+                                }
+                                else
+                                {
+                                    IList<Bill> billList = TheBillMgr.CreateBill(tempList, this.CurrentUser);
+                                    createdBill.Add(billList[0]);
+                                }
+                            }
+                            foreach (ActingBill actb in tempList)
+                            {
+                                createBillList.Remove(actb);
+                            }
+                        }
+                    }
+
                 }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex.Message);
+            }
+            _createdBillNo += " 已创建以下账单：<br/>";
+            foreach (Bill b in createdBill)
+            {
+                _createdBillNo += b.BillNo + "<br />";
+
 
             }
+
+
+            #region output result xls
+            if (createdBill != null && createdBill.Count > 0)
+            {
+                this.btnBack_Click(sender, e);
+
+                ExportResult(createdBill);
+            }
+            #endregion
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            ShowErrorMessage(ex.Message);
+            ShowErrorMessage(exception.Message);
         }
-        _createdBillNo += " 已创建以下账单：<br/>";
-        foreach (Bill b in createdBill)
-        {
-            _createdBillNo += b.BillNo + "<br />";
-
-
-        }
-
-
-        #region output result xls
-        if (createdBill != null && createdBill.Count > 0)
-        {
-            this.btnBack_Click(sender, e);
-
-            ExportResult(createdBill);
-        }
-        #endregion
-
 
     }
 

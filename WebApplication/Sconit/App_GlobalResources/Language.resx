@@ -1137,4 +1137,7 @@
   <data name="ProcurementPlan2" xml:space="preserve">
     <value>采购计划发货</value>
   </data>
+  <data name="PlanVersionContrast" xml:space="preserve">
+    <value>版本比较</value>
+  </data>
 </root>
