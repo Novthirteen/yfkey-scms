@@ -1761,7 +1761,7 @@ namespace com.Sconit.Service.MRP.Impl
                     string itemCode = string.Empty;
                     decimal safeStock = 0;
                     decimal maxStock = 0;
-                    decimal uc = 0;
+                    decimal? uc = null;
 
                     #region 读取销售路线
                     dFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colDisFlow));
@@ -1924,13 +1924,10 @@ namespace com.Sconit.Service.MRP.Impl
 
                     #region 读取包装量
                     string rUnitCount = ImportHelper.GetCellStringValue(row.GetCell(colUnitCount));
-                    if (string.IsNullOrEmpty(rUnitCount))
+                    if (!string.IsNullOrEmpty(rUnitCount))
                     {
-                        uc = 0;
-                    }
-                    else
-                    {
-                        if (!decimal.TryParse(rUnitCount, out uc))
+                        decimal cUc = 0;
+                        if (!decimal.TryParse(rUnitCount, out cUc))
                         {
                             //throw new BusinessErrorException(string.Format("第{0}行：包装量只能填写大于0数字。", rowCount));
                             errorMessages += "</br>" + string.Format("第{0}行：包装量只能填写大于0数字。", rowCount);
@@ -1942,6 +1939,7 @@ namespace com.Sconit.Service.MRP.Impl
                             errorMessages += "</br>" + string.Format("第{0}行：包装量只能填写大于0数字。", rowCount);
                             continue;
                         }
+                        uc = cUc;
                     }
                     #endregion
 
@@ -2033,16 +2031,23 @@ namespace com.Sconit.Service.MRP.Impl
                     upSql += string.Format(",lastModifyDate='{1}',LastModifyUser='{2}' where code='{0}' ", byFlow.dFlowCode, newTime, user.Code);
                     this.genericMgr.ExecuteSql(upSql);
 
-                    upSql = string.Format(" update FlowMstr set MrpLeadTime={0},lastModifyDate='{2}',LastModifyUser='{3}' where Code='{1}' ", byFlow.tLeadTime, byFlow.tFlowCode, newTime, user.Code);
-                    this.genericMgr.ExecuteSql(upSql);
+                    //upSql = string.Format(" update FlowMstr set MrpLeadTime={0},lastModifyDate='{2}',LastModifyUser='{3}' where Code='{1}' ", byFlow.tLeadTime, byFlow.tFlowCode, newTime, user.Code);
+                    //this.genericMgr.ExecuteSql(upSql);
 
                     foreach (var l in byFlow.list)
                     {
                         //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
-                        upSql = string.Format(" update FlowDet set Uc={0},lastModifyDate='{1}',LastModifyUser='{2}' where Flow='{3}' and Item='{4}' ", l[10], newTime, user.Code, l[0], l[7]);
-                        this.genericMgr.ExecuteSql(upSql);
+                        //upSql = string.Format(" update FlowDet set Uc={0},lastModifyDate='{1}',LastModifyUser='{2}' where Flow='{3}' and Item='{4}' ", l[10], newTime, user.Code, l[0], l[7]);
+                        //this.genericMgr.ExecuteSql(upSql);
 
-                        upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},Uc={2},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], l[10], newTime, user.Code, l[5], l[7]);
+                        if (l[10] != null && ((decimal?)l[10]).HasValue)
+                        {
+                            upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},HuLotSize={2},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], l[10], newTime, user.Code, l[5], l[7]);
+                        }
+                        else
+                        {
+                            upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8],"", newTime, user.Code, l[5], l[7]);
+                        }
                         this.genericMgr.ExecuteSql(upSql);
                     }
 
@@ -2081,12 +2086,12 @@ namespace com.Sconit.Service.MRP.Impl
                 int colUnitCount = 8;//包装量
                 #endregion
 
-                var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
-                IList<object[]> allDFlowCodeList = new List<object[]>();
-                foreach (System.Data.DataRow flowRow in disFlowCodes.Rows)
-                {
-                    allDFlowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2] });
-                }
+                //var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
+                //IList<object[]> allDFlowCodeList = new List<object[]>();
+                //foreach (System.Data.DataRow flowRow in disFlowCodes.Rows)
+                //{
+                //    allDFlowCodeList.Add(new object[] { flowRow[0].ToString(), flowRow[1].ToString(), flowRow[2] });
+                //}
 
                 var allProdItems = this.genericMgr.FindAllWithCustomQuery<Item>(" select i from Item as i where i.IsActive=1 ");
                 var allBoms = this.genericMgr.FindAllWithCustomQuery<Bom>(" select i from Bom as i where i.IsActive=1 ");
@@ -2232,6 +2237,7 @@ namespace com.Sconit.Service.MRP.Impl
                             errorMessages += "</br/>" + string.Format("第{0}行：包装量填写有误。", rowCount);
                             continue;
                         }
+                        //currentItem.HuLotSize = s;
                         currentItem.UnitCount = s;
                     }
                     #endregion
@@ -2252,6 +2258,11 @@ namespace com.Sconit.Service.MRP.Impl
                     item.LastModifyDate = nowTime;
                     item.LastModifyUser = user;
                     this.genericMgr.Update(item);
+
+                    //if (item.HuLotSize.HasValue && item.HuLotSize.Value > 0)
+                    //{
+                    //    string upSql = string.Format(" update d set d.HuLotSize={0} from FlowDet d,FlowMstr  f where d.Flow=f.Code and d.Item='{1}' and f.Type='Production'",item.HuLotSize.Value,item.Code);
+                    //}
                 }
             }
         }
@@ -2461,16 +2472,16 @@ namespace com.Sconit.Service.MRP.Impl
 
                         if (!string.IsNullOrEmpty(rUc))
                         {
-                            decimal s;
-                            if (!decimal.TryParse(rUc, out s))
+                            int s;
+                            if (!int.TryParse(rUc, out s))
                             {
                                 errorMessages += "</br/>" + string.Format("第{0}行：包装量{1}填写有误。", rowCount, rUc);
                                 continue;
                             }
                             foreach (var fd in cFlowDetails)
                             {
-                                fd.UnitCount = s;
-                                fd.HuLotSize = Convert.ToInt32(s);
+                                //fd.UnitCount = s;
+                                fd.HuLotSize = s;
                                 upFlowDets.Add(fd);
                             }
                         }

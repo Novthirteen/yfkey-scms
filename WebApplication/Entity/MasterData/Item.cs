@@ -21,6 +21,8 @@ namespace com.Sconit.Entity.MasterData
 
         public bool IsBlank { get; set; }
 
+        public decimal? HuLotSize { get; set; }
+
         #endregion
     }
 }
