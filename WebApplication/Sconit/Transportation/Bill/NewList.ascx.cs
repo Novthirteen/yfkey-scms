@@ -146,7 +146,7 @@ public partial class Transportation_Bill_NewList : ListModuleBase
             //    tbDiscountRate.Text = (Math.Round(discount / (unitPrice * remailQty), this.DecimalLength, MidpointRounding.AwayFromZero) * 100).ToString("F2");
             //}
             //tbDiscount.Text = discount.ToString("F2");
-            tbAmount.Text = remailAmount.ToString("F2");
+            tbAmount.Text = (Math.Floor(remailAmount * 100) / 100).ToString("F2");
             tbAmount.Attributes["oldValue"] = tbAmount.Text;
         }
     }

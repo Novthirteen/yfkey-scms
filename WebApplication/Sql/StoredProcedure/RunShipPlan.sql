@@ -303,7 +303,7 @@ BEGIN
 		--获取发运路线和发运库位的库存（中间仓库存）
 		insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, 
 		LocQty, InTransitQty, SafeStock, MaxStock, ActiveQty)
-		select det.Flow, ISNULL(mstr.MRPLeadTime, 0) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, det.UC, mstr.LocFrom, mstr.LocTo, 
+		select det.Flow, ISNULL(mstr.MRPLeadTime, 0) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, isnull(cast(det.UC as decimal(18,8) ),0), mstr.LocFrom, mstr.LocTo, 
 		ISNULL(loc.Qty, 0), ISNULL(loc.InTransitQty, 0), ISNULL(det.SafeStock, 0), ISNULL(det.MaxStock, 0), (ISNULL(loc.Qty, 0) + ISNULL(loc.InTransitQty, 0) - ISNULL(det.SafeStock, 0))
 		from FlowDet as det
 		inner join FlowMstr as mstr on det.Flow = mstr.Code
