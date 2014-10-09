@@ -70,8 +70,8 @@ public partial class NewMrp_ProductionPlan_DetailList : MainModuleBase
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0),isnull(m.Status,'Submit')
- from  dbo.MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as m on det.ProductionPlanId=m.Id
-inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
+ from  dbo.MRP_ProductionPlanDet as det with(nolock) inner join MRP_ProductionPlanMstr as m with(nolock) on det.ProductionPlanId=m.Id
+inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
 
         //if (!string.IsNullOrEmpty(this.tbFlow.Text.Trim()))
         //{
@@ -588,8 +588,8 @@ inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.Prod
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0)
- from  dbo.MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as m on det.ProductionPlanId=m.Id
-inner join MRP_ProductionPlanInitLocationDet as l on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
+ from  dbo.MRP_ProductionPlanDet as det with(nolock) inner join MRP_ProductionPlanMstr as m with(nolock) on det.ProductionPlanId=m.Id
+inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
 
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
         if (!string.IsNullOrEmpty(this.tbItemCode.Text.Trim()))

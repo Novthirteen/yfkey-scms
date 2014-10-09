@@ -73,10 +73,10 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
 select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime,isnull(det.uc,0),isnull(f.MrpLeadTime,0),m.Id,isnull(det.MinLotSize,0)
- from MRP_PurchasePlanDet as det 
-inner join MRP_PurchasePlanMstr as m on m.Id=det.PurchasePlanId
+ from MRP_PurchasePlanDet as det with(nolock) 
+inner join MRP_PurchasePlanMstr as m with(nolock) on m.Id=det.PurchasePlanId
  inner join FlowMstr as f on det.Flow=f.Code
-left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
+left join MRP_PurchasePlanInitLocationDet as l with(nolock) on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
 
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
@@ -802,10 +802,10 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
 select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,isnull(det.ReqQty,0),isnull(det.PurchaseQty,0),det.WindowTime,det.Version,m.ReleaseNo,m.Status,isnull(l.InitStock,0),isnull(l.SafeStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.OrderQty,0),isnull(l.MaxStock,0),det.StartTime,isnull(det.uc,0),isnull(f.MrpLeadTime,0),m.Id,isnull(det.MinLotSize,0)
- from MRP_PurchasePlanDet as det 
-inner join MRP_PurchasePlanMstr as m on m.Id=det.PurchasePlanId
+ from MRP_PurchasePlanDet as det with(nolock) 
+inner join MRP_PurchasePlanMstr as m with(nolock) on m.Id=det.PurchasePlanId
  inner join FlowMstr as f on det.Flow=f.Code
-left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
+left join MRP_PurchasePlanInitLocationDet as l with(nolock) on det.PurchasePlanId=l.PurchasePlanId and det.Item=l.Item where 1=1  ";
 
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
@@ -821,9 +821,9 @@ left join MRP_PurchasePlanInitLocationDet as l on det.PurchasePlanId=l.PurchaseP
         }
         else
         {
-            this.list.InnerHtml = "";
-            ShowErrorMessage("采购路线不能为空。");
-            return;
+            //this.list.InnerHtml = "";
+            //ShowErrorMessage("采购路线不能为空。");
+            //return;
         }
 
         if (!string.IsNullOrEmpty(this.tbItemCode.Text.Trim()))

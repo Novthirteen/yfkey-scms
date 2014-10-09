@@ -60,10 +60,10 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.btSeqHidden.Value = string.Empty;
         //,ip.StartTime as ipStartTime,ip.WindowTime as ipWindowTime,isnull(ip.Qty,0)
         var searchSql = @" select det.Flow,det.Item,det.ItemDesc,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0) ,det.uc,isnull(f.MrpLeadTime,0),m.Id
-from  MRP_ShipPlanDet as det 
- inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
+from  MRP_ShipPlanDet as det with(nolock)
+ inner join MRP_ShipPlanMstr as m with(nolock) on det.ShipPlanId=m.Id 
  inner join FlowMstr as f on det.Flow=f.Code
- left join MRP_ShipPlanInitLocationDet as l on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1  ";
+ left join MRP_ShipPlanInitLocationDet as l with(nolock) on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1  ";
         //left join MRP_ShipPlanIpDet as ip on ip.ShipPlanId=m.Id and ip.Item=det.Item where 1=1  ";
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
@@ -827,10 +827,10 @@ from  MRP_ShipPlanDet as det
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @" select det.Flow,det.Item,det.ItemDesc,det.RefItemCode,det.LocFrom,det.LocTo,det.WindowTime,det.Version,isnull(det.ShipQty,0),isnull(det.OrgShipQty,0),m.ReleaseNo,m.Status,m.LastModifyDate,m.LastModifyUser,det.Id,isnull(det.ReqQty,0),isnull(l.InitStock,0),isnull(l.SafeStock,0), isnull(l.InTransitQty,0),det.UUID ,det.StartTime,isnull(det.OrderQty,0),isnull(l.MaxStock,0) ,det.uc,isnull(f.MrpLeadTime,0),m.Id
-from  MRP_ShipPlanDet as det 
- inner join MRP_ShipPlanMstr as m on det.ShipPlanId=m.Id 
+from  MRP_ShipPlanDet as det  with(nolock)
+ inner join MRP_ShipPlanMstr as m with(nolock) on det.ShipPlanId=m.Id 
  inner join FlowMstr as f on det.Flow=f.Code
- left join MRP_ShipPlanInitLocationDet as l on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1  ";
+ left join MRP_ShipPlanInitLocationDet as l with(nolock) on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1  ";
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
         string flowCodeValues = this.tbFlow.Value.Trim();
