@@ -88,7 +88,7 @@ public partial class Reports_InvDetail_List : ReportModuleBase
         #endregion
 
         #region Select Parameters
-        CriteriaHelper.SetLocationCriteria(criteria, "Location.Code", this._criteriaParam);
+        CriteriaHelper.SetLocationCriteria(criteria, "l.Code", this._criteriaParam);
         if(this._criteriaParam.Item != null)
         {
             criteria.Add(Expression.Eq("Item.Code",this._criteriaParam.Item));
