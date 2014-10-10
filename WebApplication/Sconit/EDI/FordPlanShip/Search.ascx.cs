@@ -78,8 +78,8 @@ public partial class EDI_FordPlanShip_Search : SearchModuleBase
             {
                 searchSql += string.Format(" and CreateDate <='{0}'", DateTime.Parse(this.tbCreateEndDate.Text));
             }
-           
-            SearchEvent((new object[] { searchSql + " order by Control_Num Desc,Id asc " }), null);
+
+            SearchEvent((new object[] { searchSql + " order by CreateDate Desc,Id asc " }), null);
             #endregion
         }
     }
