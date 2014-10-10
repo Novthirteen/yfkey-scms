@@ -64,7 +64,7 @@ public partial class MasterData_Reports_Inventory_List : ReportModuleBase
         #endregion
 
         #region Select Parameters
-        CriteriaHelper.SetLocationCriteria(criteria, "Location.Code", this._criteriaParam);
+        CriteriaHelper.SetLocationCriteria(criteria, "l.Code", this._criteriaParam);
         CriteriaHelper.SetItemCriteria(criteria, "Item.Code", this._criteriaParam);
         CriteriaHelper.SetLotNoCriteria(criteria, "LotNo", this._criteriaParam);
 

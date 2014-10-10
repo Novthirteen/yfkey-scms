@@ -63,7 +63,7 @@ public partial class Reports_InvIOB_List : ReportModuleBase
         #endregion
 
         #region Select Parameters
-        CriteriaHelper.SetLocationCriteria(criteria, "Location.Code", this._criteriaParam);
+        CriteriaHelper.SetLocationCriteria(criteria, "l.Code", this._criteriaParam);
         CriteriaHelper.SetItemCriteria(criteria, "Item.Code", this._criteriaParam);
 
         #endregion
