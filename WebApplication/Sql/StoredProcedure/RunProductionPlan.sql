@@ -35,7 +35,6 @@ BEGIN
 	declare @ActiveQty decimal(18, 8)
 	declare @LastActiveQty decimal(18, 8)
 	declare @Effdate datetime
-	declare @BomQty decimal(18, 8)
 	declare @ProductionPlanId int
 	declare @StartTime datetime
 	declare @LastOverflowCount int
@@ -107,7 +106,8 @@ BEGIN
 			RateQty decimal(18, 8), 
 			ScrapPct decimal(18, 8),
 			StartTime datetime,
-			WindowTime datetime
+			WindowTime datetime,
+			ReqQty decimal(18, 8)
 		)
 
 		create table #tempNextLevlProductPlan
@@ -170,6 +170,8 @@ BEGIN
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
 			BackFlushMethod varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			StartDate datetime,
+			EndDate datetime
 		)
 
 		create table #tempOpenOrder
@@ -196,6 +198,11 @@ BEGIN
 			DailyStartTime datetime
 		)
 
+		create table #tempBomCode
+		(
+			Code varchar(50) COLLATE  Chinese_PRC_CI_AS primary key 
+		)
+
 		create index IX_tempWeeklyProductionPlanDetMap_DailyUUID on #tempWeeklyProductionPlanDetMap(DailyUUID asc)
 
 		select @ShipPlanReleaseNo = MAX(ReleaseNo) from MRP_ShipPlanMstr where [Status] = 'Submit'
@@ -211,6 +218,9 @@ BEGIN
 		end
 
 		-----------------------------↓获取顶层毛需求-----------------------------
+		--缓存BomCode
+		insert into #tempBomCode select mstr.Code from BomMstr as mstr inner join BomDet as det on mstr.Code = det.Bom group by mstr.Code
+
 		--记录计划数
 		insert into #tempCurrentLevlProductPlan(UUID, GroupId, GroupSeq, Item, ItemDesc, RefItemCode, Uom, ShipQty, OrderQty, Bom, EffDate, StartTime, WindowTime)
 		select NEWID(), DENSE_RANK() over(Order by det.Item), DENSE_RANK() over(Partition by Item order by det.StartTime),
@@ -221,10 +231,8 @@ BEGIN
 		from MRP_ShipPlanDet as det 
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
 		inner join Item as i on det.Item = i.Code
+		inner join #tempBomCode as pBom on ((i.Bom is not null and pBom.Code = i.Bom) or (i.Bom is null and pBom.Code = det.Item))
 		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily'
-		and exists(select top 1 1 from BomDet as bd 
-					where ((i.Bom is not null and bd.Bom = i.Bom) or (i.Bom is null and bd.Bom = det.Item))
-					and bd.StartDate <= det.StartTime and (bd.EndDate >= det.StartTime or bd.EndDate is null))
 		group by det.Item, det.ItemDesc, det.RefItemCode, det.BaseUom, det.StartTime, i.Bom, i.LeadTime
 
 		--如果生效时间小于今天的把开始时间设置为今天，不考虑过期的计划数，但是要考虑过期的订单数
@@ -238,7 +246,7 @@ BEGIN
 		select t.UUID, det.Flow, det.Item, det.StartTime, ISNULL(det.ShipQty, 0), i.ScrapPct, det.Uom, det.UnitQty
 		from MRP_ShipPlanDet as det
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
-		inner join Item as i on det.Item = i.Code
+		inner join Item as i WITH(NOLOCK) on det.Item = i.Code
 		inner join #tempCurrentLevlProductPlan as t on t.Item = det.Item and t.EffDate = det.StartTime
 		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily' and ISNULL(det.ShipQty, 0) <> 0
 		and DATEADD(day, -ISNULL(i.LeadTime, 0), det.StartTime) >= @DateNow
@@ -246,7 +254,7 @@ BEGIN
 		select t.UUID, det.Flow, det.Item, det.StartTime, ISNULL(det.OrderQty, 0), i.ScrapPct, det.Uom, det.UnitQty
 		from MRP_ShipPlanDet as det
 		inner join MRP_ShipPlanMstr as mstr on det.ShipPlanId = mstr.Id
-		inner join Item as i on det.Item = i.Code
+		inner join Item as i WITH(NOLOCK) on det.Item = i.Code
 		inner join #tempCurrentLevlProductPlan as t on t.Item = det.Item and t.EffDate = det.StartTime
 		where mstr.ReleaseNo = @ShipPlanReleaseNo and det.[Type] = 'Daily' and ISNULL(det.OrderQty, 0) <> 0
 		-----------------------------↑获取顶层毛需求-----------------------------
@@ -263,10 +271,10 @@ BEGIN
 			select p.Item, ISNULL(a.Qty, 0), ISNULL(a.InspectQty, 0), ISNULL(a.InTransitQty, 0), ISNULL(i.SafeStock, 0), ISNULL(i.MaxStock, 0),
 			ISNULL(a.Qty, 0) + ISNULL(a.InspectQty, 0) + ISNULL(a.InTransitQty, 0) - ISNULL(i.SafeStock, 0)
 			from (select distinct Item from #tempCurrentLevlProductPlan) as p
-			inner join Item as i on p.Item = i.Code 
+			inner join Item as i WITH(NOLOCK) on p.Item = i.Code 
 			left join (select loc.Item, SUM(loc.Qty) as Qty, SUM(loc.InspectQty) as InspectQty, SUM(loc.InTransitQty) as InTransitQty
 						from MRP_LocationDetSnapShot as loc
-						inner join Location as l on loc.Location = l.Code
+						inner join Location as l WITH(NOLOCK) on loc.Location = l.Code
 						inner join (select distinct Item from #tempCurrentLevlProductPlan) as p on loc.Item = p.Item
 						where l.IsFG = 1  --取成品库位库存
 						group by loc.Item
@@ -304,18 +312,17 @@ BEGIN
 			-----------------------------↑计算净需求-----------------------------
 
 
-
 			-----------------------------↓分解Bom，查找下层Bom是否是半成品-----------------------------
 			set @GroupId = null
 			set @MaxGroupId = null
 			select @GroupId = MIN(GroupId), @MaxGroupId = MAX(GroupId) from #tempCurrentLevlProductPlan
 			while (@GroupId <= @MaxGroupId)
-			begin  --按零件分组循环
+			begin  --按零件分组循环				
 				set @Item = null
 				set @Bom = null
 				select top 1 @Item = Item, @Bom = Bom from #tempCurrentLevlProductPlan where GroupId = @GroupId
 
-				if not exists(select top 1 1 from BomMstr where Code = @Bom and IsActive = 1)
+				if not exists(select top 1 1 from BomMstr WITH(NOLOCK) where Code = @Bom and IsActive = 1)
 				begin   --没有找到Bom主数据
 					insert into #tempMsg(Lvl, Item, Bom, Msg) values('Error', @Item, @Bom, N'物料[' + @Item + N']的Bom[' + @Bom + N']主数据不存在或已停用')
 					delete from #tempCurrentLevlProductPlan where Item = @Bom
@@ -323,59 +330,44 @@ BEGIN
 					continue
 				end
 
-				set @GroupSeq = null
-				set @MaxGroupSeq = null
-				select @GroupSeq = MIN(GroupSeq), @MaxGroupSeq = MAX(GroupSeq) from #tempCurrentLevlProductPlan where GroupId = @GroupId
-				while @GroupSeq <= @MaxGroupSeq
-				begin  --按上线日期循环
-					if exists(select top 1 1 from #tempCurrentLevlProductPlan where GroupId = @GroupId and GroupSeq = @GroupSeq and Qty > 0)
-					begin
-						set @EffDate = null
-						set @BomQty = null
-						select @EffDate = StartTime, @BomQty = Qty from #tempCurrentLevlProductPlan where GroupId = @GroupId and GroupSeq = @GroupSeq
+				truncate table #tempBomDetail
+				--查找物料Bom，不按生效日期循环查找，所有BOM全部查出来
+				insert into #tempBomDetail exec GetFlatBomDetailWithoutEffDate @Bom
 
-						truncate table #tempBomDetail
-						insert into #tempBomDetail exec GetFlatBomDetail @Bom, @EffDate
-
-						if not exists(select top 1 1 from #tempBomDetail)
-						begin --展开后没有Bom明细
-							insert into #tempMsg(Lvl, Item, Bom, EffDate, Msg) values('Error', @Item, @Bom, @EffDate, N'物料[' + @Item + N']Bom[' + @Bom + N']上线日期[' + convert(varchar(10), @EffDate, 121) + ']的Bom明细不存在')
-							delete from #tempCurrentLevlProductPlan where GroupId = @GroupId and GroupSeq = @GroupSeq
-							set @GroupSeq = @GroupSeq + 1
-							continue
-						end
-
-						--如果下层是半成品，插入临时下层生产计划
-						truncate table #tempTempNextLevlProductPlan
-						insert into #tempTempNextLevlProductPlan(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, 
-						RateQty, ScrapPct, StartTime, WindowTime)
-						select NEWID(), bom.Item, i.Desc1, null, bom.Uom, @BomQty * bom.RateQty * (1 + bom.ScrapPct / 100), ISNULL(i.Bom, bom.Item),
-						bom.RateQty, bom.ScrapPct, DATEADD(day, -ISNULL(i.LeadTime, 0), @EffDate), @EffDate
-						from #tempBomDetail as bom 
-						inner join Item as i on bom.Item = i.Code
-						where exists(select top 1 1 from BomDet as bd 
-										where ((i.Bom is not null and bd.Bom = i.Bom) or (i.Bom is null and bd.Bom = bom.Item))
-										and bd.StartDate <= @EffDate and (bd.EndDate >= @EffDate or bd.EndDate is null))
-
-						--把开始时间小于今天把开始时间更新为今天
-						update tmp set StartTime = @DateNow, WindowTime = DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow)
-						from #tempTempNextLevlProductPlan as tmp inner join Item as i on tmp.Item = i.Code
-						where StartTime < @DateNow
-
-						--插入物料追溯表
-						insert into #tempProductPlanDetTrace(UUID, Item, ReqDate, ReqQty, Bom, RateQty, ScrapPct, Uom)
-						select pl.UUID, @Item, pl.StartTime, @BomQty, @Bom, pl.RateQty, pl.ScrapPct, pl.Uom 
-						from #tempTempNextLevlProductPlan as pl
-						inner join Item as i on pl.Item = i.Code
-
-						--插入下层生产计划
-						insert into #tempNextLevlProductPlan(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, RateQty, ScrapPct, StartTime, WindowTime)
-						select UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, RateQty, ScrapPct, StartTime, WindowTime from #tempTempNextLevlProductPlan
-					end
-
-					set @GroupSeq = @GroupSeq + 1 
+				if not exists(select top 1 1 from #tempBomDetail)
+				begin --展开后没有Bom明细
+					insert into #tempMsg(Lvl, Item, Bom, EffDate, Msg) values('Error', @Item, @Bom, @EffDate, N'物料[' + @Item + N']Bom[' + @Bom + N']的Bom明细不存在')
+					delete from #tempCurrentLevlProductPlan where GroupId = @GroupId and GroupSeq = @GroupSeq
+					set @GroupId = @GroupId + 1
+					continue
 				end
-			
+
+				truncate table #tempTempNextLevlProductPlan
+				insert into #tempTempNextLevlProductPlan(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, 
+				RateQty, ScrapPct, StartTime, WindowTime, ReqQty)
+				select NEWID(), bom.Item, i.Desc1, null, bom.Uom, pl.Qty * bom.RateQty * (1 + bom.ScrapPct / 100), ISNULL(i.Bom, bom.Item),
+				bom.RateQty, bom.ScrapPct, DATEADD(day, -ISNULL(i.LeadTime, 0), EffDate), EffDate, pl.Qty
+				from #tempBomDetail as bom 
+				inner join #tempCurrentLevlProductPlan as pl on bom.StartDate <= pl.EffDate and (bom.EndDate >= pl.EffDate or bom.EndDate is null) 
+				inner join Item as i WITH(NOLOCK) on bom.Item = i.Code
+				inner join #tempBomCode as pBom on ((i.Bom is not null and pBom.Code = i.Bom) or (i.Bom is null and pBom.Code = bom.Item))
+				where  pl.GroupId = @GroupId
+
+				--把开始时间小于今天把开始时间更新为今天
+				update tmp set StartTime = @DateNow, WindowTime = DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow)
+				from #tempTempNextLevlProductPlan as tmp inner join Item as i on tmp.Item = i.Code
+				where StartTime < @DateNow
+
+				--插入物料追溯表
+				insert into #tempProductPlanDetTrace(UUID, Item, ReqDate, ReqQty, Bom, RateQty, ScrapPct, Uom)
+				select pl.UUID, @Item, pl.StartTime, pl.ReqQty, @Bom, pl.RateQty, pl.ScrapPct, pl.Uom 
+				from #tempTempNextLevlProductPlan as pl
+				inner join Item as i on pl.Item = i.Code
+
+				--插入下层生产计划
+				insert into #tempNextLevlProductPlan(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, RateQty, ScrapPct, StartTime, WindowTime)
+				select UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, RateQty, ScrapPct, StartTime, WindowTime from #tempTempNextLevlProductPlan
+
 				set @GroupId = @GroupId + 1
 			end
 			-----------------------------↑分解Bom，查找下层Bom是否是半成品-----------------------------
