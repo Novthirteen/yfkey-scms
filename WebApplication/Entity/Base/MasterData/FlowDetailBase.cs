@@ -480,6 +480,7 @@ namespace com.Sconit.Entity.MasterData
             }
         }
         public Int32 MRPWeight { get; set; }
+        public bool IsMrp { get; set; }
 
         #region    Ford EDI Option
         //public string ReceivingPlant { get; set; }

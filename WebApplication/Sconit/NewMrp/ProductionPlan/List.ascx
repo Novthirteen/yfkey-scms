@@ -53,6 +53,10 @@
                        <asp:LinkButton ID="lbtRunProdPlan" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "ReleaseNo") %>'
                             Text="生成采购计划" OnClick="btnRunPurchasePlan_Click" OnClientClick="return showTimesClick()">
                        </asp:LinkButton>
+                        &nbsp&nbsp
+                       <asp:LinkButton ID="lbtRunProdPlan2" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "ReleaseNo") %>'
+                            Text="生成采购发货计划" OnClick="btnRunPurchasePlan_Click2" OnClientClick="return showTimesClick2()">
+                       </asp:LinkButton>
                        
                     </ItemTemplate>
 
@@ -90,6 +94,21 @@
 
     function showTimesClick() {
         if (confirm('确定要生成采购计划？')) {
+            var oldDate = new Date();
+            timer = setInterval(function () { oldDate = getSpeedDate(oldDate) }, 1000);
+            progress_update();
+            $("#ctl01_ucList_showTimes").show();
+            return true;
+        } else {
+            $("#ctl01_ucList_showTimes").hide();
+            clearInterval(timer);
+            progress_stop();
+            return false;
+        }
+    }
+
+    function showTimesClick2() {
+        if (confirm('确定要生成采购发货计划？')) {
             var oldDate = new Date();
             timer = setInterval(function () { oldDate = getSpeedDate(oldDate) }, 1000);
             progress_update();

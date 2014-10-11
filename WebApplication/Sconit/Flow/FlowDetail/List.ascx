@@ -48,6 +48,11 @@
                         <cc1:CodeMstrLabel ID="lblNeedInspection" runat="server" Code="TrueOrFalse" Value='<%# Bind("NeedInspection") %>' />
                     </ItemTemplate>
                 </asp:TemplateField>
+                 <asp:TemplateField HeaderText="${MasterData.Flow.FlowDetail.IsMrp}" SortExpression="IsMrp">
+                    <ItemTemplate>
+                        <cc1:CodeMstrLabel ID="lblIsMrp" runat="server" Code="TrueOrFalse" Value='<%# Bind("IsMrp") %>' />
+                    </ItemTemplate>
+                </asp:TemplateField>
                 <asp:TemplateField HeaderText="${Common.GridView.Action}">
                     <ItemTemplate>
                         <asp:LinkButton ID="lbtnEdit" runat="server" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "Id") %>'

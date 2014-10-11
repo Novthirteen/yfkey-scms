@@ -223,6 +223,8 @@ public partial class MasterData_FlowDetail_Edit : EditModuleBase
             tbLocTo.ServiceParameter = "string:" + flow.PartyTo.Code;
             tbLocTo.DataBind();
             tbLocTo.Text = flowDetail.LocationTo == null ? string.Empty : flowDetail.LocationTo.Code;
+            this.FV_FlowDetail.FindControl("lblIsMrp").Visible = true;
+            this.FV_FlowDetail.FindControl("cbIsMrp").Visible = true;
 
 
         }

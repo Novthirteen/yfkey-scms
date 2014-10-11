@@ -117,6 +117,24 @@ public partial class NewMrp_ProductionPlan_List : ListModuleBase
         this.showTimes.Style.Value = "display:none";
     }
 
+    protected void btnRunPurchasePlan_Click2(object sender, EventArgs e)
+    {
+        try
+        {
+            TheMrpMgr.RunMrp2(this.CurrentUser);
+            ShowSuccessMessage("生成成功。");
+        }
+        catch (SqlException ex)
+        {
+            ShowErrorMessage(ex.Message);
+        }
+        catch (Exception ee)
+        {
+            ShowErrorMessage(ee.Message);
+        }
+        this.showTimes.Style.Value = "display:none";
+    }
+
     protected void Back_Render(object sender, EventArgs e)
     {
         this.ucShowErrorMsg.Visible = false;
