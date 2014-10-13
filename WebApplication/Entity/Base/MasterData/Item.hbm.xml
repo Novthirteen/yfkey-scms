@@ -29,5 +29,6 @@
     <property name="IsMRP" column="IsMRP" type="Boolean"  />
     <property name="MinLotSize" column="MinLotSize" type="Int32"  />
     <property name="ScrapPct" column="ScrapPct" type="Decimal"  />
+    <property name="InventoryCountDown" column="InventoryCountDown" type="Decimal"  />
   </class>
 </hibernate-mapping>

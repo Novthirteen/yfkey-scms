@@ -69,7 +69,7 @@ public partial class NewMrp_ProductionPlan_DetailList : MainModuleBase
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0),isnull(m.Status,'Submit')
+        var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0),isnull(m.Status,'Submit'),l.InventoryCountDown
  from  dbo.MRP_ProductionPlanDet as det with(nolock) inner join MRP_ProductionPlanMstr as m with(nolock) on det.ProductionPlanId=m.Id
 inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
 
@@ -130,6 +130,7 @@ inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.Production
                 UnitCount = Math.Round(Convert.ToDecimal(row[19])),
                 MinLotSize = Math.Round(Convert.ToDecimal(row[20])),
                 Status =  row[21].ToString(),
+                InventoryCountDown = !string.IsNullOrEmpty(row[22].ToString())? (decimal?)row[22] : null,
             });
         }
         if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
@@ -224,7 +225,7 @@ inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.Production
         //str.Append(CopyString());
         //head
         string headStr = string.Empty;
-        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>报验</th>");
+        str.Append("<thead><tr class='GVHeader'><th rowspan='2'>序号</th><th rowspan='2'>物料号</th><th rowspan='2'>物料描述</th><th rowspan='2'>客户零件号</th><th rowspan='2'>包装量</th><th rowspan='2'>经济批量</th><th rowspan='2'>安全库存</th><th rowspan='2'>最大库存</th><th rowspan='2'>期初库存</th><th rowspan='2'>报验</th><th rowspan='2'>库存倒数</th>");
         int ii = 0;
         foreach (var planByDateIndex in planByDateIndexs)
         {
@@ -336,6 +337,9 @@ inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.Production
                 str.Append("<td style='background:orange'>");
             }
             str.Append((firstPlan.InspectQty).ToString("0.##"));
+            str.Append("</td>");
+            str.Append("<td>");
+            str.Append(firstPlan.InventoryCountDown.HasValue?firstPlan.InventoryCountDown.Value.ToString("0.##"):"");
             str.Append("</td>");
             foreach (var planByDateIndex in planByDateIndexs)
             {
@@ -587,7 +591,7 @@ inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.Production
     {
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
-        var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0)
+        var searchSql = @"  select m.Id,m.ReleaseNo,det.Id,det.Item,det.itemDesc,det.RefItemCode,isnull(det.OrgQty,0),isnull(det.Qty,0),det.Uom,det.StartTime,det.WindowTime,det.UUID,isnull(det.OrderQty,0),isnull(l.initStock,0),isnull(l.SafeStock,0),isnull(l.MaxStock,0),isnull(l.InTransitQty,0),isnull(l.InspectQty,0),isnull(det.ReqQty,0),isnull(det.UC,0),isnull(MinLotSize,0),l.InventoryCountDown
  from  dbo.MRP_ProductionPlanDet as det with(nolock) inner join MRP_ProductionPlanMstr as m with(nolock) on det.ProductionPlanId=m.Id
 inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.ProductionPlanId=l.ProductionPlanId and det.Item=l.Item  where 1=1  ";
 
@@ -631,6 +635,7 @@ inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.Production
                 ReqQty = Math.Round(Convert.ToDecimal(row[18])),
                 UnitCount = Math.Round(Convert.ToDecimal(row[19])),
                 MinLotSize = Math.Round(Convert.ToDecimal(row[20])),
+                InventoryCountDown = (decimal?)row[21],
             });
         }
         if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)

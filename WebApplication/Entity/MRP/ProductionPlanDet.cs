@@ -28,6 +28,9 @@ namespace com.Sconit.Entity.MRP
         public decimal InspectQty { get; set; }
 
         public string Status { get; set; }
+
+        public decimal? InventoryCountDown { get; set; }
+        
         #endregion
     }
 }

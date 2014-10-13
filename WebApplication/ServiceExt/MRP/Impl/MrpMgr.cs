@@ -2131,6 +2131,7 @@ namespace com.Sconit.Service.MRP.Impl
                 int colMaxStock = 6;//最大库存
                 int colMinLotSize = 7;//经济批量
                 int colUnitCount = 8;//包装量
+                int colInventoryCountDown = 9;//库存倒数
                 #endregion
 
                 //var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
@@ -2162,6 +2163,7 @@ namespace com.Sconit.Service.MRP.Impl
                     int? maxStock = null;
                     int? minLotSize = null;
                     decimal? uc = null;
+                    decimal? inventoryCountDown = null;
                     Item currentItem = null;
 
                     #region 读取成品代码
@@ -2288,6 +2290,28 @@ namespace com.Sconit.Service.MRP.Impl
                     //    //currentItem.HuLotSize = s;
                     //    currentItem.UnitCount = s;
                     //}
+                    #endregion
+
+                    #region 库存倒数
+                    string rInventoryCountDown = ImportHelper.GetCellStringValue(row.GetCell(colInventoryCountDown));
+                    if (!string.IsNullOrEmpty(rInventoryCountDown))
+                    {
+                        decimal s;
+                        if (!decimal.TryParse(rInventoryCountDown, out s))
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：包装量填写有误。", rowCount));
+                            errorMessages += "</br/>" + string.Format("第{0}行：库存倒数填写有误。", rowCount);
+                            continue;
+                        }
+                        if (s<=0)
+                        {
+                            //throw new BusinessErrorException(string.Format("第{0}行：包装量填写有误。", rowCount));
+                            errorMessages += "</br/>" + string.Format("第{0}行：库存倒数填写有误。", rowCount);
+                            continue;
+                        }
+                        //currentItem.HuLotSize = s;
+                        currentItem.InventoryCountDown = s;
+                    }
                     #endregion
                     updateItemList.Add(currentItem);
 
