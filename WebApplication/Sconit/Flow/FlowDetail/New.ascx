@@ -385,8 +385,10 @@
                             </cc1:CodeMstrDropDownList>
                         </td>
                         <td class="ttd01">
+                            <asp:Literal ID="lblIsMrp" runat="server" Text="${MasterData.Flow.FlowDetail.IsMrp}:" Visible="false" />
                         </td>
                         <td class="ttd02">
+                            <asp:CheckBox ID="cbIsMrp" runat="server" Checked='<%# Bind("IsMrp") %>' Visible="false"  />
                         </td>
                     </tr>
                 </table>

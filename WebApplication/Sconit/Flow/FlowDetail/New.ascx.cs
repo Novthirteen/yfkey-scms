@@ -400,6 +400,7 @@ public partial class MasterData_FlowDetail_New : ModuleBase
         ((TextBox)(this.FV_FlowDetail.FindControl("tbProjectDescription"))).Text = string.Empty;
         ((TextBox)(this.FV_FlowDetail.FindControl("tbRemark"))).Text = string.Empty;
         ((CheckBox)(this.FV_FlowDetail.FindControl("cbIsAutoCreate"))).Checked = true;
+        ((CheckBox)(this.FV_FlowDetail.FindControl("cbIsMrp"))).Checked = true;
 
         ((TextBox)(this.FV_FlowDetail.FindControl("tbMRPWeight"))).Text = "1";
 
@@ -538,6 +539,8 @@ public partial class MasterData_FlowDetail_New : ModuleBase
             tbLocTo.ServiceParameter = "string:" + flow.PartyTo.Code;
             tbLocTo.DataBind();
             tbLocTo.Text = string.Empty;
+            this.FV_FlowDetail.FindControl("lblIsMrp").Visible = true;
+            this.FV_FlowDetail.FindControl("cbIsMrp").Visible = true;
 
         }
     }

@@ -63,7 +63,8 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
 from  MRP_ShipPlanDet as det with(nolock)
  inner join MRP_ShipPlanMstr as m with(nolock) on det.ShipPlanId=m.Id 
  inner join FlowMstr as f on det.Flow=f.Code
- left join MRP_ShipPlanInitLocationDet as l with(nolock) on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1  ";
+ inner join FlowDet as fd on det.Flow=fd.Flow and det.Item=fd.Item and fd.IsMrp=1
+ left join MRP_ShipPlanInitLocationDet as l with(nolock) on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1 ";
         //left join MRP_ShipPlanIpDet as ip on ip.ShipPlanId=m.Id and ip.Item=det.Item where 1=1  ";
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 
@@ -830,6 +831,7 @@ from  MRP_ShipPlanDet as det with(nolock)
 from  MRP_ShipPlanDet as det  with(nolock)
  inner join MRP_ShipPlanMstr as m with(nolock) on det.ShipPlanId=m.Id 
  inner join FlowMstr as f on det.Flow=f.Code
+ inner join FlowDet as fd on det.Flow=fd.Flow and det.Item=fd.Item and fd.IsMrp=1
  left join MRP_ShipPlanInitLocationDet as l with(nolock) on det.ShipPlanId=l.ShipPlanId and det.Item=l.Item and det.LocTo=l.Location where 1=1  ";
         searchSql += string.Format(" and det.Type='{0}' ", this.rbType.SelectedValue);
 

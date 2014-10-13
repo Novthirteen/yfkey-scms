@@ -60,5 +60,6 @@
     <property name="PackagingCode" column="PackagingCode" type="String" length="50" />
     <property name="LadingQuantity" column="LadingQuantity" type="String" length="50" />
     <property name="UnitsPerContainer" column="UnitsPerContainer" type="String" length="50" />
+    <property name="IsMrp" column="IsMrp" type="Boolean"  />
   </class>
 </hibernate-mapping>

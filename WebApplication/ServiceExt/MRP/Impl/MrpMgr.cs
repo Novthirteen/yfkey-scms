@@ -688,6 +688,19 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
 
+        [Transaction(TransactionMode.Requires)]
+        public void RunMrp2(User user)
+        {
+            lock (RunPlanLock)
+            {
+                SqlParameter[] sqlParameterArr = new SqlParameter[1];
+                sqlParameterArr[0] = new SqlParameter("@RunUser", SqlDbType.VarChar, 50);
+                sqlParameterArr[0].Value = user.Code;
+                this.genericMgr.GetDatasetByStoredProcedure("RunPurchasePlanProxy2", sqlParameterArr);
+
+            }
+        }
+
         public void RunMrp(DateTime effectiveDate, User user)
         {
         }
@@ -1724,6 +1737,7 @@ namespace com.Sconit.Service.MRP.Impl
                 int colSafeStock = 9;//安全库存
                 int colMaxStock = 10;//最大库存
                 int colUnitCount = 11;//包装量
+                int colIsMrp = 12;//包装量
                 #endregion
 
                 var disFlowCodes = this.genericMgr.GetDatasetBySql(" select m.Code,d.Item,d.Id from flowdet as d inner join flowmstr as m on  m.code=d.flow where m.type='Distribution' and m.IsActive=1 ").Tables[0];
@@ -1762,6 +1776,7 @@ namespace com.Sconit.Service.MRP.Impl
                     decimal safeStock = 0;
                     decimal maxStock = 0;
                     decimal? uc = null;
+                    bool? isMrp = null;
 
                     #region 读取销售路线
                     dFlowCode = ImportHelper.GetCellStringValue(row.GetCell(colDisFlow));
@@ -1944,6 +1959,26 @@ namespace com.Sconit.Service.MRP.Impl
                     //}
                     #endregion
 
+                    #region 是否参与Mrp
+                    string rIsMrp = ImportHelper.GetCellStringValue(row.GetCell(colIsMrp));
+                    if (!string.IsNullOrEmpty(rIsMrp))
+                    {
+                        if (rIsMrp == "0")
+                        {
+                            isMrp = false;
+                        }
+                        else if (rIsMrp == "1")
+                        {
+                            isMrp = true;
+                        }
+                        else
+                        {
+                            errorMessages += "</br>" + string.Format("第{0}行：IsMrp填写有误。", rowCount);
+                            continue;
+                        }
+                    }
+                    #endregion
+
                     #region 读取物料代码
 
                     itemCode = ImportHelper.GetCellStringValue(row.GetCell(colItem));
@@ -1972,7 +2007,7 @@ namespace com.Sconit.Service.MRP.Impl
                     #endregion
                     //销售路线	销售提前期	MRPCode	周起始	周工作日	发运路线	发运提前期	物料代码	安全库存	最大库存	包装量	
 
-                    object[] objArr = new object[] { dFlowCode, dLeadTime, mrpCode, dateFst, workDate, tFlowCode, tLeadTime, itemCode, safeStock, maxStock, uc };
+                    object[] objArr = new object[] { dFlowCode, dLeadTime, mrpCode, dateFst, workDate, tFlowCode, tLeadTime, itemCode, safeStock, maxStock, uc, isMrp };
                     allReadList.Add(objArr);
                 }
                 if (allReadList.Count == 0)
@@ -2048,8 +2083,18 @@ namespace com.Sconit.Service.MRP.Impl
                         //}
                         //else
                         //{
-                            upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8],"", newTime, user.Code, l[5], l[7]);
+                        // upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8],"", newTime, user.Code, l[5], l[7]);
                         //}
+                        // upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], "", newTime, user.Code, l[5], l[7]);
+
+                        if (l[11] != null && ((bool?)l[11]).HasValue)
+                        {
+                            upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},lastModifyDate='{3}',LastModifyUser='{4}',IsMrp={5} where Flow='{6}' and Item='{7}' ", l[9], l[8],"", newTime, user.Code, ((bool?)l[11]).Value?1:0, l[5], l[7]);
+                        }
+                        else
+                        {
+                            upSql = string.Format(" update FlowDet set MaxStock={0},SafeStock={1},lastModifyDate='{3}',LastModifyUser='{4}' where Flow='{5}' and Item='{6}' ", l[9], l[8], "", newTime, user.Code, l[5], l[7]);
+                        }
                         this.genericMgr.ExecuteSql(upSql);
                     }
 
