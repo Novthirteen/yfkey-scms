@@ -620,7 +620,7 @@ BEGIN
 		
 		insert into #tempIpDet(IpNo, Flow, Item, StartTime, WindowTime, Qty)
 		select det.IpNo, det.Flow, det.Item, det.StartTime, DATEADD(day, mstr.LeadTime, det.StartTime), SUM(det.Qty) as Qty
-		from MRP_IpDetSnapShot as det inner join (select distinct Flow, LeadTime from #tempShipFlowDet) as mstr on det.Flow = mstr.Flow
+		from MRP_IpDetSnapShot as det inner join (select distinct Flow, LeadTime from #tempShipFlowDet) as mstr on det.Flow = mstr.Flow where DATEADD(day, mstr.LeadTime, det.StartTime)>DATEADD(day, -7, getdate())
 		group by det.IpNo, det.Flow, det.Item, det.StartTime, mstr.LeadTime, det.WindowTime
 		---------------------------¡ü»º´æÔÚÍ¾-----------------------------
 		
