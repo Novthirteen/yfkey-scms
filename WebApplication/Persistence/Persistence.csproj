@@ -365,8 +365,6 @@
     <Compile Include="Base\Procurement\NH\NHItemFlowPlanTrackBaseDao.cs" />
     <Compile Include="Base\Procurement\NH\NHOrderTracerBaseDao.cs" />
     <Compile Include="Base\Procurement\NH\NHPurchasePriceListBaseDao.cs" />
-    <Compile Include="Base\SconitAdoNetTransactionFactory.cs" />
-    <Compile Include="Base\SconitAdoTransaction.cs" />
     <Compile Include="Base\SqlDaoBase.cs" />
     <Compile Include="Base\SQLHelper.cs" />
     <Compile Include="Base\SqlHelperDao.cs" />
