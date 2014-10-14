@@ -617,7 +617,7 @@ BEGIN
 				update det set PurchaseQty = CASE WHEN @ActiveQty >= PurchaseQty THEN 0 WHEN @ActiveQty < PurchaseQty and @ActiveQty > 0 THEN PurchaseQty - @ActiveQty ELSE PurchaseQty END,
 				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = PurchaseQty
 				from #tempPurchasePlanDet as det with(INDEX(IX_tempPurchasePlanDet_Flow_Item_WindowTime))
-				where det.Item = @Item and det.PurchaseFlow = @Flow and det.WindowTime >= @WindowTime
+				where det.PurchaseFlow = @Flow and det.Item = @Item and det.WindowTime >= @WindowTime
 			end
 
 			set @RowId = @RowId + 1

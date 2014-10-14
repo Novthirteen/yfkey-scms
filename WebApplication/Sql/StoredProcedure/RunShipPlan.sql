@@ -142,7 +142,7 @@ BEGIN
 			WindowTime datetime
 		)
 
-		create index IX_StartTime on #tempShipPlanDet(StartTime asc)
+		create index IX_Flow_Item_StartTime on #tempShipPlanDet(Flow asc, Item asc, StartTime asc)
 
 		create table #tempShipPlanDetTrace
 		(
@@ -444,7 +444,7 @@ BEGIN
 			begin
 				update det set ShipQty = CASE WHEN @ActiveQty >= ShipQty THEN 0 WHEN @ActiveQty < ShipQty and @ActiveQty>0 THEN ShipQty - @ActiveQty ELSE ShipQty END,
 				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = ShipQty
-				from #tempShipPlanDet as det with(INDEX(IX_StartTime))
+				from #tempShipPlanDet as det with(INDEX(IX_Flow_Item_StartTime))
 				where det.Flow = @Flow and det.Item = @Item
 			end
 
@@ -483,7 +483,7 @@ BEGIN
 			begin
 				update det set ShipQty = CASE WHEN @ActiveQty >= ShipQty THEN 0 WHEN @ActiveQty < ShipQty and @ActiveQty>0 THEN ShipQty - @ActiveQty ELSE ShipQty END,
 				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = ShipQty
-				from #tempShipPlanDet as det with(INDEX(IX_StartTime))
+				from #tempShipPlanDet as det with(INDEX(IX_Flow_Item_StartTime))
 				where det.Flow = @Flow and det.Item = @Item and det.StartTime >= @StartTime
 			end
 
