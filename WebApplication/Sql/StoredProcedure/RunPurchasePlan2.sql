@@ -389,7 +389,7 @@ BEGIN
 		delete pl from #tempMaterialPlanDet as pl inner join Item as i on pl.Item = i.Code where i.IsMRP <> 1
 		-----------------------------↑展开Bom-----------------------------
 		
-print 111
+
 
 		-----------------------------↓获取转手贸易发货计划-----------------------------
 		select @ShipPlanReleaseNo = MAX(ReleaseNo) from MRP_ShipPlanMstr where [Status] = 'Submit'
@@ -415,7 +415,7 @@ print 111
 		-----------------------------↑获取转手贸易发货计划-----------------------------
 		
 
-print 222
+
 		-----------------------------↓获取采购路线-----------------------------
 		--获取获取采购路线和采购库位的库存
 		--insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, 
@@ -427,22 +427,21 @@ print 222
 		--inner join Item as i on det.Item = i.Code
 		--left join MRP_LocationDetSnapShot as loc on det.Item = loc.Item and mstr.LocTo = loc.Location
 		--where mstr.[Type] = 'Procurement' and mstr.IsActive = 1 
-print 333	
+	
 		insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, 
 		LocQty, InTransitQty, SafeStock, MaxStock, ActiveQty,MinLotSize,InspectQty)		
-		select det.Flow, max(ISNULL(mstr.MRPLeadTime, 0)) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, max(isnull(det.HuLotSize,0)), mstr.LocFrom, mstr.LocTo, 
+		select det.Flow, max(ISNULL(mstr.MRPLeadTime, 0)) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, max(ISNULL(det.HuLotSize,0)), mstr.LocFrom, mstr.LocTo, 
 		max(ISNULL(loc.Qty, 0)), max(ISNULL(loc.PurchaseInTransitQty, 0)), max(ISNULL(det.SafeStock, 0)), max(ISNULL(det.MaxStock, 0)), max(ISNULL(loc.Qty, 0) + ISNULL(loc.PurchaseInTransitQty, 0) - ISNULL(det.SafeStock	, 0)) ,max(det.MinLotSize) as MinLotSize ,max(ISNULL(loc.InspectQty, 0)) as InspectQty
 		from FlowDet as det
 		inner join FlowMstr as mstr on det.Flow = mstr.Code
 		inner join Item as i on det.Item = i.Code
 		left join 
-		(select ld.Item, SUM(ISNULL(ld.Qty, 0)) as Qty, SUM(ISNULL(ld.InTransitQty, 0)) as InTransitQty, SUM(ISNULL(ld.PurchaseInTransitQty, 0)) as PurchaseInTransitQty, SUM(ISNULL		(ld.InspectQty, 0)) as InspectQty
+		(select ld.Item, SUM(ISNULL(ld.Qty, 0)) as Qty, SUM(ISNULL(ld.InTransitQty, 0)) as InTransitQty, SUM(ISNULL(ld.PurchaseInTransitQty, 0)) as PurchaseInTransitQty, SUM(ISNULL(ld.InspectQty, 0)) as InspectQty
 		from MRP_LocationDetSnapShot as ld
 		group by ld.Item) as loc on det.Item = loc.Item 
 		where mstr.[Type] = 'Procurement' and mstr.IsActive = 1
 		group by det.Flow,  det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom ,  mstr.LocFrom, mstr.LocTo
 	
-print 333		
 		--计算单位换算
 		update #tempShipFlowDet set UnitQty = 1 where Uom = BaseUom 
 		update det set UnitQty = c.BaseQty / c.AltQty
@@ -457,14 +456,14 @@ print 333
 		update det set UnitQty =  c.AltQty / c.BaseQty
 		from #tempShipFlowDet as det inner join UomConv as c on det.Uom = c.BaseUom  and det.BaseUom = c.AltUom 
 		where det.UnitQty is null and c.Item is null
-print 333	
+
 		--删除没有维护单位换算的物料
 		insert into #tempMsg(Lvl, Flow, Item,  Uom,  Msg) 
 		select 'Error', Flow, Item,  Uom, 
 		N'采购路线[' + Flow + N']物料[ ' + Item + N']没有维护单位[ ' + Uom + N']和基本单位[' + BaseUom + N']的换算率' 
 		from #tempShipFlowDet where UnitQty is null
 		delete from #tempShipFlowDet where UnitQty is null
-print 333
+
 		--采购路线没有维护物料
 		insert into #tempMsg(Lvl, Item, Qty, Uom, PlanDate, Msg) 
 		select 'Error', c.Item, c.ReqQty, c.BaseUom, c.ReqTime, 
@@ -473,7 +472,7 @@ print 333
 		where f.RowId is null
 		-----------------------------↑获取采购路线以及库存-----------------------------
 		
-print 333
+
 		
 		-----------------------------↓计算采购计划-----------------------------
 		insert into #tempPurchasePlanDet(UUID, PurchaseFlow, LeadTime, Item, ItemDesc, RefItemCode, BaseReqQty, BasePurchaseQty, Uom, BaseUom, UC, MinLotSize, StartTime, WindowTime)
@@ -537,7 +536,7 @@ print 333
 		-----------------------------↑计算采购计划-----------------------------
          
 
-print 444
+
 		-----------------------------↓低于安全库存的转为当天的物料需求计划-----------------------------
 		update p set BasePurchaseQty = BasePurchaseQty - d.ActiveQty
 		from #tempPurchasePlanDet as p 
@@ -578,7 +577,7 @@ print 444
 		update #tempPurchasePlanDet set ReqQty = BaseReqQty * UnitQty, PurchaseQty = BasePurchaseQty * UnitQty
 		-----------------------------↑低于安全库存的转为当天的物料需求计划-----------------------------
 
-print 555
+
 
 		-----------------------------↓补齐日计划-----------------------------
 		declare @CurrentSTime datetime
@@ -600,7 +599,7 @@ print 555
 		-----------------------------↑补齐日计划-----------------------------
 	
 	
-print 666	
+
 		-----------------------------↓缓存订单-----------------------------
 		--查找订单数
 		insert into #tempOpenOrder(Flow, OrderNo, Item,  StartTime, WindowTime, EffDate, OrderQty, ShipQty, RecQty)
@@ -635,7 +634,7 @@ print 666
 		from #tempOpenOrder as ord inner join #tempPurchasePlanDet as pl on pl.Item = ord.Item and pl.PurchaseFlow = ord.Flow and pl.StartTime = ord.EffDate
 		---------------------------↑更新订单数-----------------------------
 		
-print 777
+
 		
 		-------------------------↓缓存在途ASN-----------------------------
 		--insert into #tempIpDet(IpNo, Flow, Item, StartTime, WindowTime, Qty)
@@ -646,11 +645,12 @@ print 777
 		
 		insert into #tempIpDet(IpNo, Flow, Item, StartTime, WindowTime, Qty)
 		select det.IpNo, det.Flow, det.Item, det.StartTime, DATEADD(day, mstr.LeadTime, det.StartTime), SUM(det.Qty) as Qty
-		from MRP_IpDetSnapShot as det inner join (select distinct Flow, LeadTime from #tempShipFlowDet) as mstr on det.Flow = mstr.Flow where DATEADD(day, mstr.LeadTime, det.StartTime)>DATEADD(day, -7, getdate())
+		from MRP_IpDetSnapShot as det inner join (select distinct Flow, LeadTime from #tempShipFlowDet) as mstr on det.Flow = mstr.Flow 
+		where DATEADD(day, mstr.LeadTime, det.StartTime) > DATEADD(day, -7, @DateTimeNow)
 		group by det.IpNo, det.Flow, det.Item, det.StartTime, mstr.LeadTime, det.WindowTime
 		---------------------------↑缓存在途-----------------------------
 		
-print 888
+
 		----根据依次扣减库存（不含在途库存）
 		set @RowId = null
 		set @MaxRowId = null
@@ -674,7 +674,7 @@ print 888
 		end
 
 
-print 999
+
 		-------------------------------↓扣减订单-----------------------------
 		set @RowId = null
 		set @MaxRowId = null
@@ -701,7 +701,7 @@ print 999
 		--left join (select UUID, SUM(ISNULL(ProdQty, 0)) as ProdQty from #tempMaterialPlanDetTrace group by UUID) as dt on d.UUID = dt.UUID
 		-----------------------------↑扣减订单-----------------------------
 
-print 101010
+
 
 		-----------------------------↓到货数按包装圆整-----------------------------
 		--数量转为采购单位
@@ -715,7 +715,6 @@ print 101010
 
 		--经济批量
 		update #tempPurchasePlanDet set PurchaseQty = CASE WHEN PurchaseQty < MinLotSize THEN MinLotSize ELSE PurchaseQty END where MinLotSize > 0 and PurchaseQty>0
-
          
 		--记录溢出量
 		update det set OverflowQty = tmp.OverflowQty
@@ -724,8 +723,6 @@ print 101010
 		from #tempPurchasePlanDet as det1 inner join #tempPurchasePlanDet as det2 on det1.Item = det2.Item and det1.PurchaseFlow = det2.PurchaseFlow 
 		where det1.StartTime <= det2.StartTime
 		group by det2.Item, det2.PurchaseFlow, det2.StartTime) as tmp on det.Item = tmp.Item and det.PurchaseFlow = tmp.PurchaseFlow and det.StartTime = tmp.StartTime
-		
-			
 		
 		--先扣减经济批量
 		--set @LastOverflowCount = 0
@@ -781,7 +778,7 @@ print 101010
 		end
 		--select '在扣减包装',* from #tempPurchasePlanDet where item='3080001011998' and purchaseflow='S0000601_R' and StartTime in('2014-08-11','2014-08-12','2014-08-13')
 		-----------------------------↑到货数按包装圆整-----------------------------
-print 111111
+
 	end try
 	begin catch
 		set @Msg = N'运行物料需求计划异常：' + Error_Message()

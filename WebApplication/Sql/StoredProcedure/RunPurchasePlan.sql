@@ -28,8 +28,6 @@ BEGIN
 	declare @MaxMstrId int
 	declare @MinPlandate datetime
 	declare @Bom varchar(50)
-	declare @EffDate datetime
-	declare @BomQty decimal(18, 8)
 	declare @ProdItem varchar(50)
 	declare @Flow varchar(50)
 	declare @Item varchar(50)
@@ -61,6 +59,15 @@ BEGIN
 			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			Msg varchar(500) COLLATE  Chinese_PRC_CI_AS
 		)
+
+		create table #tempGroupedEffShiftPlan
+		(
+			RowId int identity(1, 1) Primary Key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS
+		)
+
+		create index IX_tempGroupedEffShiftPlan_Item on #tempGroupedEffShiftPlan(Item asc)
 
 		create table #tempEffShiftPlan
 		(
@@ -94,6 +101,8 @@ BEGIN
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
 			BackFlushMethod varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			StartDate datetime,
+			EndDate datetime
 		)
 
 		create table #tempCurrentMaterialPlanDet
@@ -101,6 +110,7 @@ BEGIN
 			UUID varchar(50) COLLATE  Chinese_PRC_CI_AS primary key,
 			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
+			OrgReqQty decimal(18, 8),
 			ReqQty decimal(18, 8),
 			RateQty decimal(18, 8),
 			ScrapPct decimal(18, 8),
@@ -252,7 +262,7 @@ BEGIN
 		select det.Item, det.ItemDesc, det.RefItemCode, (ISNULL(det.Qty, 0) + ISNULL(det.OrderQty, 0)), det.Uom, det.Uom, 1, det.StartTime
 		from MRP_ProductionPlanDet as det inner join MRP_ProductionPlanMstr as mstr on det.ProductionPlanId = mstr.Id
 		--where mstr.Id in (select MAX(Id) from MRP_ProductionPlanMstr) and det.[Type] = 'Daily' and det.StartTime >= @DateNow
-		where mstr.Id in (select MAX(Id) from MRP_ProductionPlanMstr and [Status] = 'Submit') and det.[Type] = 'Daily' and det.StartTime >= @DateNow
+		where mstr.Id in (select MAX(Id) from MRP_ProductionPlanMstr where [Status] = 'Submit') and det.[Type] = 'Daily' and det.StartTime >= @DateNow
 		-----------------------------↑获取生产计划-----------------------------
 
 
@@ -287,24 +297,27 @@ BEGIN
 		left join BomDet as b on t.Bom = b.Bom
 		where b.Bom is null
 
-		--循环展开Bom
-		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempEffShiftPlan
+		insert into #tempGroupedEffShiftPlan(Item, Bom) select Item, Bom from #tempEffShiftPlan group by Item, Bom
+		select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempGroupedEffShiftPlan
 		while @RowId <= @MaxRowId
 		begin
-			if exists(select top 1 1 from #tempEffShiftPlan where RowId = @RowId)
+			if exists(select top 1 1 from #tempGroupedEffShiftPlan where RowId = @RowId)
 			begin
-				select @ProdItem = Item, @Bom = Bom, @EffDate = PlanDate, @BomQty = Qty 
-				from #tempEffShiftPlan where RowId = @RowId
+				select @ProdItem = Item, @Bom = Bom from #tempEffShiftPlan where RowId = @RowId
 				
 				truncate table #tempBomDetail
-				insert into #tempBomDetail exec GetFlatBomDetail @Bom, @EffDate
+				--查找物料Bom，不按生效日期循环查找，所有BOM全部查出来
+				insert into #tempBomDetail exec GetFlatBomDetailWithoutEffDate @Bom
 
 				truncate table #tempCurrentMaterialPlanDet
-				insert into #tempCurrentMaterialPlanDet(UUID, Item, ItemDesc, ReqQty, RateQty, ScrapPct,
+				insert into #tempCurrentMaterialPlanDet(UUID, Item, ItemDesc, OrgReqQty, ReqQty, RateQty, ScrapPct,
 				Uom, BaseUom, ReqTime)
-				select NEWID(), t.Item, i.Desc1, @BomQty * (t.RateQty + t.ScrapPct / 100), t.RateQty, t.ScrapPct,
-				t.Uom, i.Uom, @EffDate
-				from #tempBomDetail as t inner join Item as i on t.Item = i.Code
+				select NEWID(), t.Item, i.Desc1, pl.Qty, pl.Qty * (t.RateQty + t.ScrapPct / 100), t.RateQty, t.ScrapPct,
+				t.Uom, i.Uom, pl.PlanDate
+				from #tempBomDetail as t 
+				inner join Item as i WITH(NOLOCK) on t.Item = i.Code
+				inner join #tempEffShiftPlan as pl on t.StartDate <= pl.PlanDate and (t.EndDate >= pl.PlanDate or t.EndDate is null) 
+				where pl.Item = @Item
 
 				--计算单位换算（Bom单位转为基本单位）
 				update #tempCurrentMaterialPlanDet set UnitQty = 1 where Uom = BaseUom
@@ -330,7 +343,7 @@ BEGIN
 
 				--记录追溯关系
 				insert into #tempMaterialPlanDetTrace(UUID, ProdItem, ProdQty, RateQty, ScrapPct, BomUnitQty, BomUom, PlanDate)
-				select UUID, @ProdItem, @BomQty, RateQty, ScrapPct, UnitQty, Uom, @EffDate 
+				select UUID, @ProdItem, OrgReqQty, RateQty, ScrapPct, UnitQty, Uom, ReqTime 
 				from #tempCurrentMaterialPlanDet 
 
 				--记录物料计划临时表
@@ -685,7 +698,6 @@ BEGIN
 		begin
 			begin tran
 		end
-
 
 
 

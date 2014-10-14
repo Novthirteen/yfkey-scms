@@ -138,6 +138,7 @@ BEGIN
 			OrgQty decimal(18, 8),
 			Qty decimal(18, 8),
 			OverflowQty decimal(18, 8),
+			InventoryCountDownQty decimal(18, 8),
 			Bom varchar(50) COLLATE  Chinese_PRC_CI_AS,
 			OrderQty decimal(18, 8),
 			StartTime datetime,
@@ -146,7 +147,7 @@ BEGIN
 
 		create index IX_tempProductPlanDet_Item_StartTime on #tempProductPlanDet(Item asc, StartTime asc)
 
-		create table #tempLocatoinDet
+		create table #tempLocationDet
 		(
 			RowId int identity(1, 1) primary key,
 			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
@@ -155,10 +156,12 @@ BEGIN
 			InTransitQty decimal(18, 8), 
 			SafeStock decimal(18, 8),
 			MaxStock decimal(18, 8),
-			RemainQty decimal(18, 8)
+			RemainQty decimal(18, 8),
+			InventoryCountDown decimal(18, 8),
+			NetInventoryCountDown decimal(18, 8)
 		)
 
-		create index IX_tempLocatoinDet_Item on #tempLocatoinDet(Item asc)
+		create index IX_tempLocatoinDet_Item on #tempLocationDet(Item asc)
 
 		create table #tempBomDetail
 		(
@@ -204,6 +207,13 @@ BEGIN
 		)
 
 		create index IX_tempWeeklyProductionPlanDetMap_DailyUUID on #tempWeeklyProductionPlanDetMap(DailyUUID asc)
+
+		create table #tempInventoryCountDown
+		(
+			RowId int identity(1, 1) primary key,
+			Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+			InventoryCountDown decimal(18, 8)
+		)
 
 		select @ShipPlanReleaseNo = MAX(ReleaseNo) from MRP_ShipPlanMstr where [Status] = 'Submit'
 
@@ -267,9 +277,10 @@ BEGIN
 		while exists(select top 1 1 from #tempCurrentLevlProductPlan)
 		begin
 			-----------------------------↓计算可用库存-----------------------------
-			insert into #tempLocatoinDet(Item, Qty, InspectQty, InTransitQty, SafeStock, MaxStock, RemainQty)
+			insert into #tempLocationDet(Item, Qty, InspectQty, InTransitQty, SafeStock, MaxStock, RemainQty, InventoryCountDown, NetInventoryCountDown)
 			select p.Item, ISNULL(a.Qty, 0), ISNULL(a.InspectQty, 0), ISNULL(a.InTransitQty, 0), ISNULL(i.SafeStock, 0), ISNULL(i.MaxStock, 0),
-			ISNULL(a.Qty, 0) + ISNULL(a.InspectQty, 0) + ISNULL(a.InTransitQty, 0) - ISNULL(i.SafeStock, 0)
+			ISNULL(a.Qty, 0) + ISNULL(a.InspectQty, 0) + ISNULL(a.InTransitQty, 0) - ISNULL(i.SafeStock, 0), i.InvCountDown, 
+			(i.InvCountDown - ISNULL(a.Qty, 0) - ISNULL(a.InspectQty, 0)) as NetInventoryCountDown
 			from (select distinct Item from #tempCurrentLevlProductPlan) as p
 			inner join Item as i WITH(NOLOCK) on p.Item = i.Code 
 			left join (select loc.Item, SUM(loc.Qty) as Qty, SUM(loc.InspectQty) as InspectQty, SUM(loc.InTransitQty) as InTransitQty
@@ -279,7 +290,7 @@ BEGIN
 						where l.IsFG = 1  --取成品库位库存
 						group by loc.Item
 						) as a on p.Item = a.Item
-			left join #tempLocatoinDet as t on p.Item = t.Item
+			left join #tempLocationDet as t on p.Item = t.Item
 			where t.Item is null  --过滤已经添加到列表中的库存
 			-----------------------------↑计算可用库存-----------------------------
 
@@ -288,14 +299,14 @@ BEGIN
 			-----------------------------↓计算净需求-----------------------------
 			set @RowId = null
 			set @MaxRowId = null
-			select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempLocatoinDet
+			select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempLocationDet
 			while (@RowId <= @MaxRowId)
 			begin
 				set @Item = null
 				set @ActiveQty = null
 				set @LastActiveQty = 0
 
-				select @ActiveQty = RemainQty, @Item = Item from #tempLocatoinDet where RowId = @RowId
+				select @ActiveQty = RemainQty, @Item = Item from #tempLocationDet where RowId = @RowId
 				if (@ActiveQty > 0)
 				begin
 					update det set Qty = CASE WHEN @ActiveQty >= Qty THEN 0 WHEN @ActiveQty < Qty and @ActiveQty > 0 THEN Qty - @ActiveQty ELSE Qty END,
@@ -305,7 +316,7 @@ BEGIN
 					where det.Item = @Item
 				end
 
-				update #tempLocatoinDet set RemainQty = @ActiveQty where RowId = @RowId
+				update #tempLocationDet set RemainQty = @ActiveQty where RowId = @RowId
 			
 				set @RowId = @RowId + 1
 			end
@@ -427,11 +438,11 @@ BEGIN
 
 		-----------------------------↓低于安全库存的转为当天的生产计划-----------------------------
 		update p set Qty = p.Qty - d.RemainQty
-		from #tempProductPlanDet as p inner join #tempLocatoinDet as d on p.Item = d.Item and p.StartTime = @DateNow
+		from #tempProductPlanDet as p inner join #tempLocationDet as d on p.Item = d.Item and p.StartTime = @DateNow
 		where d.RemainQty < 0
 		insert into #tempProductPlanDet(UUID, Item, ItemDesc, RefItemCode, Uom, Qty, Bom, StartTime, WindowTime)
 		select NEWID(), d.Item, i.Desc1, null, i.Uom, -d.RemainQty, ISNULL(i.Bom, d.Item), @DateNow, DATEADD(day, ISNULL(i.LeadTime, 0), @DateNow) 
-		from  #tempLocatoinDet as d left join #tempProductPlanDet as p on p.Item = d.Item and p.StartTime = @DateNow
+		from  #tempLocationDet as d left join #tempProductPlanDet as p on p.Item = d.Item and p.StartTime = @DateNow
 		inner join Item as i on d.Item = i.Code
 		where d.RemainQty < 0 and p.Item is null
 		-----------------------------↑低于安全库存的转为当天的生产计划-----------------------------
@@ -512,10 +523,10 @@ BEGIN
 
 
 		-----------------------------↓生产数按包装圆整-----------------------------
-		--取包装量、经济批量
+		----取包装量、经济批量
 		update pl set UC = i.UC, MinLotSize = i.MinLotSize, OrgQty = Qty
 		from #tempProductPlanDet as pl inner join Item as i on pl.Item = i.Code
-		 
+
 		--数量按包装圆整
 		update #tempProductPlanDet set Qty = ceiling(Qty / UC) * UC where UC > 0
 
@@ -567,6 +578,50 @@ BEGIN
 		end
 		-----------------------------↑生产数按包装圆整-----------------------------
 
+
+
+		-----------------------------↓考虑库存倒数-----------------------------		
+		--库存净需求减去已下达的订单数（库存净需求 = 库存需求 - 库存数 - 已下达的订单数）
+		update loc set NetInventoryCountDown = loc.NetInventoryCountDown - ord.OrderQty
+		from #tempLocationDet as loc 
+		inner join (select Item, SUM(OrderQty) as OrderQty from #tempProductPlanDet group by Item) as ord on loc.Item = ord.Item
+		where loc.NetInventoryCountDown > 0
+
+		--库存净需求小于等于0的把生产计划数全部更新为0
+		update pl set Qty = 0
+		from #tempProductPlanDet as pl inner join #tempLocationDet as loc on pl.Item = loc.Item
+		where loc.NetInventoryCountDown <= 0
+			
+		if exists(select top 1 1 from #tempLocationDet where NetInventoryCountDown > 0)
+		begin
+			insert into #tempInventoryCountDown(Item, InventoryCountDown) 
+			select Item, NetInventoryCountDown from #tempLocationDet where NetInventoryCountDown > 0
+
+			set @RowId = null
+			set @MaxRowId = null
+			select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempInventoryCountDown
+			while (@RowId <= @MaxRowId)
+			begin
+				set @ActiveQty = null
+				set @LastActiveQty = 0
+				set @Item = null
+
+				select @ActiveQty = InventoryCountDown, @Item = Item from #tempInventoryCountDown where RowId = @RowId
+
+				update #tempProductPlanDet set InventoryCountDownQty = Qty where Item = @Item
+				update det set InventoryCountDownQty = CASE WHEN @ActiveQty >= InventoryCountDownQty THEN 0 WHEN @ActiveQty < InventoryCountDownQty and @ActiveQty>0 THEN InventoryCountDownQty - @ActiveQty ELSE InventoryCountDownQty END,
+				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = InventoryCountDownQty
+				from #tempProductPlanDet as det with(INDEX(IX_tempProductPlanDet_Item_StartTime))
+				where det.Item = @Item
+				update #tempProductPlanDet set Qty = Qty - InventoryCountDownQty where Item = @Item
+
+				set @RowId = @RowId + 1
+			end
+		end
+		-----------------------------↑考虑库存倒数-----------------------------
+
+
+
 		delete from #tempProductPlanDet where Item not like '3%'
 	end try
 	begin catch
@@ -600,8 +655,8 @@ BEGIN
 		set @ProductionPlanId = @@Identity
 
 		--新增主生产计划期初库存
-		insert into MRP_ProductionPlanInitLocationDet(ProductionPlanId, [Type], Item, InitStock, SafeStock, MaxStock, InTransitQty, CreateDate, CreateUser)
-		select @ProductionPlanId, 'Daily', Item, Qty, SafeStock, MaxStock, InTransitQty, @DateTimeNow, @RunUser from #tempLocatoinDet
+		insert into MRP_ProductionPlanInitLocationDet(ProductionPlanId, [Type], Item, InitStock, SafeStock, MaxStock, InTransitQty, InventoryCountDown, CreateDate, CreateUser)
+		select @ProductionPlanId, 'Daily', Item, Qty, SafeStock, MaxStock, InTransitQty, InventoryCountDown, @DateTimeNow, @RunUser from #tempLocationDet
 
 		--新增主生产计划明细
 		insert into MRP_ProductionPlanDet(ProductionPlanId, [Type], UUID, Item, ItemDesc, RefItemCode, ReqQty, OrgQty, Qty, OrderQty, Uom, UC, MinLotSize, StartTime, WindowTime, CreateDate, CreateUser, LastModifyDate, LastModifyUser, [Version])
