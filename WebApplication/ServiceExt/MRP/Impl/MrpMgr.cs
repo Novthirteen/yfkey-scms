@@ -107,7 +107,6 @@ namespace com.Sconit.Service.MRP.Impl
         }
 
         private static object RunPlanLock = new object();
-        [Transaction(TransactionMode.Requires)]
         public void RunProductionPlan(User user)
         {
             lock (RunPlanLock)
@@ -675,7 +674,6 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
 
-        [Transaction(TransactionMode.Requires)]
         public void RunMrp(User user)
         {
             lock (RunPlanLock)
@@ -688,7 +686,6 @@ namespace com.Sconit.Service.MRP.Impl
             }
         }
 
-        [Transaction(TransactionMode.Requires)]
         public void RunMrp2(User user)
         {
             lock (RunPlanLock)
