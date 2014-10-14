@@ -431,7 +431,7 @@ BEGIN
 		insert into #tempShipFlowDet(Flow, LeadTime, Item, ItemDesc, RefItemCode, Uom, BaseUom, UC, LocFrom, LocTo, 
 		LocQty, InTransitQty, SafeStock, MaxStock, ActiveQty,MinLotSize,InspectQty)		
 		select det.Flow, max(ISNULL(mstr.MRPLeadTime, 0)) as LeadTime, det.Item, i.Desc1, det.RefItemCode, det.Uom, i.Uom as BaseUom, max(ISNULL(det.HuLotSize,0)), mstr.LocFrom, mstr.LocTo, 
-		max(ISNULL(loc.Qty, 0)), max(ISNULL(loc.PurchaseInTransitQty, 0)), max(ISNULL(det.SafeStock, 0)), max(ISNULL(det.MaxStock, 0)), max(ISNULL(loc.Qty, 0) + ISNULL(loc.PurchaseInTransitQty, 0) - ISNULL(det.SafeStock	, 0)) ,max(det.MinLotSize) as MinLotSize ,max(ISNULL(loc.InspectQty, 0)) as InspectQty
+		max(ISNULL(loc.Qty, 0)), max(ISNULL(loc.PurchaseInTransitQty, 0)), max(ISNULL(i.SafeStock, 0)), max(ISNULL(i.MaxStock, 0)), max(ISNULL(loc.Qty, 0) + ISNULL(loc.PurchaseInTransitQty, 0) - ISNULL(i.SafeStock	, 0)) ,max(det.MinLotSize) as MinLotSize ,max(ISNULL(loc.InspectQty, 0)) as InspectQty
 		from FlowDet as det
 		inner join FlowMstr as mstr on det.Flow = mstr.Code
 		inner join Item as i on det.Item = i.Code
