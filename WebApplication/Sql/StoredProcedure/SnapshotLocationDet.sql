@@ -59,6 +59,7 @@ BEGIN
 			inner join OrderDet as oDet on oTrans.OrderDetId = oDet.Id
 			inner join OrderMstr as oMstr on oDet.OrderNo = oMstr.OrderNo
 			where oMstr.[Type] in ('Procurement', 'Subconctracting') and iMstr.[Status] = 'Create' and oMstr.SubType = 'Nml'
+			and convert(varchar(10), oMstr.WindowTime, 121)>convert(varchar(10),DATEADD(day, -7, getdate()), 121)
 			group by oDet.Item, oDet.LocTo
 			union all
 			--ªÒ»°ºÏ—Èø‚¥Ê

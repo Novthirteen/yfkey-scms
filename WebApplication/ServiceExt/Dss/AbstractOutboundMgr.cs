@@ -567,7 +567,7 @@ namespace com.Sconit.Service.Dss
         {
             DetachedCriteria criteria = DetachedCriteria.For(typeof(DssExportHistory))
                 .Add(Expression.Eq("IsActive", true))
-                .Add(Expression.Gt("CreateDate", DateTime.Now.AddMonths(-1)))//仅处理一个月内的历史
+               //.Add(Expression.Gt("CreateDate", DateTime.Now.AddMonths(-1)))//仅处理一个月内的历史
                 .Add(Expression.Eq("DssOutboundControl.Id", dssOutboundControlId));
 
             IList<DssExportHistory> dssExportHistoryList = criteriaMgr.FindAll<DssExportHistory>(criteria);

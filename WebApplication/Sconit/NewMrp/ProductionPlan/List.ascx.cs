@@ -70,12 +70,18 @@ public partial class NewMrp_ProductionPlan_List : ListModuleBase
                 {
                     System.Web.UI.WebControls.LinkButton lbtRunProdPlan = e.Row.FindControl("lbtRunProdPlan") as System.Web.UI.WebControls.LinkButton;
                     lbtRunProdPlan.Visible = false;
+
+                    System.Web.UI.WebControls.LinkButton lbtRunProdPlan2 = e.Row.FindControl("lbtRunProdPlan2") as System.Web.UI.WebControls.LinkButton;
+                    lbtRunProdPlan2.Visible = false;
                 }
             }
             else
             {
                 System.Web.UI.WebControls.LinkButton lbtRunProdPlan = e.Row.FindControl("lbtRunProdPlan") as System.Web.UI.WebControls.LinkButton;
                 lbtRunProdPlan.Visible = false;
+
+                System.Web.UI.WebControls.LinkButton lbtRunProdPlan2 = e.Row.FindControl("lbtRunProdPlan2") as System.Web.UI.WebControls.LinkButton;
+                lbtRunProdPlan2.Visible = false;
             }
         }
     }

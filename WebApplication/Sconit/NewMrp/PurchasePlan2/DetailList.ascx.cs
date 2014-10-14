@@ -73,7 +73,7 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
-		select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,max(isnull(det.ReqQty,0)),max(isnull(det.PurchaseQty,0)),det.WindowTime,det.Version,m.ReleaseNo,m.Status,max(isnull(l.InitStock,0)),max(isnull(fd.SafeStock,0)),max(isnull(l.InTransitQty,0)),max(isnull(l.InspectQty,0)),max(isnull(det.OrderQty,0)),max(isnull(fd.MaxStock,0)),det.StartTime,max(isnull(det.uc,0)),max(isnull(f.MrpLeadTime,0)),m.Id,max(isnull(det.MinLotSize,0)),max(isnull(det.UnitQty,0))
+		select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,max(isnull(det.ReqQty,0)),max(isnull(det.PurchaseQty,0)),det.WindowTime,det.Version,m.ReleaseNo,m.Status,max(isnull(l.InitStock,0)),max(isnull(l.SafeStock,0)),max(isnull(l.InTransitQty,0)),max(isnull(l.InspectQty,0)),max(isnull(det.OrderQty,0)),max(isnull(l.MaxStock,0)),det.StartTime,max(isnull(det.uc,0)),max(isnull(f.MrpLeadTime,0)),m.Id,max(isnull(det.MinLotSize,0)),max(isnull(det.UnitQty,0))
  from MRP_PurchasePlanDet2 as det with(nolock) 
 inner join MRP_PurchasePlanMstr2 as m with(nolock) on m.Id=det.PurchasePlanId
 inner join FlowMstr as f on det.Flow=f.Code
@@ -824,7 +824,7 @@ left join MRP_PurchasePlanInitLocationDet2 as l with(nolock) on det.PurchasePlan
         this.btQtyHidden.Value = string.Empty;
         this.btSeqHidden.Value = string.Empty;
         var searchSql = @"
-	select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,max(isnull(det.ReqQty,0)),max(isnull(det.PurchaseQty,0)),det.WindowTime,det.Version,m.ReleaseNo,m.Status,max(isnull(l.InitStock,0)),max(isnull(fd.SafeStock,0)),max(isnull(l.InTransitQty,0)),max(isnull(l.InspectQty,0)),max(isnull(det.OrderQty,0)),max(isnull(fd.MaxStock,0)),det.StartTime,max(isnull(det.uc,0)),max(isnull(f.MrpLeadTime,0)),m.Id,max(isnull(det.MinLotSize,0)),max(isnull(det.UnitQty,0))
+	select det.Id,det.UUID,det.Flow,det.Item,det.ItemDesc,det.RefItemCode,max(isnull(det.ReqQty,0)),max(isnull(det.PurchaseQty,0)),det.WindowTime,det.Version,m.ReleaseNo,m.Status,max(isnull(l.InitStock,0)),max(isnull(l.SafeStock,0)),max(isnull(l.InTransitQty,0)),max(isnull(l.InspectQty,0)),max(isnull(det.OrderQty,0)),max(isnull(l.MaxStock,0)),det.StartTime,max(isnull(det.uc,0)),max(isnull(f.MrpLeadTime,0)),m.Id,max(isnull(det.MinLotSize,0)),max(isnull(det.UnitQty,0))
  from MRP_PurchasePlanDet2 as det with(nolock) 
 inner join MRP_PurchasePlanMstr2 as m with(nolock) on m.Id=det.PurchasePlanId
 inner join FlowMstr as f on det.Flow=f.Code
