@@ -317,7 +317,7 @@ BEGIN
 				from #tempBomDetail as t 
 				inner join Item as i WITH(NOLOCK) on t.Item = i.Code
 				inner join #tempEffShiftPlan as pl on t.StartDate <= pl.PlanDate and (t.EndDate >= pl.PlanDate or t.EndDate is null) 
-				where pl.Item = @Item
+				where pl.Item = @ProdItem
 
 				--计算单位换算（Bom单位转为基本单位）
 				update #tempCurrentMaterialPlanDet set UnitQty = 1 where Uom = BaseUom
@@ -527,7 +527,7 @@ BEGIN
 		delete from #tempPurchasePlanDet where UnitQty is null
 
 		--数量转为采购单位
-		update #tempPurchasePlanDet set ReqQty = BaseReqQty * UnitQty, PurchaseQty = BasePurchaseQty * UnitQty
+		update #tempPurchasePlanDet set ReqQty = BaseReqQty / UnitQty, PurchaseQty = BasePurchaseQty / UnitQty
 		-----------------------------↑查找采购路线-----------------------------
 
 
@@ -617,7 +617,7 @@ BEGIN
 				update det set PurchaseQty = CASE WHEN @ActiveQty >= PurchaseQty THEN 0 WHEN @ActiveQty < PurchaseQty and @ActiveQty > 0 THEN PurchaseQty - @ActiveQty ELSE PurchaseQty END,
 				@ActiveQty = @ActiveQty - @LastActiveQty, @LastActiveQty = PurchaseQty
 				from #tempPurchasePlanDet as det with(INDEX(IX_tempPurchasePlanDet_Flow_Item_WindowTime))
-				where det.PurchaseFlow = @Flow and det.Item = @Item and det.WindowTime >= @WindowTime
+				where det.Item = @Item and det.PurchaseFlow = @Flow and det.WindowTime >= @WindowTime
 			end
 
 			set @RowId = @RowId + 1
@@ -703,12 +703,18 @@ BEGIN
 
 		-----------------------------↓生成物料需求计划(日）-----------------------------
 		--删除未释放的物料需求计划
-		delete from MRP_PurchasePlanIpDet where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
-		delete from MRP_PurchasePlanOpenOrder where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
-		delete from MRP_PurchasePlanDetTrace where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
-		delete from MRP_PurchasePlanInitLocationDet where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
-		delete from MRP_PurchasePlanDet where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
-		delete from MRP_PurchasePlanMstr where Status = 'Create'
+		--delete from MRP_PurchasePlanIpDet where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
+		--delete from MRP_PurchasePlanOpenOrder where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
+		--delete from MRP_PurchasePlanDetTrace where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
+		--delete from MRP_PurchasePlanInitLocationDet where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
+		--delete from MRP_PurchasePlanDet where PurchasePlanId in(select Id from MRP_PurchasePlanMstr where Status = 'Create')
+		--delete from MRP_PurchasePlanMstr where Status = 'Create'
+		truncate table MRP_PurchasePlanIpDet
+		truncate table MRP_PurchasePlanOpenOrder
+		truncate table MRP_PurchasePlanDetTrace
+		truncate table MRP_PurchasePlanInitLocationDet
+		truncate table MRP_PurchasePlanDet
+		truncate table MRP_PurchasePlanMstr
 
 		--获取ReleaseNo
 		select @ReleaseNo = ISNULL(MAX(ReleaseNo), 0) + 1 from MRP_PurchasePlanMstr

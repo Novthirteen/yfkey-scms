@@ -638,11 +638,16 @@ BEGIN
 
 		-----------------------------↓生成生产计划（日）-----------------------------
 		--删除未释放的发运计划
-		delete from MRP_ProductionPlanOpenOrder where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
-		delete from MRP_ProductionPlanInitLocationDet where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
-		delete from MRP_ProductionPlanDetTrace where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
-		delete from MRP_ProductionPlanDet where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
-		delete from MRP_ProductionPlanMstr where  [Status] = 'Create'
+		--delete from MRP_ProductionPlanOpenOrder where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
+		--delete from MRP_ProductionPlanInitLocationDet where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
+		--delete from MRP_ProductionPlanDetTrace where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
+		--delete from MRP_ProductionPlanDet where ProductionPlanId in(select Id from MRP_ProductionPlanMstr where [Status] = 'Create')
+		--delete from MRP_ProductionPlanMstr where  [Status] = 'Create'
+		truncate table  MRP_ProductionPlanOpenOrder 
+		truncate table  MRP_ProductionPlanInitLocationDet 
+		truncate table  MRP_ProductionPlanDetTrace 
+		truncate table  MRP_ProductionPlanDet 
+		truncate table  MRP_ProductionPlanMstr
 
 		--获取ReleaseNo
 		select @ReleaseNo = ISNULL(MAX(ReleaseNo), 0) + 1 from MRP_ProductionPlanMstr

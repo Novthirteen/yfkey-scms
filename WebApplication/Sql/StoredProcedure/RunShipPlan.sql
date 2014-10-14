@@ -558,12 +558,18 @@ BEGIN
 
 		-----------------------------↓生成发运计划（日）-----------------------------
 		--删除未释放的发运计划
-		delete from MRP_ShipPlanIpDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
-		delete from MRP_ShipPlanOpenOrder where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
-		delete from MRP_ShipPlanInitLocationDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
-		delete from MRP_ShipPlanDetTrace where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
-		delete from MRP_ShipPlanDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
-		delete from MRP_ShipPlanMstr where Status = 'Create'
+		--delete from MRP_ShipPlanIpDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
+		--delete from MRP_ShipPlanOpenOrder where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
+		--delete from MRP_ShipPlanInitLocationDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
+		--delete from MRP_ShipPlanDetTrace where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
+		--delete from MRP_ShipPlanDet where ShipPlanId in(select Id from MRP_ShipPlanMstr where Status = 'Create')
+		--delete from MRP_ShipPlanMstr where Status = 'Create'
+		truncate table MRP_ShipPlanIpDet
+		truncate table MRP_ShipPlanOpenOrder
+		truncate table MRP_ShipPlanInitLocationDet
+		truncate table MRP_ShipPlanDetTrace
+		truncate table MRP_ShipPlanDet
+		truncate table MRP_ShipPlanMstr
 
 		--获取ReleaseNo
 		select @ReleaseNo = ISNULL(MAX(ReleaseNo), 0) + 1 from MRP_ShipPlanMstr
