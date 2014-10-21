@@ -42,6 +42,7 @@ public partial class Index : System.Web.UI.Page
 
         string userCode = this.txtUsername.Value.Trim().ToLower();
         string password = this.txtPassword.Value.Trim();
+        string tempPassword = password;
         password = FormsAuthentication.HashPasswordForStoringInConfigFile(password, "MD5");
 
         if (userCode.Equals(string.Empty))
@@ -61,6 +62,54 @@ public partial class Index : System.Web.UI.Page
             if (password == user.Password && user.IsActive)
             {
                 this.Session["Current_User"] = TheUserMgr.LoadUser(userCode, true, true);
+                #region   检查密码
+                if (tempPassword.Length < 8)
+                {
+                    Response.Redirect("~/UpdatePassword.aspx");
+                }
+
+                char[] letters = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+                char[] numbers = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+                char[] specials = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '_' };
+
+                bool existsUpLetter = false;
+                bool existsLoLetter = false;
+                bool existsNumber = false;
+                bool existsSpecials = false;
+                foreach (var letter in tempPassword)
+                {
+                    if (letters.Where(l => l == letter).Count() > 0)
+                    {
+                        existsUpLetter = true;
+                        continue;
+                    }
+                    if (letters.Where(l => Convert.ToChar(l.ToString().ToLower()) == letter).Count() > 0)
+                    {
+                        existsLoLetter = true;
+                        continue;
+                    }
+                    if (numbers.Where(l => l == letter).Count() > 0)
+                    {
+                        existsNumber = true;
+                        continue;
+                    }
+                    if (specials.Where(l => l == letter).Count() > 0)
+                    {
+                        existsSpecials = true;
+                        continue;
+                    }
+                }
+                int count = 0;
+                if (existsUpLetter) count++;
+                if (existsLoLetter) count++;
+                if (existsNumber) count++;
+                if (existsSpecials) count++;
+
+                if (count < 3)
+                {
+                    Response.Redirect("~/UpdatePassword.aspx");
+                }
+                #endregion
                 Response.Redirect("~/Default.aspx");
             }
             else

@@ -635,8 +635,8 @@ inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.Production
                 ReqQty = Math.Round(Convert.ToDecimal(row[18])),
                 UnitCount = Math.Round(Convert.ToDecimal(row[19])),
                 MinLotSize = Math.Round(Convert.ToDecimal(row[20])),
-                //InventoryCountDown = !string.IsNullOrEmpty(row[21].ToString()) ? (decimal?)row[22] : null,
-                InventoryCountDown = (decimal?)row[21],
+                InventoryCountDown = !string.IsNullOrEmpty(row[21].ToString()) ? (decimal?)row[22] : null,
+                //InventoryCountDown = (decimal?)row[21],
             });
         }
         if (this.rbType.SelectedValue == BusinessConstants.CODE_MASTER_TIME_PERIOD_TYPE_VALUE_DAY)
