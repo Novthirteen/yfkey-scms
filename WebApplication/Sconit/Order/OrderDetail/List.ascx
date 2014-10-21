@@ -33,6 +33,7 @@
                 $('#' + parentId + 'tbUnitPrice').attr('value', result.UnitPrice);
                 $('#' + parentId + 'hfPriceListCode').attr('value', result.PriceListCode);
                 $('#' + parentId + 'hfPriceListDetailId').attr('value', result.PriceListDetailId);
+                $('#' + parentId + 'hfPackageVolumn').attr('value', result.PackageVolumn);
             },
             function OnFailed(error) {
                 alert(error.get_message());
@@ -57,6 +58,7 @@
                 $('#' + parentId + 'tbUnitPrice').attr('value', result.UnitPrice);
                 $('#' + parentId + 'hfPriceListCode').attr('value', result.PriceListCode);
                 $('#' + parentId + 'hfPriceListDetailId').attr('value', result.PriceListDetailId);
+                $('#' + parentId + 'hfPackageVolumn').attr('value', result.PackageVolumn);
             },
             function OnFailed(error) {
                 alert(error.get_message());
@@ -117,6 +119,7 @@
                     <asp:TemplateField HeaderText="${MasterData.Order.OrderDetail.Sequence}">
                         <ItemTemplate>
                             <asp:HiddenField ID="hfId" runat="server" Value='<%# Bind("Id") %>' />
+                            <asp:HiddenField ID="hfPackageVolumn" runat="server" Value='<%# Bind("PackageVolumn") %>' />
                             <asp:Label ID="lblSeq" runat="server" Text='<%# Bind("Sequence") %>' onmouseup="if(!readOnly)select();" />
                             <asp:TextBox ID="tbSeq" runat="server" onmouseup="if(!readOnly)select();" Visible="false"
                                 Width="30" Text='<%# Bind("Sequence") %>' />
@@ -182,6 +185,7 @@
                                 onfocus="this.blur();" Width="50" />
                         </ItemTemplate>
                     </asp:TemplateField>
+                   
                     <asp:TemplateField HeaderText="${MasterData.Order.OrderDetail.PackageType}" Visible="false">
                         <ItemTemplate>
                             <asp:Label ID="lblPackageType" runat="server" Text='<%#Bind("PackageType") %>' />
@@ -268,7 +272,7 @@
                                 Width="50" />
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="${MasterData.Order.OrderDetail.Discount}" Visible="false">
+                    <asp:TemplateField HeaderText="${MasterData.Order.OrderDetail.Discount}" >
                         <ItemTemplate>
                             <asp:TextBox ID="tbDiscount" runat="server" onmouseup="if(!readOnly)select();" Width="50" />
                         </ItemTemplate>
@@ -281,7 +285,7 @@
                     <asp:TemplateField HeaderText="${Common.GridView.Action}" Visible="false">
                         <ItemTemplate>
                             <cc1:linkbutton id="lbtnAdd" runat="server" commandargument='<%# DataBinder.Eval(Container.DataItem, "ID") %>'
-                                text="${Common.Button.New}" onclick="lbtnAdd_Click" visible="false" functionid="EditOrderDetail"
+                                text="${Common.Button.New}" onclick="lbtnAdd_Click" functionid="EditOrderDetail"
                                 validationgroup="vgAdd">
                             </cc1:linkbutton>
                             <cc1:linkbutton id="lbtnView" runat="server" commandargument='<%# DataBinder.Eval(Container.DataItem, "ID") %>'

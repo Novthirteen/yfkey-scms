@@ -74,7 +74,7 @@ public class FlowMgrWS : BaseWS
                                 flowDetailProxy.PriceListDetailId = priceListDetailTo.Id;
                             }
                         }
-
+                        flowDetailProxy.PackageVolumn = fd.PackageVolumn;
                     }
 
                     if (changeRef)
