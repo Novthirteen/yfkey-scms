@@ -331,7 +331,7 @@ BEGIN
 		begin
 			if exists(select top 1 1 from #tempGroupedEffShiftPlan where RowId = @RowId)
 			begin
-				select @ProdItem = Item, @Bom = Bom from #tempEffShiftPlan where RowId = @RowId
+				select @ProdItem = Item, @Bom = Bom from #tempGroupedEffShiftPlan where RowId = @RowId
 				
 				truncate table #tempBomDetail
 				--查找物料Bom，不按生效日期循环查找，所有BOM全部查出来
@@ -345,7 +345,7 @@ BEGIN
 				from #tempBomDetail as t 
 				inner join Item as i WITH(NOLOCK) on t.Item = i.Code
 				inner join #tempEffShiftPlan as pl on t.StartDate <= pl.PlanDate and (t.EndDate >= pl.PlanDate or t.EndDate is null) 
-				where pl.Item = @Item
+				where pl.Item = @ProdItem
 
 				--计算单位换算（Bom单位转为基本单位）
 				update #tempCurrentMaterialPlanDet set UnitQty = 1 where Uom = BaseUom
@@ -505,8 +505,6 @@ BEGIN
 		from #tempPurchasePlanDet where UnitQty is null
 		delete from #tempPurchasePlanDet where UnitQty is null
 
-		
-
 		--毛需求插入合并表
 		--合并毛需求至一行（最小UUID)
 		update p set BaseReqQty = t.BaseReqQty,BasePurchaseQty = t.BasePurchaseQty
@@ -532,7 +530,7 @@ BEGIN
 		from #tempMaterialPlanDetTrace as t inner join #tempPurchasePlanDet as m on t.UUID = m.UUID
 		
 		----数量转为采购单位
-		update #tempPurchasePlanDet set ReqQty = BaseReqQty * UnitQty, PurchaseQty = BasePurchaseQty * UnitQty
+		update #tempPurchasePlanDet set ReqQty = BaseReqQty / UnitQty, PurchaseQty = BasePurchaseQty / UnitQty
 		-----------------------------↑计算采购计划-----------------------------
          
 
@@ -646,7 +644,7 @@ BEGIN
 		insert into #tempIpDet(IpNo, Flow, Item, StartTime, WindowTime, Qty)
 		select det.IpNo, det.Flow, det.Item, det.StartTime, DATEADD(day, mstr.LeadTime, det.StartTime), SUM(det.Qty) as Qty
 		from MRP_IpDetSnapShot as det inner join (select distinct Flow, LeadTime from #tempShipFlowDet) as mstr on det.Flow = mstr.Flow 
-		where DATEADD(day, mstr.LeadTime, det.StartTime) > DATEADD(day, -7, @DateTimeNow)
+		where DATEADD(day, mstr.LeadTime, det.StartTime) > DATEADD(day, -7, @DateNow)
 		group by det.IpNo, det.Flow, det.Item, det.StartTime, mstr.LeadTime, det.WindowTime
 		---------------------------↑缓存在途-----------------------------
 		
@@ -795,12 +793,18 @@ BEGIN
 
 		-----------------------------↓生成物料需求计划(日）-----------------------------
 		--删除未释放的物料需求计划
-		delete from MRP_PurchasePlanIpDet2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
-		delete from MRP_PurchasePlanOpenOrder2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
-		delete from MRP_PurchasePlanDetTrace2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
-		delete from MRP_PurchasePlanInitLocationDet2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
-		delete from MRP_PurchasePlanDet2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
-		delete from MRP_PurchasePlanMstr2 where Status = 'Create'
+		--delete from MRP_PurchasePlanIpDet2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
+		--delete from MRP_PurchasePlanOpenOrder2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
+		--delete from MRP_PurchasePlanDetTrace2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
+		--delete from MRP_PurchasePlanInitLocationDet2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
+		--delete from MRP_PurchasePlanDet2 where PurchasePlanId in(select Id from MRP_PurchasePlanMstr2 where Status = 'Create')
+		--delete from MRP_PurchasePlanMstr2 where Status = 'Create'
+		truncate table MRP_PurchasePlanIpDet2
+		truncate table MRP_PurchasePlanOpenOrder2
+		truncate table MRP_PurchasePlanDetTrace2
+		truncate table MRP_PurchasePlanInitLocationDet2
+		truncate table MRP_PurchasePlanDet2
+		truncate table MRP_PurchasePlanMstr2
 
 		--获取ReleaseNo
 		select @ReleaseNo = ISNULL(MAX(ReleaseNo), 0) + 1 from MRP_PurchasePlanMstr2
