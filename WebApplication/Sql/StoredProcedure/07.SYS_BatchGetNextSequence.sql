@@ -51,7 +51,8 @@ BEGIN
             rollback
         end 
         
-		declare @ErrorMsg nvarchar(MAX) = Error_Message() 
+		declare @ErrorMsg nvarchar(MAX)
+		set @ErrorMsg = N'批量获取序号出现异常：' + Error_Message() 
 		RAISERROR(@ErrorMsg, 16, 1) 
     end catch
 END

@@ -17,7 +17,7 @@ CREATE PROCEDURE [dbo].[BIL_CreateActingBill4ReceiveOrder]
 	@CreateUser varchar(50)
 ) --WITH ENCRYPTION
 AS 
-BEGIN
+BEGIN  --todo退库立即结算
 	set nocount on
 	declare @DateTimeNow datetime
 	declare @ErrorMsg nvarchar(MAX)
@@ -32,7 +32,7 @@ BEGIN
             begin tran
         end
 
-		create table #tempPlanBillId
+		create table #tempPlanBillId_01
 		(
 			PlanBillId int,
 			ActQty decimal(18, 8),
@@ -44,7 +44,7 @@ BEGIN
 		
 		if (@OrderType = 'Procurement' or @OrderType = 'Subconctracting')
 		begin
-			insert into #tempPlanBillId(PlanBillId, ActQty, LastModifyDate)
+			insert into #tempPlanBillId_01(PlanBillId, ActQty, LastModifyDate)
 			select pb.Id, rd.RecQty, pb.LastModifyDate
 			from ReceiptDet as rd with(NOLOCK)
 			inner join OrderLocTrans as olt with(NOLOCK) on rd.OrderLocTransId = olt.Id
@@ -54,7 +54,7 @@ BEGIN
 		end
 		else if (@OrderType = 'Transfer')			
 		begin
-			insert into #tempPlanBillId(PlanBillId, ActQty, LastModifyDate)
+			insert into #tempPlanBillId_01(PlanBillId, ActQty, LastModifyDate)
 			select pb.Id, rd.RecQty, pb.LastModifyDate
 			from ReceiptDet as rd with(NOLOCK)
 			inner join OrderLocTrans as olt with(NOLOCK) on rd.OrderLocTransId = olt.Id
@@ -64,7 +64,7 @@ BEGIN
 		end
 		else if (@OrderType = 'Distribution')
 		begin
-			insert into #tempPlanBillId(PlanBillId, ActQty, LastModifyDate)
+			insert into #tempPlanBillId_01(PlanBillId, ActQty, LastModifyDate)
 			select pb.Id, rd.RecQty, pb.LastModifyDate
 			from ReceiptDet as rd with(NOLOCK)
 			inner join OrderLocTrans as olt with(NOLOCK) on rd.OrderLocTransId = olt.Id
@@ -72,9 +72,9 @@ BEGIN
 			where rd.RecNo = @RecNo and pb.SettleTerm ='BAR'
 		end
 
-		if exists(select top 1 1 from #tempPlanBillId)
+		if exists(select top 1 1 from #tempPlanBillId_01)
 		begin
-			create table #tempPlanBill
+			create table #tempPlanBill_01
 			(
 				OrderNo varchar(50),
 				ExtRecNo varchar(50),
@@ -97,17 +97,17 @@ BEGIN
 				ActQty decimal(18, 8),
 			)
 
-			insert into #tempPlanBill(OrderNo, ExtRecNo, RecNo, IpNo, TransType, Item, RefItemCode, BillAddr, Uom, UC, PriceList, UnitPrice, Currency, IsIncludeTax, TaxCode, LocFrom, IsProvEst, EffDate, ActQty)
+			insert into #tempPlanBill_01(OrderNo, ExtRecNo, RecNo, IpNo, TransType, Item, RefItemCode, BillAddr, Uom, UC, PriceList, UnitPrice, Currency, IsIncludeTax, TaxCode, LocFrom, IsProvEst, EffDate, ActQty)
 			select pb.OrderNo, pb.ExtRecNo, pb.RecNo, pb.IpNo, pb.TransType, pb.Item, pb.RefItemCode, pb.BillAddr, pb.Uom, pb.UC, pb.PriceList, pb.UnitPrice, pb.Currency, pb.IsIncludeTax, pb.TaxCode, pb.LocFrom, pb.IsProvEst, pb.EffDate, SUM(rd.RecQty * olt.UnitQty)
 			from ReceiptDet as rd with(NOLOCK)
 			inner join PlanBill as pb with(NOLOCK) on rd.Id = pb.RecDetId
-			inner join #tempPlanBillId as tpb with(NOLOCK) on pb.Id = tpb.Id
+			inner join #tempPlanBillId_01 as tpb with(NOLOCK) on pb.Id = tpb.Id
 			group by pb.OrderNo, pb.ExtRecNo, pb.RecNo, pb.IpNo, pb.TransType, pb.Item, pb.RefItemCode, pb.BillAddr, pb.Uom, pb.UC, pb.PriceList, pb.UnitPrice, pb.Currency, pb.IsIncludeTax, pb.TaxCode, pb.LocFrom, pb.IsProvEst, pb.EffDate
 	
-			update pb set PlanQty = pb.PlanQty - tpb.ActQty, ActQty = ISNULL(pb.ActQty, 0) + tpb.ActQty
-			from PlanBill as pb with(NOLOCK) inner join #tempPlanBillId as tpb on pb.Id = tpb.PlanBillId and pb.LastModifyDate = tpb.LastModifyDate
+			update pb set ActQty = ISNULL(pb.ActQty, 0) + tpb.ActQty
+			from PlanBill as pb with(NOLOCK) inner join #tempPlanBillId_01 as tpb on pb.Id = tpb.PlanBillId and pb.LastModifyDate = tpb.LastModifyDate
 
-			if exists(select top 1 1 from #tempPlanBillId having COUNT(1) <> @@ROWCOUNT)
+			if exists(select top 1 1 from #tempPlanBillId_01 having COUNT(1) <> @@ROWCOUNT)
 			begin
 				RAISERROR(N'数据已经被更新，请重试。', 16, 1)
 			end
@@ -116,7 +116,7 @@ BEGIN
 			Status = (CASE WHEN BilledQty <> (BillQty + tpb.ActQty) THEN 'Create' ELSE 'Close' END),
 			LastModifyUser = @CreateUser,
 			LastModifyDate = @DateTimeNow
-			from #tempPlanBill as tpb inner join ActBill as ab 
+			from #tempPlanBill_01 as tpb inner join ActBill as ab 
 			on tpb.OrderNo = ab.OrderNo
 			and (tpb.ExtRecNo = ab.ExtRecNo or (tpb.ExtRecNo is null and ab.ExtRecNo is null))
 			and tpb.RecNo = ab.RecNo
@@ -190,7 +190,7 @@ BEGIN
 			tpb.LocFrom,
 			tpb.IpNo,
 			tpb.RefItemCode 
-			from #tempPlanBill as tpb left join ActBill as ab 
+			from #tempPlanBill_01 as tpb left join ActBill as ab 
 			on tpb.OrderNo = ab.OrderNo
 			and (tpb.ExtRecNo = ab.ExtRecNo or (tpb.ExtRecNo is null and ab.ExtRecNo is null))
 			and tpb.RecNo = ab.RecNo
@@ -209,10 +209,10 @@ BEGIN
 			and tpb.EffDate = ab.EffDate
 			where ab.Id is null
 
-			drop table #tempPlanBill
+			drop table #tempPlanBill_01
 		end
 		
-		drop table #tempPlanBillId
+		drop table #tempPlanBillId_01
 
 		if @trancount = 0 
 		begin  

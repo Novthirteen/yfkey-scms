@@ -27,7 +27,7 @@ BEGIN
 		set @Msg = ''
 		set @ExpandLevel = 1
 
-		create table #tempBomDetail
+		create table #tempBomDetail_06
 		(
 			RowId int identity(1, 1) primary key,
 			BomDetId int,
@@ -43,21 +43,21 @@ BEGIN
 			BackFlushMethod varchar(50) COLLATE  Chinese_PRC_CI_AS
 		)
 
-		insert into #tempBomDetail(BomDetId, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Location, BackFlushMethod)
+		insert into #tempBomDetail_06(BomDetId, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Location, BackFlushMethod)
 		select Id, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Loc, BackFlushMethod from BomDet with(NOLOCK)
 		where Bom = @BomCode and StartDate <= @EffDate and (EndDate >= @EffDate or EndDate is null)
 
-		select @MaxRowId = MAX(RowId) from #tempBomDetail
+		select @MaxRowId = MAX(RowId) from #tempBomDetail_06
 
-		while exists(select top 1 1 from #tempBomDetail where StruType = 'X')
+		while exists(select top 1 1 from #tempBomDetail_06 where StruType = 'X')
 		begin
-			insert into #tempBomDetail(BomDetId, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Location, BackFlushMethod)
+			insert into #tempBomDetail_06(BomDetId, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Location, BackFlushMethod)
 			select Id, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Loc, BackFlushMethod from BomDet with(NOLOCK)
-			where Bom in (select Item from #tempBomDetail where StruType = 'X') 
+			where Bom in (select Item from #tempBomDetail_06 where StruType = 'X') 
 			and StartDate <= @EffDate and (EndDate >= @EffDate or EndDate is null)
 
-			delete from #tempBomDetail where RowId <= @MaxRowId and StruType = 'X'
-			select @MaxRowId = MAX(RowId) from #tempBomDetail
+			delete from #tempBomDetail_06 where RowId <= @MaxRowId and StruType = 'X'
+			select @MaxRowId = MAX(RowId) from #tempBomDetail_06
 			if (@ExpandLevel >= 99)
 			begin
 				RAISERROR(N'Bom分解超过99层，可能有循环。', 16, 1) 
@@ -68,9 +68,9 @@ BEGIN
 			end
 		end
 
-		select BomDetId, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Location, BackFlushMethod from #tempBomDetail
+		select BomDetId, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Location, BackFlushMethod from #tempBomDetail_06
 
-		drop table #tempBomDetail
+		drop table #tempBomDetail_06
 	end try
 	begin catch
 		set @Msg = N'Bom分解出现异常：' + Error_Message()
