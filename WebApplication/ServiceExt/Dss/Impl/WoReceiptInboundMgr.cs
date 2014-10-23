@@ -79,15 +79,15 @@ namespace com.Sconit.Service.Dss.Impl
 
         protected override void CreateOrUpdateObject(IList<object> objList)
         {
-            List<DssImportHistory> sourceList = objList.Select(o => (DssImportHistory)o).ToList<DssImportHistory>();
+            //List<DssImportHistory> sourceList = objList.Select(o => (DssImportHistory)o).ToList<DssImportHistory>();
 
-            if (sourceList != null && sourceList.Count > 0)
-            {
-                foreach (DssImportHistory dssImportHistory in sourceList)
-                {
-                    ReceiveWo(dssImportHistory);
-                }
-            }
+            //if (sourceList != null && sourceList.Count > 0)
+            //{
+            //    foreach (DssImportHistory dssImportHistory in sourceList)
+            //    {
+            //        ReceiveWo(dssImportHistory);
+            //    }
+            //}
         }
 
         [Transaction(TransactionMode.RequiresNew)]
