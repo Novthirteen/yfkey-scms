@@ -153,6 +153,19 @@ namespace com.Sconit.Web
             }
         }
 
+        private Decimal? _packageVolumn;
+        public Decimal? PackageVolumn
+        {
+            get
+            {
+                return _packageVolumn;
+            }
+            set
+            {
+                _packageVolumn = value;
+            }
+        }
+
     }
 
 

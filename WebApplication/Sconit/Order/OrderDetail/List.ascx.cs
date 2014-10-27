@@ -799,6 +799,7 @@ public partial class Order_OrderDetail_List : ModuleBase
                 TextBox tbNewDiscount = (TextBox)newOrderDetailRow.FindControl("tbDiscount");
                 HiddenField hfPriceListCode = (HiddenField)newOrderDetailRow.FindControl("hfPriceListCode");
                 HiddenField hfPriceListDetailId = (HiddenField)newOrderDetailRow.FindControl("hfPriceListDetailId");
+                HiddenField tbPackageVolumn = (HiddenField)newOrderDetailRow.FindControl("hfPackageVolumn");
 
                 int seqInterval = int.Parse(TheEntityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_SEQ_INTERVAL).Value);
                 decimal orderQty = tbNewOrderQty.Text.Trim() == string.Empty ? 0 : decimal.Parse(tbNewOrderQty.Text.Trim());
@@ -813,6 +814,11 @@ public partial class Order_OrderDetail_List : ModuleBase
                 else if (tbNewUnitCount.Text.Trim() != string.Empty)
                 {
                     huLotSize = Convert.ToInt32(decimal.Parse(tbNewUnitCount.Text.Trim()));
+                }
+                decimal? packageVolumn = null;
+                if (tbPackageVolumn.Value != string.Empty)
+                {
+                    packageVolumn = decimal.Parse(tbPackageVolumn.Value);
                 }
 
                 IList<Item> newItemList = new List<Item>(); //待新增明细列表
@@ -854,6 +860,7 @@ public partial class Order_OrderDetail_List : ModuleBase
                     newOrderDetail.Sequence = (tbNewSeq.Text.Trim() == string.Empty ? this.CurrentSeq : int.Parse(tbNewSeq.Text.Trim()) + i * seqInterval);
                     newOrderDetail.IsBlankDetail = false;
                     newOrderDetail.Item = item;
+                    newOrderDetail.PackageVolumn = packageVolumn;
 
                     if (newOrderDetail.Item.Code != newItem.Code)
                     {
@@ -1208,7 +1215,8 @@ public partial class Order_OrderDetail_List : ModuleBase
     //根据订单类型隐藏相应列
     private void HiddenGVColumn(OrderHead orderHead)
     {
-
+        this.GV_List.Columns[7].Visible = true;  //外包装
+        
         #region 按flowtype显示
         if (this.ModuleType == BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_PROCUREMENT)
         {
