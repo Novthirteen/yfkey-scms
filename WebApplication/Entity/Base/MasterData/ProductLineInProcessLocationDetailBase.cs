@@ -203,6 +203,8 @@ namespace com.Sconit.Entity.MasterData
                 _lastModifyUser = value;
             }
         }
+
+        public Int32 Version { get; set; }
         #endregion
 
 		public override int GetHashCode()

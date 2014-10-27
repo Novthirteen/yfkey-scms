@@ -26,8 +26,6 @@ namespace com.Sconit.Service.Dss
             log.Info("Start process inbound ");
 
             //重新提交数据
-            IList<DssImportHistory> activeDssImportHistoryList = dssImportHistoryMgr.GetActiveDssImportHistory(dssInboundControl.Id);
-
             #region DataReader
             IList<DssImportHistory> dssImportHistoryList = new List<DssImportHistory>();
             foreach (string fileName in files)
@@ -96,31 +94,26 @@ namespace com.Sconit.Service.Dss
             }
             #endregion
 
-            IListHelper.AddRange<DssImportHistory>(activeDssImportHistoryList, dssImportHistoryList);
-
-            IList<object> objCreate = this.ProcessCreateData(activeDssImportHistoryList);
-            IList<object> objDelete = this.ProcessDeleteData(activeDssImportHistoryList);
-
-            try
+            #region 执行导入程序
+            if (dssInboundControl.Id != 9)  //工单导入不通过程序执行，改为在存储过程中执行
             {
-                this.CreateOrUpdateObject(objCreate);
-                this.DeleteObject(objDelete);
+                IList<DssImportHistory> activeDssImportHistoryList = dssImportHistoryMgr.GetActiveDssImportHistory(dssInboundControl.Id);
+                IListHelper.AddRange<DssImportHistory>(activeDssImportHistoryList, dssImportHistoryList);
 
-                //山寨，先把除工单的全部更新active为false,以免每次都随工单执行
-                if (dssInboundControl.Id != 9)
+                IList<object> objCreate = this.ProcessCreateData(activeDssImportHistoryList);
+                IList<object> objDelete = this.ProcessDeleteData(activeDssImportHistoryList);
+
+                try
                 {
-                    foreach (DssImportHistory dssImpHis in activeDssImportHistoryList)
-                    {
-                        dssImpHis.IsActive = false;
-                        dssImportHistoryMgr.UpdateDssImportHistory(dssImpHis);
-                    }
-
+                    this.CreateOrUpdateObject(objCreate);
+                    this.DeleteObject(objDelete);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Write to database error:", ex);
                 }
             }
-            catch (Exception ex)
-            {
-                log.Error("Write to database error:", ex);
-            }
+            #endregion
         }
 
         public virtual void CreateDssImportHistory(DssInboundControl dssInboundControl, IList<DssImportHistory> dssImportHistoryList, string[] files)
