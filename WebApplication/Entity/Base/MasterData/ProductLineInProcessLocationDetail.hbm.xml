@@ -4,7 +4,8 @@
 		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
       		<generator class="identity" />
         </id>
-		<many-to-one name="ProductLine" column="ProdLine" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
+    <version name="Version" column="Version" type="Int32"  />
+    <many-to-one name="ProductLine" column="ProdLine" class="com.Sconit.Entity.MasterData.Flow, com.Sconit.Entity" cascade="none" />
 		<property name="Operation" column="Op" type="Int32"  />	
 		<many-to-one name="Item" column="Item" class="com.Sconit.Entity.MasterData.Item, com.Sconit.Entity" cascade="none" />
 		<property name="HuId" column="HuId" type="String" length="50" />	
