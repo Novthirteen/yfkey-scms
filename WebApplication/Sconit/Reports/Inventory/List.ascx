@@ -44,7 +44,7 @@
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:BoundField DataField="Qty" HeaderText="${Common.Business.Qty}" SortExpression="Qty"
-                    DataFormatString="{0:0.###}" />
+                    DataFormatString="{0:0.########}" />
             </Columns>
         </cc1:GridView>
         <cc1:GridPager ID="gp" runat="server" GridViewID="GV_List" PageSize="10">
