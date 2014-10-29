@@ -24,23 +24,23 @@ public partial class MasterData_Reports_Inventory_Search : SearchModuleBase
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        this.tbLocation.ServiceParameter = "string:" + this.CurrentUser.Code;
+        //this.tbLocation.ServiceParameter = "string:" + this.CurrentUser.Code;
     }
 
     protected override void InitPageParameter(IDictionary<string, string> actionParameter)
     {
-        if (actionParameter.ContainsKey("LotNo"))
-        {
-            this.tbLotNo.Text = actionParameter["LotNo"];
-        }
-        if (actionParameter.ContainsKey("Location"))
-        {
-            this.tbLocation.Text = actionParameter["Location"];
-        }
-        if (actionParameter.ContainsKey("Item"))
-        {
-            this.tbItem.Text = actionParameter["Item"];
-        }
+        //if (actionParameter.ContainsKey("LotNo"))
+        //{
+        //    this.tbLotNo.Text = actionParameter["LotNo"];
+        //}
+        //if (actionParameter.ContainsKey("Location"))
+        //{
+        //    this.tbLocation.Text = actionParameter["Location"];
+        //}
+        //if (actionParameter.ContainsKey("Item"))
+        //{
+        //    this.tbItem.Text = actionParameter["Item"];
+        //}
     }
 
     protected void btnSearch_Click(object sender, EventArgs e)
@@ -70,9 +70,15 @@ public partial class MasterData_Reports_Inventory_Search : SearchModuleBase
     private CriteriaParam CollectParam()
     {
         CriteriaParam criteriaParam = new CriteriaParam();
-        criteriaParam.Item = this.tbItem.Text.Trim() != string.Empty ? this.tbItem.Text.Trim() : null;
-        criteriaParam.Location = this.tbLocation.Text.Trim() != string.Empty ? new string[] { this.tbLocation.Text.Trim() } : null;
+        criteriaParam.ItemCodes = this.ttItem.Value.Trim() != string.Empty ? this.ttItem.Value.Trim() : null;
+        criteriaParam.LocCodes = this.ttLocation.Value.Trim() != string.Empty ? this.ttLocation.Value.Trim() : null;
+        //criteriaParam.LotNos = this.ttLotNo.Value.Trim() != string.Empty ? this.ttLotNo.Value.Trim() : null;
         criteriaParam.LotNo = this.tbLotNo.Text.Trim() != string.Empty ? this.tbLotNo.Text.Trim() : null;
+        criteriaParam.Item = this.tbItem.Text.Trim() != string.Empty ? this.tbItem.Text.Trim() : null;
+        string page = this.PostBackHidden.Text != string.Empty ? this.PostBackHidden.Text.Trim() : string.Empty;
+        criteriaParam.Page = string.IsNullOrEmpty(page) ? 1 : int.Parse(page);
+        criteriaParam.SortParam = this.PostBackSortHidden.Text != string.Empty ? this.PostBackSortHidden.Text.Trim() : "Id";
+        this.PostBackSortHidden.Text = string.Empty;
         return criteriaParam;
     }
 

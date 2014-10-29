@@ -66,6 +66,13 @@ namespace com.Sconit.Entity.View
         public bool ClassifiedBin { get; set; }
 
         public bool ClassifiedLotNo { get; set; }
+
+        public string ItemCodes { get; set; }
+        public string LocCodes { get; set; }
+        public string LotNos { get; set; }
+        public int Page { get; set; }
+        public string SortParam { get; set; }
+
         #endregion
     }
 }
