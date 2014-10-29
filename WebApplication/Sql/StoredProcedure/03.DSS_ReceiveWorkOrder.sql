@@ -29,30 +29,43 @@ BEGIN
 	Create table #tempWOReceipt_03
 	(
 		Id int primary key,
-		ProdLine varchar(50),
-		Item varchar(50),
-		ItemDesc varchar(50),
-		HuId varchar(50),
-		QtyStr varchar(50),
+		ProdLine varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		ItemDesc varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		QtyStr varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		IsQtyNumeric bit,
-		OfflineDateStr varchar(50),
-		OfflineTimeStr varchar(50),
+		OfflineDateStr varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		OfflineTimeStr varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		IsOfflineDateTime bit,
 		Qty decimal(18, 8),
 		OffLineDateTime datetime,
-		OrderNo varchar(50),
+		OrderNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		OrderDetId int,
 		OrderLocTransId int,
-		LotNo varchar(50),
+		LotNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		LotNoYear varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		LotNoMonth varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		LotNoDay varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		UC decimal(18, 8),
-		Uom varchar(5),
+		Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 		UnitQty decimal(18, 8),
 		ManufactureDate DateTime,
-		ManufactureParty varchar(50),
-		ManufacturePartyName varchar(50),
-		Location varchar(50),
-		LocationName varchar(50),
-		RecNo varchar(50)
+		ManufactureParty varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		ManufacturePartyName varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		LocationName varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		RecNo varchar(50) COLLATE  Chinese_PRC_CI_AS
+	)
+
+	Create table #tempNoWO_DSS_03
+	(
+		RowId int identity(1, 1) primary key,
+		ProdLine varchar(50),
+		Item varchar(50),
+		Qty decimal(18, 8),
+		StartTime datetime,
+		WindowTime datetime,
 	)
 
 	Create table #tempBomTobeBackflush_03
@@ -73,8 +86,8 @@ BEGIN
 
 	begin try
 		begin try
-			insert into #tempWOReceipt_03(Id, ProdLine, Item, ItemDesc, HuId, QtyStr, IsQtyNumeric, OfflineDateStr, OfflineTimeStr, IsOfflineDateTime)
-			select dih.Id, dih.data0, dih.data1, i.Desc1, dih.data2, dih.data3, ISNUMERIC(dih.data3), dih.data7, dih.data8, ISDATE(dih.data7 + ' ' + dih.data8)
+			insert into #tempWOReceipt_03(Id, ProdLine, Item, ItemDesc, HuId, LotNo, LotNoYear, LotNoMonth, LotNoDay, QtyStr, IsQtyNumeric, OfflineDateStr, OfflineTimeStr, IsOfflineDateTime)
+			select dih.Id, dih.data0, dih.data1, i.Desc1, dih.data2, SUBSTRING(data2, LEN(data2) - 7, 4), SUBSTRING(data2, LEN(data2) - 7, 1), SUBSTRING(data2, LEN(data2) - 6, 1), SUBSTRING(data2, LEN(data2) - 5, 2), dih.data3, ISNUMERIC(dih.data3), dih.data7, dih.data8, ISDATE(dih.data7 + ' ' + dih.data8)
 			from DssImpHis as dih left join Item as i on dih.Item = i.Code
 			where dih.IsActive = 1 and dih.ErrCount < 2 and dih.DssInboundCtrl = 9 and dih.EventCode = 'CREATE' and dih.HuId is not null
 
@@ -128,6 +141,33 @@ BEGIN
 				delete from #tempWOReceipt_03 where HuId is null or HuId = ''
 			end
 
+			if exists (select top 1 1 from #tempWOReceipt_03 where LotNoYear not in ('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'S', 'T', 'V', 'W', 'X', 'Y'))
+			begin
+				update dih set Memo = '批号的年份格式不正确。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
+				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
+				where tmp.LotNoYear not in ('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'S', 'T', 'V', 'W', 'X', 'Y')
+
+				delete from #tempWOReceipt_03 where LotNoYear not in ('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'S', 'T', 'V', 'W', 'X', 'Y')
+			end
+
+			if exists (select top 1 1 from #tempWOReceipt_03 where LotNoMonth not in ('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C'))
+			begin
+				update dih set Memo = '批号的月份格式不正确。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
+				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
+				where tmp.LotNoMonth not in ('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C')
+
+				delete from #tempWOReceipt_03 where LotNoMonth not in ('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C')
+			end
+
+			if exists (select top 1 1 from #tempWOReceipt_03 where LotNoDay > 31 or LotNoDay < 1)
+			begin
+				update dih set Memo = '批号的日期格式不正确。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
+				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
+				where tmp.LotNoDay > 31 or tmp.LotNoDay < 1
+
+				delete from #tempWOReceipt_03 where LotNoDay > 31 or LotNoDay < 1
+			end
+
 			if exists(select top 1 1 from #tempWOReceipt_03 where QtyStr is null or QtyStr = '')
 			begin
 				update dih set Memo = '数量不能为空。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
@@ -135,6 +175,15 @@ BEGIN
 				where tmp.QtyStr is null or tmp.QtyStr = ''
 
 				delete from #tempWOReceipt_03 where QtyStr is null or QtyStr = ''
+			end
+
+			if exists(select top 1 1 from #tempWOReceipt_03 where QtyStr = 0)
+			begin
+				update dih set Memo = '数量不能为0。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
+				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
+				where QtyStr = 0
+
+				delete from #tempWOReceipt_03 where QtyStr = 0
 			end
 
 			if exists(select top 1 1 from #tempWOReceipt_03 where IsQtyNumeric = 0)
@@ -204,11 +253,11 @@ BEGIN
 			exec SYS_BatchGetNextSequence 'REC', @RowCount, @BaseRecNoSeq output
 
 			update tmp set RecNo = rec.RecNo
-			from #tempWOReceipt_03 as tmp inner join  (select Id, ('REC' + replicate('0', 9 - len(@BaseRecNoSeq - ROW_NUMBER() over (order by Id) + 1)) + convert(varchar(50), @BaseRecNoSeq - ROW_NUMBER() over (order by Id) + 1)) as RecNo 
+			from #tempWOReceipt_03 as tmp inner join (select Id, ('REC' + replicate('0', 9 - len(@BaseRecNoSeq - ROW_NUMBER() over (order by Id) + 1)) + convert(varchar(50), @BaseRecNoSeq - ROW_NUMBER() over (order by Id) + 1)) as RecNo 
 													from #tempWOReceipt_03 as tmp) as rec on tmp.Id = rec.Id
 
 			update #tempWOReceipt_03 set Qty = CONVERT(decimal(18, 8), QtyStr), OffLineDateTime = CONVERT(DateTime, OfflineDateStr + ' ' + OfflineTimeStr), 
-			LotNo = SUBSTRING(HuId, LEN(HuId) - 7, 4), ManufactureDate = CONVERT(DateTime, OfflineDateStr)
+			ManufactureDate = CONVERT(DateTime, OfflineDateStr)
 
 			update #tempWOReceipt_03 set ProdLine = mstr.Flow, OrderNo = mstr.OrderNo, OrderDetId = det.Id, OrderLocTransId = trans.Id, UC = det.UC, 
 			Uom = det.Uom, UnitQty = trans.UnitQty, ManufactureParty = mstr.PartyFrom, ManufacturePartyName = p.Name,  Location = trans.Loc, LocationName = l.Name
@@ -221,16 +270,7 @@ BEGIN
 
 			if exists(select top 1 1 from #tempWOReceipt_03 where OrderNo is null)
 			begin  --为没有找到工单的收货创建工单
-				Create table #tempNoWO_DSS_03
-				(
-					RowId int identity(1, 1) primary key,
-					ProdLine varchar(50),
-					Item varchar(50),
-					Qty decimal(18, 8),
-					StartTime datetime,
-					WindowTime datetime,
-				)
-
+				
 				declare @RowId int
 				declare @MaxRowId int
 				declare @ProdLine varchar(50)
@@ -255,7 +295,7 @@ BEGIN
 						exec ORD_CreateWorkOrder @ProdLine, 0, null, @Item, @Qty, @StartTime, @WindowTime, 'Normal', 'Nml', @CreateUser, 1, 1, @OrderNo output
 
 						--新增工单回写工单收货表
-						update #tempWOReceipt_03 set ProdLine = mstr.Flow, OrderNo = @OrderNo, OrderDetId = det.Id, OrderLocTransId = trans.Id, UC = det.UC, 
+						update tmp set ProdLine = mstr.Flow, OrderNo = @OrderNo, OrderDetId = det.Id, OrderLocTransId = trans.Id, UC = det.UC, 
 						Uom = det.Uom, UnitQty = trans.UnitQty, ManufactureParty = mstr.PartyFrom, Location = trans.Loc, LocationName = l.Name
 						from #tempWOReceipt_03 as tmp 
 						inner join OrderMstr as mstr on mstr.OrderNo = @OrderNo and tmp.ProdLine = @ProdLine and tmp.Item = @Item
@@ -273,8 +313,6 @@ BEGIN
 
 					set @RowId = @RowId + 1
 				end
-
-				drop table #tempNoWO_DSS_03
 			end
 			
 			insert into #tempBomTobeBackflush_03(Flow, OrderNo, OrderDetId, OrderLocTransId, RecNo, Item, HuId, BackflushQty, Location, BackFlushMethod, DssImpHisId, EffDate)
@@ -297,14 +335,17 @@ BEGIN
 
 			declare @LocationLotDetId int
 			insert into WOBomBackflush(Flow, OrderNo, OrderDetId, OrderLocTransId, RecNo, Item, HuId, BackflushQty, Location, DssImpHisId, EffDate, CreateDate, CreateUser)
-			select Flow, OrderNo, OrderDetId, OrderLocTransId, RecNo, Item, HuId, BackflushQty, Location, DssImpHisId, EffDate, @DateTimeNow, @CreateUser from #tempBomTobeBackflush_03 where BackFlushMethod = 'GoodsReceive'
+			select Flow, OrderNo, OrderDetId, OrderLocTransId, RecNo, Item, HuId, BackflushQty, Location, DssImpHisId, EffDate, @DateTimeNow, @CreateUser 
+			from #tempBomTobeBackflush_03 where BackFlushMethod = 'GoodsReceive' and BackflushQty <> 0
 
-			insert into OrderPlanBackflush(OrderLocTransId, PlanQty, IsActive, Flow) select OrderLocTransId, BackflushQty, 1, Flow from #tempBomTobeBackflush_03 where BackFlushMethod = 'BatchFeed'
+			insert into OrderPlanBackflush(OrderLocTransId, PlanQty, IsActive, Flow) select OrderLocTransId, BackflushQty, 1, Flow from #tempBomTobeBackflush_03 
+			where BackFlushMethod = 'BatchFeed' and BackflushQty <> 0
 
-			update dih set IsActive = 0, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
+			update dih set IsActive = 0, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow, data12 = tmp.OrderNo, data13 = tmp.OrderDetId, data14 = tmp.OrderLocTransId
+			from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
 
-			insert into HuDet(HuId, LotNo, Item, QualityLevel, Uom, UC, UnitQty, Qty, OrderNo, ManufactureDate, ManufactureParty, PrintCount, CreateDate, CreateUser, LotSize, Location, Status)
-			select HuId, LotNo, Item, 'Level1', Uom, UC, UnitQty, Qty, OrderNo, ManufactureDate, ManufactureParty, 0, @DateTimeNow, @CreateUser, Qty, Location, 'Inventory' from #tempWOReceipt_03
+			insert into HuDet(HuId, LotNo, Item, QualityLevel, Uom, UC, UnitQty, Qty, OrderNo, RecNo, ManufactureDate, ManufactureParty, PrintCount, CreateDate, CreateUser, LotSize, Location, Status)
+			select HuId, LotNo, Item, 'Level1', Uom, UC, UnitQty, Qty, OrderNo, RecNo, ManufactureDate, ManufactureParty, 0, @DateTimeNow, @CreateUser, Qty, Location, 'Inventory' from #tempWOReceipt_03
 		
 			update det set RecQty = RecQty + Qty
 			from OrderDet as det inner join #tempWOReceipt_03 as tmp on det.Id = tmp.OrderDetId
@@ -344,5 +385,6 @@ BEGIN
 
 	drop table #tempBomTobeBackflush_03
 	drop table #tempWOReceipt_03
+	drop table #tempNoWO_DSS_03
 END
 GO

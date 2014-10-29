@@ -105,3 +105,8 @@ go
 alter table OrderPlanBackflush alter column IpNo varchar(50) null
 go
 
+alter table LocationLotDet add [Version] int default(1)
+go
+
+update LocationLotDet set [Version] = 1 where [Version] is null
+go

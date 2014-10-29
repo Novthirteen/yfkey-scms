@@ -27,8 +27,17 @@ BEGIN
 	create table #tempQtyInventoryIO
 	(
 		RowId int Identity(1, 1) primary key,
-		Item varchar(50),
-		Location varchar(50),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Qty decimal(18, 8),
+		PlanBillId int
+	)
+
+	create table #tempQtyInventoryTrans
+	(
+		RowId int Identity(1, 1) primary key,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Qty decimal(18, 8),
 		PlanBillId int
 	)
@@ -36,26 +45,19 @@ BEGIN
 	create table #tempHuInventoryIO
 	(
 		RowId int Identity(1, 1) primary key,
-		HuId varchar(50),
-		Location varchar(50),
+		HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Bin varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Qty decimal(18, 8)
-	)
-
-	create table #tempQtyInventoryTrans
-	(
-		RowId int Identity(1, 1) primary key,
-		Location varchar(50),
-		Item varchar(50),
-		Qty decimal(18, 8),
-		PlanBillId int
 	)
 
 	create table #tempHuInventoryTrans
 	(
 		RowId int Identity(1, 1) primary key,
-		Location varchar(50),
-		HuId varchar(50),
-		LotNo varchar(50),
+		HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Bin varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		LotNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Qty decimal(18, 8),
 		PlanBillId int
 	)
@@ -70,30 +72,46 @@ BEGIN
 			create table #tempInventoryIO
 			(
 				RowId int Identity(1, 1) primary key,
-				Item varchar(50),
-				Location varchar(50),
+				Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				Bin varchar(50) COLLATE  Chinese_PRC_CI_AS,
 				Qty decimal(18, 8),
-				HuId varchar(50),
 				PlanBillId int
 			)
+
+	
 		end
 
 		if not exists(select top 1 1 FROM tempdb.sys.objects WHERE type = 'U' AND name like '#tempInventoryTrans%') 
 		begin
-			set @ErrorMsg = '没有定义出入库参数表。'
+			set @ErrorMsg = '没有定义出入库返回表。'
 			RAISERROR(@ErrorMsg, 16, 1) 
 
 			--代码不会执行到这里
 			create table #tempInventoryTrans
 			(
 				RowId int Identity(1, 1) primary key,
-				Location varchar(50),
-				Item varchar(50),
-				HuId varchar(50),
-				LotNo varchar(50),
+				Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				Bin varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				LotNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
 				Qty decimal(18, 8),
 				PlanBillId int
 			)
+		end
+
+		if exists(select top 1 1 from #tempInventoryIO as tmp left join Item as i with(NOLOCK) on tmp.Item = i.Code where i.Code is null)
+		begin
+			select top 1 @ErrorMsg = N'零件[' + tmp.Item + N']不存在。' from #tempInventoryIO as tmp left join Item as i with(NOLOCK) on tmp.Item = i.Code where i.Code is null
+			RAISERROR(@ErrorMsg, 16, 1) 
+		end
+
+		if exists(select top 1 1 from #tempInventoryIO as tmp left join Location as l with(NOLOCK) on tmp.Location = l.Code where l.Code is null)
+		begin
+			select top 1 @ErrorMsg = N'库位[' + tmp.Location + N']不存在。' from #tempInventoryIO as tmp left join Location as l with(NOLOCK) on tmp.Location = l.Code where l.Code is null
+			RAISERROR(@ErrorMsg, 16, 1) 
 		end
 
 		if (@NeedInspection = 1)
@@ -111,10 +129,11 @@ BEGIN
 		else
 		begin  --非检验处理
 			insert into #tempQtyInventoryIO(Item, Location, Qty, PlanBillId)
-			select Item, Location, Qty, PlanBillId from #tempInventoryIO where HuId is null
+			select Item, Location, SUM(Qty) as Qty, PlanBillId from #tempInventoryIO where HuId is null
+			group by Item, Location, PlanBillId
 
-			insert into #tempHuInventoryIO(HuId, Location)
-			select HuId, Location from #tempInventoryIO where HuId is not null
+			insert into #tempHuInventoryIO(HuId, Location, Bin, Qty)
+			select HuId, Location, Bin, Qty from #tempInventoryIO where HuId is not null
 
 			if exists(select top 1 1 from #tempQtyInventoryIO)
 			begin
@@ -126,18 +145,16 @@ BEGIN
 
 				exec INV_RecordQtyInventory @CreateUser
 
-				insert into #tempInventoryTrans(Location, Item, Qty, PlanBillId)
-				select Location, Item, Qty, PlanBillId from #tempQtyInventoryTrans
-				
+				insert into #tempInventoryTrans(Item, Location, Qty, PlanBillId)
+				select Item, Location, Qty, PlanBillId from #tempQtyInventoryTrans
 			end
 
 			if exists(select top 1 1 from #tempHuInventoryIO)
 			begin
 				exec INV_RecordHuInventory @CreateUser
 
-				insert into #tempInventoryTrans(Location, HuId, LotNo, Qty, PlanBillId)
-				select Location, HuId, LotNo, Qty, PlanBillId from #tempHuInventoryTrans
-
+				insert into #tempInventoryTrans(HuId, LotNo, Location, Bin, Qty, PlanBillId)
+				select HuId, LotNo, Location, Bin, Qty, PlanBillId from #tempHuInventoryTrans
 			end
 		end
 	end try
