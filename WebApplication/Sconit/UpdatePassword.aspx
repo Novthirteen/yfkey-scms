@@ -152,7 +152,7 @@
                                     <tr>
                                         <td>
                                             <div class="login_fields_captions">
-                                            <asp:Literal ID="lblPassword" runat="server" Text="密码:" />
+                                                <asp:Literal ID="lblPassword" runat="server" Text="密码:" />
                                         </td>
                                         <td>
                                             <asp:TextBox ID="tbPassword" TextMode="Password" runat="server" Text='<%#Bind("Password") %>'
@@ -162,10 +162,10 @@
                                     <tr>
                                         <td>
                                             <div class="login_fields_captions">
-                                            <asp:Literal ID="lblConfirmPassword" runat="server" Text="确认密码:" />
+                                                <asp:Literal ID="lblConfirmPassword" runat="server" Text="确认密码:" />
                                         </td>
                                         <td>
-                                             <asp:TextBox ID="tbConfirmPassword" TextMode="Password" runat="server" Text='<%#Bind("Password") %>'
+                                            <asp:TextBox ID="tbConfirmPassword" TextMode="Password" runat="server" Text='<%#Bind("Password") %>'
                                                 Width="150" />
                                         </td>
                                     </tr>
@@ -173,8 +173,8 @@
                                         <td>
                                         </td>
                                         <td align="right">
-                                            <asp:Button ID="btnUpdatePassword" runat="server" OnClick="Update_Click"
-                                                    Text="保存" CssClass="apply" ValidationGroup="vgPassword" />
+                                            <asp:Button ID="btnUpdatePassword" runat="server" OnClick="Update_Click" Text="保存"
+                                                CssClass="apply" ValidationGroup="vgPassword" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -190,6 +190,21 @@
                     </table>
                     </form>
                 </div>
+                <table class="login_plugins_table" style="left: 30%; position: absolute; top: 70%"
+                    cellspacing="4" cellpadding="0" id="table4">
+                    <tr>
+                        <td>密码要求：</td>
+                        <td>
+                            <asp:Label ID="Label1" >(1)密码长度大于等于8位。</asp:Label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <asp:Label ID="Label2" >(2)英大写(A)、小写(a)、数(12)、特殊字符(&)，至少包含3种类型如（Aa123@#$）。</asp:Label>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>

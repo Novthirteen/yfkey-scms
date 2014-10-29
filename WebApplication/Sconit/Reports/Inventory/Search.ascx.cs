@@ -72,7 +72,9 @@ public partial class MasterData_Reports_Inventory_Search : SearchModuleBase
         CriteriaParam criteriaParam = new CriteriaParam();
         criteriaParam.ItemCodes = this.ttItem.Value.Trim() != string.Empty ? this.ttItem.Value.Trim() : null;
         criteriaParam.LocCodes = this.ttLocation.Value.Trim() != string.Empty ? this.ttLocation.Value.Trim() : null;
-        criteriaParam.LotNos = this.ttLotNo.Value.Trim() != string.Empty ? this.ttLotNo.Value.Trim() : null;
+        //criteriaParam.LotNos = this.ttLotNo.Value.Trim() != string.Empty ? this.ttLotNo.Value.Trim() : null;
+        criteriaParam.LotNo = this.tbLotNo.Text.Trim() != string.Empty ? this.tbLotNo.Text.Trim() : null;
+        criteriaParam.Item = this.tbItem.Text.Trim() != string.Empty ? this.tbItem.Text.Trim() : null;
         string page = this.PostBackHidden.Text != string.Empty ? this.PostBackHidden.Text.Trim() : string.Empty;
         criteriaParam.Page = string.IsNullOrEmpty(page) ? 1 : int.Parse(page);
         criteriaParam.SortParam = this.PostBackSortHidden.Text != string.Empty ? this.PostBackSortHidden.Text.Trim() : "Id";

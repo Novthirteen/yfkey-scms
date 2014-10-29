@@ -12,7 +12,8 @@
                     <textarea id="ttLocation" rows="2" runat="server"  style="width:200" />
             </td>
             <td class="td01">
-                <asp:Literal ID="lblItem" runat="server" Text="${Common.Business.ItemCode}:" />
+                <%--<asp:Literal ID="lblItem" runat="server" Text="${Common.Business.ItemCode}:" />--%>
+                物料代码(多选)
             </td>
             <td class="td02">
                     <textarea id="ttItem" rows="2" runat="server"  style="width:200" />
@@ -25,19 +26,34 @@
                 <asp:Literal ID="lblLotNo" runat="server" Text="${Common.Business.LotNo}:" />
             </td>
             <td class="td02">
-                    <textarea id="ttLotNo" rows="2" runat="server"  style="width:200" />
-                <%--<asp:TextBox ID="tbLotNo" runat="server" />--%>
+                    <%--<textarea id="ttLotNo" rows="2" runat="server"  style="width:200" />--%>
+                <asp:TextBox ID="tbLotNo" runat="server" />
+            </td>
+            <td class="td01">
+                <asp:Literal ID="lblItem" runat="server" Text="${Common.Business.ItemCode}:" />
+            </td>
+            <td class="t02">
+               <uc3:TextBox ID="tbItem" runat="server" Visible="true" DescField="Description" ImageUrlField="ImageUrl"
+                    Width="280" ValueField="Code" ServicePath="ItemMgr.service" ServiceMethod="GetCacheAllItem" />
+                
+            </td>
+        </tr>
+        <tr>
+            <td class="td01">
+            </td>
+            <td class="td02">
             </td>
             <td class="td01">
             </td>
-            <td class="t02">
-                <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" CssClass="button2"
+            <td class="td02">
+            <asp:Button ID="btnSearch" runat="server" Text="${Common.Button.Search}" CssClass="button2"
                     OnClick="btnSearch_Click" />
                 <asp:Button ID="btnExport" runat="server" Text="${Common.Button.Export}" CssClass="button2"
                     OnClick="btnExport_Click" />
                 <asp:textbox ID="PostBackSortHidden" runat="server" Text=""  style="display:none" />
                 <asp:textbox ID="PostBackHidden" runat="server" Text=""  style="display:none" />
             </td>
+
         </tr>
     </table>
 </fieldset>

@@ -99,7 +99,8 @@ inner join Location as loc on loc.Code=l.Location where 1=1 ";
 
         string locCodes = this._criteriaParam.LocCodes;
         string itemCodes = this._criteriaParam.ItemCodes;
-        string lotNos = this._criteriaParam.LotNos;
+        string itemCode = this._criteriaParam.Item;
+        string lotNo = this._criteriaParam.LotNo;
         if (!string.IsNullOrEmpty(locCodes))
         {
             locCodes = locCodes.Replace("\r\n", ",");
@@ -107,22 +108,30 @@ inner join Location as loc on loc.Code=l.Location where 1=1 ";
             locCodes = locCodes.Replace(",", "','");
             searchSql += string.Format(" and l.Location in ('{0}') ", locCodes);
         }
-      
+
 
         if (!string.IsNullOrEmpty(itemCodes))
         {
             itemCodes = itemCodes.Replace("\r\n", ",");
             itemCodes = itemCodes.Replace("\n", ",");
             itemCodes = itemCodes.Replace(",", "','");
+            if (!string.IsNullOrEmpty(itemCode))
+            {
+                itemCodes += " ','" + itemCode;
+            }
             searchSql += string.Format(" and l.Item in ('{0}') ", itemCodes);
         }
-
-        if (!string.IsNullOrEmpty(lotNos))
+        else
         {
-            lotNos = lotNos.Replace("\r\n", ",");
-            lotNos = lotNos.Replace("\n", ",");
-            lotNos = lotNos.Replace(",", "','");
-            searchSql += string.Format(" and l.LotNo in ('{0}') ", lotNos);
+            if (!string.IsNullOrEmpty(itemCode))
+            {
+                searchSql += string.Format(" and l.Item ='{0}' ", itemCode);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(lotNo))
+        {
+            searchSql += string.Format(" and l.LotNo ='{0}' ", lotNo);
         }
         StaticSql = searchSql;
         CurrentPageIndex = this._criteriaParam.Page;
