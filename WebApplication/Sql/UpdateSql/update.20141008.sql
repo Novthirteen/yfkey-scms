@@ -105,3 +105,47 @@ go
 alter table OrderPlanBackflush alter column IpNo varchar(50) null
 go
 
+alter table LocationLotDet add [Version] int default(1)
+go
+
+update LocationLotDet set [Version] = 1 where [Version] is null
+go
+
+create index IX_PlanBill_HuId on PlanBill(HuId asc)
+go
+
+--drop index IX_LocTrans_3 on LocTrans
+--go
+
+--drop index IX_LocTrans_4 on LocTrans
+--go
+
+--drop index IX_LocTrans_5 on LocTrans
+--go
+
+--create index IX_LocTrans_OrderNo on LocTrans(OrderNo asc)
+--go
+
+--create index IX_LocTrans_IpNo on LocTrans(IpNo asc)
+--go
+
+--create index IX_LocTrans_RecNo on LocTrans(RecNo asc)
+--go
+
+--create index IX_LocTrans_Item on LocTrans(Item asc)
+--go
+
+--create index IX_LocTrans_Loc on LocTrans(Loc asc)
+--go
+
+--create index IX_LocTrans_EffDate on LocTrans(EffDate asc)
+--go
+
+--create index IX_LocTrans_OrderDetId on LocTrans(OrderDetId asc)
+--go
+
+--create index IX_LocTrans_OrderLocTransId on LocTrans(OrderLocTransId asc)
+--go
+
+DROP INDEX [IX_LOCLOTDET_QTY] ON [dbo].[LocationLotDet]
+GO

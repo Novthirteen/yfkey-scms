@@ -36,8 +36,8 @@ BEGIN
 	create table #tempWOBomBackflush_09
 	(
 		Id int Primary Key,
-		Item varchar(50),
-		Location varchar(50),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		BackflushQty decimal(18, 8), 
 	)
 
@@ -46,39 +46,49 @@ BEGIN
 	create table #tempGroupWOBomBackflush_09
 	(
 		RowId int identity(1, 1) Primary Key,
-		Item varchar(50),
-		Location varchar(50),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		BackflushQty decimal(18, 8),
 	)
 
 	create table #tempLog_09
 	(
-		Item varchar(50),
-		Location varchar(50),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		BackflushQty decimal(18, 8),
 		Lvl tinyint,
-		Msg varchar(500)
+		Msg varchar(500) COLLATE  Chinese_PRC_CI_AS,
+		CreateDate datetime
 	)
 
 	create table #tempInventoryIO
 	(
 		RowId int Identity(1, 1) primary key,
-		Item varchar(50),
-		Location varchar(50),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Bin varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Qty decimal(18, 8),
-		HuId varchar(50),
 		PlanBillId int
 	)
 
 	create table #tempInventoryTrans
 	(
 		RowId int Identity(1, 1) primary key,
-		Location varchar(50),
-		Item varchar(50),
-		HuId varchar(50),
-		LotNo varchar(50),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Bin varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		LotNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Qty decimal(18, 8),
 		PlanBillId int
+	)
+
+	create table #tempSettlePlanBill
+	(
+		RowId int Identity(1, 1) primary key,
+		PlanBillId int,
+		SettleQty decimal(18, 8)
 	)
 
 	begin try
@@ -101,16 +111,31 @@ BEGIN
 				select @Item = Item, @Location = Location, @BackflushQty = -BackflushQty from #tempGroupWOBomBackflush_09 where RowId = @RowId
 				
 				begin try
-					insert into #tempLog_09(Item, Location, BackflushQty, Lvl, Msg) values(@Item, @Location, @BackflushQty, 0, N'开始反冲')
+					insert into #tempLog_09(Item, Location, BackflushQty, Lvl, Msg, CreateDate) values(@Item, @Location, @BackflushQty, 0, N'开始反冲', GETDATE())
 					if @Trancount = 0
 					begin
 						begin tran
 					end
 
+					--更新OrderLocTrans表
+					update olt set AccumQty = ISNULL(olt.AccumQty, 0) + bf.BackflushQty
+					from WOBomBackflush as bf inner join OrderLocTrans as olt on bf.OrderLocTransId = olt.Id
+					inner join #tempWOBomBackflush_09 as tmp on tmp.Id = bf.Id
+					where tmp.Item = @Item and tmp.Location = @Location
+
 					--反冲物料
 					truncate table #tempInventoryIO
 					insert into #tempInventoryIO(Item, Location, Qty) values(@Item, @Location, @BackflushQty)
 					exec INV_RecordInventory 0, @CreateUser
+
+					if exists(select top 1 1 from #tempInventoryTrans where PlanBillId is not null and Qty <> 0)
+					begin  --所有未结算的物料在反冲后全部结算
+						insert into #tempSettlePlanBill(PlanBillId, SettleQty) select PlanBillId, SUM(-Qty) from #tempInventoryTrans where PlanBillId is not null and Qty <> 0 group by PlanBillId
+						--把结算数量更新成订单单位
+						update tmp set tmp.SettleQty = tmp.SettleQty / pb.UnitQty from #tempSettlePlanBill as tmp inner join PlanBill as pb on tmp.PlanBillId = pb.Id
+						--执行结算程序
+						exec BIL_SettlePlanBill @CreateUser
+					end
 
 					--记录库存事务
 					insert into LocTrans(OrderNo, RecNo, TransType, Item, ItemDesc, Uom, Qty, PartyFrom, PartyFromName, PartyTo, PartyToName, Loc, LocName, EffDate, CreateDate, CreateUser, OrderDetId, OrderLocTransId, IsSubContract)
@@ -180,7 +205,7 @@ BEGIN
 						commit
 					end
 
-					insert into #tempLog_09(Item, Location, BackflushQty, Lvl, Msg) values(@Item, @Location, @BackflushQty, 0, N'反冲成功')
+					insert into #tempLog_09(Item, Location, BackflushQty, Lvl, Msg, CreateDate) values(@Item, @Location, @BackflushQty, 0, N'反冲成功', GETDATE())
 				end try
 				begin catch
 					if @Trancount = 0
@@ -190,11 +215,12 @@ BEGIN
 
 					set @ErrorMsg = N'反冲出现异常：' + Error_Message()
 					set @ErrorMsg = SUBSTRING(@ErrorMsg, 1, 500)
-					insert into #tempLog_09(Item, Location, BackflushQty, Lvl, Msg) values(@Item, @Location, @BackflushQty, 1, @ErrorMsg)
+					insert into #tempLog_09(Item, Location, BackflushQty, Lvl, Msg, CreateDate) values(@Item, @Location, @BackflushQty, 1, @ErrorMsg, GETDATE())
 				end catch
 
+				--记录反冲日志
 				insert into WOBomBackflushLog(Item, Location, BackflushQty, Lvl, Msg, CreateUser, CreateDate) 
-				select Item, Location, BackflushQty, Lvl, Msg, @CreateUser, @DateTimeNow from #tempLog_09
+				select Item, Location, BackflushQty, Lvl, Msg, @CreateUser, CreateDate from #tempLog_09
 				truncate table #tempLog_09
 
 				set @RowId = @RowId + 1
@@ -204,9 +230,6 @@ BEGIN
 			set @ErrorMsg = N'数据更新出现异常：' + Error_Message()
 			RAISERROR(@ErrorMsg, 16, 1) 
 		end catch
-	
-		--记录反冲日志
-		
 	end try
 	begin catch
 		set @ErrorMsg = N'批量反冲Bom出现异常：' + Error_Message()
@@ -218,6 +241,7 @@ BEGIN
 	drop table #tempLog_09
 	drop table #tempInventoryIO
 	drop table #tempInventoryTrans
+	drop table #tempSettlePlanBill
 END 
 
 

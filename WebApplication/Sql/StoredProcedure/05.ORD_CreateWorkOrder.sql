@@ -65,7 +65,7 @@ BEGIN
 		StruType varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 		Op int,
-		Ref varchar(50),
+		Ref varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		RateQty decimal(18, 8),
 		ScrapPct decimal(18, 8),
 		Location varchar(50),
@@ -75,24 +75,24 @@ BEGIN
 	create table #tempOrderLocTrans_04
 	(
 		RowId int identity(1, 1) primary key,
-		Item varchar(50),
-		ItemDesc varchar(100),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		ItemDesc varchar(100) COLLATE  Chinese_PRC_CI_AS,
 		BomDet int,
-		Uom varchar(5),
-		BaseUom varchar(5),
+		Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
+		BaseUom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 		UC decimal(18, 8),
 		Op int,
-		IOType varchar(50),
-		TransType varchar(50),
+		IOType varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		TransType varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		BomUnitQty decimal(18, 8),   --Bom用量
 		UnitQty decimal(18, 8),      --和基本单位的转换率
 		OrderQty decimal(18, 8),
-		Loc varchar(50),
-		RejLoc varchar(50),
+		Loc varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		RejLoc varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		HuLotSize decimal(18, 8),
-		BackFlushMethod varchar(50),
-		TagNo varchar(50),
-		Shelf varchar(50),
+		BackFlushMethod varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		TagNo varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Shelf varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Cartons int
 	)
 	
@@ -281,7 +281,7 @@ BEGIN
 			Op,
 			IOType,
 			TransType,
-			UnitQty,
+			BomUnitQty,
 			OrderQty,
 			Loc,
 			RejLoc,
@@ -298,7 +298,7 @@ BEGIN
 			'In',
 			'RCT-WO',
 			@FGUnitQty,
-			@OrderQty,
+			@OrderQty * @FGUnitQty,
 			@DefaultLocTo,
 			'Reject',
 			@FGUC
@@ -317,7 +317,7 @@ BEGIN
 				Op,
 				IOType,
 				TransType,
-				UnitQty,
+				BomUnitQty,
 				OrderQty,
 				Loc,
 				RejLoc,
@@ -334,7 +334,7 @@ BEGIN
 				'OUT',
 				'RCT-WO',
 				@FGUnitQty,
-				@OrderQty,
+				@OrderQty * @FGUnitQty,
 				'Reject',
 				'Reject',
 				@FGUC
@@ -369,16 +369,14 @@ BEGIN
 			bom.Op,
 			'Out',
 			'ISS-WO',
-			bom.RateQty,
-			bom.RateQty * @OrderQty * @FGBomUnitQty,
+			bom.RateQty * (1 + bom.ScrapPct),
+			bom.RateQty * (1 + bom.ScrapPct) * @OrderQty,
 			ISNULL(bom.Location, ISNULL(rd.LocFrom, @DefaultLocFrom)),
 			'Reject',
 			bom.BackFlushMethod
 			from #tempBomDetail_04 as bom 
 			inner join Item as i on bom.Item = i.Code
 			left join RoutingDet as rd on rd.Routing = @Routing and rd.Op = bom.Op and ISNULL(rd.Ref, '') = ISNULL(bom.Ref, '')
-
-			drop table #tempBomDetail_04
 
 			--取工位和货架
 			update olt set TagNo = s.TagNo, Shelf = s.Code
@@ -639,7 +637,7 @@ BEGIN
 			Op,
 			IOType,
 			TransType,
-			UnitQty,
+			BomUnitQty,
 			OrderQty,
 			0,
 			0,
@@ -660,8 +658,6 @@ BEGIN
 				commit
 			end
 
-			drop table #tempOrderLocTrans_04
-
 			set @WorkOrderNo = @OrderNo
 		end try
 		begin catch
@@ -678,5 +674,8 @@ BEGIN
 		set @ErrorMsg = N'创建工单出现异常：' + Error_Message() 
 		RAISERROR(@ErrorMsg, 16, 1) 
 	end catch
+
+	drop table #tempBomDetail_04
+	drop table #tempOrderLocTrans_04
 END
 GO

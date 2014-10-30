@@ -37,8 +37,8 @@ BEGIN
 	create table #tempInventoryQtyIn_08
 	(
 		RowId int Identity(1, 1) primary key,
-		Item varchar(50),
-		Location varchar(50),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Qty decimal(18, 8),
 		PlanBillId int
 	)
@@ -46,8 +46,8 @@ BEGIN
 	create table #tempInventoryQtyOut_08
 	(
 		RowId int Identity(1, 1) primary key,
-		Item varchar(50),
-		Location varchar(50),
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		AllowNegativeInventory bit,
 		Qty decimal(18, 8)
 	)
@@ -55,21 +55,21 @@ BEGIN
 	create table #tempLoadedLocationLotDet_08
 	(
 		Id int primary key,
-		Location varchar(50),
-		Item varchar(50),
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		OrgQty decimal(18, 8),
 		Qty decimal(18, 8),
 		IsCS bit,
 		PlanBillId int,
-		LastModifyDate datetime,
+		[Version] int,
 	)
 	create index #tempLoadedLocationLotDet_08_Item_Location_Id on #tempLoadedLocationLotDet_08(Item asc, Location asc, Id asc)
 
 	create table #tempInsertLocationLotDet_08
 	(
 		RowId int Identity(1, 1) primary key,
-		Location varchar(50),
-		Item varchar(50),
+		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Qty decimal(18, 8),
 		IsCS bit,
 		PlanBillId int
@@ -92,8 +92,8 @@ BEGIN
 			create table #tempQtyInventoryIO
 			(
 				RowId int Identity(1, 1) primary key,
-				Item varchar(50),
-				Location varchar(50),
+				Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 				Qty decimal(18, 8),
 				PlanBillId int
 			)
@@ -108,8 +108,8 @@ BEGIN
 			create table #tempQtyInventoryTrans
 			(
 				RowId int Identity(1, 1) primary key,
-				Location varchar(50),
-				Item varchar(50),
+				Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
+				Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 				Qty decimal(18, 8),
 				PlanBillId int
 			)
@@ -128,16 +128,16 @@ BEGIN
 			where tmp.Qty < 0
 			group by tmp.Item, tmp.Location, l.AllowNegaInv
 
-			if exists(select top 1 1 from #tempInventoryQtyOut_08 where AllowNegativeInventory is null)
-			begin
-				select @ErrorMsg = N'库位[' + Location + N']不存在。' from #tempInventoryQtyOut_08 where AllowNegativeInventory is null
-				RAISERROR(@ErrorMsg, 16, 1) 
-			end
+			--if exists(select top 1 1 from #tempInventoryQtyOut_08 where AllowNegativeInventory is null)
+			--begin
+			--	select @ErrorMsg = N'库位[' + Location + N']不存在。' from #tempInventoryQtyOut_08 where AllowNegativeInventory is null
+			--	RAISERROR(@ErrorMsg, 16, 1) 
+			--end
 
 			if exists(select top 1 1 from #tempInventoryQtyIn_08)
 			begin  --数量入库
-				insert into #tempLoadedLocationLotDet_08(Id, Location, Item, OrgQty, Qty, LastModifyDate)
-				select det.Id, det.Location, det.Item, det.Qty, det.Qty, det.LastModifyDate from #tempInventoryQtyIn_08 as tmp 
+				insert into #tempLoadedLocationLotDet_08(Id, Location, Item, OrgQty, Qty, [Version])
+				select det.Id, det.Location, det.Item, det.Qty, det.Qty, det.[Version] from #tempInventoryQtyIn_08 as tmp 
 				inner join LocationLotDet as det on tmp.Item = det.Item and tmp.Location = det.Location
 				where det.Qty < 0 and HuId is null
 
@@ -178,8 +178,8 @@ BEGIN
 
 			if exists(select top 1 1 from #tempInventoryQtyOut_08)
 			begin  --数量出库，出库PlanBillId必定为空
-				insert into #tempLoadedLocationLotDet_08(Id, Location, Item, OrgQty, Qty, PlanBillId, LastModifyDate)
-				select det.Id, det.Location, det.Item, det.Qty, det.Qty, det.PlanBillId, det.LastModifyDate from #tempInventoryQtyOut_08 as tmp 
+				insert into #tempLoadedLocationLotDet_08(Id, Location, Item, OrgQty, Qty, PlanBillId, [Version])
+				select det.Id, det.Location, det.Item, det.Qty, det.Qty, CASE WHEN det.IsCS = 1 THEN det.PlanBillId ELSE null END, det.[Version] from #tempInventoryQtyOut_08 as tmp 
 				inner join LocationLotDet as det on tmp.Item = det.Item and tmp.Location = det.Location
 				where det.Qty <> 0 and HuId is null
 
@@ -262,8 +262,8 @@ BEGIN
 
 			if @UpdateCount > 0
 			begin 
-				update LocationLotDet set Qty = tmp.Qty, LastModifyDate = GETDATE()
-				from LocationLotDet as det inner join #tempLoadedLocationLotDet_08 as tmp on det.Id = tmp.Id and det.LastModifyDate = tmp.LastModifyDate
+				update LocationLotDet set Qty = tmp.Qty, LastModifyDate = GETDATE(), [Version] = det.[Version] + 1
+				from LocationLotDet as det inner join #tempLoadedLocationLotDet_08 as tmp on det.Id = tmp.Id and det.[Version] = tmp.[Version]
 				where tmp.OrgQty <> tmp.Qty
 
 				if (@@ROWCOUNT <> @UpdateCount)
@@ -272,8 +272,8 @@ BEGIN
 				end
 			end
 
-			insert into LocationLotDet(Location, Item, Qty, IsCS, PlanBillId, CreateDate, LastModifyDate)
-			select Location, Item, Qty, IsCS, PlanBillId, @DateTimeNow, @DateTimeNow from #tempInsertLocationLotDet_08
+			insert into LocationLotDet(Location, Item, Qty, IsCS, PlanBillId, CreateDate, LastModifyDate, [Version])
+			select Location, Item, Qty, IsCS, PlanBillId, @DateTimeNow, @DateTimeNow, 1 from #tempInsertLocationLotDet_08
 			
 			if @Trancount = 0 
 			begin  
@@ -291,7 +291,7 @@ BEGIN
 		end catch
 	end try
 	begin catch
-		set @ErrorMsg = N'更新数量库存出现异常：' + Error_Message() 
+		set @ErrorMsg = N'更新数量库存出现异常：' + Error_Message()
 		RAISERROR(@ErrorMsg, 16, 1) 
 	end catch
 

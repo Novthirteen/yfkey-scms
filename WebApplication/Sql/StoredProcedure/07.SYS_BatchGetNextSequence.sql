@@ -20,7 +20,8 @@ CREATE PROCEDURE [dbo].[SYS_BatchGetNextSequence]
 AS
 BEGIN
 	SET NOCOUNT ON 
-	declare @trancount int = @@trancount
+	declare @trancount int 
+	set @trancount = @@trancount
 	
 	begin try
 		if @trancount = 0
