@@ -98,6 +98,20 @@ function checkPassword(source, args)
                             <asp:CheckBox ID="tbIsActive" runat="server" Checked='<%#Bind("IsActive") %>' />
                         </td>
                     </tr>
+                      <tr>
+                        <td class="td01">
+                            <asp:Literal ID="lblIsEnforcePolicy" runat="server" Text="${Security.User.IsEnforcePolicy}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:CheckBox ID="tbIsEnforcePolicy" runat="server" Checked='<%#Bind("IsEnforcePolicy") %>' />
+                        </td>
+                        <td class="td01">
+                            <asp:Literal ID="lblIsEnforceExpiration" runat="server" Text="${Security.User.IsEnforceExpiration}:" />
+                        </td>
+                        <td class="td02">
+                            <asp:CheckBox ID="tbIsEnforceExpiration" runat="server" Checked='<%#Bind("IsEnforceExpiration") %>' />
+                        </td>
+                    </tr>
                     <tr>
                         <td class="td01">
                         </td>

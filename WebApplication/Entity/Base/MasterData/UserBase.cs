@@ -195,6 +195,15 @@ namespace com.Sconit.Entity.MasterData
                 _Roles = value;
             }
         }
+
+        /// <summary>
+        /// 需要使用强密码
+        /// </summary>
+        public Boolean IsEnforcePolicy { get; set; }
+        /// <summary>
+        /// 需要修改密码
+        /// </summary>
+        public Boolean IsEnforceExpiration { get; set; }
         #endregion
 
 		public override int GetHashCode()
