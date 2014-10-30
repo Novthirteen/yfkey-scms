@@ -298,7 +298,7 @@ BEGIN
 			'In',
 			'RCT-WO',
 			@FGUnitQty,
-			@OrderQty,
+			@OrderQty * @FGUnitQty,
 			@DefaultLocTo,
 			'Reject',
 			@FGUC
@@ -334,7 +334,7 @@ BEGIN
 				'OUT',
 				'RCT-WO',
 				@FGUnitQty,
-				@OrderQty,
+				@OrderQty * @FGUnitQty,
 				'Reject',
 				'Reject',
 				@FGUC
@@ -369,16 +369,14 @@ BEGIN
 			bom.Op,
 			'Out',
 			'ISS-WO',
-			bom.RateQty,
-			bom.RateQty * @OrderQty * @FGBomUnitQty,
+			bom.RateQty * (1 + bom.ScrapPct),
+			bom.RateQty * (1 + bom.ScrapPct) * @OrderQty,
 			ISNULL(bom.Location, ISNULL(rd.LocFrom, @DefaultLocFrom)),
 			'Reject',
 			bom.BackFlushMethod
 			from #tempBomDetail_04 as bom 
 			inner join Item as i on bom.Item = i.Code
 			left join RoutingDet as rd on rd.Routing = @Routing and rd.Op = bom.Op and ISNULL(rd.Ref, '') = ISNULL(bom.Ref, '')
-
-			drop table #tempBomDetail_04
 
 			--取工位和货架
 			update olt set TagNo = s.TagNo, Shelf = s.Code
@@ -660,8 +658,6 @@ BEGIN
 				commit
 			end
 
-			drop table #tempOrderLocTrans_04
-
 			set @WorkOrderNo = @OrderNo
 		end try
 		begin catch
@@ -678,5 +674,8 @@ BEGIN
 		set @ErrorMsg = N'创建工单出现异常：' + Error_Message() 
 		RAISERROR(@ErrorMsg, 16, 1) 
 	end catch
+
+	drop table #tempBomDetail_04
+	drop table #tempOrderLocTrans_04
 END
 GO

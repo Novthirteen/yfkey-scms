@@ -89,7 +89,7 @@ BEGIN
 			insert into #tempWOReceipt_03(Id, ProdLine, Item, ItemDesc, HuId, LotNo, LotNoYear, LotNoMonth, LotNoDay, QtyStr, IsQtyNumeric, OfflineDateStr, OfflineTimeStr, IsOfflineDateTime)
 			select dih.Id, dih.data0, dih.data1, i.Desc1, dih.data2, SUBSTRING(data2, LEN(data2) - 7, 4), SUBSTRING(data2, LEN(data2) - 7, 1), SUBSTRING(data2, LEN(data2) - 6, 1), SUBSTRING(data2, LEN(data2) - 5, 2), dih.data3, ISNUMERIC(dih.data3), dih.data7, dih.data8, ISDATE(dih.data7 + ' ' + dih.data8)
 			from DssImpHis as dih left join Item as i on dih.Item = i.Code
-			where dih.IsActive = 1 and dih.ErrCount < 2 and dih.DssInboundCtrl = 9 and dih.EventCode = 'CREATE' and dih.HuId is not null
+			where dih.IsActive = 1 and dih.ErrCount < 2 and dih.DssInboundCtrl = 9 and dih.EventCode = 'CREATE'
 
 			if not exists(select top 1 1 from #tempWOReceipt_03)
 			begin
@@ -134,11 +134,11 @@ BEGIN
 
 			if exists(select top 1 1 from #tempWOReceipt_03 where LEN(HuId) < 9)
 			begin
-				update dih set Memo = '条码不能为空。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
+				update dih set Memo = '条码长度不能小于9。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
 				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
-				where tmp.HuId is null or tmp.HuId = ''
+				where LEN(tmp.HuId) < 9
 
-				delete from #tempWOReceipt_03 where HuId is null or HuId = ''
+				delete from #tempWOReceipt_03 where  LEN(HuId) < 9
 			end
 
 			if exists (select top 1 1 from #tempWOReceipt_03 where LotNoYear not in ('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'S', 'T', 'V', 'W', 'X', 'Y'))

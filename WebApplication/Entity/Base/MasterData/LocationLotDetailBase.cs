@@ -145,6 +145,8 @@ namespace com.Sconit.Entity.MasterData
             }
         }
 
+        public Int32 Version { get; set; }
+
         private String _refLocation;
         public String RefLocation
         {

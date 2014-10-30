@@ -44,7 +44,7 @@ BEGIN
 		)
 
 		insert into #tempBomDetail_06(BomDetId, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Location, BackFlushMethod)
-		select Id, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Loc, BackFlushMethod from BomDet with(NOLOCK)
+		select Id, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Loc, ISNULL(BackFlushMethod, 'GoodsReceive') from BomDet with(NOLOCK)
 		where Bom = @BomCode and StartDate <= @EffDate and (EndDate >= @EffDate or EndDate is null)
 
 		select @MaxRowId = MAX(RowId) from #tempBomDetail_06
@@ -52,7 +52,7 @@ BEGIN
 		while exists(select top 1 1 from #tempBomDetail_06 where StruType = 'X')
 		begin
 			insert into #tempBomDetail_06(BomDetId, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Location, BackFlushMethod)
-			select Id, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Loc, BackFlushMethod from BomDet with(NOLOCK)
+			select Id, Bom, Item, StruType, Uom, Op, Ref, RateQty, ScrapPct, Loc, ISNULL(BackFlushMethod, 'GoodsReceive') from BomDet with(NOLOCK)
 			where Bom in (select Item from #tempBomDetail_06 where StruType = 'X') 
 			and StartDate <= @EffDate and (EndDate >= @EffDate or EndDate is null)
 
