@@ -179,7 +179,7 @@ BEGIN
 			if exists(select top 1 1 from #tempInventoryQtyOut_08)
 			begin  --数量出库，出库PlanBillId必定为空
 				insert into #tempLoadedLocationLotDet_08(Id, Location, Item, OrgQty, Qty, PlanBillId, [Version])
-				select det.Id, det.Location, det.Item, det.Qty, det.Qty, det.PlanBillId, det.[Version] from #tempInventoryQtyOut_08 as tmp 
+				select det.Id, det.Location, det.Item, det.Qty, det.Qty, CASE WHEN det.IsCS = 1 THEN det.PlanBillId ELSE null END, det.[Version] from #tempInventoryQtyOut_08 as tmp 
 				inner join LocationLotDet as det on tmp.Item = det.Item and tmp.Location = det.Location
 				where det.Qty <> 0 and HuId is null
 

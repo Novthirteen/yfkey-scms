@@ -73,7 +73,7 @@ BEGIN
 			from PlanBill as pb
 			inner join (select PlanBillId, SUM(SettleQty) as SettleQty from #tempSettlePlanBill group by PlanBillId) as tmp on pb.Id = tmp.PlanBillId
 
-			if exists(select top 1 1 from #tempPlanBill_11 where PlanQty <= ActQty or ABS(PlanQty - ActQty) < ABS(ThisActQty))
+			if exists(select top 1 1 from #tempPlanBill_11 where ABS(PlanQty) <= ABS(ActQty) or ABS(PlanQty - ActQty) < ABS(ThisActQty))
 			begin
 				select top 1 @ErrorMsg = N'要货单[' + OrderNo + N']的结算数量大于收货数量。' from #tempPlanBill_11 where PlanQty <= ActQty or ABS(PlanQty + ActQty) < ABS(ThisActQty)
 				RAISERROR(@ErrorMsg, 16, 1) 

@@ -82,6 +82,7 @@ BEGIN
 			create table #tempHuInventoryTrans
 			(
 				RowId int Identity(1, 1) primary key,
+				Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 				HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
 				Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 				Bin varchar(50) COLLATE  Chinese_PRC_CI_AS,
@@ -95,15 +96,15 @@ BEGIN
 			--记录入库临时表
 			insert into #tempInventoryHuIn_04(Item, HuId, LotNo, Qty, Location, Bin, LocationLotDetId, HuQty, PlanBillId)
 			select hu.Item, tmp.HuId, hu.LotNo, tmp.Qty, tmp.Location, tmp.Bin, det.Id, hu.Qty, pb.Id
-			from #tempHuInventoryIO as tmp 
+			from #tempHuInventoryIO as tmp
 			left join LocationLotDet as det with(NOLOCK) on tmp.HuId = det.HuId and det.Qty > 0
 			left join HuDet as hu with(NOLOCK) on tmp.HuId = hu.HuId
-			left join PlanBill as pb on tmp.HuId = pb.HuId and pb.ActQty = 0
+			left join PlanBill as pb with(NOLOCK) on tmp.HuId = pb.HuId and pb.PlanQty > 0 and pb.ActQty = 0 and pb.TransType = 'PO'  --PlanQty > 0，因为小于0的会立即结算
 			where tmp.Qty > 0
 
 			--记录出库临时表
-			insert into #tempInventoryHuOut_04(HuId, LotNo, Qty, Location, LocationQty, LocationLotDetId, PlanBillId, [Version], HuQty)
-			select tmp.HuId, hu.LotNo, tmp.Qty, tmp.Location, det.Qty, det.Id, CASE WHEN det.IsCS = 1 THEN det.PlanBillId ELSE null end, det.[Version], hu.Qty
+			insert into #tempInventoryHuOut_04(Item, HuId, LotNo, Qty, Location, LocationQty, LocationLotDetId, PlanBillId, [Version], HuQty)
+			select hu.Item, tmp.HuId, hu.LotNo, tmp.Qty, tmp.Location, det.Qty, det.Id, CASE WHEN det.IsCS = 1 THEN det.PlanBillId ELSE null end, det.[Version], hu.Qty
 			from #tempHuInventoryIO as tmp 
 			left join LocationLotDet as det with(NOLOCK) on tmp.HuId = det.HuId and tmp.Location = det.Location and det.Qty > 0
 			left join HuDet as hu with(NOLOCK) on tmp.HuId = hu.HuId
@@ -111,9 +112,9 @@ BEGIN
 
 			if exists(select top 1 1 from #tempInventoryHuIn_04)
 			begin  --入库条码校验
-				if exists(select top 1 1 from #tempInventoryHuIn_04 where HuQty is null)
+				if exists(select top 1 1 from #tempInventoryHuIn_04 where Item is null)
 				begin
-					select @ErrorMsg = N'条码[' + HuId + N']不存在。' from #tempInventoryHuIn_04 where HuQty is null
+					select @ErrorMsg = N'条码[' + HuId + N']不存在。' from #tempInventoryHuIn_04 where Item is null
 					RAISERROR(@ErrorMsg, 16, 1) 
 				end
 
@@ -132,16 +133,15 @@ BEGIN
 				end
 
 				--记录返回的出入库事务
-				insert into #tempHuInventoryTrans(HuId, LotNo, Location, Bin, Qty)
-				select HuId, LotNo, Location, Bin, Qty from #tempInventoryHuIn_04
+				insert into #tempHuInventoryTrans(Item, HuId, LotNo, Location, Bin, Qty, PlanBillId)
+				select Item, HuId, LotNo, Location, Bin, Qty, PlanBillId from #tempInventoryHuIn_04
 			end
-
 
 			if exists(select top 1 1 from #tempInventoryHuOut_04)
 			begin  --出库条码校验
-				if exists(select top 1 1 from #tempInventoryHuOut_04 where HuQty is null)
+				if exists(select top 1 1 from #tempInventoryHuOut_04 where Item is null)
 				begin
-					select @ErrorMsg = N'条码[' + HuId + N']不存在。' from #tempInventoryHuOut_04 where HuQty is null
+					select @ErrorMsg = N'条码[' + HuId + N']不存在。' from #tempInventoryHuOut_04 where Item is null
 					RAISERROR(@ErrorMsg, 16, 1) 
 				end
 
@@ -165,8 +165,8 @@ BEGIN
 				end
 				
 				--记录返回的出入库事务
-				insert into #tempHuInventoryTrans(HuId, LotNo, Location, Qty, PlanBillId)
-				select HuId, LotNo, Location, Qty, PlanBillId from #tempInventoryHuOut_04
+				insert into #tempHuInventoryTrans(Item, HuId, LotNo, Location, Qty, PlanBillId)
+				select Item, HuId, LotNo, Location, Qty, PlanBillId from #tempInventoryHuOut_04
 			end
 		end try
 		begin catch
@@ -180,17 +180,22 @@ BEGIN
 				begin tran
 			end
 
-			--if exists(select top 1 1 from #tempInventoryHuIn_04)
-			--begin  --入库条码更新
-			--	insert into LocationLotDet(Location, Bin, Item, HuId, LotNo, Qty, IsCS, PlanBillId, CreateDate, LastModifyDate, [Version])
-			--	select Location, Bin, Item, HuId, LotNo, Qty, CASE WHEN PlanBillId is null THEN 0 ELSE 1 END, PlanBillId, @DateTimeNow, @DateTimeNow, 1 from #tempInventoryHuIn_04
-			--end
+			if exists(select top 1 1 from #tempInventoryHuIn_04)
+			begin  --入库条码更新
+				insert into LocationLotDet(Location, Bin, Item, HuId, LotNo, Qty, IsCS, PlanBillId, CreateDate, LastModifyDate, [Version])
+				select Location, Bin, Item, HuId, LotNo, Qty, CASE WHEN PlanBillId is null THEN 0 ELSE 1 END, PlanBillId, @DateTimeNow, @DateTimeNow, 1 from #tempInventoryHuIn_04
+			end
 
-			--if exists(select top 1 1 from #tempInventoryHuOut_04)
-			--begin  --出库条码更新
-				
-			--end
+			if exists(select top 1 1 from #tempInventoryHuOut_04)
+			begin  --出库条码更新
+				update LocationLotDet set Qty = 0, LastModifyDate = @DateTimeNow, [Version] = det.[Version] + 1
+				from LocationLotDet as det inner join #tempInventoryHuOut_04 as tmp on det.Id = tmp.LocationLotDetId and det.[Version] = tmp.[Version]
 
+				if (@@ROWCOUnt <> (select COUNT(1) from #tempInventoryHuOut_04))
+				begin
+					RAISERROR(N'数据已经被更新，请重试。', 16, 1)
+				end
+			end
 
 			if @Trancount = 0 
 			begin  

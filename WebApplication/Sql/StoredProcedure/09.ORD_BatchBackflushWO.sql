@@ -84,6 +84,13 @@ BEGIN
 		PlanBillId int
 	)
 
+	create table #tempSettlePlanBill
+	(
+		RowId int Identity(1, 1) primary key,
+		PlanBillId int,
+		SettleQty decimal(18, 8)
+	)
+
 	begin try
 		begin try
 			insert into #tempWOBomBackflush_09(Id, Item, Location, BackflushQty)
@@ -110,10 +117,25 @@ BEGIN
 						begin tran
 					end
 
+					--更新OrderLocTrans表
+					update olt set AccumQty = ISNULL(olt.AccumQty, 0) + bf.BackflushQty
+					from WOBomBackflush as bf inner join OrderLocTrans as olt on bf.OrderLocTransId = olt.Id
+					inner join #tempWOBomBackflush_09 as tmp on tmp.Id = bf.Id
+					where tmp.Item = @Item and tmp.Location = @Location
+
 					--反冲物料
 					truncate table #tempInventoryIO
 					insert into #tempInventoryIO(Item, Location, Qty) values(@Item, @Location, @BackflushQty)
 					exec INV_RecordInventory 0, @CreateUser
+
+					if exists(select top 1 1 from #tempInventoryTrans where PlanBillId is not null and Qty <> 0)
+					begin  --所有未结算的物料在反冲后全部结算
+						insert into #tempSettlePlanBill(PlanBillId, SettleQty) select PlanBillId, SUM(-Qty) from #tempInventoryTrans where PlanBillId is not null and Qty <> 0 group by PlanBillId
+						--把结算数量更新成订单单位
+						update tmp set tmp.SettleQty = tmp.SettleQty / pb.UnitQty from #tempSettlePlanBill as tmp inner join PlanBill as pb on tmp.PlanBillId = pb.Id
+						--执行结算程序
+						exec BIL_SettlePlanBill @CreateUser
+					end
 
 					--记录库存事务
 					insert into LocTrans(OrderNo, RecNo, TransType, Item, ItemDesc, Uom, Qty, PartyFrom, PartyFromName, PartyTo, PartyToName, Loc, LocName, EffDate, CreateDate, CreateUser, OrderDetId, OrderLocTransId, IsSubContract)
@@ -219,6 +241,7 @@ BEGIN
 	drop table #tempLog_09
 	drop table #tempInventoryIO
 	drop table #tempInventoryTrans
+	drop table #tempSettlePlanBill
 END 
 
 

@@ -207,7 +207,7 @@ BEGIN
             rollback
         end 
 		
-		set @ErrorMsg = Error_Message() 
+		set @ErrorMsg = N'创建寄售库存账单出现异常：' + Error_Message() 
 		RAISERROR(@ErrorMsg, 16, 1) 
 	end catch
 END

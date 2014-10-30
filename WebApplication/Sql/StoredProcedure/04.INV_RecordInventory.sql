@@ -54,6 +54,7 @@ BEGIN
 	create table #tempHuInventoryTrans
 	(
 		RowId int Identity(1, 1) primary key,
+		Item varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		HuId varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Location varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		Bin varchar(50) COLLATE  Chinese_PRC_CI_AS,
@@ -153,8 +154,8 @@ BEGIN
 			begin
 				exec INV_RecordHuInventory @CreateUser
 
-				insert into #tempInventoryTrans(HuId, LotNo, Location, Bin, Qty, PlanBillId)
-				select HuId, LotNo, Location, Bin, Qty, PlanBillId from #tempHuInventoryTrans
+				insert into #tempInventoryTrans(Item, HuId, LotNo, Location, Bin, Qty, PlanBillId)
+				select Item, HuId, LotNo, Location, Bin, Qty, PlanBillId from #tempHuInventoryTrans
 			end
 		end
 	end try

@@ -88,7 +88,7 @@ BEGIN
 		begin try
 			insert into #tempWOReceipt_03(Id, ProdLine, Item, ItemDesc, HuId, LotNo, LotNoYear, LotNoMonth, LotNoDay, QtyStr, IsQtyNumeric, OfflineDateStr, OfflineTimeStr, IsOfflineDateTime)
 			select dih.Id, dih.data0, dih.data1, i.Desc1, dih.data2, SUBSTRING(data2, LEN(data2) - 7, 4), SUBSTRING(data2, LEN(data2) - 7, 1), SUBSTRING(data2, LEN(data2) - 6, 1), SUBSTRING(data2, LEN(data2) - 5, 2), dih.data3, ISNUMERIC(dih.data3), dih.data7, dih.data8, ISDATE(dih.data7 + ' ' + dih.data8)
-			from DssImpHis as dih left join Item as i on dih.Item = i.Code
+			from DssImpHis as dih left join Item as i on dih.data1 = i.Code
 			where dih.IsActive = 1 and dih.ErrCount < 2 and dih.DssInboundCtrl = 9 and dih.EventCode = 'CREATE'
 
 			if not exists(select top 1 1 from #tempWOReceipt_03)
@@ -347,8 +347,11 @@ BEGIN
 			insert into HuDet(HuId, LotNo, Item, QualityLevel, Uom, UC, UnitQty, Qty, OrderNo, RecNo, ManufactureDate, ManufactureParty, PrintCount, CreateDate, CreateUser, LotSize, Location, Status)
 			select HuId, LotNo, Item, 'Level1', Uom, UC, UnitQty, Qty, OrderNo, RecNo, ManufactureDate, ManufactureParty, 0, @DateTimeNow, @CreateUser, Qty, Location, 'Inventory' from #tempWOReceipt_03
 		
-			update det set RecQty = RecQty + Qty
+			update det set RecQty = ISNULL(det.RecQty, 0) + Qty
 			from OrderDet as det inner join #tempWOReceipt_03 as tmp on det.Id = tmp.OrderDetId
+
+			update olt set AccumQty = ISNULL(olt.AccumQty, 0) + Qty * tmp.UnitQty
+			from OrderLocTrans as olt inner join #tempWOReceipt_03 as tmp on olt.Id = tmp.OrderLocTransId
 
 			insert into ReceiptMstr(RecNo, OrderType, CreateDate, CreateUser, PartyFrom, PartyTo, IsPrinted, NeedPrint)
 			select RecNo, 'Production', @DateTimeNow, @CreateUser, ManufactureParty, ManufactureParty, 0, 0 from #tempWOReceipt_03
