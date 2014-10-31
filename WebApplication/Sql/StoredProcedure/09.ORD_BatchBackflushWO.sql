@@ -119,9 +119,11 @@ BEGIN
 
 					--更新OrderLocTrans表
 					update olt set AccumQty = ISNULL(olt.AccumQty, 0) + bf.BackflushQty
-					from WOBomBackflush as bf inner join OrderLocTrans as olt on bf.OrderLocTransId = olt.Id
-					inner join #tempWOBomBackflush_09 as tmp on tmp.Id = bf.Id
-					where tmp.Item = @Item and tmp.Location = @Location
+					from  OrderLocTrans as olt inner join (select bf.OrderLocTransId, SUM(bf.BackflushQty) as BackflushQty 
+															from WOBomBackflush as bf 
+															inner join #tempWOBomBackflush_09 as tmp on tmp.Id = bf.Id
+															where tmp.Item = @Item and tmp.Location = @Location
+															group by bf.OrderLocTransId) as bf on bf.OrderLocTransId = olt.Id
 
 					--反冲物料
 					truncate table #tempInventoryIO

@@ -347,11 +347,11 @@ BEGIN
 			insert into HuDet(HuId, LotNo, Item, QualityLevel, Uom, UC, UnitQty, Qty, OrderNo, RecNo, ManufactureDate, ManufactureParty, PrintCount, CreateDate, CreateUser, LotSize, Location, Status)
 			select HuId, LotNo, Item, 'Level1', Uom, UC, UnitQty, Qty, OrderNo, RecNo, ManufactureDate, ManufactureParty, 0, @DateTimeNow, @CreateUser, Qty, Location, 'Inventory' from #tempWOReceipt_03
 		
-			update det set RecQty = ISNULL(det.RecQty, 0) + Qty
-			from OrderDet as det inner join #tempWOReceipt_03 as tmp on det.Id = tmp.OrderDetId
+			update det set RecQty = ISNULL(det.RecQty, 0) + tmp.Qty
+			from OrderDet as det inner join (select OrderDetId, SUM(Qty) as Qty from #tempWOReceipt_03 group by OrderDetId) as tmp on det.Id = tmp.OrderDetId
 
-			update olt set AccumQty = ISNULL(olt.AccumQty, 0) + Qty * tmp.UnitQty
-			from OrderLocTrans as olt inner join #tempWOReceipt_03 as tmp on olt.Id = tmp.OrderLocTransId
+			update olt set AccumQty = ISNULL(olt.AccumQty, 0) + tmp.Qty * olt.UnitQty
+			from OrderLocTrans as olt inner join (select OrderLocTransId, SUM(Qty) as Qty from #tempWOReceipt_03 group by OrderLocTransId) as tmp on olt.Id = tmp.OrderLocTransId
 
 			insert into ReceiptMstr(RecNo, OrderType, CreateDate, CreateUser, PartyFrom, PartyTo, IsPrinted, NeedPrint)
 			select RecNo, 'Production', @DateTimeNow, @CreateUser, ManufactureParty, ManufactureParty, 0, 0 from #tempWOReceipt_03

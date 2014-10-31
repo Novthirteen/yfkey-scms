@@ -156,7 +156,7 @@ BEGIN
 			tmp.Item,
 			tmp.BillAddr,
 			tmp.Uom,
-			tmp.ThisActQty,
+			SUM(tmp.ThisActQty),
 			0,
 			tmp.UnitPrice,
 			0,
@@ -194,7 +194,26 @@ BEGIN
 			and tmp.IsProvEst = ab.IsProvEst
 			and tmp.EffDate = ab.EffDate
 			where ab.Id is null
-		
+			group by
+			tmp.OrderNo,
+			tmp.RecNo,
+			tmp.ExtRecNo,
+			tmp.TransType,
+			tmp.Item,
+			tmp.BillAddr,
+			tmp.Uom,
+			tmp.UnitPrice,
+			tmp.PriceList,
+			tmp.Currency,
+			tmp.IsIncludeTax,
+			tmp.TaxCode,
+			tmp.IsProvEst,
+			tmp.EffDate,
+			tmp.UC,
+			tmp.LocFrom,
+			tmp.IpNo,
+			tmp.RefItemCode 
+
 			if @trancount = 0 
 			begin  
 				commit
