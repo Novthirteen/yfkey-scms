@@ -193,7 +193,7 @@
                 <table class="login_plugins_table" style="left: 30%; position: absolute; top: 70%"
                     cellspacing="4" cellpadding="0" id="table4">
                     <tr>
-                        <td>密码要求：</td>
+                        <td>强密码要求：</td>
                         <td>
                             <asp:Label ID="Label1" >(1)密码长度大于等于8位。</asp:Label>
                         </td>

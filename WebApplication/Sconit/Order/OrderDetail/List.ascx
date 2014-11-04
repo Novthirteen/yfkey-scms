@@ -119,7 +119,7 @@
                     <asp:TemplateField HeaderText="${MasterData.Order.OrderDetail.Sequence}">
                         <ItemTemplate>
                             <asp:HiddenField ID="hfId" runat="server" Value='<%# Bind("Id") %>' />
-                            <asp:HiddenField ID="hfPackageVolumn" runat="server" Value='<%# Bind("PackageVolumn") %>' />
+                            <asp:HiddenField ID="hfPackageVolumn" runat="server" />
                             <asp:Label ID="lblSeq" runat="server" Text='<%# Bind("Sequence") %>' onmouseup="if(!readOnly)select();" />
                             <asp:TextBox ID="tbSeq" runat="server" onmouseup="if(!readOnly)select();" Visible="false"
                                 Width="30" Text='<%# Bind("Sequence") %>' />

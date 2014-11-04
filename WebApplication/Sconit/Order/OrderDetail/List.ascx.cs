@@ -818,7 +818,14 @@ public partial class Order_OrderDetail_List : ModuleBase
                 decimal? packageVolumn = null;
                 if (tbPackageVolumn.Value != string.Empty)
                 {
-                    packageVolumn = decimal.Parse(tbPackageVolumn.Value);
+                    try
+                    {
+                        packageVolumn = decimal.Parse(tbPackageVolumn.Value);
+                    }
+                    catch (Exception)
+                    {
+                        packageVolumn = null;
+                    }
                 }
 
                 IList<Item> newItemList = new List<Item>(); //待新增明细列表
