@@ -34,8 +34,8 @@ public partial class MasterData_User_New : NewModuleBase
         ((TextBox)(this.FV_User.FindControl("tbPhone"))).Text = string.Empty;
         ((TextBox)(this.FV_User.FindControl("tbMobilePhone"))).Text = string.Empty;
         ((CheckBox)(this.FV_User.FindControl("tbIsActive"))).Checked = false;
-        ((CheckBox)(this.FV_User.FindControl("IsEnforcePolicy"))).Checked = false;
-        ((CheckBox)(this.FV_User.FindControl("IsEnforceExpiration"))).Checked = false;
+        ((CheckBox)(this.FV_User.FindControl("tbIsEnforcePolicy"))).Checked = false;
+        ((CheckBox)(this.FV_User.FindControl("tbIsEnforceExpiration"))).Checked = false;
     }
 
     protected void ODS_User_Inserting(object sender, ObjectDataSourceMethodEventArgs e)
