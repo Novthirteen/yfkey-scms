@@ -22,6 +22,7 @@ BEGIN
 	declare @DateTimeNow datetime
 	declare @ErrorMsg nvarchar(MAX)
 	declare @trancount int
+	declare @OrderType varchar(50)
 
 	set @DateTimeNow = GetDate()
 	set @trancount = @@trancount
@@ -32,12 +33,9 @@ BEGIN
             begin tran
         end
 		
-		if exists(select top 1 1 from ReceiptMstr as rm with(NOLOCK)
-			inner join ReceiptDet as rd with(NOLOCK) on rm.RecNo = rd.RecNo	
-			inner join OrderLocTrans as olt with(NOLOCK) on rd.OrderLocTransId = olt.Id
-			inner join OrderDet as od with(NOLOCK) on olt.OrderDetId = od.Id
-			inner join OrderMstr as om with(NOLOCK) on od.OrderNo = od.OrderNo 
-			where rm.RecNo = @RecNo and om.[Type] in ('Procurement', 'Subconctracting'))
+		select @OrderType = OrderType from ReceiptMstr with(NOLOCK) where RecNo = @RecNo
+
+		if (@OrderType in ('Procurement', 'Subconctracting'))
 		begin
 			insert into PlanBill(
 			OrderNo,
@@ -115,7 +113,7 @@ BEGIN
 			left join PriceListDet as pld with(NOLOCK) on od.PriceListDetFrom = pld.PriceList
 			where rm.RecNo = @RecNo
 		end
-		else
+		else if (@OrderType in ('Procurement', 'Subconctracting'))
 		begin
 			insert into PlanBill(
 			OrderNo,

@@ -1,17 +1,20 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Castle.Services.Transaction;
 using com.Mes.Dss.Entity;
 using com.Sconit.Entity;
+using com.Sconit.Entity.Dss;
 using com.Sconit.Entity.MasterData;
 using com.Sconit.Entity.Mes;
 using com.Sconit.Service;
 using com.Sconit.Service.Criteria;
+using com.Sconit.Service.Dss;
+using com.Sconit.Service.Hql;
 using com.Sconit.Service.MasterData;
 using com.Sconit.Service.Mes;
 using NHibernate.Expression;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 //TODO: Add other using statements here.
 
@@ -42,10 +45,11 @@ namespace com.Mes.Dss.Service.Impl
         public ICriteriaMgr criteriaMgr { get; set; }
         public IOrderLocationTransactionMgr orderLocationTransactionMgr { get; set; }
         public IMesScmsCompletedIssueMgr mesScmsCompletedIssueMgr { get; set; }
-        
+        public IDssInboundControlMgr dssInboundControlMgr { get; set; }
+        public IHqlMgr hqlMgr { get; set; }
+        public IDssImportHistoryMgr dssImportHistoryMgr { get; set; }
 
         private static log4net.ILog log = log4net.LogManager.GetLogger("Log.MesDssIn");
-
 
         public static readonly string DSS_IN_SHELF = "MES_SCMS_STATION_SHELF";
         public static readonly string DSS_IN_ORDER = "MES_SCMS_COMPLETED_ORDER";
@@ -119,29 +123,29 @@ namespace com.Mes.Dss.Service.Impl
                 IList<MesScmsCompletedBox> huList = mesScmsCompletedBoxMgr.GetUpdateMesScmsCompletedBox();
                 if (huList != null && huList.Count > 0)
                 {
+                    DateTime dateTimeNow = DateTime.Now;
+                    DssInboundControl dssInboundControl = dssInboundControlMgr.LoadDssInboundControl(9);
                     foreach (MesScmsCompletedBox mesScmsCompletedBox in huList)
                     {
                         try
                         {
-                            DetachedCriteria criteria = DetachedCriteria.For<OrderDetail>();
-                            criteria.CreateAlias("OrderHead", "oh");
-                            criteria.Add(Expression.Eq("oh.OrderNo", mesScmsCompletedBox.OrderNo));
-                            criteria.Add(Expression.Eq("Item.Code", mesScmsCompletedBox.ItemCode));
-                            criteria.Add(Expression.Eq("oh.Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_INPROCESS));
-                            IList<OrderDetail> orderDetailList = criteriaMgr.FindAll<OrderDetail>(criteria);
-                            if (orderDetailList.Count == 0)
-                            {
-                                log.Error(mesScmsCompletedBox.HuId + " not found order");
-                                continue;
-                            }
-                            orderMgr.DoReceiveWO(mesScmsCompletedBox.HuId, orderDetailList[0], (decimal)mesScmsCompletedBox.Qty);
-                            //可能在这里添加逻辑  
-                            //
-                            //
-                            
-                            //IList<MesScmsCompletedIssue> itemList = mesScmsCompletedIssueMgr.GetUpdateMesScmsCompletedIssue(mesScmsCompletedBox.OrderNo, mesScmsCompletedBox.HuId);
+                            DssImportHistory dssImportHistory = new DssImportHistory();
+                            dssImportHistory.DssInboundCtrl = dssInboundControl;
+                            dssImportHistory.EventCode = "CREATE";
+                            dssImportHistory.IsActive = true;
+                            dssImportHistory.KeyCode = "MES";
+                            dssImportHistory.ItemCode = mesScmsCompletedBox.ItemCode;
+                            dssImportHistory.HuId = mesScmsCompletedBox.HuId;
+                            dssImportHistory.Qty = (decimal)mesScmsCompletedBox.Qty;
+                            dssImportHistory.CreateDate = DateTime.Now;
+                            dssImportHistory.data1 = mesScmsCompletedBox.ItemCode;
+                            dssImportHistory.data2 = mesScmsCompletedBox.HuId;
+                            dssImportHistory.data3 = mesScmsCompletedBox.Qty.ToString();
+                            dssImportHistory.data7 = dateTimeNow.ToString("dd/MM/yyyy");
+                            dssImportHistory.data8 = dateTimeNow.ToString("HH:mm:ss");
+                            dssImportHistory.data12 = mesScmsCompletedBox.OrderNo;
+                            this.dssImportHistoryMgr.CreateDssImportHistory(dssImportHistory);
 
-                            //Bom updateBom = BomCompare(orderDetailList[0].Bom.BomDetails, itemList);
                             mesScmsCompletedBoxMgr.Complete(mesScmsCompletedBox);
                         }
                         catch (Exception e)

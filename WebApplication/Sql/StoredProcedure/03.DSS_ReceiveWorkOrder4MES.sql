@@ -86,8 +86,8 @@ BEGIN
 
 	begin try
 		begin try
-			insert into #tempWOReceipt_03(Id, ProdLine, Item, ItemDesc, HuId, LotNo, LotNoYear, LotNoMonth, LotNoDay, QtyStr, IsQtyNumeric, OfflineDateStr, OfflineTimeStr, IsOfflineDateTime)
-			select dih.Id, dih.data0, dih.data1, i.Desc1, dih.data2, SUBSTRING(data2, LEN(data2) - 7, 4), SUBSTRING(data2, LEN(data2) - 7, 1), SUBSTRING(data2, LEN(data2) - 6, 1), SUBSTRING(data2, LEN(data2) - 5, 2), dih.data3, ISNUMERIC(dih.data3), dih.data7, dih.data8, ISDATE(dih.data7 + ' ' + dih.data8)
+			insert into #tempWOReceipt_03(Id, ProdLine, Item, ItemDesc, HuId, LotNo, LotNoYear, LotNoMonth, LotNoDay, QtyStr, IsQtyNumeric, OfflineDateStr, OfflineTimeStr, IsOfflineDateTime, OrderNo)
+			select dih.Id, dih.data0, dih.data1, i.Desc1, dih.data2, SUBSTRING(data2, LEN(data2) - 7, 4), SUBSTRING(data2, LEN(data2) - 7, 1), SUBSTRING(data2, LEN(data2) - 6, 1), SUBSTRING(data2, LEN(data2) - 5, 2), dih.data3, ISNUMERIC(dih.data3), dih.data7, dih.data8, ISDATE(dih.data7 + ' ' + dih.data8), dih.data12
 			from DssImpHis as dih left join Item as i on dih.data1 = i.Code
 			where dih.IsActive = 1 and dih.ErrCount < 2 and dih.DssInboundCtrl = 9 and dih.EventCode = 'CREATE'
 
@@ -96,13 +96,13 @@ BEGIN
 				return
 			end
 
-			if exists(select top 1 1 from #tempWOReceipt_03 where ProdLine is null or ProdLine = '')
+			if exists(select top 1 1 from #tempWOReceipt_03 where (ProdLine is null or ProdLine = '') and (OrderNo is null or OrderNo = ''))
 			begin
 				update dih set Memo = '生产线不能为空。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
 				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
-				where tmp.ProdLine is null or tmp.ProdLine = ''
+				where (tmp.ProdLine is null or tmp.ProdLine = '') and (tmp.OrderNo is null or tmp.OrderNo = '')
 
-				delete from #tempWOReceipt_03 where ProdLine is null or ProdLine = ''
+				delete from #tempWOReceipt_03 where (ProdLine is null or ProdLine = '') and (OrderNo is null or OrderNo = '')
 			end
 
 			if exists(select top 1 1 from #tempWOReceipt_03 where Item is null or Item = '')
@@ -241,7 +241,26 @@ BEGIN
 				delete tmp from #tempWOReceipt_03 as tmp
 				inner join (select HuId, Min(Id) as Id from #tempWOReceipt_03 group by HuId having count(1) > 1) as uni on uni.HuId = tmp.HuId and uni.Id <> tmp.Id
 			end
-		
+
+			--为已经有生产单号的找生产单相关信息
+			update #tempWOReceipt_03 set ProdLine = mstr.Flow, OrderDetId = det.Id, OrderLocTransId = trans.Id, UC = det.UC, 
+			Uom = det.Uom, UnitQty = trans.UnitQty, ManufactureParty = mstr.PartyFrom, ManufacturePartyName = p.Name,  Location = trans.Loc, LocationName = l.Name
+			from #tempWOReceipt_03 as tmp inner join OrderMstr as mstr on mstr.OrderNo = tmp.OrderNo
+			inner join OrderDet as det on mstr.OrderNo = det.OrderNo
+			inner join OrderLocTrans as trans on det.Id = trans.OrderDetId and trans.TransType = 'RCT-WO'
+			inner join Location as l on trans.Loc = l.Code
+			inner join Party as p on mstr.PartyFrom = p.Code
+			where tmp.OrderNo is not null and tmp.OrderNo <> ''
+
+			if exists(select top 1 1 from #tempWOReceipt_03 where OrderNo is not null and OrderNo <> '' and OrderDetId is null)
+			begin
+				update dih set Memo = '生产单号不存在。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
+				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
+				where tmp.OrderNo is not null and tmp.OrderNo <> '' and tmp.OrderDetId is null
+				
+				delete from #tempWOReceipt_03 where OrderNo is not null and OrderNo <> '' and OrderDetId is null
+			end
+
 			if not exists(select top 1 1 from #tempWOReceipt_03)
 			begin
 				return
@@ -266,7 +285,7 @@ BEGIN
 			inner join OrderLocTrans as trans on det.Id = trans.OrderDetId and trans.TransType = 'RCT-WO'
 			inner join Location as l on trans.Loc = l.Code
 			inner join Party as p on mstr.PartyFrom = p.Code
-			where mstr.[Type] = 'Production' and mstr.[Status] = 'In-Process'
+			where mstr.[Type] = 'Production' and mstr.[Status] = 'In-Process' and (tmp.OrderNo is not null or tmp.OrderNo <> '')
 
 			if exists(select top 1 1 from #tempWOReceipt_03 where OrderNo is null)
 			begin  --为没有找到工单的收货创建工单
