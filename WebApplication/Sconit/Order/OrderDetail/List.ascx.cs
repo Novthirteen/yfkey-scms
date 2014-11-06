@@ -800,6 +800,7 @@ public partial class Order_OrderDetail_List : ModuleBase
                 HiddenField hfPriceListCode = (HiddenField)newOrderDetailRow.FindControl("hfPriceListCode");
                 HiddenField hfPriceListDetailId = (HiddenField)newOrderDetailRow.FindControl("hfPriceListDetailId");
                 HiddenField tbPackageVolumn = (HiddenField)newOrderDetailRow.FindControl("hfPackageVolumn");
+                Controls_TextBox tbRefItemCode = (Controls_TextBox)newOrderDetailRow.FindControl("tbRefItemCode");
 
                 int seqInterval = int.Parse(TheEntityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_SEQ_INTERVAL).Value);
                 decimal orderQty = tbNewOrderQty.Text.Trim() == string.Empty ? 0 : decimal.Parse(tbNewOrderQty.Text.Trim());
@@ -868,6 +869,7 @@ public partial class Order_OrderDetail_List : ModuleBase
                     newOrderDetail.IsBlankDetail = false;
                     newOrderDetail.Item = item;
                     newOrderDetail.PackageVolumn = packageVolumn;
+                    newOrderDetail.ReferenceItemCode = tbRefItemCode.Text;
 
                     if (newOrderDetail.Item.Code != newItem.Code)
                     {
