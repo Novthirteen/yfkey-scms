@@ -141,7 +141,7 @@ namespace com.Mes.Dss.Service.Impl
                             dssImportHistory.data1 = mesScmsCompletedBox.ItemCode;
                             dssImportHistory.data2 = mesScmsCompletedBox.HuId;
                             dssImportHistory.data3 = mesScmsCompletedBox.Qty.ToString();
-                            dssImportHistory.data7 = dateTimeNow.ToString("dd/MM/yyyy");
+                            dssImportHistory.data7 = dateTimeNow.ToString("MM/dd/yyyy");
                             dssImportHistory.data8 = dateTimeNow.ToString("HH:mm:ss");
                             dssImportHistory.data12 = mesScmsCompletedBox.OrderNo;
                             this.dssImportHistoryMgr.CreateDssImportHistory(dssImportHistory);
