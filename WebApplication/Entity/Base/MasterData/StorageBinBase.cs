@@ -71,6 +71,19 @@ namespace com.Sconit.Entity.MasterData
                 _sequence = value;
             }
         }
+
+        private Boolean _isIsolation;
+        public Boolean IsIsolation
+        {
+            get
+            {
+                return _isIsolation;
+            }
+            set
+            {
+                _isIsolation = value;
+            }
+        }
         #endregion
 
 		public override int GetHashCode()

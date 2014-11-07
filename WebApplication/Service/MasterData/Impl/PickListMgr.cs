@@ -10,6 +10,7 @@ using com.Sconit.Entity.Exception;
 using com.Sconit.Utility;
 using com.Sconit.Service.Criteria;
 using NHibernate.Expression;
+using System.Linq;
 
 //TODO: Add other using statements here.
 
@@ -491,6 +492,9 @@ namespace com.Sconit.Service.MasterData.Impl
                             locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, orderDetail.UnitCount, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "Id;Asc" }, orderHead.IsPickFromBin, false);
                         }
                     }
+
+                    //¸ôÀë¿â¸ñ¹ýÂËµô
+                   // locationLotDetailList = locationLotDetailList.Where(ld =>ld.StorageBin==null || !ld.StorageBin.IsIsolation).ToList();
                     #endregion
 
                     IList<PickListDetail> submitPickListDetailList = this.pickListDetailMgr.GetPickListDetail(orderLocationTransaction.Location.Code, orderDetail.Item.Code, orderDetail.UnitCount, orderDetail.Uom.Code, new string[] { BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT, BusinessConstants.CODE_MASTER_STATUS_VALUE_INPROCESS });
@@ -498,7 +502,7 @@ namespace com.Sconit.Service.MasterData.Impl
 
                     occupiedLocationLotDetailList = this.Convert2OccupiedLocationLotDetail(submitPickListDetailList, pickList.PickBy);
                 }
-
+                
                 if (locationLotDetailList != null && locationLotDetailList.Count > 0)
                 {
                     PickListDetail lastestPickListDetail = null;

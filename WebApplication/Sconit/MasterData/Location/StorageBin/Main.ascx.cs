@@ -99,6 +99,7 @@ public partial class MasterData_Location_StorageBin_Main : ModuleBase
         storageBin.Code = ((Literal)this.GV_Bin.Rows[e.RowIndex].FindControl("ltlCode")).Text.Trim();
         storageBin.Description = ((TextBox)this.GV_Bin.Rows[e.RowIndex].FindControl("tbDescription")).Text.Trim();
         storageBin.IsActive = ((CheckBox)this.GV_Bin.Rows[e.RowIndex].FindControl("cbActive")).Checked;
+        storageBin.IsIsolation = ((CheckBox)this.GV_Bin.Rows[e.RowIndex].FindControl("cbIsIsolation")).Checked;
         TheStorageBinMgr.UpdateStorageBin(storageBin);
         this.GV_Bin.EditIndex = -1;
 
