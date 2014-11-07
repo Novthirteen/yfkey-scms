@@ -448,11 +448,11 @@ namespace com.Sconit.Service.MasterData.Impl
                         //零头优先发、LotnNo先进先出、货架、包装                        
                         if (orderHead.IsPickFromBin)
                         {
-                            locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, null, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "sb.Sequence;Asc", "Qty;Asc", "Id;Asc" }, orderHead.IsPickFromBin, true);
+                            locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, null, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "sb.Sequence;Asc", "Qty;Asc", "Id;Asc" }, orderHead.IsPickFromBin, true, null, null, true);
                         }
                         else
                         {
-                            locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, null, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "Qty;Asc", "Id;Asc" }, orderHead.IsPickFromBin, false);
+                            locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, null, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "Qty;Asc", "Id;Asc" }, orderHead.IsPickFromBin, false, null, null, true);
                         }
                         #region 重新排序，把零头放在前面
                         if (locationLotDetailList != null && locationLotDetailList.Count > 0)

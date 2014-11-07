@@ -31,6 +31,8 @@ namespace com.Sconit.Service.MasterData
 
         IList<LocationLotDetail> GetHuLocationLotDetail(string locationCode, string areaCode, string binCode, string huId, string itemCode, string lotNo, bool includeZero, decimal? unitCount, string uomCode, string[] orderBy, bool inBin, bool createSBAlias, DateTime? createDate, int? rowCount);
 
+        IList<LocationLotDetail> GetHuLocationLotDetail(string locationCode, string areaCode, string binCode, string huId, string itemCode, string lotNo, bool includeZero, decimal? unitCount, string uomCode, string[] orderBy, bool inBin, bool createSBAlias, DateTime? createDate, int? rowCount, bool ignoreIsolationBin);
+
         IList<LocationLotDetail> GetLocationLotDetail(string locationCode, string itemCode, bool isConsignment);
 
         IList<LocationLotDetail> GetLocationLotDetail(string locationCode, string itemCode, bool isConsignment, bool includeZero);
