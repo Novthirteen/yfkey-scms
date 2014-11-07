@@ -51,6 +51,9 @@
                     </td>
                     <td class="td02">
                         <asp:CheckBox ID="cbIsActive" runat="server" Checked='<%#Bind("IsActive") %>' />
+
+                        <asp:Literal ID="Literal1" runat="server" Text="${Common.Business.IsIsolation}:" />
+                        <asp:CheckBox ID="cbIsIsolation" runat="server" Checked='<%#Bind("IsIsolation") %>' />
                     </td>
                     <td />
                     <td>

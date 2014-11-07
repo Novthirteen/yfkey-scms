@@ -52,6 +52,14 @@
                         <asp:TextBox ID="tbDescription" runat="server" Text='<%# Bind("Description") %>' />
                     </EditItemTemplate>
                 </asp:TemplateField>
+                 <asp:TemplateField HeaderText="${Common.Business.IsIsolation}" ItemStyle-Width="20px">
+                    <ItemTemplate>
+                        <asp:CheckBox ID="cbIsIsolation1" runat="server" Checked='<%# Eval("IsIsolation") %>' Enabled="false" />
+                    </ItemTemplate>
+                    <EditItemTemplate>
+                        <asp:CheckBox ID="cbIsIsolation" runat="server" Checked='<%# Bind("IsIsolation") %>' />
+                    </EditItemTemplate>
+                </asp:TemplateField>
                 <asp:TemplateField HeaderText="${Common.Business.IsActive}" ItemStyle-Width="20px">
                     <ItemTemplate>
                         <asp:CheckBox ID="cbActive1" runat="server" Checked='<%# Eval("IsActive") %>' Enabled="false" />
@@ -60,6 +68,7 @@
                         <asp:CheckBox ID="cbActive" runat="server" Checked='<%# Bind("IsActive") %>' />
                     </EditItemTemplate>
                 </asp:TemplateField>
+                
                 <asp:CommandField ShowEditButton="True" ShowDeleteButton="true" ItemStyle-Width="100px" EditText="${Common.Button.Edit}" UpdateText="${Common.Button.Save}" CancelText="${Common.Button.Cancel}"
                     HeaderText="${Common.GridView.Action}" DeleteText="&lt;span onclick=&quot;JavaScript:return confirm('${Common.Delete.Confirm}?')&quot;&gt;${Common.Button.Delete}&lt;/span&gt;">
                 </asp:CommandField>
