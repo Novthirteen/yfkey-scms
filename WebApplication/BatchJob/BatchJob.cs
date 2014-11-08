@@ -39,7 +39,7 @@ namespace BatchJob
                 container = new WindsorContainer(new XmlInterpreter(new ConfigResource("castle")));
 
                 timer = new System.Timers.Timer();
-                timer.Interval = Convert.ToDouble(TimerHelper.GetInterval(Settings.Default.IntervalType, Convert.ToInt32(Settings.Default.IntervalValue)));
+                timer.Interval = Convert.ToDouble(TimerHelper.GetInterval(Settings.Default.IntervalType, 1));
                 timer.Enabled = true;
                 timer.Elapsed += new System.Timers.ElapsedEventHandler(timer_Elapsed);
 

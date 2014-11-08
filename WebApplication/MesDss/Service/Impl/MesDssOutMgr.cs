@@ -162,7 +162,7 @@ namespace com.Mes.Dss.Service.Impl
                             {
                                 #region SCMS_WO
                                 workOrder = new ScmsWorkOrder();
-                                workOrder.Bom = orderDetail.Bom.Code;
+                                workOrder.Bom = orderDetail.Bom != null ? orderDetail.Bom.Code : orderDetail.Item.Code;
                                 workOrder.Flag = MesDssConstants.SCMS_MES_FLAG_SCMS_UPDATED;
                                 workOrder.IsAdditional = orderDetail.OrderHead.IsAdditional ? "1" : "0";
                                 workOrder.ItemCode = orderDetail.Item.Code;

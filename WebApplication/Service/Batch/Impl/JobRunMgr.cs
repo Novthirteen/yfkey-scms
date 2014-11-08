@@ -15,6 +15,7 @@ namespace com.Sconit.Service.Batch.Impl
         #region IJobRunMgr Members
 
         private static log4net.ILog log = log4net.LogManager.GetLogger("Log.BatchJob");
+        private static log4net.ILog lelog = log4net.LogManager.GetLogger("Log.BatchJobLeanEngine");
 
         private IBatchTriggerMgr batchTriggerMgr;
         private IBatchJobParameterMgr batchJobParameterMgr;
@@ -44,8 +45,16 @@ namespace com.Sconit.Service.Batch.Impl
 
         private void Run(IWindsorContainer container, bool isLeanEngine)
         {
-            log.Info("----------------------------------Invincible's dividing line---------------------------------------");
-            log.Info("BatchJobs run start.");
+            if (isLeanEngine)
+            {
+                lelog.Info("----------------------------------Invincible's dividing line---------------------------------------");
+                lelog.Info("BatchJobs run start.");
+            }
+            else
+            {
+                log.Info("----------------------------------Invincible's dividing line---------------------------------------");
+                log.Info("BatchJobs run start.");
+            }
 
             IList<BatchTrigger> tobeFiredTriggerList = this.batchTriggerMgr.GetTobeFiredTrigger();
 
@@ -54,8 +63,8 @@ namespace com.Sconit.Service.Batch.Impl
                 foreach (BatchTrigger tobeFiredTrigger in tobeFiredTriggerList)
                 {
                     bool isSuccess = true;
-                    if ((isLeanEngine && tobeFiredTrigger.Id != 2 && tobeFiredTrigger.Id != 23 && tobeFiredTrigger.Id != 7)
-                        || (!isLeanEngine && (tobeFiredTrigger.Id == 2 || tobeFiredTrigger.Id == 23 || tobeFiredTrigger.Id == 7)))
+                    if ((isLeanEngine && tobeFiredTrigger.Id != 2 && tobeFiredTrigger.Id != 23 && tobeFiredTrigger.Id != 7 && tobeFiredTrigger.Id != 50)
+                        || (!isLeanEngine && (tobeFiredTrigger.Id == 2 || tobeFiredTrigger.Id == 23 || tobeFiredTrigger.Id == 7 || tobeFiredTrigger.Id == 50)))
                     {
                         continue;
                     }
@@ -65,7 +74,14 @@ namespace com.Sconit.Service.Batch.Impl
                     try
                     {
                         #region Job运行前处理
-                        log.Info("Start run job. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
+                        if (isLeanEngine)
+                        {
+                            lelog.Info("Start run job. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
+                        }
+                        else
+                        {
+                            log.Info("Start run job. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
+                        }
                         runLog.BatchJobDetail = jobDetail;
                         runLog.BatchTrigger = tobeFiredTrigger;
                         runLog.StartTime = DateTime.Now;
@@ -82,7 +98,14 @@ namespace com.Sconit.Service.Batch.Impl
                         {
                             foreach (BatchJobParameter batchJobParameter in batchJobParameterList)
                             {
-                                log.Debug("Set Job Parameter Name:" + batchJobParameter.ParameterName + ", Value:" + batchJobParameter.ParameterValue);
+                                if (isLeanEngine)
+                                {
+                                    lelog.Debug("Set Job Parameter Name:" + batchJobParameter.ParameterName + ", Value:" + batchJobParameter.ParameterValue);
+                                }
+                                else
+                                {
+                                    log.Debug("Set Job Parameter Name:" + batchJobParameter.ParameterName + ", Value:" + batchJobParameter.ParameterValue);
+                                }
                                 dataMap.PutData(batchJobParameter.ParameterName, batchJobParameter.ParameterValue);
                             }
                         }
@@ -94,7 +117,14 @@ namespace com.Sconit.Service.Batch.Impl
                         {
                             foreach (BatchTriggerParameter batchTriggerParameter in batchTriggerParameterList)
                             {
-                                log.Debug("Set Trigger Parameter Name:" + batchTriggerParameter.ParameterName + ", Value:" + batchTriggerParameter.ParameterValue);
+                                if (isLeanEngine)
+                                {
+                                    lelog.Debug("Set Trigger Parameter Name:" + batchTriggerParameter.ParameterName + ", Value:" + batchTriggerParameter.ParameterValue);
+                                }
+                                else
+                                {
+                                    log.Debug("Set Trigger Parameter Name:" + batchTriggerParameter.ParameterName + ", Value:" + batchTriggerParameter.ParameterValue);
+                                }
                                 dataMap.PutData(batchTriggerParameter.ParameterName, batchTriggerParameter.ParameterValue);
                             }
                         }
@@ -105,18 +135,32 @@ namespace com.Sconit.Service.Batch.Impl
                         #endregion
 
                         #region 调用Job
-                        
-                        
-                        
+
+
+
                         IJob job = container.Resolve<IJob>(jobDetail.ServiceName);
-                        log.Debug("Start run job: " + jobDetail.ServiceName);
+                        if (isLeanEngine)
+                        {
+                            lelog.Debug("Start run job: " + jobDetail.ServiceName);
+                        }
+                        else
+                        {
+                            log.Debug("Start run job: " + jobDetail.ServiceName);
+                        }
                         job.Execute(jobRunContext);
                         #endregion
 
                         #endregion
 
                         #region Job运行后处理
-                        log.Info("Job run successful. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
+                        if (isLeanEngine)
+                        {
+                            lelog.Info("Job run successful. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
+                        }
+                        else
+                        {
+                            log.Info("Job run successful. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
+                        }
                         runLog.EndTime = DateTime.Now;
                         runLog.Status = "Successful";
                         this.batchRunLogMgr.UpdateBatchRunLog(runLog);
@@ -126,8 +170,16 @@ namespace com.Sconit.Service.Batch.Impl
                     {
                         try
                         {
+                            this.batchTriggerMgr.CleanSession();
                             isSuccess = false;
-                            log.Error("Job run failure. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name, ex);
+                            if (isLeanEngine)
+                            {
+                                lelog.Error("Job run failure. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name, ex);
+                            }
+                            else
+                            {
+                                log.Error("Job run failure. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name, ex);
+                            }
                             runLog.EndTime = DateTime.Now;
                             runLog.Status = "Failure";
                             if (ex.Message != null && ex.Message.Length > 255)
@@ -142,7 +194,14 @@ namespace com.Sconit.Service.Batch.Impl
                         }
                         catch (Exception ex1)
                         {
-                            log.Error("", ex1);
+                            if (isLeanEngine)
+                            {
+                                lelog.Error("", ex1);
+                            }
+                            else
+                            {
+                                log.Error("", ex1);
+                            }
                         }
                     }
                     finally
@@ -157,7 +216,14 @@ namespace com.Sconit.Service.Batch.Impl
                             if (oldTobeFiredTrigger.RepeatCount != 0 && oldTobeFiredTrigger.TimesTriggered >= oldTobeFiredTrigger.RepeatCount)
                             {
                                 //关闭Trigger
-                                log.Debug("Close Trigger:" + oldTobeFiredTrigger.Name);
+                                if (isLeanEngine)
+                                {
+                                    lelog.Debug("Close Trigger:" + oldTobeFiredTrigger.Name);
+                                }
+                                else
+                                {
+                                    log.Debug("Close Trigger:" + oldTobeFiredTrigger.Name);
+                                }
                                 oldTobeFiredTrigger.Status = BusinessConstants.CODE_MASTER_STATUS_VALUE_CLOSE;
                                 oldTobeFiredTrigger.NextFireTime = null;
                             }
@@ -166,7 +232,14 @@ namespace com.Sconit.Service.Batch.Impl
                                 if (isSuccess)
                                 {
                                     //设置下次运行时间
-                                    log.Debug("Set Trigger Next Start Time, Add:" + oldTobeFiredTrigger.Interval.ToString() + " " + oldTobeFiredTrigger.IntervalType);
+                                    if (isLeanEngine)
+                                    {
+                                        lelog.Debug("Set Trigger Next Start Time, Add:" + oldTobeFiredTrigger.Interval.ToString() + " " + oldTobeFiredTrigger.IntervalType);
+                                    }
+                                    else
+                                    {
+                                        log.Debug("Set Trigger Next Start Time, Add:" + oldTobeFiredTrigger.Interval.ToString() + " " + oldTobeFiredTrigger.IntervalType);
+                                    }
                                     DateTime dateTimeNow = DateTime.Now;
                                     if (!oldTobeFiredTrigger.NextFireTime.HasValue)
                                     {
@@ -208,7 +281,14 @@ namespace com.Sconit.Service.Batch.Impl
                                             throw new ArgumentException("invalid Interval Type:" + oldTobeFiredTrigger.IntervalType);
                                         }
                                     }
-                                    log.Debug("Trigger Next Start Time is set as:" + oldTobeFiredTrigger.NextFireTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                                    if (isLeanEngine)
+                                    {
+                                        lelog.Debug("Trigger Next Start Time is set as:" + oldTobeFiredTrigger.NextFireTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                                    }
+                                    else
+                                    {
+                                        log.Debug("Trigger Next Start Time is set as:" + oldTobeFiredTrigger.NextFireTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                                    }
                                 }
                             }
                             this.batchTriggerMgr.UpdateBatchTrigger(oldTobeFiredTrigger);
@@ -216,7 +296,14 @@ namespace com.Sconit.Service.Batch.Impl
                         }
                         catch (Exception ex)
                         {
-                            log.Error("Error occur when update batch trigger.", ex);
+                            if (isLeanEngine)
+                            {
+                                lelog.Error("Error occur when update batch trigger.", ex);
+                            }
+                            else
+                            {
+                                log.Error("Error occur when update batch trigger.", ex);
+                            }
                         }
                         #endregion
                     }
@@ -224,12 +311,25 @@ namespace com.Sconit.Service.Batch.Impl
             }
             else
             {
-                log.Info("No job found may run in this batch.");
+                if (isLeanEngine)
+                {
+                    lelog.Info("No job found may run in this batch.");
+                }
+                else
+                {
+                    log.Info("No job found may run in this batch.");
+                }
             }
 
-            log.Info("BatchJobs run end.");
+            if (isLeanEngine)
+            {
+                lelog.Info("BatchJobs run end.");
+            }
+            else
+            {
+                log.Info("BatchJobs run end.");
+            }
         }
-
         #endregion
     }
 }

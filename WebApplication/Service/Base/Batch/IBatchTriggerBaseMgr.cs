@@ -8,7 +8,7 @@ using com.Sconit.Entity.Batch;
 
 namespace com.Sconit.Service.Batch
 {
-    public interface IBatchTriggerBaseMgr
+    public interface IBatchTriggerBaseMgr : ISession
     {
         #region Method Created By CodeSmith
 
