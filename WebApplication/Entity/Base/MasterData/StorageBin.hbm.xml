@@ -8,5 +8,6 @@
 		<many-to-one name="Area" column="Area" class="com.Sconit.Entity.MasterData.StorageArea, com.Sconit.Entity" cascade="none" />
         <property name="IsActive" column="IsActive" type="Boolean" />
     <property name="Sequence" column="Seq" type="Int32" />
-    </class>
+    <property name="IsIsolation" column="IsIsolation" type="Boolean" />
+  </class>
 </hibernate-mapping>

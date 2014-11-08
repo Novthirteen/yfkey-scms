@@ -10,6 +10,7 @@ using com.Sconit.Entity.Exception;
 using com.Sconit.Utility;
 using com.Sconit.Service.Criteria;
 using NHibernate.Expression;
+using System.Linq;
 
 //TODO: Add other using statements here.
 
@@ -448,11 +449,11 @@ namespace com.Sconit.Service.MasterData.Impl
                         //零头优先发、LotnNo先进先出、货架、包装                        
                         if (orderHead.IsPickFromBin)
                         {
-                            locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, null, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "sb.Sequence;Asc", "Qty;Asc", "Id;Asc" }, orderHead.IsPickFromBin, true);
+                            locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, null, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "sb.Sequence;Asc", "Qty;Asc", "Id;Asc" }, orderHead.IsPickFromBin, true, null, null, true);
                         }
                         else
                         {
-                            locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, null, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "Qty;Asc", "Id;Asc" }, orderHead.IsPickFromBin, false);
+                            locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, null, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "Qty;Asc", "Id;Asc" }, orderHead.IsPickFromBin, false, null, null, true);
                         }
                         #region 重新排序，把零头放在前面
                         if (locationLotDetailList != null && locationLotDetailList.Count > 0)
@@ -491,6 +492,9 @@ namespace com.Sconit.Service.MasterData.Impl
                             locationLotDetailList = this.locationLotDetailMgr.GetHuLocationLotDetail(orderLocationTransaction.Location.Code, null, null, null, orderDetail.Item.Code, null, false, orderDetail.UnitCount, orderDetail.Uom.Code, new string[] { "hu.ManufactureDate;Asc", "Id;Asc" }, orderHead.IsPickFromBin, false);
                         }
                     }
+
+                    //隔离库格过滤掉
+                   // locationLotDetailList = locationLotDetailList.Where(ld =>ld.StorageBin==null || !ld.StorageBin.IsIsolation).ToList();
                     #endregion
 
                     IList<PickListDetail> submitPickListDetailList = this.pickListDetailMgr.GetPickListDetail(orderLocationTransaction.Location.Code, orderDetail.Item.Code, orderDetail.UnitCount, orderDetail.Uom.Code, new string[] { BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT, BusinessConstants.CODE_MASTER_STATUS_VALUE_INPROCESS });
@@ -498,7 +502,7 @@ namespace com.Sconit.Service.MasterData.Impl
 
                     occupiedLocationLotDetailList = this.Convert2OccupiedLocationLotDetail(submitPickListDetailList, pickList.PickBy);
                 }
-
+                
                 if (locationLotDetailList != null && locationLotDetailList.Count > 0)
                 {
                     PickListDetail lastestPickListDetail = null;
