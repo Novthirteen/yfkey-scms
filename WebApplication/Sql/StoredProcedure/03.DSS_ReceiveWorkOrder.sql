@@ -58,7 +58,7 @@ BEGIN
 		RecNo varchar(50) COLLATE  Chinese_PRC_CI_AS
 	)
 
-	Create table #tempNoWO_DSS_03
+	Create table #tempNoWO_03
 	(
 		RowId int identity(1, 1) primary key,
 		ProdLine varchar(50),
@@ -299,18 +299,18 @@ BEGIN
 				declare @WindowTime datetime
 				declare @OrderNo varchar(50)
 
-				insert into #tempNoWO_DSS_03(ProdLine, Item, Qty, StartTime, WindowTime)
+				insert into #tempNoWO_03(ProdLine, Item, Qty, StartTime, WindowTime)
 				select ProdLine, Item, Sum(Qty), DATEADD(HOUR, -12, MIN(OffLineDateTime)), DATEADD(HOUR, 12, MAX(OffLineDateTime))
 				from #tempWOReceipt_03 where OrderNo is null
 				group by ProdLine, Item
 
-				select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempNoWO_DSS_03
+				select @RowId = MIN(RowId), @MaxRowId = MAX(RowId) from #tempNoWO_03
 
 				while @RowId <= @MaxRowId
 				begin
 					begin try
 						select @ProdLine = ProdLine, @Item = Item, @Qty = Qty, @StartTime = StartTime, @WindowTime = WindowTime
-						from #tempNoWO_DSS_03 where RowId = @RowId
+						from #tempNoWO_03 where RowId = @RowId
 						exec ORD_CreateWorkOrder @ProdLine, 0, null, @Item, @Qty, @StartTime, @WindowTime, 'Normal', 'Nml', @CreateUser, 1, 1, @OrderNo output
 
 						--新增工单回写工单收货表
@@ -335,7 +335,7 @@ BEGIN
 			end
 			
 			insert into #tempBomTobeBackflush_03(Flow, OrderNo, OrderDetId, OrderLocTransId, RecNo, Item, HuId, BackflushQty, Location, BackFlushMethod, DssImpHisId, EffDate)
-			select tmp.ProdLine, tmp.OrderNo, tmp.OrderDetId, trans.Id, tmp.RecNo, trans.Item, tmp.HuId, trans.UnitQty * tmp.Qty, trans.Loc, trans.BackFlushMethod, tmp.Id, CONVERT(varchar(10), tmp.OffLineDateTime, 120)
+			select tmp.ProdLine, tmp.OrderNo, tmp.OrderDetId, trans.Id, tmp.RecNo, trans.Item, tmp.HuId, trans.UnitQty * tmp.Qty, trans.Loc, ISNULL(trans.BackFlushMethod, 'GoodsReceive'), tmp.Id, CONVERT(varchar(10), tmp.OffLineDateTime, 120)
 			from #tempWOReceipt_03 as tmp inner join OrderLocTrans as trans on tmp.OrderDetId = trans.OrderDetId
 			where trans.TransType = 'ISS-WO'
 		end try
@@ -407,6 +407,6 @@ BEGIN
 
 	drop table #tempBomTobeBackflush_03
 	drop table #tempWOReceipt_03
-	drop table #tempNoWO_DSS_03
+	drop table #tempNoWO_03
 END
 GO
