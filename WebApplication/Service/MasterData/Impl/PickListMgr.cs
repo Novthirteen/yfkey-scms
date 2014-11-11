@@ -493,8 +493,6 @@ namespace com.Sconit.Service.MasterData.Impl
                         }
                     }
 
-                    //¸ôÀë¿â¸ñ¹ýÂËµô
-                   // locationLotDetailList = locationLotDetailList.Where(ld =>ld.StorageBin==null || !ld.StorageBin.IsIsolation).ToList();
                     #endregion
 
                     IList<PickListDetail> submitPickListDetailList = this.pickListDetailMgr.GetPickListDetail(orderLocationTransaction.Location.Code, orderDetail.Item.Code, orderDetail.UnitCount, orderDetail.Uom.Code, new string[] { BusinessConstants.CODE_MASTER_STATUS_VALUE_SUBMIT, BusinessConstants.CODE_MASTER_STATUS_VALUE_INPROCESS });

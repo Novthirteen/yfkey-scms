@@ -246,6 +246,7 @@ namespace com.Sconit.Service.Dss
                     }
                     catch (Exception ex)
                     {
+                        this.dssImportHistoryMgr.CleanSession();
                         log.Error("DeserializeForDelete error:" + ex);
                         continue;
                     }
@@ -266,6 +267,7 @@ namespace com.Sconit.Service.Dss
                     }
                     catch (Exception ex)
                     {
+                        this.dssImportHistoryMgr.CleanSession();
                         log.Error("DeserializeForDelete error:" + ex);
                         continue;
                     }

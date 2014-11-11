@@ -106,7 +106,10 @@ namespace com.Sconit.Service.Batch.Job
                         #endregion
 
                         #region 初始化远程目录
-                        FtpHelper ftp = new FtpHelper(ftpServer, ftpPort, ftpTempFolder, ftpUser, ftpPass);
+                        SocketFtpHelper ftp = new SocketFtpHelper(ftpServer, ftpUser, ftpPass, 60, ftpPort);
+                        ftp.Login();
+                        ftp.ChangeDir(ftpTempFolder);
+                        ftp.BinaryMode = true;
 
                         ftpTempFolder = ftpTempFolder.Replace("\\", "/");
                         if (!ftpTempFolder.EndsWith("/"))
@@ -120,7 +123,7 @@ namespace com.Sconit.Service.Batch.Job
                             foreach (string fileName in ftp.GetFileList(filePattern))
                             {
 
-                                ftp.Delete(fileName);
+                                ftp.DeleteFile(fileName);
 
                             }
                         }
@@ -165,7 +168,7 @@ namespace com.Sconit.Service.Batch.Job
                                     string fomatedFileFullPath = fileFullPath.Replace("\\", "/");
                                     string fileName = fomatedFileFullPath.Substring(fomatedFileFullPath.LastIndexOf("/") + 1);
                                     ftp.Upload(fomatedFileFullPath);
-                                    ftp.MovieFile(fileName, ftpFolder + fileName);
+                                    ftp.RenameFile(fileName, ftpFolder + fileName, true);
                                     log.Info("Delete file: " + fomatedFileFullPath);
                                     File.Delete(fomatedFileFullPath);
                                 }

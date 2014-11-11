@@ -6,7 +6,7 @@ using com.Sconit.Entity.Dss;
 
 namespace com.Sconit.Service.Dss
 {
-    public interface IDssImportHistoryMgr : IDssImportHistoryBaseMgr
+    public interface IDssImportHistoryMgr : IDssImportHistoryBaseMgr, ISession
     {
         #region Customized Methods
 
