@@ -7,7 +7,7 @@ using com.Sconit.Entity.Procurement;
 
 namespace com.Sconit.Service.MasterData
 {
-    public interface IOrderMgr
+    public interface IOrderMgr : ISession
     {
         OrderHead LoadOrder(string orderNo, string userCode);
 

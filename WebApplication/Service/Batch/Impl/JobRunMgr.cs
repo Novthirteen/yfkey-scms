@@ -16,6 +16,7 @@ namespace com.Sconit.Service.Batch.Impl
 
         private static log4net.ILog log = log4net.LogManager.GetLogger("Log.BatchJob");
         private static log4net.ILog lelog = log4net.LogManager.GetLogger("Log.BatchJobLeanEngine");
+        private static log4net.ILog rwolog = log4net.LogManager.GetLogger("Log.BatchJobReceiveWO");
 
         private IBatchTriggerMgr batchTriggerMgr;
         private IBatchJobParameterMgr batchJobParameterMgr;
@@ -35,21 +36,30 @@ namespace com.Sconit.Service.Batch.Impl
 
         public void RunBatchJobs(IWindsorContainer container)
         {
-            Run(container, false);
+            Run(container, false, false);
         }
 
         public void RunLeanEngineJob(IWindsorContainer container)
         {
-            Run(container, true);
+            Run(container, true, false);
+        }
+        public void RunReceiveWOJob(IWindsorContainer container)
+        {
+            Run(container, false, true);
         }
 
-        private void Run(IWindsorContainer container, bool isLeanEngine)
+        private void Run(IWindsorContainer container, bool isLeanEngine, bool isReceiveWO)
         {
             if (isLeanEngine)
             {
                 lelog.Info("----------------------------------Invincible's dividing line---------------------------------------");
                 lelog.Info("BatchJobs run start.");
             }
+            else if (isReceiveWO)
+            {
+                rwolog.Info("----------------------------------Invincible's dividing line---------------------------------------");
+                rwolog.Info("BatchJobs run start.");
+            } 
             else
             {
                 log.Info("----------------------------------Invincible's dividing line---------------------------------------");
@@ -63,8 +73,17 @@ namespace com.Sconit.Service.Batch.Impl
                 foreach (BatchTrigger tobeFiredTrigger in tobeFiredTriggerList)
                 {
                     bool isSuccess = true;
-                    if ((isLeanEngine && tobeFiredTrigger.Id != 2 && tobeFiredTrigger.Id != 23 && tobeFiredTrigger.Id != 7 && tobeFiredTrigger.Id != 50)
-                        || (!isLeanEngine && (tobeFiredTrigger.Id == 2 || tobeFiredTrigger.Id == 23 || tobeFiredTrigger.Id == 7 || tobeFiredTrigger.Id == 50)))
+                    if (isLeanEngine && tobeFiredTrigger.Id != 2 && tobeFiredTrigger.Id != 23 && tobeFiredTrigger.Id != 51 && tobeFiredTrigger.Id != 54 && tobeFiredTrigger.Id != 55 && tobeFiredTrigger.Id != 56)
+                    {
+                        continue;
+                    }
+
+                    if (isReceiveWO && tobeFiredTrigger.Id != 7 && tobeFiredTrigger.Id != 50)
+                    {
+                        continue;
+                    }
+
+                    if (!isLeanEngine && !isReceiveWO && tobeFiredTrigger.Id != 8 && tobeFiredTrigger.Id != 16 && tobeFiredTrigger.Id != 20)
                     {
                         continue;
                     }
@@ -78,6 +97,10 @@ namespace com.Sconit.Service.Batch.Impl
                         {
                             lelog.Info("Start run job. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
                         }
+                        else if (isReceiveWO)
+                        {
+                            rwolog.Info("Start run job. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
+                        } 
                         else
                         {
                             log.Info("Start run job. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
@@ -102,6 +125,10 @@ namespace com.Sconit.Service.Batch.Impl
                                 {
                                     lelog.Debug("Set Job Parameter Name:" + batchJobParameter.ParameterName + ", Value:" + batchJobParameter.ParameterValue);
                                 }
+                                else if (isReceiveWO)
+                                {
+                                    rwolog.Debug("Set Job Parameter Name:" + batchJobParameter.ParameterName + ", Value:" + batchJobParameter.ParameterValue);
+                                } 
                                 else
                                 {
                                     log.Debug("Set Job Parameter Name:" + batchJobParameter.ParameterName + ", Value:" + batchJobParameter.ParameterValue);
@@ -121,6 +148,10 @@ namespace com.Sconit.Service.Batch.Impl
                                 {
                                     lelog.Debug("Set Trigger Parameter Name:" + batchTriggerParameter.ParameterName + ", Value:" + batchTriggerParameter.ParameterValue);
                                 }
+                                else if (isReceiveWO)
+                                {
+                                    rwolog.Debug("Set Trigger Parameter Name:" + batchTriggerParameter.ParameterName + ", Value:" + batchTriggerParameter.ParameterValue);
+                                } 
                                 else
                                 {
                                     log.Debug("Set Trigger Parameter Name:" + batchTriggerParameter.ParameterName + ", Value:" + batchTriggerParameter.ParameterValue);
@@ -143,6 +174,10 @@ namespace com.Sconit.Service.Batch.Impl
                         {
                             lelog.Debug("Start run job: " + jobDetail.ServiceName);
                         }
+                        else if (isReceiveWO)
+                        {
+                            rwolog.Debug("Start run job: " + jobDetail.ServiceName);
+                        } 
                         else
                         {
                             log.Debug("Start run job: " + jobDetail.ServiceName);
@@ -157,6 +192,10 @@ namespace com.Sconit.Service.Batch.Impl
                         {
                             lelog.Info("Job run successful. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
                         }
+                        else if (isReceiveWO)
+                        {
+                            rwolog.Info("Job run successful. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
+                        } 
                         else
                         {
                             log.Info("Job run successful. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name);
@@ -176,6 +215,10 @@ namespace com.Sconit.Service.Batch.Impl
                             {
                                 lelog.Error("Job run failure. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name, ex);
                             }
+                            else if (isReceiveWO)
+                            {
+                                rwolog.Error("Job run failure. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name, ex);
+                            } 
                             else
                             {
                                 log.Error("Job run failure. JobId:" + jobDetail.Id + ", JobName:" + jobDetail.Name, ex);
@@ -198,6 +241,10 @@ namespace com.Sconit.Service.Batch.Impl
                             {
                                 lelog.Error("", ex1);
                             }
+                            else if (isReceiveWO)
+                            {
+                                rwolog.Error("", ex1);
+                            } 
                             else
                             {
                                 log.Error("", ex1);
@@ -220,6 +267,10 @@ namespace com.Sconit.Service.Batch.Impl
                                 {
                                     lelog.Debug("Close Trigger:" + oldTobeFiredTrigger.Name);
                                 }
+                                else if (isReceiveWO)
+                                {
+                                    rwolog.Debug("Close Trigger:" + oldTobeFiredTrigger.Name);
+                                } 
                                 else
                                 {
                                     log.Debug("Close Trigger:" + oldTobeFiredTrigger.Name);
@@ -236,6 +287,10 @@ namespace com.Sconit.Service.Batch.Impl
                                     {
                                         lelog.Debug("Set Trigger Next Start Time, Add:" + oldTobeFiredTrigger.Interval.ToString() + " " + oldTobeFiredTrigger.IntervalType);
                                     }
+                                    else if (isReceiveWO)
+                                    {
+                                        rwolog.Debug("Set Trigger Next Start Time, Add:" + oldTobeFiredTrigger.Interval.ToString() + " " + oldTobeFiredTrigger.IntervalType);
+                                    } 
                                     else
                                     {
                                         log.Debug("Set Trigger Next Start Time, Add:" + oldTobeFiredTrigger.Interval.ToString() + " " + oldTobeFiredTrigger.IntervalType);
@@ -285,6 +340,10 @@ namespace com.Sconit.Service.Batch.Impl
                                     {
                                         lelog.Debug("Trigger Next Start Time is set as:" + oldTobeFiredTrigger.NextFireTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
                                     }
+                                    else if (isReceiveWO)
+                                    {
+                                        rwolog.Debug("Trigger Next Start Time is set as:" + oldTobeFiredTrigger.NextFireTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                                    } 
                                     else
                                     {
                                         log.Debug("Trigger Next Start Time is set as:" + oldTobeFiredTrigger.NextFireTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -300,6 +359,10 @@ namespace com.Sconit.Service.Batch.Impl
                             {
                                 lelog.Error("Error occur when update batch trigger.", ex);
                             }
+                            else if (isReceiveWO)
+                            {
+                                rwolog.Error("Error occur when update batch trigger.", ex);
+                            } 
                             else
                             {
                                 log.Error("Error occur when update batch trigger.", ex);
@@ -315,6 +378,10 @@ namespace com.Sconit.Service.Batch.Impl
                 {
                     lelog.Info("No job found may run in this batch.");
                 }
+                else if (isReceiveWO)
+                {
+                    rwolog.Info("No job found may run in this batch.");
+                } 
                 else
                 {
                     log.Info("No job found may run in this batch.");
@@ -325,6 +392,10 @@ namespace com.Sconit.Service.Batch.Impl
             {
                 lelog.Info("BatchJobs run end.");
             }
+            else if (isReceiveWO)
+            {
+                rwolog.Info("BatchJobs run end.");
+            } 
             else
             {
                 log.Info("BatchJobs run end.");

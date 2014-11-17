@@ -97,21 +97,22 @@ namespace com.Sconit.Service.Dss
             #region 执行导入程序
             if (dssInboundControl.Id != 9)  //工单导入不通过程序执行，改为在存储过程中执行
             {
-                IList<DssImportHistory> activeDssImportHistoryList = dssImportHistoryMgr.GetActiveDssImportHistory(dssInboundControl.Id);
-                IListHelper.AddRange<DssImportHistory>(activeDssImportHistoryList, dssImportHistoryList);
+                DoAsyncProcessDssInboundRecord(dssInboundControl);
+                //IList<DssImportHistory> activeDssImportHistoryList = dssImportHistoryMgr.GetActiveDssImportHistory(dssInboundControl.Id);
+                //IListHelper.AddRange<DssImportHistory>(activeDssImportHistoryList, dssImportHistoryList);
 
-                IList<object> objCreate = this.ProcessCreateData(activeDssImportHistoryList);
-                IList<object> objDelete = this.ProcessDeleteData(activeDssImportHistoryList);
+                //IList<object> objCreate = this.ProcessCreateData(activeDssImportHistoryList);
+                //IList<object> objDelete = this.ProcessDeleteData(activeDssImportHistoryList);
 
-                try
-                {
-                    this.CreateOrUpdateObject(objCreate);
-                    this.DeleteObject(objDelete);
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Write to database error:", ex);
-                }
+                //try
+                //{
+                //    this.CreateOrUpdateObject(objCreate);
+                //    this.DeleteObject(objDelete);
+                //}
+                //catch (Exception ex)
+                //{
+                //    log.Error("Write to database error:", ex);
+                //}
             }
             #endregion
         }
@@ -295,5 +296,31 @@ namespace com.Sconit.Service.Dss
 
         protected abstract void CreateOrUpdateObject(object obj);
         protected abstract void DeleteObject(object obj);
+
+        public void DoAsyncProcessDssInboundRecord(DssInboundControl dssInboundControl)
+        {
+            AsyncProcessDssInboundRecord asyncProcessDssInboundRecord = new AsyncProcessDssInboundRecord(this.ProcessDssInboundRecord);
+            asyncProcessDssInboundRecord.BeginInvoke(dssInboundControl, null, null);
+        }
+
+        public delegate void AsyncProcessDssInboundRecord(DssInboundControl dssInboundControl);
+
+        public void ProcessDssInboundRecord(DssInboundControl dssInboundControl)
+        {
+            IList<DssImportHistory> activeDssImportHistoryList = dssImportHistoryMgr.GetActiveDssImportHistory(dssInboundControl.Id);
+
+            IList<object> objCreate = this.ProcessCreateData(activeDssImportHistoryList);
+            IList<object> objDelete = this.ProcessDeleteData(activeDssImportHistoryList);
+
+            try
+            {
+                this.CreateOrUpdateObject(objCreate);
+                this.DeleteObject(objDelete);
+            }
+            catch (Exception ex)
+            {
+                log.Error("Write to database error:", ex);
+            }
+        }
     }
 }

@@ -366,6 +366,11 @@ BEGIN
 			insert into HuDet(HuId, LotNo, Item, QualityLevel, Uom, UC, UnitQty, Qty, OrderNo, RecNo, ManufactureDate, ManufactureParty, PrintCount, CreateDate, CreateUser, LotSize, Location, Status)
 			select HuId, LotNo, Item, 'Level1', Uom, UC, UnitQty, Qty, OrderNo, RecNo, ManufactureDate, ManufactureParty, 0, @DateTimeNow, @CreateUser, Qty, Location, 'Inventory' from #tempWOReceipt_03
 		
+			update mstr set Status = 'Complete', CompleteDate = @DateTimeNow, CompleteUser = @CreateUser, [Version] = mstr.[Version] + 1
+			from OrderDet as det inner join (select OrderDetId, SUM(Qty) as Qty from #tempWOReceipt_03 group by OrderDetId) as tmp on det.Id = tmp.OrderDetId
+			inner join OrderMstr as mstr on det.OrderNo = mstr.OrderNo
+			where det.OrderQty <= ISNULL(det.RecQty, 0) + tmp.Qty
+
 			update det set RecQty = ISNULL(det.RecQty, 0) + tmp.Qty
 			from OrderDet as det inner join (select OrderDetId, SUM(Qty) as Qty from #tempWOReceipt_03 group by OrderDetId) as tmp on det.Id = tmp.OrderDetId
 

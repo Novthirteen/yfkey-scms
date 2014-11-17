@@ -24,8 +24,10 @@ namespace BatchJobTest
         private void button1_Click(object sender, EventArgs e)
         {
             IWindsorContainer container = new WindsorContainer(new XmlInterpreter(new ConfigResource("castle")));
-            IJobRunMgr jobRunMgr = container.Resolve<IJobRunMgr>("JobRunMgr.service");
-            jobRunMgr.RunBatchJobs(container);
+            com.Sconit.Service.Batch.Job.DssOutboundJob dssOutboundJob = container.Resolve<com.Sconit.Service.Batch.Job.DssOutboundJob>("DssOutboundJob");
+            dssOutboundJob.Execute(null);
+            //IJobRunMgr jobRunMgr = container.Resolve<IJobRunMgr>("JobRunMgr.service");
+            //jobRunMgr.RunBatchJobs(container);
             container.Dispose();
         }
     }

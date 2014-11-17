@@ -22,6 +22,7 @@ namespace BatchJob
 
         public System.Timers.Timer timer;
         public System.Timers.Timer leanEngineTimer;
+        public System.Timers.Timer receiveWOTimer;
 
         public BatchJob()
         {
@@ -47,6 +48,11 @@ namespace BatchJob
                 leanEngineTimer.Interval = Convert.ToDouble(TimerHelper.GetInterval(Settings.Default.IntervalType, 1));
                 leanEngineTimer.Enabled = true;
                 leanEngineTimer.Elapsed += new System.Timers.ElapsedEventHandler(leanEngineTimer_Elapsed);
+
+                receiveWOTimer = new System.Timers.Timer();
+                receiveWOTimer.Interval = Convert.ToDouble(TimerHelper.GetInterval(Settings.Default.IntervalType, 1));
+                receiveWOTimer.Enabled = true;
+                receiveWOTimer.Elapsed += new System.Timers.ElapsedEventHandler(receiveWOTimer_Elapsed);
             }
             catch (Exception ex)
             {
@@ -89,6 +95,19 @@ namespace BatchJob
             }
         }
 
+        private void RunReceiveWOJob()
+        {
+            try
+            {
+                IJobRunMgr jobRunMgr = container.Resolve<IJobRunMgr>("JobRunMgr.service");
+                jobRunMgr.RunReceiveWOJob(container);
+            }
+            catch (Exception ex)
+            {
+                log.Error("Batch Job Run Failure", ex);
+            }
+        }
+
 
         private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -102,6 +121,13 @@ namespace BatchJob
             leanEngineTimer.Enabled = !Settings.Default.InterruptTimer;
             RunLeanEngineJob();
             leanEngineTimer.Enabled = true;
+        }
+
+        private void receiveWOTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            receiveWOTimer.Enabled = !Settings.Default.InterruptTimer;
+            RunReceiveWOJob();
+            receiveWOTimer.Enabled = true;
         }
     }
 }
