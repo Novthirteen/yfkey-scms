@@ -97,7 +97,7 @@ namespace com.Sconit.Service.Dss
             #region 执行导入程序
             if (dssInboundControl.Id != 9)  //工单导入不通过程序执行，改为在存储过程中执行
             {
-                DoAsyncProcessDssInboundRecord(dssInboundControl);
+                //DoAsyncProcessDssInboundRecord(dssInboundControl);
                 //IList<DssImportHistory> activeDssImportHistoryList = dssImportHistoryMgr.GetActiveDssImportHistory(dssInboundControl.Id);
                 //IListHelper.AddRange<DssImportHistory>(activeDssImportHistoryList, dssImportHistoryList);
 
@@ -305,21 +305,25 @@ namespace com.Sconit.Service.Dss
 
         public delegate void AsyncProcessDssInboundRecord(DssInboundControl dssInboundControl);
 
+        private static object ProcessDssInboundRecordLock = new object();
         public void ProcessDssInboundRecord(DssInboundControl dssInboundControl)
         {
-            IList<DssImportHistory> activeDssImportHistoryList = dssImportHistoryMgr.GetActiveDssImportHistory(dssInboundControl.Id);
-
-            IList<object> objCreate = this.ProcessCreateData(activeDssImportHistoryList);
-            IList<object> objDelete = this.ProcessDeleteData(activeDssImportHistoryList);
-
-            try
+            lock (ProcessDssInboundRecordLock)
             {
-                this.CreateOrUpdateObject(objCreate);
-                this.DeleteObject(objDelete);
-            }
-            catch (Exception ex)
-            {
-                log.Error("Write to database error:", ex);
+                IList<DssImportHistory> activeDssImportHistoryList = dssImportHistoryMgr.GetActiveDssImportHistory(dssInboundControl.Id);
+
+                IList<object> objCreate = this.ProcessCreateData(activeDssImportHistoryList);
+                IList<object> objDelete = this.ProcessDeleteData(activeDssImportHistoryList);
+
+                try
+                {
+                    this.CreateOrUpdateObject(objCreate);
+                    this.DeleteObject(objDelete);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Write to database error:", ex);
+                }
             }
         }
     }
