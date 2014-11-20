@@ -73,12 +73,12 @@ namespace com.Sconit.Service.Batch.Impl
                 foreach (BatchTrigger tobeFiredTrigger in tobeFiredTriggerList)
                 {
                     bool isSuccess = true;
-                    if (isLeanEngine && tobeFiredTrigger.Id != 2 && tobeFiredTrigger.Id != 23 && tobeFiredTrigger.Id != 51 && tobeFiredTrigger.Id != 54 && tobeFiredTrigger.Id != 55 && tobeFiredTrigger.Id != 56)
+                    if (isLeanEngine && tobeFiredTrigger.Id != 2 && tobeFiredTrigger.Id != 23 && tobeFiredTrigger.Id != 51 && tobeFiredTrigger.Id != 54 && tobeFiredTrigger.Id != 55 && tobeFiredTrigger.Id != 56 && tobeFiredTrigger.Id != 7)
                     {
                         continue;
                     }
 
-                    if (isReceiveWO && tobeFiredTrigger.Id != 7 && tobeFiredTrigger.Id != 50)
+                    if (isReceiveWO && tobeFiredTrigger.Id != 57 && tobeFiredTrigger.Id != 50)
                     {
                         continue;
                     }

@@ -396,6 +396,9 @@ namespace com.Sconit.Entity.Dss
             }
         }
 
+        public string LastModifyUser { get; set; }
+        public DateTime? LastModifyDate { get; set; }
+
         #endregion
 
         public override int GetHashCode()

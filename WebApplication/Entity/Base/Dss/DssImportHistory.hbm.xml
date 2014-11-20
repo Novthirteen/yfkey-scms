@@ -35,5 +35,7 @@
         <property name="data18" column="data18" type="String" length="255" />
         <property name="data19" column="data19" type="String" length="255" />
         <property name="data20" column="data20" type="String" length="255" />
+        <property name="LastModifyDate" column="LastModifyDate" type="DateTime"  />
+        <property name="LastModifyUser" column="LastModifyUser" type="String" length="50"  />
     </class>
 </hibernate-mapping>

@@ -127,6 +127,7 @@
     <Compile Include="Base\Transportation\ITransportationRouteBaseMgr.cs" />
     <Compile Include="Base\Transportation\ITransportationRouteDetailBaseMgr.cs" />
     <Compile Include="Base\Transportation\IVehicleBaseMgr.cs" />
+    <Compile Include="Batch\Job\DssInboundLoadFileJob.cs" />
     <Compile Include="Batch\Job\DssInboundJob.cs" />
     <Compile Include="Batch\Job\DssOutboundJob.cs" />
     <Compile Include="Batch\Job\MesJob.cs" />
