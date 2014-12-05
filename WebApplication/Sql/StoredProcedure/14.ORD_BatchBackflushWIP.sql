@@ -174,7 +174,7 @@ BEGIN
 						begin  --待反冲记录
 							select @ProdLineIpId = Id, @IpNo = IpNo, @LocFrom = LocFrom, @LocFromName = LocFromName,
 							@HuId = HuId, @PlanBillId = PlanBillId, @RemainQty = RemainQty, @Version = [Version]
-							from #tempThisProdLineIp_14 where RowId = @RowId
+							from #tempThisProdLineIp_14 where RowId = @IpRowId
 
 							insert into #tempLog_14(ProdLineIpId, Item, ProdLine, IpNo, LocFrom, HuId, RemainQty, Lvl, Msg, CreateDate) 
 							values(@ProdLineIpId, @Item, @ProdLine, @IpNo, @LocFrom, @HuId, @RemainQty, 0, N'开始投料反冲', GETDATE())
