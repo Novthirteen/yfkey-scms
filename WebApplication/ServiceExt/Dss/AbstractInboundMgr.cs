@@ -8,6 +8,7 @@ using com.Sconit.Entity;
 using com.Sconit.Entity.Dss;
 using com.Sconit.Entity.Exception;
 using Castle.Services.Transaction;
+using com.Sconit.Service.Hql;
 
 namespace com.Sconit.Service.Dss
 {
@@ -16,10 +17,12 @@ namespace com.Sconit.Service.Dss
         private static log4net.ILog logLoadFile = log4net.LogManager.GetLogger("Log.DssInboundLoadFile");
         private static log4net.ILog log = log4net.LogManager.GetLogger("Log.DssInbound");
         private IDssImportHistoryMgr dssImportHistoryMgr;
+        private IGenericMgr genericMgr;
 
-        public AbstractInboundMgr(IDssImportHistoryMgr dssImportHistoryMgr)
+        public AbstractInboundMgr(IDssImportHistoryMgr dssImportHistoryMgr, IGenericMgr genericMgr)
         {
             this.dssImportHistoryMgr = dssImportHistoryMgr;
+            this.genericMgr = genericMgr;
         }
 
         public virtual void ProcessInboundFile(DssInboundControl dssInboundControl, string[] files)
@@ -128,19 +131,21 @@ namespace com.Sconit.Service.Dss
                                 this.DeleteObject(this.DeserializeForDelete(activeDssImportHistory));
                             }
 
-                            activeDssImportHistory.IsActive = false;
-                            activeDssImportHistory.LastModifyDate = DateTime.Now;
-                            activeDssImportHistory.LastModifyUser = "su";
-                            this.dssImportHistoryMgr.Update(activeDssImportHistory);
-                            this.dssImportHistoryMgr.FlushSession();
+                            this.genericMgr.ExecuteSql("update DssImpHis set IsActive = 0 where Id = " + activeDssImportHistory.Id);
+                            //activeDssImportHistory.IsActive = false;
+                            //activeDssImportHistory.LastModifyDate = DateTime.Now;
+                            //activeDssImportHistory.LastModifyUser = "su";
+                            //this.dssImportHistoryMgr.Update(activeDssImportHistory);
+                            //this.dssImportHistoryMgr.FlushSession();
                         }
                         catch (Exception ex)
                         {
                             this.dssImportHistoryMgr.CleanSession();
-                            activeDssImportHistory.ErrorCount++;
-                            activeDssImportHistory.LastModifyDate = DateTime.Now;
-                            activeDssImportHistory.LastModifyUser = "su";
-                            this.dssImportHistoryMgr.Update(activeDssImportHistory);
+                            this.genericMgr.ExecuteSql("update DssImpHis set ErrCount = ISNULL(ErrCount, 0) + 1 where Id = " + activeDssImportHistory.Id);
+                            //activeDssImportHistory.ErrorCount++;
+                            //activeDssImportHistory.LastModifyDate = DateTime.Now;
+                            //activeDssImportHistory.LastModifyUser = "su";
+                            //this.dssImportHistoryMgr.Update(activeDssImportHistory);
                             logLoadFile.Error("Write to database error:", ex);
                         }
                         log.Debug("End process record " + activeDssImportHistory.Id);

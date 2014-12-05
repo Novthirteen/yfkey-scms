@@ -55,8 +55,9 @@ namespace com.Sconit.Service.Dss.Impl
             IShipAddressMgr shipAddressMgr,
             IBillAddressMgr billAddressMgr,
             IPartyMgr partyMgr,
-            IDssImportHistoryMgr dssImportHistoryMgr)
-            : base(dssImportHistoryMgr)
+            IDssImportHistoryMgr dssImportHistoryMgr,
+            IGenericMgr genericMgr)
+            : base(dssImportHistoryMgr, genericMgr)
         {
             this.customerMgr = customerMgr;
             this.userMgr = userMgr;
