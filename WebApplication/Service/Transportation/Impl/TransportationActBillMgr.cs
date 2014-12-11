@@ -398,7 +398,11 @@ namespace com.Sconit.Service.Transportation.Impl
                 if (order.PricingMethod == BusinessConstants.TRANSPORTATION_PRICING_METHOD_SHIPT)
                 {
                     actBill.BillQty = 1;
-                    actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
+                    if (priceListDetail != null && actBill.UnitPrice == 0)
+                    {
+                        actBill.UnitPrice = priceListDetail.UnitPrice;
+                        actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
+                    }
                 }
                 #endregion
 

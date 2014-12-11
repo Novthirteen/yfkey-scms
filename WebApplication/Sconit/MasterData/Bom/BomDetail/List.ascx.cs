@@ -34,6 +34,7 @@ public partial class MasterData_Bom_BomDetail_List : ListModuleBase
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
             e.Row.Cells[7].Text = TheCodeMasterMgr.GetCachedCodeMaster(BusinessConstants.CODE_MASTER_BOM_DETAIL_TYPE, e.Row.Cells[7].Text.Trim()).Description;
+           // e.Row.Cells[12].Text = string.IsNullOrEmpty(e.Row.Cells[12].Text.Trim()) ? "收货回冲" : e.Row.Cells[12].Text;
         }
     }
     protected void lbtnEdit_Click(object sender, EventArgs e)

@@ -124,7 +124,7 @@ public partial class Finance_Bill_NewSearch : SearchModuleBase
 
         //djin 2013-3-20 客户回单
         var hd = (from b in actingBillList
-                  where b.ExternalReceiptNo != null
+                  where !string.IsNullOrEmpty(b.ExternalReceiptNo) //!= null
                   select b.ExternalReceiptNo.Substring(0, 2)).Distinct();
 
         ExternalReceiptNo.Items.Clear();

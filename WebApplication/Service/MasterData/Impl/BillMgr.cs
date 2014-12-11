@@ -270,6 +270,8 @@ namespace com.Sconit.Service.MasterData.Impl
                 if (billDetail.IsProvEst && !bill.HasProvEst)
                 {
                     bill.HasProvEst = true;
+                    bill.LastModifyDate = dateTimeNow;
+                    bill.LastModifyUser = user;
                     this.UpdateBill(bill);
                 }
                 #endregion

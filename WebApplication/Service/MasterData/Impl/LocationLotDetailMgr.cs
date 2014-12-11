@@ -90,7 +90,7 @@ namespace com.Sconit.Service.MasterData.Impl
         [Transaction(TransactionMode.Unspecified)]
         public IList<LocationLotDetail> GetHuLocationLotDetail(string locationCode, string areaCode, string binCode, string huId, string itemCode, string lotNo, bool includeZero, decimal? unitCount, string uomCode, string[] orderBy, bool inBin, bool createSBAlias, DateTime? createDate, int? rowCount)
         {
-            return GetHuLocationLotDetail(locationCode, areaCode, binCode, huId, itemCode, lotNo, includeZero, unitCount, uomCode, orderBy, inBin, createSBAlias, createDate, rowCount, false)
+            return GetHuLocationLotDetail(locationCode, areaCode, binCode, huId, itemCode, lotNo, includeZero, unitCount, uomCode, orderBy, inBin, createSBAlias, createDate, rowCount, false);
         }
 
         [Transaction(TransactionMode.Unspecified)]
