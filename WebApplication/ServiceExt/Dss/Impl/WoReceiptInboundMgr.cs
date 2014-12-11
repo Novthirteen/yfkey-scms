@@ -38,8 +38,9 @@ namespace com.Sconit.Service.Dss.Impl
             INumberControlMgr numberControlMgr,
             IOrderMgr orderManager,
             IOrderLocationTransactionMgr orderLocationTransactionMgr,
-            IDssImportHistoryMgr dssImportHistoryMgr)
-            : base(dssImportHistoryMgr)
+            IDssImportHistoryMgr dssImportHistoryMgr,
+            IGenericMgr genericMgr)
+            : base(dssImportHistoryMgr, genericMgr)
         {
             this.criteriaMgr = criteriaMgr;
             this.uomConversionMgr = uomConversionMgr;

@@ -47,8 +47,9 @@ namespace com.Sconit.Service.Dss.Impl
             ISalesPriceListMgr salesPriceListMgr, IPurchasePriceListMgr purchasePriceListMgr,
             IDssImportHistoryMgr dssImportHistoryMgr,
             ISupplierMgr supplierMgr,
-            ICustomerMgr customerMgr)
-            : base(dssImportHistoryMgr)
+            ICustomerMgr customerMgr,
+            IGenericMgr genericMgr)
+            : base(dssImportHistoryMgr, genericMgr)
         {
             this.priceListMgr = priceListMgr;
             this.userMgr = userMgr;

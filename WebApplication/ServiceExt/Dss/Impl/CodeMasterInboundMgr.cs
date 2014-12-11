@@ -23,8 +23,9 @@ namespace com.Sconit.Service.Dss.Impl
             };
 
         public CodeMasterInboundMgr(IUomMgr uomMgr,
-            IDssImportHistoryMgr dssImportHistoryMgr)
-            : base(dssImportHistoryMgr)
+            IDssImportHistoryMgr dssImportHistoryMgr,
+            IGenericMgr genericMgr)
+            : base(dssImportHistoryMgr, genericMgr)
         {
             this.uomMgr = uomMgr;
         }

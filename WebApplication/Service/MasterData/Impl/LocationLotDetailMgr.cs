@@ -137,14 +137,14 @@ namespace com.Sconit.Service.MasterData.Impl
                 criteria.Add(Expression.IsNotNull("StorageBin"));
             }
 
-            if (ignoreIsolationBin)
-            {
-                if (!createSBAlias)
-                {
-                    criteria.CreateAlias("StorageBin", "sb");
-                }
-                criteria.Add(Expression.Eq("sb.IsIsolation", false));
-            }
+            //if (ignoreIsolationBin)
+            //{
+            //    if (!createSBAlias)
+            //    {
+            //        criteria.CreateAlias("StorageBin", "sb");
+            //    }
+            //    criteria.Add(Expression.Eq("sb.IsIsolation", false));
+            //}
 
             if (huId != null && huId.Trim() != string.Empty)
             {

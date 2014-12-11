@@ -613,7 +613,9 @@
     <EmbeddedResource Include="Base\MasterData\PlannedBill.hbm.xml" />
     <EmbeddedResource Include="Base\MasterData\PriceList.hbm.xml" />
     <EmbeddedResource Include="Base\MasterData\PriceListDetail.hbm.xml" />
-    <EmbeddedResource Include="Base\MasterData\ProductLineInProcessLocationDetail.hbm.xml" />
+    <EmbeddedResource Include="Base\MasterData\ProductLineInProcessLocationDetail.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Base\MasterData\Receipt.hbm.xml" />
     <EmbeddedResource Include="Base\MasterData\ReceiptDetail.hbm.xml" />
     <EmbeddedResource Include="Base\MasterData\ReceiptInProcessLocation.hbm.xml" />

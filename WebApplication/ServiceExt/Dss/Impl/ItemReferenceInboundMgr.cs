@@ -28,8 +28,9 @@ namespace com.Sconit.Service.Dss.Impl
            IItemReferenceMgr itemReferenceMgr,
             IUserMgr userMgr,
              IPartyMgr partyMgr,
-            IDssImportHistoryMgr dssImportHistoryMgr)
-            : base(dssImportHistoryMgr)
+            IDssImportHistoryMgr dssImportHistoryMgr,
+            IGenericMgr genericMgr)
+            : base(dssImportHistoryMgr, genericMgr)
         {
             this.itemMgr = itemMgr;
             this.itemReferenceMgr = itemReferenceMgr;

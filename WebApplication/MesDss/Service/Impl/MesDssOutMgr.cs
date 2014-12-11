@@ -41,26 +41,34 @@ namespace com.Mes.Dss.Service.Impl
 
         public void ProcessOut(ScmsTableIndex scmsTableIndex)
         {
-            if(scmsTableIndex.TableName.Trim().ToUpper()==BusinessConstants.DSS_OUT_HU)
+            if (scmsTableIndex.TableName.Trim().ToUpper() == BusinessConstants.DSS_OUT_HU)
             {
-                    this.ProcessHuOut(scmsTableIndex);
+                log.Debug("start process hu.");
+                this.ProcessHuOut(scmsTableIndex);
+                log.Debug("end process hu.");
             }
-            else if(scmsTableIndex.TableName.Trim().ToUpper()==BusinessConstants.DSS_OUT_ITEM)
+            else if (scmsTableIndex.TableName.Trim().ToUpper() == BusinessConstants.DSS_OUT_ITEM)
             {
-                    this.ProcessItemOut(scmsTableIndex);
+                log.Debug("start process item.");
+                this.ProcessItemOut(scmsTableIndex);
+                log.Debug("end process item.");
             }
-            else if(scmsTableIndex.TableName.Trim().ToUpper()==BusinessConstants.DSS_OUT_ORDERDETAIL)
+            else if (scmsTableIndex.TableName.Trim().ToUpper() == BusinessConstants.DSS_OUT_ORDERDETAIL)
             {
-                    this.ProcessOrderDetailOut(scmsTableIndex);
+                log.Debug("start process OrderDetail.");
+                this.ProcessOrderDetailOut(scmsTableIndex);
+                log.Debug("end process OrderDetail.");
             }
-            else if(scmsTableIndex.TableName.Trim().ToUpper()==BusinessConstants.DSS_OUT_MESBOMDETAIL)
+            else if (scmsTableIndex.TableName.Trim().ToUpper() == BusinessConstants.DSS_OUT_MESBOMDETAIL)
             {
+                log.Debug("start process MesBomDetail.");
                 this.ProcessMesBomDetailOut(scmsTableIndex);
+                log.Debug("end process MesBomDetail.");
             }
-            
+
         }
 
-        [Transaction(TransactionMode.Requires)]
+        //[Transaction(TransactionMode.Requires)]
         private void ProcessHuOut(ScmsTableIndex scmsTableIndex)
         {
             IList<Hu> huList = GetTransferHu();
@@ -96,7 +104,7 @@ namespace com.Mes.Dss.Service.Impl
         }
 
 
-        [Transaction(TransactionMode.Requires)]
+        //[Transaction(TransactionMode.Requires)]
         private void ProcessItemOut(ScmsTableIndex scmsTableIndex)
         {
             IList<Item> itemList = GetTransferItem();
@@ -143,7 +151,7 @@ namespace com.Mes.Dss.Service.Impl
         }
 
 
-        [Transaction(TransactionMode.Requires)]
+        //[Transaction(TransactionMode.Requires)]
         private void ProcessOrderDetailOut(ScmsTableIndex scmsTableIndex)
         {
             IList<OrderDetail> orderDetailList = GetTransferOrderDetail();
@@ -155,14 +163,14 @@ namespace com.Mes.Dss.Service.Impl
                     {
                         ScmsWorkOrder workOrder = scmsWorkOrderMgr.LoadScmsWorkOrder(orderDetail.OrderHead.OrderNo, orderDetail.Item.Code);
                         ScmsWorkOrderNew newwo = scmsWorkOrderNewMgr.LoadScmsWorkOrder(orderDetail.OrderHead.OrderNo, orderDetail.Item.Code);
-                        ScmsWorkOrderNewKQ kqwo = scmsWorkOrderNewKQMgr.LoadScmsWorkOrder(orderDetail.OrderHead.OrderNo,orderDetail.Item.Code);
+                        ScmsWorkOrderNewKQ kqwo = scmsWorkOrderNewKQMgr.LoadScmsWorkOrder(orderDetail.OrderHead.OrderNo, orderDetail.Item.Code);
                         if (orderDetail.OrderHead.SubType != "Rwo")//返工工单不许传递  djin 2012-4-28
-                         {
+                        {
                             if (workOrder == null)
                             {
                                 #region SCMS_WO
                                 workOrder = new ScmsWorkOrder();
-                                workOrder.Bom = orderDetail.Bom.Code;
+                                workOrder.Bom = orderDetail.Bom != null ? orderDetail.Bom.Code : orderDetail.Item.Code;
                                 workOrder.Flag = MesDssConstants.SCMS_MES_FLAG_SCMS_UPDATED;
                                 workOrder.IsAdditional = orderDetail.OrderHead.IsAdditional ? "1" : "0";
                                 workOrder.ItemCode = orderDetail.Item.Code;
@@ -205,7 +213,7 @@ namespace com.Mes.Dss.Service.Impl
                                 newwo.WindowTime = orderDetail.OrderHead.WindowTime;
                                 newwo.ShiftCode = orderDetail.OrderHead.Shift.Code;
                                 scmsWorkOrderNewMgr.CreateScmsWorkOrder(newwo);
-                                 
+
                                 #endregion
                             }
 
@@ -235,10 +243,9 @@ namespace com.Mes.Dss.Service.Impl
                                 #endregion
                             }
 
-
                             orderDetail.TransferFlag = false;
                             orderDetailMgr.UpdateOrderDetail(orderDetail);
-                         }
+                        }
                     }
                     catch (Exception e)
                     {
@@ -290,11 +297,11 @@ namespace com.Mes.Dss.Service.Impl
                                 else
                                 {
                                     //DJIN 20120817
-                                    scmsBom.Flag = mesBomDetail.IsActive||!mesBomDetail.EndDate.HasValue ? MesDssConstants.SCMS_MES_FLAG_SCMS_UPDATED : MesDssConstants.SCMS_MES_FLAG_SCMS_DELETE;
+                                    scmsBom.Flag = mesBomDetail.IsActive || !mesBomDetail.EndDate.HasValue ? MesDssConstants.SCMS_MES_FLAG_SCMS_UPDATED : MesDssConstants.SCMS_MES_FLAG_SCMS_DELETE;
                                     scmsBom.LastModifyDate = DateTime.Now;
                                     scmsBom.LastModifyUser = userMgr.GetMonitorUser().Code;
                                     scmsBom.Qty = mesBomDetail.RateQty;
-                                   
+
                                     scmsBomMgr.UpdateScmsBom(scmsBom);
                                 }
                             }

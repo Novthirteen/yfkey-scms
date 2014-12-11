@@ -136,26 +136,36 @@ namespace com.Sconit.Service.Procurement.Impl
             {
                 foreach (OrderHead oh in orderList)
                 {
-                    //all Empty check
-                    bool isValid = false;
-                    foreach (OrderDetail od in oh.OrderDetails)
+                    try
                     {
-                        if (od.RequiredQty > 0)
+                        //all Empty check
+                        bool isValid = false;
+                        foreach (OrderDetail od in oh.OrderDetails)
                         {
-                            isValid = true;
-                            break;
+                            if (od.RequiredQty > 0)
+                            {
+                                isValid = true;
+                                break;
+                            }
                         }
+
+                        if (isValid)
+                        {
+                            //oh.Shift = shiftMgr.LoadShift("A");//temp,todo
+
+                            log.Debug("Begin to create order," + oh.Flow);
+
+                            this.OrderMgr.CreateOrder(oh, userCode);
+
+                            log.Debug("End to create order," + oh.OrderNo);
+                            log.Debug("----------------------------------Invincible's dividing line---------------------------------------");
+                        }
+
                     }
-
-                    if (isValid)
+                    catch (Exception ex)
                     {
-                        //oh.Shift = shiftMgr.LoadShift("A");//temp,todo
-
-                        log.Debug("Begin to create order," + oh.Flow);
-
-                        this.OrderMgr.CreateOrder(oh, userCode);
-
-                        log.Debug("End to create order," + oh.OrderNo);
+                        this.OrderMgr.CleanSession();
+                        log.Error("create order fail", ex);
                         log.Debug("----------------------------------Invincible's dividing line---------------------------------------");
                     }
                 }
@@ -225,7 +235,7 @@ namespace com.Sconit.Service.Procurement.Impl
                 {
                     flow.NextOrderTime = order.Flow.NextOrderTime;
                     flow.NextWinTime = order.Flow.NextWindowTime;
-                    this.FlowMgr.UpdateFlow(flow,false);
+                    this.FlowMgr.UpdateFlow(flow, false);
                     log.Debug("Update window time to :" + flow.NextWinTime);
                 }
             }
@@ -452,7 +462,7 @@ namespace com.Sconit.Service.Procurement.Impl
             #endregion
 
             return plans;
-        } 
+        }
 
         private List<OrderTracer> TransformToOrderTracer(List<LeanEngine.Entity.OrderTracer> list)
         {

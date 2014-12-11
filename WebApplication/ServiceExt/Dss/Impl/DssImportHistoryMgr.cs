@@ -32,7 +32,8 @@ namespace com.Sconit.Service.Dss.Impl
             DetachedCriteria criteria = DetachedCriteria.For(typeof(DssImportHistory));
             criteria.Add(Expression.Eq("IsActive", true));
             criteria.Add(Expression.Eq("DssInboundCtrl.Id", dssInboundCtrlId));
-            criteria.Add(Expression.Lt("ErrorCount", 2));//2012-6-12 djin 3±ä1//2012-10-25 1->2 
+            criteria.Add(Expression.Lt("ErrorCount", 10));//2012-6-12 djin 3±ä1//2012-10-25 1->2 
+            criteria.AddOrder(Order.Asc("Id"));
 
             return criteriaMgr.FindAll<DssImportHistory>(criteria);
         }

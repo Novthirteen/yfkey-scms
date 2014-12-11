@@ -42,8 +42,9 @@ namespace com.Sconit.Service.Dss.Impl
             IBomDetailMgr bomDetailMgr,
             IDssImportHistoryMgr dssImportHistoryMgr,
             IMesBomMgr mesBomMgr,
-            IMesBomDetailMgr mesBomDetailMgr)
-            : base(dssImportHistoryMgr)
+            IMesBomDetailMgr mesBomDetailMgr,
+            IGenericMgr genericMgr)
+            : base(dssImportHistoryMgr, genericMgr)
         {
             this.itemMgr = itemMgr;
             this.uomMgr = uomMgr;

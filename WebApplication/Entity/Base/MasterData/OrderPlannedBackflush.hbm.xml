@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
- 	<class name="com.Sconit.Entity.MasterData.OrderPlannedBackflush, com.Sconit.Entity" table="OrderPlanBackflush" lazy="false">
-		<id name="Id" column="Id" type="Int32" unsaved-value="0" >
-      		<generator class="identity" />
+    <class name="com.Sconit.Entity.MasterData.OrderPlannedBackflush, com.Sconit.Entity" table="OrderPlanBackflush" lazy="false">
+        <id name="Id" column="Id" type="Int32" unsaved-value="0" >
+            <generator class="identity" />
         </id>
-		<many-to-one name="OrderLocationTransaction" column="OrderLocTransId" class="com.Sconit.Entity.MasterData.OrderLocationTransaction, com.Sconit.Entity" cascade="none" />
-    <property name="InProcessLocation" column="IpNo" type="String" length="50" />
-		<property name="PlannedQty" column="PlanQty" type="Decimal"  />	
-    <property name="IsActive" column="IsActive" type="Boolean"  />
-    <property name="Flow" column="Flow" type="String" length="50" />
-  	</class>
+        <many-to-one name="OrderLocationTransaction" column="OrderLocTransId" class="com.Sconit.Entity.MasterData.OrderLocationTransaction, com.Sconit.Entity" cascade="none" />
+        <property name="InProcessLocation" column="IpNo" type="String" length="50" />
+        <property name="PlannedQty" column="PlanQty" type="Decimal"  />
+        <property name="IsActive" column="IsActive" type="Boolean"  />
+        <property name="Flow" column="Flow" type="String" length="50" />
+    </class>
 </hibernate-mapping>

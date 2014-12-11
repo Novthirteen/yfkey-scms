@@ -132,6 +132,7 @@ BEGIN
 
 					if exists(select top 1 1 from #tempInventoryTrans where PlanBillId is not null and Qty <> 0)
 					begin  --所有未结算的物料在反冲后全部结算
+						truncate table #tempSettlePlanBill
 						insert into #tempSettlePlanBill(PlanBillId, SettleQty) select PlanBillId, SUM(-Qty) from #tempInventoryTrans where PlanBillId is not null and Qty <> 0 group by PlanBillId
 						--把结算数量更新成订单单位
 						update tmp set tmp.SettleQty = tmp.SettleQty / pb.UnitQty from #tempSettlePlanBill as tmp inner join PlanBill as pb on tmp.PlanBillId = pb.Id

@@ -11,5 +11,6 @@ namespace com.Sconit.Service.Batch
         void RunBatchJobs(IWindsorContainer container);
 
         void RunLeanEngineJob(IWindsorContainer container);
+        void RunReceiveWOJob(IWindsorContainer container);
     }
 }

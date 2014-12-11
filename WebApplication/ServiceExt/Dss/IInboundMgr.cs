@@ -9,5 +9,6 @@ namespace com.Sconit.Service.Dss
     public interface IInboundMgr
     {
         void ProcessInboundFile(DssInboundControl dssInboundControl, string[] files);
+        void ProcessInboundRecord(DssInboundControl dssInboundControl);
     }
 }
