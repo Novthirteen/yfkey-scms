@@ -117,7 +117,7 @@
                 </asp:TemplateField>--%>
                  <asp:TemplateField HeaderText="中间商">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbIntermediateConsignee" runat="server" Text='<%# Bind("IntermediateConsignee") %>'  Width="50"/>
+                        <asp:TextBox ID="tbIntermediateConsignee" runat="server" Text='<%# Bind("IntermediateConsignee") %>' MaxLength="30"  Width="50"/>
                     </ItemTemplate>
                 </asp:TemplateField>
                 
@@ -135,17 +135,17 @@
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="${EDI.EDIFordPlanBase.Uom}">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbInUom" runat="server" Text='<%# Bind("Uom") %>' Width="50"></asp:TextBox>
+                        <asp:TextBox ID="tbInUom" runat="server" Text='<%# Bind("Uom") %>' MaxLength="2" Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="装箱单号">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbShipmentID" runat="server" Text='<%# Bind("ShipmentID") %>' Width="50"></asp:TextBox>
+                        <asp:TextBox ID="tbShipmentID" runat="server" Text='<%# Bind("ShipmentID") %>'  MaxLength="11"  Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Bill of Lading Reference">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbLadingNum" runat="server" Text='<%# Bind("LadingNum") %>' Width="50"></asp:TextBox>
+                        <asp:TextBox ID="tbLadingNum" runat="server" Text='<%# Bind("LadingNum") %>'  MaxLength="11"  Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Purpose">
@@ -172,12 +172,12 @@
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="U/M">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbWeightUom" runat="server" Text='<%# Bind("WeightUom") %>' Width="50"></asp:TextBox>
+                        <asp:TextBox ID="tbWeightUom" runat="server" Text='<%# Bind("WeightUom") %>' MaxLength="2" Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Packaging Type">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbOutPackType" runat="server" Text='<%# Bind("OutPackType") %>'
+                        <asp:TextBox ID="tbOutPackType" runat="server" Text='<%# Bind("OutPackType") %>'  MaxLength="5"
                             Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
@@ -189,19 +189,19 @@
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Carrier Code">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbCarrierCode" runat="server" Text='<%# Bind("CarrierCode") %>'
+                        <asp:TextBox ID="tbCarrierCode" runat="server" Text='<%# Bind("CarrierCode") %>'  MaxLength="4" 
                             Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Trans Method Code">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbTransportationMethod" runat="server" Text='<%# Bind("TransportationMethod") %>'
+                        <asp:TextBox ID="tbTransportationMethod" runat="server" Text='<%# Bind("TransportationMethod") %>'  MaxLength="2"
                             Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Conveyance Number">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbEquipmentNum" runat="server" Text='<%# Bind("EquipmentNum") %>'
+                        <asp:TextBox ID="tbEquipmentNum" runat="server" Text='<%# Bind("EquipmentNum") %>'  MaxLength="7" 
                             Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
@@ -213,7 +213,7 @@
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="机场代码">
                     <ItemTemplate>
-                        <asp:TextBox ID="tbAirportCode" runat="server" Text='<%# Bind("AirportCode") %>'
+                        <asp:TextBox ID="tbAirportCode" runat="server" Text='<%# Bind("AirportCode") %>'   MaxLength="5" 
                             Width="50"></asp:TextBox>
                     </ItemTemplate>
                 </asp:TemplateField>
