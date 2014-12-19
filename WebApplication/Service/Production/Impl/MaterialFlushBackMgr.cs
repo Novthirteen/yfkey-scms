@@ -12,6 +12,7 @@ using com.Sconit.Service.Distribution;
 using com.Sconit.Service.MasterData;
 using com.Sconit.Entity.Procurement;
 using com.Sconit.Entity.Exception;
+using com.Sconit.Entity.Dss;
 
 namespace com.Sconit.Service.Production.Impl
 {
@@ -21,14 +22,17 @@ namespace com.Sconit.Service.Production.Impl
         private IOrderLocationTransactionMgr orderLocationTransactionMgr;
         private IEntityPreferenceMgr entityPreferenceMgr;
         private IHuMgr huMgr;
+        private IGenericMgr genericMgr;
         public MaterialFlushBackMgr(
             IOrderLocationTransactionMgr orderLocationTransactionMgr,
             IEntityPreferenceMgr entityPreferenceMgr,
-            IHuMgr huMgr)
+            IHuMgr huMgr,
+            IGenericMgr genericMgr)
         {
             this.orderLocationTransactionMgr = orderLocationTransactionMgr;
             this.entityPreferenceMgr = entityPreferenceMgr;
             this.huMgr = huMgr;
+            this.genericMgr = genericMgr;
         }
         #endregion
 
@@ -217,6 +221,15 @@ namespace com.Sconit.Service.Production.Impl
             //}
 
             return materialFlushBackList;
+        }
+
+        [Transaction(TransactionMode.Unspecified)]
+        public void ImportProdItemHuId(IList<DssImportHistory> dssImportHistoryList)
+        {
+            foreach (var dssImpHis in dssImportHistoryList)
+            {
+                this.genericMgr.Create(dssImpHis);
+            }
         }
     }
 }

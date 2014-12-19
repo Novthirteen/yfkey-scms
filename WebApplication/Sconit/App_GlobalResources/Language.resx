@@ -1140,4 +1140,7 @@
   <data name="PlanVersionContrast" xml:space="preserve">
     <value>版本比较</value>
   </data>
+  <data name="ImportProductionHuId" xml:space="preserve">
+    <value>生产条码导入</value>
+  </data>
 </root>

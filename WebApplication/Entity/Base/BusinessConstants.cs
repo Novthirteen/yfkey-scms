@@ -13,6 +13,7 @@ namespace com.Sconit.Entity
         public static readonly string PAGE_NEW_ACTION = "NewAction";
         public static readonly string PAGE_EDIT_ACTION = "EditAction";
         public static readonly string PAGE_SEARCH_ACTION = "SearchAction";
+        public static readonly string PAGE_IMPORT_ACTION = "ImportAction";
 
         public static readonly string PARTY_TYPE_REGION = "Region";
         public static readonly string PARTY_TYPE_SUPPLIER = "Supplier";

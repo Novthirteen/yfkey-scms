@@ -198,6 +198,10 @@ public partial class Order_OrderHead_Main : MainModuleBase
             {
                 ListEdit_Render(this.ActionParameter["Code"], null);
             }
+            if (this.Action == BusinessConstants.PAGE_IMPORT_ACTION)
+            {
+                Import_Render(this, null);
+            }
             //首页显示时隐藏search
             //if (this.Session["Temp_Session_ACT"] != null)
             //{
@@ -205,6 +209,17 @@ public partial class Order_OrderHead_Main : MainModuleBase
             //    Session.Contents.Remove("Temp_Session_ACT");
             //}
         }
+    }
+
+    void Import_Render(object sender, EventArgs e)
+    {
+        this.ucSearch.Visible = false;
+        this.ucList.Visible = false;
+        this.ucScrapNew.Visible = false;
+        this.ucNew.Visible = false;
+        this.ucEdit.Visible = false;
+        this.ucImport.Visible = false;
+        this.ucImportHuId.Visible = true;
     }
 
     //The event handler when user click button "Search" button

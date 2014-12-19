@@ -5,6 +5,7 @@ using System.Text;
 using com.Sconit.Entity.Production;
 using com.Sconit.Entity.MasterData;
 using com.Sconit.Entity.Procurement;
+using com.Sconit.Entity.Dss;
 
 namespace com.Sconit.Service.Production
 {
@@ -21,6 +22,8 @@ namespace com.Sconit.Service.Production
         IList<MaterialFlushBack> AssignMaterialFlushBack(MaterialFlushBack sourceMaterialFlushBack, IList<OrderDetail> orderDetailList);
 
         IList<MaterialFlushBack> AssignMaterialFlushBack(MaterialFlushBack sourceMaterialFlushBack, IList<OrderLocationTransaction> inOrderLocationTransaction);
+
+        void ImportProdItemHuId(IList<DssImportHistory> dssImportHistoryList);
 
         #endregion Customized Methods
     }
