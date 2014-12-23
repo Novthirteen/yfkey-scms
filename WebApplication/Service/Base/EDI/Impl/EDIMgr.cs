@@ -597,7 +597,7 @@ namespace com.Sconit.Service.EDI.Impl
                     temp_FORD_EDI_856.Part_Num = ediFordPlan.RefItem;
                     temp_FORD_EDI_856.Purchase_Order_Num = ediFordPlan.PurchaseOrder;
                     temp_FORD_EDI_856.Shipped_Qty = ediFordPlan.ShipQty.ToString();
-                    temp_FORD_EDI_856.Cum_Shipped_Qty = ediFordPlan.LastShippedCumulative.HasValue ? (ediFordPlan.LastShippedCumulative.Value + ediFordPlan.CurrenCumQty + ediFordPlan.ShipQty.Value).ToString() : ediFordPlan.CurrenCumQty.ToString();
+                    temp_FORD_EDI_856.Cum_Shipped_Qty = ediFordPlan.LastShippedCumulative.HasValue ? (ediFordPlan.LastShippedCumulative.Value + ediFordPlan.CurrenCumQty + ediFordPlan.ShipQty.Value).ToString() : (ediFordPlan.CurrenCumQty + ediFordPlan.ShipQty.Value).ToString();
                     temp_FORD_EDI_856.Cum_Shipped_UOM = ediFordPlan.Uom;
                     temp_FORD_EDI_856.Number_of_Loads = ediFordPlan.InPackQty.HasValue ? ediFordPlan.InPackQty.ToString() : string.Empty;  // 包装个数
                     temp_FORD_EDI_856.Qty_Per_Load = ediFordPlan.PerLoadQty.HasValue ? ediFordPlan.PerLoadQty.Value.ToString() : string.Empty;  // 单箱件数

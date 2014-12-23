@@ -116,6 +116,7 @@
         <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Rwo_StatusGroupId-1__act--NewAction" title="$Resources:Language,WOReturn"  description="WOReturn"  />
         <siteMapNode url="~/Main.aspx?mid=Production.Feed" title="$Resources:Language,Feed"  description="Feed"  />
         <siteMapNode url="~/Main.aspx?mid=Production.Backflush" title="$Resources:Language,Backflush"  description="Backflush"  />
+        <siteMapNode url="~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Nml_StatusGroupId-1__act--ImportAction" title="$Resources:Language,ImportProductionHuId"  description="ImportProductionHuId"  />
       </siteMapNode>
       <siteMapNode url="" title="$Resources:Language,Information" description="Information">
         <siteMapNode url="~/Main.aspx?mid=Order.ReceiptNotes__mp--ModuleType-Production" title="$Resources:Language,ProductionReceiptNotes" description="ProductionReceiptNotes"/>

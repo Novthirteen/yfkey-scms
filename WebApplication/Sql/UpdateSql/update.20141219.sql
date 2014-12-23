@@ -1,0 +1,1 @@
+insert into Acc_Permission values('~/Main.aspx?mid=Order.OrderHead.Production__mp--ModuleType-Production_ModuleSubType-Nml_StatusGroupId-1__act--ImportAction','生产条码导入','Production')
