@@ -87,6 +87,11 @@ namespace com.Sconit.Service.Dss.Impl
         #region Private Method
         private IList<DssExportHistory> ConvertList(IList<BillDetail> list, DssOutboundControl dssOutboundControl)
         {
+            DetachedCriteria criteria = DetachedCriteria.For(typeof(DssObjectMapping))
+              .Add(Expression.Eq("Entity", "BillTo")).Add(Expression.Eq("ExternalSystem", "QAD"))
+              .Add(Expression.Eq("ExternalEntity", "ShipTo"));
+
+            IList<DssObjectMapping> dom = criteriaMgr.FindAll<DssObjectMapping>(criteria);
             IList<DssExportHistory> result = new List<DssExportHistory>();
             if (list != null && list.Count > 0)
             {
@@ -110,6 +115,12 @@ namespace com.Sconit.Service.Dss.Impl
                     dssExportHistory.PartyTo = billDetail.Bill.BillAddress.Party.Code;//客户
 
                     dssExportHistory.DefinedString1 = billDetail.Bill.BillNo;//开票通知单号
+                    dssExportHistory.DefinedString2 = billDetail.Bill.BillAddress.Code; //BillTo
+                    if (dom != null && dom.Count > 0)
+                    {
+                        DssObjectMapping sd = dom.Where(d => d.Code == billDetail.Bill.BillAddress.Code).FirstOrDefault();
+                        dssExportHistory.DefinedString3 = sd.ExternalCode;  //Map到shipto
+                    }
 
                     dssExportHistory.KeyCode = DssHelper.GetBillKeyCode(dssExportHistory, billDetail.Bill.BillNo);
 

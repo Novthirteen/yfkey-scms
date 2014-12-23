@@ -44,8 +44,8 @@ namespace com.Sconit.Service.Dss.Impl
             { 
                 DssHelper.GetEventValue(dssExportHistory.EventCode),
                 dssExportHistory.PartyFrom,//QAD:Site
-                dssExportHistory.KeyCode,
-                dssExportHistory.PartyTo,//客户
+                dssExportHistory.KeyCode,           
+                !string.IsNullOrEmpty(dssExportHistory.DefinedString3) ? dssExportHistory.DefinedString3 : dssExportHistory.PartyTo,//客户
                 null,
                 null,
                 null
