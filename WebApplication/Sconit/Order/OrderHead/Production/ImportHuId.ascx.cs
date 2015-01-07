@@ -12,6 +12,7 @@ using com.Sconit.Web;
 using com.Sconit.Entity.MasterData;
 using com.Sconit.Entity;
 using com.Sconit.Entity.Dss;
+using com.Sconit.Entity.Exception;
 
 
 public partial class Order_OrderHead_Production_ImportHuId : ModuleBase
@@ -237,6 +238,10 @@ public partial class Order_OrderHead_Production_ImportHuId : ModuleBase
             TheMaterialFlushBackMgr.ImportProdItemHuId(importList);
 
             ShowSuccessMessage("导入成功。");
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
         }
         catch (Exception ex)
         {

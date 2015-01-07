@@ -803,6 +803,10 @@ left join MRP_PurchasePlanInitLocationDet2 as l with(nolock) on det.PurchasePlan
             ShowSuccessMessage("修改成功。");
             this.btnSearch_Click(null, null);
         }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
         catch (Exception ex)
         {
             ShowErrorMessage(ex.Message);
@@ -1130,7 +1134,7 @@ left join MRP_PurchasePlanInitLocationDet2 as l with(nolock) on det.PurchasePlan
         }
         catch (BusinessErrorException ex)
         {
-            ShowErrorMessage(ex.Message);
+            ShowErrorMessage(ex);
         }
         catch (Exception et)
         {

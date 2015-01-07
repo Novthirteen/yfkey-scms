@@ -139,6 +139,10 @@ public partial class Finance_Bill_Search : SearchModuleBase
             ShowSuccessMessage("操作成功");
             fs01.Visible = false;
         }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
         catch (Exception ex)
         {
             ShowErrorMessage(ex.Message);

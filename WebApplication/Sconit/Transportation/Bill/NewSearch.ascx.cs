@@ -156,6 +156,10 @@ public partial class Transportation_Bill_NewSearch : SearchModuleBase
                     btnBack_Click(sender, e);
                 }
             }
+            catch (BusinessErrorException ex)
+            {
+                ShowErrorMessage(ex);
+            }
             catch (Exception ex)
             {
                 ShowErrorMessage(ex.Message);

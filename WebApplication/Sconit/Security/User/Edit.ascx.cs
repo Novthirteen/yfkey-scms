@@ -15,6 +15,7 @@ using com.Sconit.Service.MasterData;
 using com.Sconit.Web;
 using com.Sconit.Entity;
 using System.Collections.Generic;
+using com.Sconit.Entity.Exception;
 
 public partial class MasterData_User_Edit : EditModuleBase
 {
@@ -145,6 +146,10 @@ public partial class MasterData_User_Edit : EditModuleBase
             TheUserMgr.UpdateUser(user);
             ShowSuccessMessage("Security.User.UpdateUserPassword.Successfully", UserCode);
             this.divPassword.Visible = false;
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
         }
         catch (Exception ex)
         {

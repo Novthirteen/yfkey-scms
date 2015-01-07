@@ -685,6 +685,10 @@ from  MRP_ShipPlanDet as det with(nolock)
             TheMrpMgr.RunProductionPlan(this.CurrentUser);
             ShowSuccessMessage("生成成功。");
         }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
         catch (SqlException ex)
         {
             ShowErrorMessage(ex.Message);
@@ -806,6 +810,10 @@ from  MRP_ShipPlanDet as det with(nolock)
             TheMrpMgr.UpdateShipPlanQty(flowList, itemList, idList, shipQtyList, releaseNoList, dateFromList, this.CurrentUser,this.rbType.SelectedValue);
             ShowSuccessMessage("修改成功。");
             this.btnSearch_Click(null, null);
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
         }
         catch (Exception ex)
         {
@@ -1289,7 +1297,7 @@ from  MRP_ShipPlanDet as det  with(nolock)
         }
         catch (BusinessErrorException ex)
         {
-            ShowErrorMessage(ex.Message);
+            ShowErrorMessage(ex);
         }
         catch (Exception et)
         {

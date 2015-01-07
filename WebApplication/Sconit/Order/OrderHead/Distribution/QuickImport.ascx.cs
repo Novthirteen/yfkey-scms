@@ -11,6 +11,7 @@ using com.Sconit.Utility;
 using com.Sconit.Web;
 using com.Sconit.Entity.MasterData;
 using com.Sconit.Entity;
+using com.Sconit.Entity.Exception;
 
 
 public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
@@ -219,6 +220,10 @@ public partial class Order_OrderHead_Distribution_QuickImport : ModuleBase
             //    orderNos += CreateOrder(newOrderHead);
             //}
             //ShowSuccessMessage(orderNos);
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
         }
         catch (Exception ex)
         {

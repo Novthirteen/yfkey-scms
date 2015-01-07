@@ -551,6 +551,10 @@ public partial class Finance_Bill_NewSearch : SearchModuleBase
 
                 }
             }
+            catch (BusinessErrorException ex)
+            {
+                ShowErrorMessage(ex);
+            }
             catch (Exception ex)
             {
                 ShowErrorMessage(ex.Message);

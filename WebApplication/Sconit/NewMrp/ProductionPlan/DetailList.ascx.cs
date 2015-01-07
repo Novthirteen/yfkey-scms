@@ -869,6 +869,10 @@ inner join MRP_ProductionPlanInitLocationDet as l with(nolock) on det.Production
             ShowSuccessMessage("修改成功。");
             this.btnSearch_Click(null, null);
         }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
         catch (Exception ex)
         {
             ShowErrorMessage(ex.Message);

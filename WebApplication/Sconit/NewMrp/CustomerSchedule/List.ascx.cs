@@ -18,6 +18,7 @@ using NHibernate.Expression;
 using com.Sconit.Entity;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using com.Sconit.Entity.Exception;
 
 public partial class NewMrp_CustomerSchedule_List : ListModuleBase
 {
@@ -55,6 +56,10 @@ public partial class NewMrp_CustomerSchedule_List : ListModuleBase
         {
             TheMrpMgr.RunProductionPlan(this.CurrentUser);
             ShowSuccessMessage("生成成功。");
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
         }
         catch (SqlException ex)
         {

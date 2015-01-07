@@ -167,6 +167,10 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
             ShowSuccessMessage("Transportation.TransportationOrder.UpdateTransportationOrder.Successfully", this.OrderNo);
             UpdateView();
         }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
         catch (Exception ex)
         {
             ShowErrorMessage(ex.Message);
@@ -237,6 +241,10 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
             const string template = "SHP.xls";
             string printUrl = TheReportMgr.WriteToFile(template, this.OrderNo);
             Page.ClientScript.RegisterStartupScript(GetType(), "method", " <script language='javascript' type='text/javascript'>PrintOrder('" + printUrl + "'); </script>");
+        }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
         }
         catch (Exception ex)
         {
@@ -349,7 +357,7 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
         catch (BusinessErrorException ex)
         {
             Restore(ds);
-            ShowErrorMessage(ex.Message);
+            ShowErrorMessage(ex);
         }
     }
 
@@ -580,6 +588,10 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
                     UpdateViewButton();
                     ShowSuccessMessage("运单状态还原成功！");
                 }
+            }
+            catch (BusinessErrorException ex)
+            {
+                ShowErrorMessage(ex);
             }
             catch (Exception ex)
             {

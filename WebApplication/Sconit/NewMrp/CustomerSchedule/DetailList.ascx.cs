@@ -187,6 +187,10 @@ public partial class NewMrp_ShipPlan_DetailList : MainModuleBase
             TheMrpMgr.RunProductionPlan(this.CurrentUser);
             ShowSuccessMessage("生成成功。");
         }
+        catch (BusinessErrorException ex)
+        {
+            ShowErrorMessage(ex);
+        }
         catch (SqlException ex)
         {
             ShowErrorMessage(ex.Message);
