@@ -323,6 +323,11 @@ namespace com.Sconit.Service.Business.Impl
                     {
                         throw new BusinessErrorException("Repack.Error.Location.NotEqual");
                     }
+                    //翻箱 拆箱 不允许操作不合格品
+                    if (locationLotDetail.Location.Code == "Inspect")
+                    {
+                        throw new BusinessErrorException("Repack.Error.Location.Inspect",huId);
+                    }
                     RepackDetail repackDetail = new RepackDetail();
                     repackDetail.LocationLotDetail = locationLotDetail;
                     repackDetail.Hu = locationLotDetail.Hu;
