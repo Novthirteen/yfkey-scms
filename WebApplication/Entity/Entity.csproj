@@ -542,7 +542,9 @@
     <EmbeddedResource Include="Base\Dss\DssExportHistory.hbm.xml" />
     <EmbeddedResource Include="Base\Dss\DssExportHistoryDetail.hbm.xml" />
     <EmbeddedResource Include="Base\Dss\DssFtpControl.hbm.xml" />
-    <EmbeddedResource Include="Base\Dss\DssImportHistory.hbm.xml" />
+    <EmbeddedResource Include="Base\Dss\DssImportHistory.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Base\Dss\DssInboundControl.hbm.xml" />
     <EmbeddedResource Include="Base\Dss\DssObjectMapping.hbm.xml" />
     <EmbeddedResource Include="Base\Dss\DssOutboundControl.hbm.xml" />
