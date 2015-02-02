@@ -47,6 +47,7 @@ BEGIN
 		LotNoYear varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		LotNoMonth varchar(50) COLLATE  Chinese_PRC_CI_AS,
 		LotNoDay varchar(50) COLLATE  Chinese_PRC_CI_AS,
+		IsLotNoDayInt bit,
 		UC decimal(18, 8),
 		Uom varchar(5) COLLATE  Chinese_PRC_CI_AS,
 		UnitQty decimal(18, 8),
@@ -86,8 +87,8 @@ BEGIN
 
 	begin try
 		begin try
-			insert into #tempWOReceipt_03(Id, ProdLine, Item, ItemDesc, HuId, LotNo, LotNoYear, LotNoMonth, LotNoDay, QtyStr, IsQtyNumeric, OfflineDateStr, OfflineTimeStr, IsOfflineDateTime, OrderNo)
-			select dih.Id, dih.data0, dih.data1, i.Desc1, dih.data2, SUBSTRING(data2, LEN(data2) - 7, 4), SUBSTRING(data2, LEN(data2) - 7, 1), SUBSTRING(data2, LEN(data2) - 6, 1), SUBSTRING(data2, LEN(data2) - 5, 2), dih.data3, ISNUMERIC(dih.data3), dih.data7, dih.data8, ISDATE(dih.data7 + ' ' + dih.data8), dih.data12
+			insert into #tempWOReceipt_03(Id, ProdLine, Item, ItemDesc, HuId, LotNo, LotNoYear, LotNoMonth, LotNoDay, IsLotNoDayInt, QtyStr, IsQtyNumeric, OfflineDateStr, OfflineTimeStr, IsOfflineDateTime, OrderNo)
+			select dih.Id, dih.data0, dih.data1, i.Desc1, dih.data2, SUBSTRING(data2, LEN(data2) - 7, 4), SUBSTRING(data2, LEN(data2) - 7, 1), SUBSTRING(data2, LEN(data2) - 6, 1), SUBSTRING(data2, LEN(data2) - 5, 2), ISNUMERIC(SUBSTRING(data2, LEN(data2) - 5, 2)), dih.data3, ISNUMERIC(dih.data3), dih.data7, dih.data8, ISDATE(dih.data7 + ' ' + dih.data8), dih.data12
 			from DssImpHis as dih left join Item as i on dih.data1 = i.Code
 			where dih.IsActive = 1 and dih.ErrCount < 2 and dih.DssInboundCtrl = 9 and dih.EventCode = 'CREATE'
 
@@ -159,13 +160,13 @@ BEGIN
 				delete from #tempWOReceipt_03 where LotNoMonth not in ('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C')
 			end
 
-			if exists (select top 1 1 from #tempWOReceipt_03 where LotNoDay > 31 or LotNoDay < 1)
+			if exists (select top 1 1 from #tempWOReceipt_03 where IsLotNoDayInt = 0 or LotNoDay > 31 or LotNoDay < 1)
 			begin
 				update dih set Memo = '批号的日期格式不正确。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
 				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
-				where tmp.LotNoDay > 31 or tmp.LotNoDay < 1
+				where tmp.IsLotNoDayInt = 0 or tmp.LotNoDay > 31 or tmp.LotNoDay < 1
 
-				delete from #tempWOReceipt_03 where LotNoDay > 31 or LotNoDay < 1
+				delete from #tempWOReceipt_03 where IsLotNoDayInt = 0 or LotNoDay > 31 or LotNoDay < 1
 			end
 
 			if exists(select top 1 1 from #tempWOReceipt_03 where QtyStr is null or QtyStr = '')
@@ -177,15 +178,6 @@ BEGIN
 				delete from #tempWOReceipt_03 where QtyStr is null or QtyStr = ''
 			end
 
-			if exists(select top 1 1 from #tempWOReceipt_03 where QtyStr = 0)
-			begin
-				update dih set Memo = '数量不能为0。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
-				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
-				where QtyStr = 0
-
-				delete from #tempWOReceipt_03 where QtyStr = 0
-			end
-
 			if exists(select top 1 1 from #tempWOReceipt_03 where IsQtyNumeric = 0)
 			begin
 				update dih set Memo = '数量不正确。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
@@ -193,6 +185,15 @@ BEGIN
 				where IsQtyNumeric = 0
 
 				delete from #tempWOReceipt_03 where IsQtyNumeric = 0
+			end
+
+			if exists(select top 1 1 from #tempWOReceipt_03 where QtyStr = 0)
+			begin
+				update dih set Memo = '数量不能为0。', ErrCount = 10, LastModifyUser = @CreateUser, LastModifyDate = @DateTimeNow
+				from DssImpHis as dih inner join #tempWOReceipt_03 as tmp on dih.Id = tmp.Id
+				where QtyStr = 0
+
+				delete from #tempWOReceipt_03 where QtyStr = 0
 			end
 
 			if exists(select top 1 1 from #tempWOReceipt_03 where OfflineDateStr is null or OfflineDateStr = '')
@@ -414,4 +415,4 @@ BEGIN
 	drop table #tempWOReceipt_03
 	drop table #tempNoWO_03
 END
-GO
+go
