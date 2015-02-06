@@ -450,6 +450,10 @@ namespace com.Sconit.Service.Transportation.Impl
                         #endregion
 
                         actBill.BillQty = totalVolume;
+                        if (priceListDetail != null && actBill.UnitPrice == 0)
+                        {
+                            actBill.UnitPrice = priceListDetail.UnitPrice;
+                        }
                         actBill.BillAmount = actBill.UnitPrice * actBill.BillQty;
                     }
                     #region ½×ÌÝ
