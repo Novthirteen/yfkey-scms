@@ -244,7 +244,7 @@ namespace com.Sconit.Service.Business.Impl
             criteria.Add(Expression.Eq("IsPrinted", false));
             criteria.Add(Expression.Eq("NeedPrintOrder", true));
             criteria.Add(Expression.Eq("Status", BusinessConstants.CODE_MASTER_STATUS_VALUE_INPROCESS));
-            criteria.Add(Expression.Eq("Type", BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_TRANSFER));
+            criteria.Add(Expression.In("Type", new string[] { BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_TRANSFER, BusinessConstants.CODE_MASTER_ORDER_TYPE_VALUE_PROCUREMENT }));
             criteria.Add(Expression.In("PartyFrom.Code", region));
 
             IList<OrderHead> orderList = criteriaMgr.FindAll<OrderHead>(criteria);

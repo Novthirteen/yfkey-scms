@@ -106,10 +106,10 @@ namespace com.Sconit.Service.Batch.Job
                         #endregion
 
                         #region 初始化远程目录
-                        SocketFtpHelper ftp = new SocketFtpHelper(ftpServer, ftpUser, ftpPass, 60, ftpPort);
-                        ftp.Login();
-                        ftp.ChangeDir(ftpTempFolder);
-                        ftp.BinaryMode = true;
+                        FtpHelper ftp = new FtpHelper(ftpServer, ftpPort, ftpTempFolder, ftpUser, ftpPass);
+                        //ftp.Login();
+                        //ftp.ChangeDir(ftpTempFolder);
+                        //ftp.BinaryMode = true;
 
                         ftpTempFolder = ftpTempFolder.Replace("\\", "/");
                         if (!ftpTempFolder.EndsWith("/"))
@@ -123,7 +123,7 @@ namespace com.Sconit.Service.Batch.Job
                             foreach (string fileName in ftp.GetFileList(filePattern))
                             {
 
-                                ftp.DeleteFile(fileName);
+                                ftp.Delete(fileName);
 
                             }
                         }
@@ -167,8 +167,23 @@ namespace com.Sconit.Service.Batch.Job
                                 {
                                     string fomatedFileFullPath = fileFullPath.Replace("\\", "/");
                                     string fileName = fomatedFileFullPath.Substring(fomatedFileFullPath.LastIndexOf("/") + 1);
+                                    log.Info("Upload file: " + fomatedFileFullPath);
                                     ftp.Upload(fomatedFileFullPath);
-                                    ftp.RenameFile(fileName, ftpFolder + fileName, true);
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.Error("Upload file:" + fileFullPath, ex);
+                                }
+                            }
+
+                            foreach (string fileFullPath in files)
+                            {
+                                try
+                                {
+                                    string fomatedFileFullPath = fileFullPath.Replace("\\", "/");
+                                    string fileName = fomatedFileFullPath.Substring(fomatedFileFullPath.LastIndexOf("/") + 1);
+                                    log.Info("Move file: " + fomatedFileFullPath);
+                                    ftp.Rename(fileName, ftpFolder + fileName);
                                     log.Info("Delete file: " + fomatedFileFullPath);
                                     File.Delete(fomatedFileFullPath);
                                 }
