@@ -188,21 +188,38 @@
                     </td>
                 </tr>
                 <tr>
+                    <%--add by ljz start--%>
+                    <td class="td01">
+                        <asp:Literal ID="lblTransportMethod" runat="server" Text="${Transportation.TransportationOrder.TransportMethod}:" />
+                    </td>
+                    <td class="td02">
+                        <cc1:CodeMstrDropDownList ID="ddlTransportMethod" Code="TransportMethod" runat="server"
+                            IncludeBlankOption="true" AutoPostBack="true" />
+                        <asp:RequiredFieldValidator ID="rfvTransportMethod" runat="server" ControlToValidate="ddlTransportMethod"
+                            Display="Dynamic" ErrorMessage="${Transportation.TransportationOrder.TransportMethod}${Common.String.Empty}"
+                            ValidationGroup="vgSaveGroup" />
+                    </td>
+                    <%--add by ljz end--%>
                     <td class="td01">
                         <asp:Literal ID="lblRemark" runat="server" Text="${Transportation.TransportationOrder.Remark}:" />
                     </td>
                     <td class="td02">
                         <asp:TextBox ID="tbRemark" runat="server" CodeField="Remark" Text='<%#Bind("Remark") %>' />
                     </td>
-
+                </tr>
+                <tr>
                     <td class="td01">
                     </td>
                     <td class="td02">
                         <asp:CheckBox ID="IsExcess" runat="server" Font-Size="9pt" Text="${Transportation.TransportationOrder.ReferencePallentCount}" />
                     </td>
+                    <td class="td01">
+                    </td>
+                    <td class="td02">
+                    </td>
                 </tr>
                 <tr>
-                <td class="td01">
+                    <td class="td01">
                     </td>
                     <td class="td02">
                     </td>

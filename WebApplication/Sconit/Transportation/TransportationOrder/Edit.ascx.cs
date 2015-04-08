@@ -113,7 +113,18 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
         {
             ddlPricingMethod.SelectedIndex = 0;
         }
-
+        //add by ljz start
+        com.Sconit.Control.CodeMstrDropDownList ddlTransportMethod = (com.Sconit.Control.CodeMstrDropDownList)(this.FV_Order.FindControl("ddlTransportMethod"));
+        if (order.TransportMethod != null)
+        {
+            ddlTransportMethod.SelectedValue = order.TransportMethod;
+            //ddlTransportMethod_SelectedIndexChanged(null, null);
+        }
+        else
+        {
+            ddlPricingMethod.SelectedIndex = 0;
+        }
+        //add by ljz end
         DropDownList ddlType = (DropDownList)(this.FV_Order.FindControl("ddlType"));
         if (order.VehicleType != null)
         {
@@ -213,8 +224,12 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
             RequiredFieldValidator rfvCarrier = (RequiredFieldValidator)(this.FV_Order.FindControl("rfvCarrier"));
             RequiredFieldValidator rfvCarrierBillAddress = (RequiredFieldValidator)(this.FV_Order.FindControl("rfvCarrierBillAddress"));
             RequiredFieldValidator rfvType = (RequiredFieldValidator)(this.FV_Order.FindControl("rfvType"));
+            RequiredFieldValidator rfvTransportMethod = (RequiredFieldValidator)(this.FV_Order.FindControl("rfvTransportMethod"));  //add by ljz
 
-            if (!rfvCarrier.IsValid || !rfvCarrierBillAddress.IsValid || !rfvType.IsValid)
+            //modify by ljz start
+            //if (!rfvCarrier.IsValid || !rfvCarrierBillAddress.IsValid || !rfvType.IsValid)
+            if (!rfvCarrier.IsValid || !rfvCarrierBillAddress.IsValid || !rfvType.IsValid || !rfvTransportMethod.IsValid)
+            //modify by ljz end
             {
                 return;
             }
@@ -655,6 +670,15 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
         order.LastModifyDate = DateTime.Now;
         order.LastModifyUser = this.CurrentUser;
         order.Remark = ((TextBox)(this.FV_Order.FindControl("tbRemark"))).Text.Trim();
+
+        //add by ljz start
+        com.Sconit.Control.CodeMstrDropDownList ddlTransportMethod = (com.Sconit.Control.CodeMstrDropDownList)(this.FV_Order.FindControl("ddlTransportMethod"));
+        if (ddlTransportMethod.SelectedValue != string.Empty)
+        {
+            order.TransportMethod = ddlTransportMethod.SelectedValue;
+        }
+        //add by ljz end
+
         //added by williamlu@esteering.cn
         order.ReferencePallentCount = ((CheckBox)(this.FV_Order.FindControl("IsExcess"))).Checked ? 1 : 0;
         //added end
@@ -775,6 +799,17 @@ public partial class Transportation_TransportationOrder_Edit : EditModuleBase
         ddlType.DataSource = GetVehicleTypeGroup(ddlPricingMethod.SelectedValue);
         ddlType.DataBind();
     }
+    //add by ljz start
+    //protected void ddlTransportMethod_SelectedIndexChanged(object sender, EventArgs e)
+    //{
+    //    com.Sconit.Control.CodeMstrDropDownList ddlTransportMethod = ((com.Sconit.Control.CodeMstrDropDownList)(this.FV_Order.FindControl("ddlTransportMethod")));
+    //    DropDownList ddlType = (DropDownList)(this.FV_Order.FindControl("ddlType"));
+
+    //    ddlType.DataSource = GetVehicleTypeGroup(ddlTransportMethod.SelectedValue);
+    //    ddlType.DataBind();
+    //    Response.Write(ddlTransportMethod.SelectedValue);
+    //}
+    //add by ljz end
 
     private IList<CodeMaster> GetVehicleTypeGroup(string pricingMethod)
     {

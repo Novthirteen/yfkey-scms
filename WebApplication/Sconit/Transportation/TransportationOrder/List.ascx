@@ -15,6 +15,23 @@
                         <%# DataBinder.Eval(Container.DataItem, "TransportationRoute.Code")%>
                     </ItemTemplate>
                 </asp:TemplateField>
+                <%--add by ljz start--%>
+                <%--<asp:TemplateField HeaderText="${Transportation.TransportationOrder.TransportMethod}">
+                    <ItemTemplate>
+                        <asp:Label ID="lblTransportMethod" runat="server" />
+                    </ItemTemplate>
+                </asp:TemplateField>--%>
+                <%--<asp:BoundField DataField="TransportMethod" HeaderText="${Transportation.TransportationOrder.TransportMethod}"
+                    SortExpression="TransportMethod" />--%>
+                      <asp:TemplateField HeaderText="${Transportation.TransportPriceListDetail.TransportMethod}"
+                    SortExpression="TransportMethod">
+                    <ItemTemplate>
+                        <cc1:CodeMstrLabel ID="lblTransportMethod" runat="server" Code="TransportMethod" Value='<%# Bind("TransportMethod") %>' />
+                        <asp:Label ID="lbTransportMethod" runat="server" Text='<%# Eval("TransportMethod")%>'
+                            CssClass="hidden" />
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <%--add by ljz end--%>
                 <asp:TemplateField HeaderText="${Transportation.TransportationOrder.ShipFrom}">
                     <ItemTemplate>
                         <asp:Label ID="lblShipFrom" runat="server" />

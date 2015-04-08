@@ -38,6 +38,7 @@ public partial class Transportation_TransportationOrder_List : ListModuleBase
             TransportationOrder order = (TransportationOrder)e.Row.DataItem;
             ((Label)(e.Row.FindControl("lblShipFrom"))).Text = order.TransportationRoute!= null? order.TransportationRoute.ShipFrom.FullAddress:string.Empty;
             ((Label)(e.Row.FindControl("lblShipTo"))).Text = order.TransportationRoute!= null? order.TransportationRoute.ShipTo.FullAddress:string.Empty;
+            //((Label)(e.Row.FindControl("lblTransportMethod"))).Text = order.TransportMethod;
         }
     }
 
