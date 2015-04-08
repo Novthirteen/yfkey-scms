@@ -339,6 +339,19 @@ namespace com.Sconit.Entity.Transportation
                 _carrierBillAddress = value;
             }
         }
+
+        private DateTime _transportMethod;
+        public DateTime TransportMethod
+        {
+            get
+            {
+                return _transportMethod;
+            }
+            set
+            {
+                _transportMethod = value;
+            }
+        }
         #endregion
 
 		public override int GetHashCode()

@@ -29,5 +29,6 @@
     <property name="EndQty" column="EndQty" type="Decimal"  />
     <property name="MinPrice" column="MinPrice" type="Decimal"  />
     <property name="MaxPrice" column="MaxPrice" type="Decimal"  />
+    <property name="TransportMethod" column="TransportMethod" type="String" length="50" />
   </class>
 </hibernate-mapping>

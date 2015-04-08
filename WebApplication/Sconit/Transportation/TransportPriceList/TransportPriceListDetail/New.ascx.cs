@@ -70,6 +70,10 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
         ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbStartQty"))).Text = "0";
         ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndQty"))).Text = "0";
         ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbMinPrice"))).Text = "0";
+        com.Sconit.Control.CodeMstrDropDownList ddlTransportMethod = ((com.Sconit.Control.CodeMstrDropDownList)(this.FV_TransportPriceListDetail.FindControl("ddlTransportMethod")));
+        ddlTransportMethod.SelectedIndex = 0;
+        ddlTransportMethod.Enabled = true;
+      
     }
 
     private void InitPricingMethod()
@@ -191,6 +195,7 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
         DropDownList ddlVehicleType = ((DropDownList)(this.FV_TransportPriceListDetail.FindControl("ddlVehicleType")));
         Controls_TextBox tbCurrency = ((Controls_TextBox)(this.FV_TransportPriceListDetail.FindControl("tbCurrency")));
         TextBox tbEndDate = ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndDate")));
+        com.Sconit.Control.CodeMstrDropDownList ddlTransportMethod = ((com.Sconit.Control.CodeMstrDropDownList)(this.FV_TransportPriceListDetail.FindControl("ddlTransportMethod")));
 
         transportPriceListDetail = (TransportPriceListDetail)e.InputParameters[0];
         transportPriceListDetail.TransportPriceList = TheTransportPriceListMgr.LoadTransportPriceList(this.TransportPriceListCode);
@@ -202,6 +207,7 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
         transportPriceListDetail.TaxCode = transportPriceListDetail.TaxCode.Trim();
         transportPriceListDetail.EndDate = tbEndDate.Text.Trim() == "" ? null : transportPriceListDetail.EndDate;
         transportPriceListDetail.Type = BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION;
+        transportPriceListDetail.TransportMethod = ddlTransportMethod.SelectedValue;
     }
 
     protected void ODS_TransportPriceListDetail_Inserted(object sender, ObjectDataSourceStatusEventArgs e)

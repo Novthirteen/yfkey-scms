@@ -172,10 +172,23 @@
                             <asp:TextBox ID="tbTaxCode" runat="server" Text='<%#Bind("TaxCode") %>' />
                         </td>
                         <td class="td01">
+                            <asp:Literal ID="lblTransportMethod" runat="server" Text="${Transportation.TransportPriceListDetail.TransportMethod}:" />
+                        </td>
+                        <td class="td02">
+                            <cc1:CodeMstrDropDownList ID="ddlTransportMethod" Code="TransportMethod" runat="server"
+                                IncludeBlankOption="false" AutoPostBack="true"  />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td01">
                             <asp:Literal ID="lblIsIncludeTax" runat="server" Text="${Transportation.TransportPriceListDetail.IsIncludeTax}:" />
                         </td>
                         <td class="td02">
                             <asp:CheckBox ID="cbIsIncludeTax" runat="server" Checked='<%#Bind("IsIncludeTax") %>' />
+                        </td>
+                        <td class="td01">
+                        </td>
+                        <td class="td02">
                         </td>
                     </tr>
                 </table>

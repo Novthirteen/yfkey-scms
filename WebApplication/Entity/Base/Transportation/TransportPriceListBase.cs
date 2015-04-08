@@ -47,7 +47,8 @@ namespace com.Sconit.Entity.Transportation
 				_isActive = value;
 			}
 		}
-        
+
+
         #endregion
 
 		public override int GetHashCode()

@@ -5,6 +5,6 @@
       		<generator class="assigned" />
         </id>
 		<many-to-one name="Party" column="Party" class="com.Sconit.Entity.MasterData.Party, com.Sconit.Entity" cascade="none" />
-		<property name="IsActive" column="IsActive" type="Boolean"  />	
-  	</class>
+		<property name="IsActive" column="IsActive" type="Boolean"  />
+  </class>
 </hibernate-mapping>

@@ -28,6 +28,14 @@
                             CssClass="hidden" />
                     </ItemTemplate>
                 </asp:TemplateField>
+                <asp:TemplateField HeaderText="${Transportation.TransportPriceListDetail.TransportMethod}"
+                    SortExpression="TransportMethod">
+                    <ItemTemplate>
+                        <cc1:CodeMstrLabel ID="lblTransportMethod" runat="server" Code="TransportMethod" Value='<%# Bind("TransportMethod") %>' />
+                        <asp:Label ID="lbTransportMethod" runat="server" Text='<%# Eval("TransportMethod")%>'
+                            CssClass="hidden" />
+                    </ItemTemplate>
+                </asp:TemplateField>
                 <asp:TemplateField HeaderText="${Transportation.TransportPriceListDetail.VehicleType}"
                     SortExpression="VehicleType">
                     <ItemTemplate>

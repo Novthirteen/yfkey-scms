@@ -276,6 +276,19 @@ namespace com.Sconit.Entity.Transportation
 			}
 		}
 
+        private string _transportMethod;
+        public string TransportMethod
+        {
+            get
+            {
+                return _transportMethod;
+            }
+            set
+            {
+                _transportMethod = value;
+            }
+        }
+
         public Decimal? MaxPrice { get; set; }
         public Decimal? MinPrice { get; set; }
         public Decimal? StartQty { get; set; }

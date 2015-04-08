@@ -224,7 +224,30 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
                 tbMinPrice.Text = transportPriceListDetail.MinPrice.Value.ToString("0.########");
             }
 
+
+            DropDownList ddlTransportMethod = (DropDownList)this.FV_TransportPriceListDetail.FindControl("ddlTransportMethod");
+
+            if (transportPriceListDetail.TransportMethod != null)
+            {
+                ddlTransportMethod.SelectedValue = transportPriceListDetail.TransportMethod;
+            }
+
+            //HtmlSelect transportMethodSelect = (HtmlSelect)(this.FV_TransportPriceListDetail.FindControl("TransportMethodSelect"));
+            //IList<CodeMaster> codeMasterList = TheGenericMgr.FindAllWithCustomQuery<CodeMaster>(" from CodeMaster as c where c.Code='TransportMethod' " );
+            //string transportMethod=transportPriceListDetail.TransportMethod;
+            //foreach (var codeMaster in codeMasterList.OrderBy(c => c.Seq))
+            //{
+            //    if (transportMethod == codeMaster.Code)
+            //    {
+            //        transportMethodSelect.Items.Add(new ListItem(codeMaster.Description, codeMaster.Value));
+            //    }
+            //    else
+            //    {
+            //        transportMethodSelect.Items.Add(new ListItem(codeMaster.Description, codeMaster.Value));
+            //    }
+            //}
         }
+        
     }
 
     protected void btnBack_Click(object sender, EventArgs e)
@@ -243,6 +266,7 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
         DropDownList ddlVehicleType = ((DropDownList)(this.FV_TransportPriceListDetail.FindControl("ddlVehicleType")));
         Controls_TextBox tbCurrency = ((Controls_TextBox)(this.FV_TransportPriceListDetail.FindControl("tbCurrency")));
         TextBox tbEndDate = ((TextBox)(this.FV_TransportPriceListDetail.FindControl("tbEndDate")));
+        DropDownList transportMethodSelect = ((DropDownList)(this.FV_TransportPriceListDetail.FindControl("ddlTransportMethod")));
 
         transportPriceListDetail = (TransportPriceListDetail)e.InputParameters[0];
         transportPriceListDetail.TransportPriceList = TheTransportPriceListMgr.LoadTransportPriceList(this.TransportPriceListCode);
@@ -254,6 +278,7 @@ public partial class Transportation_TransportPriceList_TransportPriceListDetail_
         transportPriceListDetail.TaxCode = transportPriceListDetail.TaxCode.Trim();
         transportPriceListDetail.EndDate = tbEndDate.Text.Trim() == "" ? null : transportPriceListDetail.EndDate;
         transportPriceListDetail.Type = BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION;
+        transportPriceListDetail.TransportMethod = transportMethodSelect.SelectedValue;
     }
 
     protected void ODS_TransportPriceListDetail_Updated(object sender, ObjectDataSourceStatusEventArgs e)
