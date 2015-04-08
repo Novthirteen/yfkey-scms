@@ -39,16 +39,16 @@ namespace com.Sconit.Service.Transportation.Impl
 
         public TransportPriceListDetail GetLastestTransportPriceListDetail(TransportPriceList priceList, Item item, DateTime effectiveDate, Currency currency, Uom uom, string priceListType, string billingMethod)
         {
-            return GetLastestTransportPriceListDetail(priceList, item, effectiveDate, currency, uom, null, null, null, priceListType, billingMethod,null);
+            return GetLastestTransportPriceListDetail(priceList, item, effectiveDate, currency, uom, null, null, null, priceListType, billingMethod,null,null);
 
         }
 
-        public TransportPriceListDetail GetLastestTransportPriceListDetail(TransportPriceList priceList, DateTime effectiveDate, Currency currency, string pricingMethod, TransportationAddress shipFrom, TransportationAddress shipTo, string priceListType, string vehicleType)
+        public TransportPriceListDetail GetLastestTransportPriceListDetail(TransportPriceList priceList, DateTime effectiveDate, Currency currency, string pricingMethod, TransportationAddress shipFrom, TransportationAddress shipTo, string priceListType, string vehicleType, string transportMethod)
         {
-            return GetLastestTransportPriceListDetail(priceList, null, effectiveDate, currency, null, pricingMethod, shipFrom, shipTo, priceListType, null, vehicleType);
+            return GetLastestTransportPriceListDetail(priceList, null, effectiveDate, currency, null, pricingMethod, shipFrom, shipTo, priceListType, null, vehicleType, transportMethod);
         }
 
-        public TransportPriceListDetail GetLastestTransportPriceListDetail(TransportPriceList priceList, Item item, DateTime effectiveDate, Currency currency, Uom uom, string pricingMethod, TransportationAddress shipFrom, TransportationAddress shipTo, string priceListType, string billingMethod, string vehicleType)
+        public TransportPriceListDetail GetLastestTransportPriceListDetail(TransportPriceList priceList, Item item, DateTime effectiveDate, Currency currency, Uom uom, string pricingMethod, TransportationAddress shipFrom, TransportationAddress shipTo, string priceListType, string billingMethod, string vehicleType, string transportMethod)
         {
           
             DetachedCriteria detachedCriteria = DetachedCriteria.For<TransportPriceListDetail>();
@@ -88,6 +88,11 @@ namespace com.Sconit.Service.Transportation.Impl
                 detachedCriteria.Add(Expression.Eq("VehicleType", vehicleType));
             }
             detachedCriteria.Add(Expression.Eq("Type", priceListType));
+
+            if (transportMethod != null && transportMethod != string.Empty)
+            {
+                detachedCriteria.Add(Expression.Eq("TransportMethod", transportMethod));
+            }
 
             detachedCriteria.AddOrder(Order.Desc("StartDate")); //按StartDate降序，取最新的价格
             IList<TransportPriceListDetail> priceListDetailList = criteriaMgr.FindAll<TransportPriceListDetail>(detachedCriteria);

@@ -375,6 +375,19 @@ namespace com.Sconit.Entity.Transportation
                 _vehicleType = value;
             }
         }
+
+        private string _transportMethod;
+        public string TransportMethod
+        {
+            get
+            {
+                return _transportMethod;
+            }
+            set
+            {
+                _transportMethod = value;
+            }
+        }
         #endregion
 
 		public override int GetHashCode()
