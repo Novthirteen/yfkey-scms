@@ -16,11 +16,6 @@
                     </ItemTemplate>
                 </asp:TemplateField>
                 <%--add by ljz start--%>
-                <%--<asp:TemplateField HeaderText="${Transportation.TransportationOrder.TransportMethod}">
-                    <ItemTemplate>
-                        <asp:Label ID="lblTransportMethod" runat="server" />
-                    </ItemTemplate>
-                </asp:TemplateField>--%>
                 <%--<asp:BoundField DataField="TransportMethod" HeaderText="${Transportation.TransportationOrder.TransportMethod}"
                     SortExpression="TransportMethod" />--%>
                       <asp:TemplateField HeaderText="${Transportation.TransportPriceListDetail.TransportMethod}"
