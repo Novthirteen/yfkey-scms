@@ -33,5 +33,6 @@
     <many-to-one name="ShipFrom" column="ShipFrom" class="com.Sconit.Entity.Transportation.TransportationAddress, com.Sconit.Entity" cascade="none" />
     <many-to-one name="ShipTo" column="ShipTo" class="com.Sconit.Entity.Transportation.TransportationAddress, com.Sconit.Entity" cascade="none" />
     <property name="VehicleType" column="VehicleType" type="String" length="50" />
+    <property name="TransportMethod" column="TransportMethod" type="String" length="50" />
   </class>
 </hibernate-mapping>

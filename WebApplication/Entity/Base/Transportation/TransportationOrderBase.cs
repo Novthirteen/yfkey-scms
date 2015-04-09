@@ -340,8 +340,8 @@ namespace com.Sconit.Entity.Transportation
             }
         }
 
-        private DateTime _transportMethod;
-        public DateTime TransportMethod
+        private string _transportMethod;
+        public string TransportMethod
         {
             get
             {

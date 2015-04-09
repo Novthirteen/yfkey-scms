@@ -313,14 +313,14 @@ namespace com.Sconit.Service.Transportation.Impl
                     {
                         if (transportationActBill.PriceList != null)
                         {
-                            transportPriceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportationActBill.PriceList, efftiveDate.Value, transportationActBill.Currency, transportationActBill.PricingMethod, transportationActBill.ShipFrom, transportationActBill.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, transportationActBill.VehicleType);
+                            transportPriceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportationActBill.PriceList, efftiveDate.Value, transportationActBill.Currency, transportationActBill.PricingMethod, transportationActBill.ShipFrom, transportationActBill.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, transportationActBill.VehicleType,, transportationActBill.TransportMethod);
                         }
                     }
                     else
                     {
                         if (transportationActBill.PriceList != null)
                         {
-                            transportPriceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportationActBill.PriceList, transportationActBill.EffectiveDate, transportationActBill.Currency, transportationActBill.PricingMethod, transportationActBill.ShipFrom, transportationActBill.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, transportationActBill.VehicleType);
+                            transportPriceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportationActBill.PriceList, transportationActBill.EffectiveDate, transportationActBill.Currency, transportationActBill.PricingMethod, transportationActBill.ShipFrom, transportationActBill.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, transportationActBill.VehicleType, transportationActBill.TransportMethod);
                         }
                     }
 
@@ -390,7 +390,7 @@ namespace com.Sconit.Service.Transportation.Impl
                 if (order.PricingMethod != BusinessConstants.TRANSPORTATION_PRICING_METHOD_LADDERSTERE)
                 {
                     priceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportPriceList[0]
-                       , order.CreateDate, currencyMgr.LoadCurrency(currency), order.PricingMethod, order.TransportationRoute.ShipFrom, order.TransportationRoute.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, order.VehicleType);
+                       , order.CreateDate, currencyMgr.LoadCurrency(currency), order.PricingMethod, order.TransportationRoute.ShipFrom, order.TransportationRoute.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, order.VehicleType,order.TransportMethod);
 
                 }
 
@@ -520,6 +520,7 @@ namespace com.Sconit.Service.Transportation.Impl
             actBill.CreateUser = user;
             actBill.LastModifyDate = DateTime.Now;
             actBill.LastModifyUser = user;
+            actBill.TransportMethod = order.TransportMethod;
             this.CreateTransportationActBill(actBill);
             return actBill;
         }
