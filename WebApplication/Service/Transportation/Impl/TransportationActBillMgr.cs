@@ -313,7 +313,7 @@ namespace com.Sconit.Service.Transportation.Impl
                     {
                         if (transportationActBill.PriceList != null)
                         {
-                            transportPriceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportationActBill.PriceList, efftiveDate.Value, transportationActBill.Currency, transportationActBill.PricingMethod, transportationActBill.ShipFrom, transportationActBill.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, transportationActBill.VehicleType,, transportationActBill.TransportMethod);
+                            transportPriceListDetail = this.transportPriceListDetailMgr.GetLastestTransportPriceListDetail(transportationActBill.PriceList, efftiveDate.Value, transportationActBill.Currency, transportationActBill.PricingMethod, transportationActBill.ShipFrom, transportationActBill.ShipTo, BusinessConstants.TRANSPORTATION_PRICELIST_DETAIL_TYPE_TRANSPORTATION, transportationActBill.VehicleType, transportationActBill.TransportMethod);
                         }
                     }
                     else
