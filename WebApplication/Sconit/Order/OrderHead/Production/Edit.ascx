@@ -386,6 +386,8 @@
             OnClick="btnExport_Click" FunctionId="ExportOrder" />
         <asp:Button ID="btnBack" runat="server" Text="${Common.Button.Back}" OnClick="btnBack_Click"
             CssClass="button2" />
+             <sc1:Button ID="btnRelease" runat="server" Text="放行" CssClass="button2"
+             FunctionId="releaseHUID" onclick="btnRelease_Click" />
     </div>
 </fieldset>
 <asp:ObjectDataSource ID="ODS_Order" runat="server" TypeName="com.Sconit.Web.OrderMgrProxy"

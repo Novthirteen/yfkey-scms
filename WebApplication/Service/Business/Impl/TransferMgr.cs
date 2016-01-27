@@ -108,6 +108,14 @@ namespace com.Sconit.Service.Business.Impl
                 throw new BusinessErrorException("Order.Error.PickUp.HuOcuppied", resolver.Input);
             }
             FlowView flowView = null;
+
+
+            if (hu.Location!=null&&hu.Location.Contains("MLAT") && hu.IsInspect == false)
+            {
+                throw new BusinessErrorException("Hu.Error.HuIdNotInspect", resolver.Input);
+            }
+
+
             if (resolver.CodePrefix != null && resolver.CodePrefix.Trim() != string.Empty)
             {
                 flowView = flowMgr.CheckAndLoadFlowView(resolver.Code, null, null, null, hu, flowTypes);
@@ -120,6 +128,7 @@ namespace com.Sconit.Service.Business.Impl
                 }
                 else
                 {
+
                     flowView = flowMgr.CheckAndLoadFlowView(null, resolver.UserCode, hu.Location, resolver.LocationToCode, hu, flowTypes);
                     setBaseMgr.FillResolverByFlow(resolver, flowView.Flow);
                 }
@@ -137,7 +146,8 @@ namespace com.Sconit.Service.Business.Impl
                         {
                             foreach (TransformerDetail det in transformer.TransformerDetails)
                             {
-                                if (det.CurrentQty != decimal.Zero) {
+                                if (det.CurrentQty != decimal.Zero)
+                                {
                                     huIdList.Add(det.HuId);
                                 }
                             }
@@ -145,7 +155,7 @@ namespace com.Sconit.Service.Business.Impl
                     }
                 }
 
-                string minLot = setDetailMgr.CheckFIFO(hu, huIdList) ;
+                string minLot = setDetailMgr.CheckFIFO(hu, huIdList);
                 if (minLot != string.Empty && minLot != null)
                 {
                     throw new BusinessErrorException("FIFO.ERROR", hu.HuId, minLot);

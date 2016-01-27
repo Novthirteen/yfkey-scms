@@ -21,6 +21,7 @@ using com.Sconit.Entity.Exception;
 using com.Sconit.Entity.Distribution;
 using System.IO;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 
 public partial class Order_OrderHead_Edit : EditModuleBase
 {
@@ -89,7 +90,7 @@ public partial class Order_OrderHead_Edit : EditModuleBase
         }
     }
 
-    //报废
+
     public bool IsScrap
     {
         get
@@ -102,7 +103,6 @@ public partial class Order_OrderHead_Edit : EditModuleBase
         }
     }
 
-    //原材料回用
     public bool IsReuse
     {
         get
@@ -178,7 +178,7 @@ public partial class Order_OrderHead_Edit : EditModuleBase
     {
         try
         {
-           // this.ucDetail.SaveCallBack();
+            // this.ucDetail.SaveCallBack();
             Receipt receipt = new Receipt();
             if (this.IsReuse)
             {
@@ -293,7 +293,7 @@ public partial class Order_OrderHead_Edit : EditModuleBase
             ShowErrorMessage("OrderDetail.Error.OrderDetailReceiveEmpty");
             return;
         }
-        //每次只准收一个成品
+
         bool isReceiptOneItem = bool.Parse(TheEntityPreferenceMgr.LoadEntityPreference(BusinessConstants.ENTITY_PREFERENCE_CODE_IS_RECEIPT_ONE_ITEM).Value);
         if (isReceiptOneItem && detailCount > 1)
         {
@@ -627,5 +627,23 @@ public partial class Order_OrderHead_Edit : EditModuleBase
             TheReportMgr.WriteToClient(orderTemplate, this.OrderNo, "order.xls");
         }
 
+    }
+    protected void btnRelease_Click(object sender, EventArgs e)
+    {
+      SqlConnection conn=new System.Data.SqlClient.SqlConnection(@"Server=192.168.210.120\scms;Database=scms;uid=sa;pwd=temp100;");
+      SqlCommand cmd=new System.Data.SqlClient.SqlCommand("update hudet set isinspect=1 where orderno='"+this.OrderNo+"' and isnull(isinspect,0)=0 ",conn);
+        try{
+            conn.Open();
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            ShowSuccessMessage("Order Release Success!");
+
+        }
+        catch
+        {
+        conn.Close();
+        ShowErrorMessage("Order Release Failure!");
+        }
+    
     }
 }

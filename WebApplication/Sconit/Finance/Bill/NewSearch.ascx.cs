@@ -136,7 +136,7 @@ public partial class Finance_Bill_NewSearch : SearchModuleBase
         }
         if (externalRece != "ALL")
         {
-            var afterF = from a in actingBillList where (a.ExternalReceiptNo != null && a.ExternalReceiptNo.Substring(0, 2) == externalRece) select a;
+            var afterF = from a in actingBillList where (a.ExternalReceiptNo != null && a.ExternalReceiptNo.Count() >= 2 && a.ExternalReceiptNo.Substring(0, 2) == externalRece) select a;
 
             this.ucNewList.BindDataSource(afterF.ToList());
         }

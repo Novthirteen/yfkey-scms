@@ -588,6 +588,8 @@ namespace com.Sconit.Persistence.Hql.NH
                         }
                     }
 
+                    query.AddScalar("maxId", NHibernateUtil.Int32);
+
                     IList result = query.List();
 
                     return result;
@@ -599,28 +601,28 @@ namespace com.Sconit.Persistence.Hql.NH
             }
         }
 
-        public IList<T> FindAllWithNativeSql<T>(string sql)
+        public IList<T> FindAllWithNativeSql<T>(string sql, IDictionary<string, NullableType> scalars)
         {
-            return FindAllWithNativeSql<T>(sql, (object[])null, (IType[])null);
+            return FindAllWithNativeSql<T>(sql, (object[])null, (IType[])null, scalars);
         }
 
-        public IList<T> FindAllWithNativeSql<T>(string sql, object value)
+        public IList<T> FindAllWithNativeSql<T>(string sql, object value, IDictionary<string, NullableType> scalars)
         {
-            return FindAllWithNativeSql<T>(sql, new object[] { value }, (IType[])null);
+            return FindAllWithNativeSql<T>(sql, new object[] { value }, (IType[])null, scalars);
         }
 
-        public IList<T> FindAllWithNativeSql<T>(string sql, object value, IType type)
+        public IList<T> FindAllWithNativeSql<T>(string sql, object value, IType type, IDictionary<string, NullableType> scalars)
         {
-            return FindAllWithNativeSql<T>(sql, new object[] { value }, new IType[] { type });
+            return FindAllWithNativeSql<T>(sql, new object[] { value }, new IType[] { type }, scalars);
 
         }
 
-        public IList<T> FindAllWithNativeSql<T>(string sql, object[] values)
+        public IList<T> FindAllWithNativeSql<T>(string sql, object[] values, IDictionary<string, NullableType> scalars)
         {
-            return FindAllWithNativeSql<T>(sql, values, (IType[])null);
+            return FindAllWithNativeSql<T>(sql, values, (IType[])null, scalars);
         }
 
-        public IList<T> FindAllWithNativeSql<T>(string sql, object[] values, IType[] types)
+        public IList<T> FindAllWithNativeSql<T>(string sql, object[] values, IType[] types, IDictionary<string, NullableType> scalars)
         {
             if (sql == null || sql.Length == 0) throw new ArgumentNullException("queryString");
             if (values != null && types != null && types.Length != values.Length) throw new ArgumentException("Length of values array must match length of types array");
@@ -643,6 +645,11 @@ namespace com.Sconit.Persistence.Hql.NH
                                 query.SetParameter(i, values[i]);
                             }
                         }
+                    }
+
+                    foreach (string column in scalars.Keys)
+                    {
+                        query.AddScalar(column, scalars[column]);
                     }
 
                     IList<T> result = query.List<T>();

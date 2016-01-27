@@ -269,6 +269,20 @@ namespace com.Sconit.Entity.MasterData
                 _isMes = value;
             }
         }
+        private Boolean _isInspect;
+
+        public Boolean IsInspect
+        {
+            get
+            {
+                return _isInspect;
+            }
+            set
+            {
+                _isInspect = value;
+            }
+        }
+
         #endregion
 
         public override int GetHashCode()

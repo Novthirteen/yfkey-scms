@@ -91,15 +91,15 @@
     <property name="IsSubcontract" column="IsSubcontract" type="Boolean"  />
     <property name="IsAdditional" column="IsAdditional" type="Boolean"  />
     <property name="IsMes" column="IsMes" type="Boolean"  />
-    <bag name="OrderDetails" table="OrderDet" inverse="true" lazy="true" order-by="Seq asc">
+    <bag name="OrderDetails" table="OrderDet" inverse="true" lazy="false" order-by="Seq asc">
       <key column="OrderNo" />
       <one-to-many class="com.Sconit.Entity.MasterData.OrderDetail, com.Sconit.Entity" />
     </bag>
-    <bag name="OrderOperations" table="OrderOp" inverse="true" lazy="true" order-by="Op asc">
+    <bag name="OrderOperations" table="OrderOp" inverse="true" lazy="false" order-by="Op asc">
       <key column="OrderNo" />
       <one-to-many class="com.Sconit.Entity.MasterData.OrderOperation, com.Sconit.Entity" />
     </bag>
-    <bag name="OrderBindings" table="OrderBinding" inverse="true" lazy="true" order-by="Id asc">
+    <bag name="OrderBindings" table="OrderBinding" inverse="true" lazy="false" order-by="Id asc">
       <key column="OrderNo" />
       <one-to-many class="com.Sconit.Entity.MasterData.OrderBinding, com.Sconit.Entity" />
     </bag>

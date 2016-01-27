@@ -105,15 +105,15 @@ namespace com.Sconit.Service.Hql
 
         IList FindAllWithNativeSql(string sql, object[] values, IType[] types);
 
-        IList<T> FindAllWithNativeSql<T>(string sql);
+        IList<T> FindAllWithNativeSql<T>(string sql, IDictionary<string, NullableType> scalars);
 
-        IList<T> FindAllWithNativeSql<T>(string sql, object value);
+        IList<T> FindAllWithNativeSql<T>(string sql, object value, IDictionary<string, NullableType> scalars);
 
-        IList<T> FindAllWithNativeSql<T>(string sql, object value, IType type);
+        IList<T> FindAllWithNativeSql<T>(string sql, object value, IType type, IDictionary<string, NullableType> scalars);
 
-        IList<T> FindAllWithNativeSql<T>(string sql, object[] values);
+        IList<T> FindAllWithNativeSql<T>(string sql, object[] values, IDictionary<string, NullableType> scalars);
 
-        IList<T> FindAllWithNativeSql<T>(string sql, object[] values, IType[] types);
+        IList<T> FindAllWithNativeSql<T>(string sql, object[] values, IType[] types, IDictionary<string, NullableType> scalars);
 
         IList<T> FindEntityWithNativeSql<T>(string sql);
 
